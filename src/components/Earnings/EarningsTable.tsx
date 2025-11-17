@@ -54,18 +54,18 @@ export const EarningsTable = ({ earnings }: EarningsTableProps) => {
   return (
     <div className={`rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} shadow-md overflow-hidden`}>
       <div className="p-6">
-        <h3 className="text-xl font-bold text-white mb-4">Статистика заработка</h3>
+        <h3 className={`text-xl font-bold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Статистика заработка</h3>
 
         {/* Weekly stats */}
         <div className="mb-6">
-          <h4 className="text-lg font-semibold text-white mb-3">За неделю</h4>
+          <h4 className={`text-lg font-semibold mb-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>За неделю</h4>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className={`${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100'}`}>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-white">Участник</th>
-                  <th className="px-4 py-3 text-right text-sm font-semibold text-white">Заработок</th>
-                  <th className="px-4 py-3 text-right text-sm font-semibold text-white">Пул</th>
+                  <th className={`px-4 py-3 text-left text-sm font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Участник</th>
+                  <th className={`px-4 py-3 text-right text-sm font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Заработок</th>
+                  <th className={`px-4 py-3 text-right text-sm font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Пул</th>
                 </tr>
               </thead>
               <tbody>
@@ -73,16 +73,16 @@ export const EarningsTable = ({ earnings }: EarningsTableProps) => {
                   const stats = getStats(member.id, weekStart, weekEnd)
                   return (
                     <tr key={member.id} className={`border-b ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
-                      <td className="px-4 py-3 text-white">{member.name}</td>
-                      <td className="px-4 py-3 text-right text-white">{stats.totalEarnings.toFixed(2)} ₽</td>
-                      <td className="px-4 py-3 text-right text-white">{stats.totalPool.toFixed(2)} ₽</td>
+                      <td className={`px-4 py-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{member.name}</td>
+                      <td className={`px-4 py-3 text-right ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{stats.totalEarnings.toFixed(2)} ₽</td>
+                      <td className={`px-4 py-3 text-right ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{stats.totalPool.toFixed(2)} ₽</td>
                     </tr>
                   )
                 })}
                 <tr className={`${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100'} font-bold`}>
-                  <td className="px-4 py-3 text-white">Итого команды</td>
-                  <td className="px-4 py-3 text-right text-white">{teamWeekEarnings.toFixed(2)} ₽</td>
-                  <td className="px-4 py-3 text-right text-white">{teamWeekPool.toFixed(2)} ₽</td>
+                  <td className={`px-4 py-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Итого команды</td>
+                  <td className={`px-4 py-3 text-right ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{teamWeekEarnings.toFixed(2)} ₽</td>
+                  <td className={`px-4 py-3 text-right ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{teamWeekPool.toFixed(2)} ₽</td>
                 </tr>
               </tbody>
             </table>
@@ -91,14 +91,14 @@ export const EarningsTable = ({ earnings }: EarningsTableProps) => {
 
         {/* Monthly stats */}
         <div>
-          <h4 className="text-lg font-semibold text-white mb-3">За месяц</h4>
+          <h4 className={`text-lg font-semibold mb-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>За месяц</h4>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className={`${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100'}`}>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-white">Участник</th>
-                  <th className="px-4 py-3 text-right text-sm font-semibold text-white">Заработок</th>
-                  <th className="px-4 py-3 text-right text-sm font-semibold text-white">Пул</th>
+                  <th className={`px-4 py-3 text-left text-sm font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Участник</th>
+                  <th className={`px-4 py-3 text-right text-sm font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Заработок</th>
+                  <th className={`px-4 py-3 text-right text-sm font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Пул</th>
                 </tr>
               </thead>
               <tbody>
@@ -106,16 +106,16 @@ export const EarningsTable = ({ earnings }: EarningsTableProps) => {
                   const stats = getStats(member.id, monthStart, monthEnd)
                   return (
                     <tr key={member.id} className={`border-b ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
-                      <td className="px-4 py-3 text-white">{member.name}</td>
-                      <td className="px-4 py-3 text-right text-white">{stats.totalEarnings.toFixed(2)} ₽</td>
-                      <td className="px-4 py-3 text-right text-white">{stats.totalPool.toFixed(2)} ₽</td>
+                      <td className={`px-4 py-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{member.name}</td>
+                      <td className={`px-4 py-3 text-right ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{stats.totalEarnings.toFixed(2)} ₽</td>
+                      <td className={`px-4 py-3 text-right ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{stats.totalPool.toFixed(2)} ₽</td>
                     </tr>
                   )
                 })}
                 <tr className={`${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100'} font-bold`}>
-                  <td className="px-4 py-3 text-white">Итого команды</td>
-                  <td className="px-4 py-3 text-right text-white">{teamMonthEarnings.toFixed(2)} ₽</td>
-                  <td className="px-4 py-3 text-right text-white">{teamMonthPool.toFixed(2)} ₽</td>
+                  <td className={`px-4 py-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Итого команды</td>
+                  <td className={`px-4 py-3 text-right ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{teamMonthEarnings.toFixed(2)} ₽</td>
+                  <td className={`px-4 py-3 text-right ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{teamMonthPool.toFixed(2)} ₽</td>
                 </tr>
               </tbody>
             </table>
