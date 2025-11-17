@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { useThemeStore } from '@/store/themeStore'
 import { useAdminStore } from '@/store/adminStore'
 import { Moon, Sun, LogOut, Shield } from 'lucide-react'
+import logo from '@/assets/logo.png'
 import { useAuthStore } from '@/store/authStore'
 
 export const Layout = ({ children }: { children: React.ReactNode }) => {
@@ -33,10 +34,12 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
           <div className="flex items-center justify-between h-16">
             {/* Logo and Title */}
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-xl">AV</span>
-              </div>
-              <h1 className="text-xl font-bold text-white">ApeVault</h1>
+              <img 
+                src={logo} 
+                alt="ApeVault Logo" 
+                className="w-10 h-10 object-contain"
+              />
+              <h1 className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>ApeVault</h1>
             </div>
 
             {/* Navigation */}

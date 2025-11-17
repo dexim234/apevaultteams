@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
 import { useThemeStore } from '@/store/themeStore'
+import logo from '@/assets/logo.png'
 
 export const Login = () => {
   const [login, setLogin] = useState('')
@@ -33,10 +34,14 @@ export const Login = () => {
     <div className={`min-h-screen flex items-center justify-center ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
       <div className={`w-full max-w-md p-8 rounded-lg shadow-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-green-500 rounded-lg flex items-center justify-center mx-auto mb-4">
-            <span className="text-white font-bold text-2xl">AV</span>
+          <div className="mx-auto mb-4 flex justify-center">
+            <img 
+              src={logo} 
+              alt="ApeVault Logo" 
+              className="w-20 h-20 object-contain"
+            />
           </div>
-          <h1 className="text-2xl font-bold text-white mb-2">ApeVault</h1>
+          <h1 className={`text-2xl font-bold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>ApeVault</h1>
           <p className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
             Командная панель управления
           </p>
