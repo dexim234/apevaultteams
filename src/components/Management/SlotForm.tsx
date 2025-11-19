@@ -24,8 +24,9 @@ export const SlotForm = ({ slot, onClose, onSave }: SlotFormProps) => {
   const [slots, setSlots] = useState<TimeSlot[]>(
     slot?.slots?.map(s => {
       // Convert old format (break) to new format (breaks array) for backward compatibility
-      if (s.break && !s.breaks) {
-        return { ...s, breaks: [s.break], break: undefined }
+      const oldSlot = s as any
+      if (oldSlot.break && !oldSlot.breaks) {
+        return { ...s, breaks: [oldSlot.break] }
       }
       return s
     }) || []
