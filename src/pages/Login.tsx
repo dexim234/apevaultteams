@@ -3,8 +3,6 @@ import { useState, useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
 import { useThemeStore } from '@/store/themeStore'
-import { useAdminStore } from '@/store/adminStore'
-import { TEAM_MEMBERS } from '@/types'
 import logo from '@/assets/logo.png'
 
 // Declare Telegram WebApp types
@@ -34,7 +32,6 @@ export const Login = () => {
   const [error, setError] = useState('')
   const { login: loginUser, user, isAuthenticated } = useAuthStore()
   const { theme } = useThemeStore()
-  const { activateAdmin } = useAdminStore()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
 

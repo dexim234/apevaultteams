@@ -25,7 +25,6 @@ export const ManagementWeekView = ({ selectedUserId, onEditSlot, onEditStatus }:
   const [loading, setLoading] = useState(true)
 
   const weekDays = getWeekDays(selectedWeek)
-  const displayUsers = selectedUserId ? TEAM_MEMBERS.filter((u) => u.id === selectedUserId) : TEAM_MEMBERS
 
   useEffect(() => {
     loadData()
