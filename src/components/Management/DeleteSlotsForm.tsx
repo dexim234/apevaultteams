@@ -18,12 +18,15 @@ export const DeleteSlotsForm = ({ onClose, onSave }: DeleteSlotsFormProps) => {
   const { theme } = useThemeStore()
   const { isAdmin } = useAdminStore()
   const headingColor = theme === 'dark' ? 'text-white' : 'text-gray-900'
-  const [selectedUserId, setSelectedUserId] = useState(user?.id || '')
+  const [selectedUserIds, setSelectedUserIds] = useState<string[]>(user?.id ? [user.id] : [])
   const [deleteByWeekDay, setDeleteByWeekDay] = useState(false)
   const [deleteByDates, setDeleteByDates] = useState(false)
+  const [deleteByDateRange, setDeleteByDateRange] = useState(false)
   const [selectedWeekDay, setSelectedWeekDay] = useState<number | null>(null)
   const [selectedDates, setSelectedDates] = useState<string[]>([])
   const [currentDate, setCurrentDate] = useState('')
+  const [dateRangeStart, setDateRangeStart] = useState('')
+  const [dateRangeEnd, setDateRangeEnd] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -31,7 +34,7 @@ export const DeleteSlotsForm = ({ onClose, onSave }: DeleteSlotsFormProps) => {
 
   const handleWeekDayToggle = (checked: boolean) => {
     if (checked) {
-      if (deleteByDates) {
+      if (deleteByDates || deleteByDateRange) {
         setError('Снимите галочку с другой функции, чтобы активировать эту')
         return
       }
@@ -45,7 +48,7 @@ export const DeleteSlotsForm = ({ onClose, onSave }: DeleteSlotsFormProps) => {
 
   const handleDatesToggle = (checked: boolean) => {
     if (checked) {
-      if (deleteByWeekDay) {
+      if (deleteByWeekDay || deleteByDateRange) {
         setError('Снимите галочку с другой функции, чтобы активировать эту')
         return
       }
@@ -55,6 +58,29 @@ export const DeleteSlotsForm = ({ onClose, onSave }: DeleteSlotsFormProps) => {
       setDeleteByDates(false)
       setSelectedDates([])
       setCurrentDate('')
+    }
+  }
+
+  const handleDateRangeToggle = (checked: boolean) => {
+    if (checked) {
+      if (deleteByWeekDay || deleteByDates) {
+        setError('Снимите галочку с другой функции, чтобы активировать эту')
+        return
+      }
+      setDeleteByDateRange(true)
+      setError('')
+    } else {
+      setDeleteByDateRange(false)
+      setDateRangeStart('')
+      setDateRangeEnd('')
+    }
+  }
+
+  const handleUserToggle = (userId: string) => {
+    if (selectedUserIds.includes(userId)) {
+      setSelectedUserIds(selectedUserIds.filter(id => id !== userId))
+    } else {
+      setSelectedUserIds([...selectedUserIds, userId])
     }
   }
 
@@ -82,13 +108,13 @@ export const DeleteSlotsForm = ({ onClose, onSave }: DeleteSlotsFormProps) => {
       return
     }
 
-    const targetUserId = isAdmin ? selectedUserId : user.id
-    if (!targetUserId) {
-      setError('Выберите участника')
+    const targetUserIds = isAdmin ? selectedUserIds : [user.id]
+    if (targetUserIds.length === 0) {
+      setError('Выберите хотя бы одного участника')
       return
     }
 
-    if (!deleteByWeekDay && !deleteByDates) {
+    if (!deleteByWeekDay && !deleteByDates && !deleteByDateRange) {
       setError('Выберите способ удаления слотов')
       return
     }
@@ -103,12 +129,26 @@ export const DeleteSlotsForm = ({ onClose, onSave }: DeleteSlotsFormProps) => {
       return
     }
 
+    if (deleteByDateRange) {
+      if (!dateRangeStart || !dateRangeEnd) {
+        setError('Укажите начальную и конечную дату диапазона')
+        return
+      }
+      if (dateRangeStart > dateRangeEnd) {
+        setError('Начальная дата должна быть раньше конечной')
+        return
+      }
+    }
+
     setError('')
     setLoading(true)
 
     try {
-      // Get all slots for the user
-      const allSlots = await getWorkSlots(targetUserId)
+      // Get all slots for all selected users
+      const allSlotsPromises = targetUserIds.map(userId => getWorkSlots(userId))
+      const allSlotsArrays = await Promise.all(allSlotsPromises)
+      const allSlots = allSlotsArrays.flat()
+      
       let slotsToDelete: string[] = []
 
       if (deleteByWeekDay) {
@@ -125,6 +165,11 @@ export const DeleteSlotsForm = ({ onClose, onSave }: DeleteSlotsFormProps) => {
         slotsToDelete = allSlots
           .filter((slot) => selectedDates.includes(slot.date))
           .map((slot) => slot.id)
+      } else if (deleteByDateRange) {
+        // Filter slots by date range
+        slotsToDelete = allSlots
+          .filter((slot) => slot.date >= dateRangeStart && slot.date <= dateRangeEnd)
+          .map((slot) => slot.id)
       }
 
       if (slotsToDelete.length === 0) {
@@ -134,9 +179,15 @@ export const DeleteSlotsForm = ({ onClose, onSave }: DeleteSlotsFormProps) => {
       }
 
       // Confirm deletion
+      const usersText = targetUserIds.length > 1 
+        ? `${targetUserIds.length} участников`
+        : TEAM_MEMBERS.find(m => m.id === targetUserIds[0])?.name || 'участника'
+      
       const confirmMessage = deleteByWeekDay
-        ? `Удалить все слоты участника на ${weekDays[selectedWeekDay!]}? (${slotsToDelete.length} слотов)`
-        : `Удалить слоты на выбранные даты? (${slotsToDelete.length} слотов)`
+        ? `Удалить все слоты ${usersText} на ${weekDays[selectedWeekDay!]}? (${slotsToDelete.length} слотов)`
+        : deleteByDateRange
+        ? `Удалить все слоты ${usersText} с ${formatDate(dateRangeStart, 'dd.MM.yyyy')} по ${formatDate(dateRangeEnd, 'dd.MM.yyyy')}? (${slotsToDelete.length} слотов)`
+        : `Удалить слоты ${usersText} на выбранные даты? (${slotsToDelete.length} слотов)`
 
       if (!confirm(confirmMessage)) {
         setLoading(false)
@@ -177,23 +228,28 @@ export const DeleteSlotsForm = ({ onClose, onSave }: DeleteSlotsFormProps) => {
             {isAdmin && (
               <div>
                 <label className={`block text-sm font-medium mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                  Участник
+                  Участники {selectedUserIds.length > 0 && `(${selectedUserIds.length} выбрано)`}
                 </label>
-                <select
-                  value={selectedUserId}
-                  onChange={(e) => setSelectedUserId(e.target.value)}
-                  className={`w-full px-4 py-2 rounded-lg border ${
-                    theme === 'dark'
-                      ? 'bg-gray-700 border-gray-600 text-white'
-                      : 'bg-white border-gray-300 text-gray-900'
-                  } focus:outline-none focus:ring-2 focus:ring-red-500`}
-                >
-                  {TEAM_MEMBERS.map((member) => (
-                    <option key={member.id} value={member.id}>
-                      {member.name}
-                    </option>
-                  ))}
-                </select>
+                <div className="flex flex-wrap gap-2">
+                  {TEAM_MEMBERS.map((member) => {
+                    const isSelected = selectedUserIds.includes(member.id)
+                    return (
+                      <button
+                        key={member.id}
+                        onClick={() => handleUserToggle(member.id)}
+                        className={`px-3 py-1.5 rounded-lg transition-colors ${
+                          isSelected
+                            ? 'bg-red-500 text-white'
+                            : theme === 'dark'
+                            ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                        }`}
+                      >
+                        {member.name}
+                      </button>
+                    )
+                  })}
+                </div>
               </div>
             )}
 
@@ -244,7 +300,7 @@ export const DeleteSlotsForm = ({ onClose, onSave }: DeleteSlotsFormProps) => {
                 className="w-4 h-4"
               />
               <span className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                Удалить по датам
+                Удалить по конкретным датам
               </span>
             </label>
 
@@ -298,6 +354,62 @@ export const DeleteSlotsForm = ({ onClose, onSave }: DeleteSlotsFormProps) => {
               </div>
             )}
 
+            {/* Delete by date range option */}
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={deleteByDateRange}
+                onChange={(e) => handleDateRangeToggle(e.target.checked)}
+                className="w-4 h-4"
+              />
+              <span className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                Удалить по диапазону дат
+              </span>
+            </label>
+
+            {deleteByDateRange && (
+              <div className="ml-6 space-y-3">
+                <div className="flex gap-2">
+                  <div className="flex-1">
+                    <label className={`block text-xs mb-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                      Начальная дата
+                    </label>
+                    <input
+                      type="date"
+                      value={dateRangeStart}
+                      onChange={(e) => setDateRangeStart(e.target.value)}
+                      className={`w-full px-4 py-2 rounded-lg border ${
+                        theme === 'dark'
+                          ? 'bg-gray-700 border-gray-600 text-white'
+                          : 'bg-white border-gray-300 text-gray-900'
+                      } focus:outline-none focus:ring-2 focus:ring-red-500`}
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <label className={`block text-xs mb-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                      Конечная дата
+                    </label>
+                    <input
+                      type="date"
+                      value={dateRangeEnd}
+                      onChange={(e) => setDateRangeEnd(e.target.value)}
+                      min={dateRangeStart}
+                      className={`w-full px-4 py-2 rounded-lg border ${
+                        theme === 'dark'
+                          ? 'bg-gray-700 border-gray-600 text-white'
+                          : 'bg-white border-gray-300 text-gray-900'
+                      } focus:outline-none focus:ring-2 focus:ring-red-500`}
+                    />
+                  </div>
+                </div>
+                {dateRangeStart && dateRangeEnd && (
+                  <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                    Будет удалено: с {formatDate(dateRangeStart, 'dd.MM.yyyy')} по {formatDate(dateRangeEnd, 'dd.MM.yyyy')}
+                  </p>
+                )}
+              </div>
+            )}
+
             {error && (
               <div className="p-3 bg-red-500 text-white rounded-lg text-sm">
                 {error}
@@ -307,7 +419,7 @@ export const DeleteSlotsForm = ({ onClose, onSave }: DeleteSlotsFormProps) => {
             <div className="flex gap-3">
               <button
                 onClick={handleDelete}
-                disabled={loading || (!deleteByWeekDay && !deleteByDates)}
+                disabled={loading || (!deleteByWeekDay && !deleteByDates && !deleteByDateRange)}
                 className="flex-1 px-4 py-2 bg-red-500 hover:bg-red-600 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg transition-colors flex items-center justify-center gap-2"
               >
                 <Trash2 className="w-4 h-4" />

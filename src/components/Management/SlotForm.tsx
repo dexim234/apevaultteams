@@ -5,7 +5,7 @@ import { useThemeStore } from '@/store/themeStore'
 import { useAdminStore } from '@/store/adminStore'
 import { addWorkSlot, updateWorkSlot, getWorkSlots } from '@/services/firestoreService'
 import { calculateHours, timeOverlaps, formatDate } from '@/utils/dateUtils'
-import { X, Plus, Trash2 } from 'lucide-react'
+import { X, Plus, Trash2, Edit } from 'lucide-react'
 import { WorkSlot, TimeSlot, TEAM_MEMBERS } from '@/types'
 
 interface SlotFormProps {
@@ -36,6 +36,8 @@ export const SlotForm = ({ slot, onClose, onSave }: SlotFormProps) => {
   const [currentBreakStart, setCurrentBreakStart] = useState('')
   const [currentBreakEnd, setCurrentBreakEnd] = useState('')
   const [currentSlotIndex, setCurrentSlotIndex] = useState<number | null>(null)
+  const [editBreakSlotIndex, setEditBreakSlotIndex] = useState<number | null>(null)
+  const [editBreakIndex, setEditBreakIndex] = useState<number | null>(null)
   const [comment, setComment] = useState(slot?.comment || '')
   const [repeatMonth, setRepeatMonth] = useState(false)
   const [repeatDays, setRepeatDays] = useState<number[]>([])
@@ -104,9 +106,13 @@ export const SlotForm = ({ slot, onClose, onSave }: SlotFormProps) => {
       return
     }
 
-    // Check for overlapping breaks
+    // Check for overlapping breaks (exclude the break being edited)
     const existingBreaks = slot.breaks || []
-    for (const existingBreak of existingBreaks) {
+    for (let i = 0; i < existingBreaks.length; i++) {
+      if (editBreakSlotIndex === slotIndex && editBreakIndex === i) {
+        continue // Skip the break being edited
+      }
+      const existingBreak = existingBreaks[i]
       if (
         (currentBreakStart >= existingBreak.start && currentBreakStart < existingBreak.end) ||
         (currentBreakEnd > existingBreak.start && currentBreakEnd <= existingBreak.end) ||
@@ -117,8 +123,17 @@ export const SlotForm = ({ slot, onClose, onSave }: SlotFormProps) => {
       }
     }
 
-    const newBreaks = [...existingBreaks, { start: currentBreakStart, end: currentBreakEnd }]
-      .sort((a, b) => a.start.localeCompare(b.start))
+    let newBreaks: { start: string; end: string }[]
+    if (editBreakSlotIndex === slotIndex && editBreakIndex !== null) {
+      // Edit existing break
+      newBreaks = [...existingBreaks]
+      newBreaks[editBreakIndex] = { start: currentBreakStart, end: currentBreakEnd }
+      newBreaks.sort((a, b) => a.start.localeCompare(b.start))
+    } else {
+      // Add new break
+      newBreaks = [...existingBreaks, { start: currentBreakStart, end: currentBreakEnd }]
+        .sort((a, b) => a.start.localeCompare(b.start))
+    }
 
     const updatedSlots = [...slots]
     updatedSlots[slotIndex] = {
@@ -130,6 +145,30 @@ export const SlotForm = ({ slot, onClose, onSave }: SlotFormProps) => {
     setCurrentBreakStart('')
     setCurrentBreakEnd('')
     setCurrentSlotIndex(null)
+    setEditBreakSlotIndex(null)
+    setEditBreakIndex(null)
+    setError('')
+  }
+
+  const startEditBreak = (slotIndex: number, breakIndex: number) => {
+    const slot = slots[slotIndex]
+    if (!slot || !slot.breaks || !slot.breaks[breakIndex]) return
+    
+    const breakTime = slot.breaks[breakIndex]
+    setEditBreakSlotIndex(slotIndex)
+    setEditBreakIndex(breakIndex)
+    setCurrentSlotIndex(slotIndex)
+    setCurrentBreakStart(breakTime.start)
+    setCurrentBreakEnd(breakTime.end)
+    setError('')
+  }
+
+  const cancelEditBreak = () => {
+    setCurrentBreakStart('')
+    setCurrentBreakEnd('')
+    setCurrentSlotIndex(null)
+    setEditBreakSlotIndex(null)
+    setEditBreakIndex(null)
     setError('')
   }
 
@@ -435,24 +474,39 @@ export const SlotForm = ({ slot, onClose, onSave }: SlotFormProps) => {
                         <span className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                           Перерывы:
                         </span>
-                        {s.breaks.map((breakTime, breakIndex) => (
-                          <div key={breakIndex} className="flex items-center justify-between">
-                            <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                              {breakTime.start} - {breakTime.end}
-                            </span>
-                            <button
-                              onClick={() => removeBreakFromSlot(index, breakIndex)}
-                              className="p-1 text-red-400 hover:bg-red-400 hover:text-white rounded transition-colors"
-                              title="Удалить перерыв"
-                            >
-                              <X className="w-3 h-3" />
-                            </button>
-                          </div>
-                        ))}
+                        {s.breaks.map((breakTime, breakIndex) => {
+                          const isEditing = editBreakSlotIndex === index && editBreakIndex === breakIndex
+                          if (isEditing) {
+                            return null // Don't show break while editing, the edit form is below
+                          }
+                          return (
+                            <div key={breakIndex} className="flex items-center justify-between gap-2">
+                              <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                                {breakTime.start} - {breakTime.end}
+                              </span>
+                              <div className="flex gap-1">
+                                <button
+                                  onClick={() => startEditBreak(index, breakIndex)}
+                                  className="p-1 text-blue-400 hover:bg-blue-400 hover:text-white rounded transition-colors"
+                                  title="Редактировать перерыв"
+                                >
+                                  <Edit className="w-3 h-3" />
+                                </button>
+                                <button
+                                  onClick={() => removeBreakFromSlot(index, breakIndex)}
+                                  className="p-1 text-red-400 hover:bg-red-400 hover:text-white rounded transition-colors"
+                                  title="Удалить перерыв"
+                                >
+                                  <X className="w-3 h-3" />
+                                </button>
+                              </div>
+                            </div>
+                          )
+                        })}
                       </div>
                     )}
 
-                    {/* Add break to this slot */}
+                    {/* Add/Edit break to this slot */}
                     <div className="ml-4 space-y-2 border-t pt-2 border-gray-500 border-opacity-30">
                       {currentSlotIndex === index ? (
                         <div className="space-y-2">
@@ -485,15 +539,10 @@ export const SlotForm = ({ slot, onClose, onSave }: SlotFormProps) => {
                               onClick={() => addBreakToSlot(index)}
                               className="flex-1 px-3 py-1.5 text-sm bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors"
                             >
-                              Добавить перерыв
+                              {editBreakSlotIndex === index && editBreakIndex !== null ? 'Сохранить' : 'Добавить перерыв'}
                             </button>
                             <button
-                              onClick={() => {
-                                setCurrentSlotIndex(null)
-                                setCurrentBreakStart('')
-                                setCurrentBreakEnd('')
-                                setError('')
-                              }}
+                              onClick={cancelEditBreak}
                               className="px-3 py-1.5 text-sm bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-colors"
                             >
                               Отмена
@@ -506,6 +555,8 @@ export const SlotForm = ({ slot, onClose, onSave }: SlotFormProps) => {
                             setCurrentSlotIndex(index)
                             setCurrentBreakStart('')
                             setCurrentBreakEnd('')
+                            setEditBreakSlotIndex(null)
+                            setEditBreakIndex(null)
                             setError('')
                           }}
                           className="w-full px-3 py-1.5 text-sm bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors flex items-center justify-center gap-1"
