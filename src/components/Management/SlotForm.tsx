@@ -4,7 +4,7 @@ import { useAuthStore } from '@/store/authStore'
 import { useThemeStore } from '@/store/themeStore'
 import { useAdminStore } from '@/store/adminStore'
 import { addWorkSlot, updateWorkSlot, getWorkSlots } from '@/services/firestoreService'
-import { calculateHours, timeOverlaps, formatDate } from '@/utils/dateUtils'
+import { calculateHours, timeOverlaps, formatDate, checkMinimumGap } from '@/utils/dateUtils'
 import { X, Plus, Trash2, Edit } from 'lucide-react'
 import { WorkSlot, TimeSlot, TEAM_MEMBERS } from '@/types'
 
@@ -207,11 +207,21 @@ export const SlotForm = ({ slot, onClose, onSave }: SlotFormProps) => {
   }
 
   const validateSlot = async (slotDate: string, timeSlots: TimeSlot[]): Promise<string | null> => {
-    // Check max 3 people per slot
-    const existingSlots = await getWorkSlots(undefined, slotDate)
+    // Get all existing slots on this date (excluding the current slot if editing)
+    const allExistingSlots = await getWorkSlots(undefined, slotDate)
+    const existingSlots = allExistingSlots.filter(s => s.id !== slot?.id)
+    
+    // Check minimum 20-minute gap between slots on the same date
+    for (const timeSlot of timeSlots) {
+      const gapCheck = checkMinimumGap(timeSlot, existingSlots, 20)
+      if (!gapCheck.valid) {
+        return gapCheck.error || 'Минимальный интервал между слотами - 20 минут'
+      }
+    }
+    
+    // Check max 3 people per slot (for overlapping times)
     for (const timeSlot of timeSlots) {
       for (const existingSlot of existingSlots) {
-        if (existingSlot.id === slot?.id) continue
         if (timeOverlaps(timeSlot, existingSlot.slots[0])) {
           const overlappingCount = existingSlot.participants.length
           if (overlappingCount >= 3) {
@@ -366,6 +376,15 @@ export const SlotForm = ({ slot, onClose, onSave }: SlotFormProps) => {
           </div>
 
           <div className="space-y-4">
+            {/* Info about minimum gap rule */}
+            {!slot && (
+              <div className={`p-3 rounded-lg ${theme === 'dark' ? 'bg-blue-900 bg-opacity-50 border border-blue-700' : 'bg-blue-50 border border-blue-200'}`}>
+                <p className={`text-sm ${theme === 'dark' ? 'text-blue-200' : 'text-blue-800'}`}>
+                  <strong>⚠️ Правило минимального интервала:</strong> Новый слот на эту дату не может начаться раньше чем через 20 минут после окончания последнего слота. Перерывы внутри слота не прерывают сессию и не учитываются в интервале.
+                </p>
+              </div>
+            )}
+
             {/* User selection for admin when adding new slot */}
             {isAdmin && !slot && (
               <div>

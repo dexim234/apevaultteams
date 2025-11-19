@@ -71,6 +71,12 @@ export const parseTime = (time: string): number => {
   return hours * 60 + minutes
 }
 
+export const formatTimeFromMinutes = (minutes: number): string => {
+  const hours = Math.floor(minutes / 60)
+  const mins = minutes % 60
+  return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`
+}
+
 export const timeOverlaps = (
   slot1: { start: string; end: string },
   slot2: { start: string; end: string }
@@ -80,6 +86,46 @@ export const timeOverlaps = (
   const s2 = parseTime(slot2.start)
   const e2 = parseTime(slot2.end)
   return (s1 < e2 && e1 > s2)
+}
+
+// Check minimum 20 minute gap between slots on the same date
+// Breaks within a slot don't count - only the actual end time matters
+export const checkMinimumGap = (
+  newSlot: { start: string; end: string; breaks?: { start: string; end: string }[] },
+  existingSlots: { slots: { start: string; end: string; breaks?: { start: string; end: string }[] }[] }[],
+  minimumGapMinutes: number = 20
+): { valid: boolean; error?: string } => {
+  // Find the latest end time among all existing slots on this date
+  let latestEndMinutes = -1
+  
+  for (const existingSlot of existingSlots) {
+    for (const timeSlot of existingSlot.slots) {
+      // Breaks don't affect the end time - we only care about the slot's actual end time
+      const endMinutes = parseTime(timeSlot.end)
+      if (endMinutes > latestEndMinutes) {
+        latestEndMinutes = endMinutes
+      }
+    }
+  }
+  
+  // If no existing slots, no gap check needed
+  if (latestEndMinutes === -1) {
+    return { valid: true }
+  }
+  
+  const newSlotStartMinutes = parseTime(newSlot.start)
+  const earliestAllowedStart = latestEndMinutes + minimumGapMinutes
+  
+  if (newSlotStartMinutes < earliestAllowedStart) {
+    const latestEndTime = formatTimeFromMinutes(latestEndMinutes)
+    const earliestAllowedTime = formatTimeFromMinutes(earliestAllowedStart)
+    return {
+      valid: false,
+      error: `Новый слот не может начаться раньше ${earliestAllowedTime}. Последний слот на эту дату заканчивается в ${latestEndTime}. Минимальный интервал между слотами - 20 минут.`
+    }
+  }
+  
+  return { valid: true }
 }
 
 export const getMoscowTime = (): Date => {
