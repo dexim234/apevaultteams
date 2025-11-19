@@ -4,7 +4,7 @@ import { Layout } from '@/components/Layout'
 import { useThemeStore } from '@/store/themeStore'
 import { RatingCard } from '@/components/Rating/RatingCard'
 import { ReferralForm } from '@/components/Rating/ReferralForm'
-import { getRatingData, getEarnings, getDayStatuses, getReferrals, getWorkSlots } from '@/services/firestoreService'
+import { getRatingData, getEarnings, getDayStatuses, getReferrals, getWorkSlots, getWeeklyMessages } from '@/services/firestoreService'
 import { getLastNDaysRange, getWeekRange, formatDate, calculateHours } from '@/utils/dateUtils'
 import { calculateRating, getRatingBreakdown } from '@/utils/ratingUtils'
 import { RatingData, Referral, TEAM_MEMBERS } from '@/types'
@@ -28,8 +28,6 @@ export const Rating = () => {
       const weekRange = getWeekRange()
       const weekStart = formatDate(weekRange.start, 'yyyy-MM-dd')
       const weekEnd = formatDate(weekRange.end, 'yyyy-MM-dd')
-      const weekIsoStart = weekRange.start.toISOString()
-      const weekIsoEnd = weekRange.end.toISOString()
 
       const monthRange = getLastNDaysRange(30)
       const monthStart = formatDate(monthRange.start, 'yyyy-MM-dd')
@@ -60,6 +58,10 @@ export const Rating = () => {
         const weekSlots = slots.filter(s => s.date >= weekStart && s.date <= weekEnd)
         const weeklyHours = weekSlots.reduce((sum, slot) => sum + calculateHours(slot.slots), 0)
 
+        // Сообщения за неделю - из коллекции messages
+        const weeklyMessages = await getWeeklyMessages(member.id, weekStart, weekEnd)
+        
+        // Для статистики используем общее количество из ratings
         const existingRatings = await getRatingData(member.id)
         const ratingData = existingRatings[0] || {
           userId: member.id,
@@ -76,7 +78,6 @@ export const Rating = () => {
           rating: 0,
           lastUpdated: new Date().toISOString(),
         }
-        const weeklyMessages = ratingData.messages || 0
 
         const userReferrals = currentReferrals.filter((referral) => referral.ownerId === member.id).length
 

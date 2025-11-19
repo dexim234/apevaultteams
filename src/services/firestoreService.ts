@@ -326,6 +326,33 @@ export const getRatingData = async (userId?: string) => {
   })
 }
 
+export const getWeeklyMessages = async (userId: string, weekStart: string, weekEnd: string): Promise<number> => {
+  try {
+    const messagesRef = collection(db, 'messages')
+    // Filter by userId first, then filter by date in memory to avoid composite index requirement
+    const q = query(messagesRef, where('userId', '==', userId))
+    const snapshot = await getDocs(q)
+    
+    // Filter by date range in memory
+    const weeklyMessages = snapshot.docs.filter(doc => {
+      const data = doc.data()
+      const date = data.date || ''
+      return date >= weekStart && date <= weekEnd
+    })
+    
+    return weeklyMessages.length
+  } catch (error) {
+    console.error('Error getting weekly messages:', error)
+    // Fallback to ratings if messages collection doesn't exist yet
+    const ratingRef = collection(db, 'ratings')
+    const q = query(ratingRef, where('userId', '==', userId))
+    const snapshot = await getDocs(q)
+    if (snapshot.empty) return 0
+    const data = snapshot.docs[0].data()
+    return data.messages || 0
+  }
+}
+
 export const updateRatingData = async (userId: string, data: Partial<RatingData>) => {
   const ratingRef = doc(db, 'ratings', userId)
   const ratingDoc = await getDoc(ratingRef)
