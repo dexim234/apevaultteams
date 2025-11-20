@@ -296,71 +296,72 @@ export const Rating = () => {
                 </p>
               </div>
             </div>
-          <div className="grid gap-4 md:grid-cols-2">
-            {TEAM_MEMBERS.map((member) => {
-              const memberRefs = referrals.filter((referral) => referral.ownerId === member.id)
-              return (
-                <div
-                  key={member.id}
-                  className={`p-4 rounded-lg border ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'} ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}
-                >
-                  <div className="flex items-center justify-between mb-3">
-                    <span className={`${headingColor} font-semibold`}>{member.name}</span>
-                    <span className={`px-3 py-1 rounded-full text-sm font-bold ${
-                      memberRefs.length > 0 
-                        ? theme === 'dark' ? 'bg-pink-600 text-white' : 'bg-pink-100 text-pink-700'
-                        : theme === 'dark' ? 'bg-gray-700 text-gray-400' : 'bg-gray-200 text-gray-600'
-                    }`}>
-                      {memberRefs.length} {memberRefs.length === 1 ? 'реферал' : memberRefs.length < 5 ? 'реферала' : 'рефералов'}
-                    </span>
-                  </div>
-                  {memberRefs.length > 0 && (
-                    <div className="space-y-2">
-                      {memberRefs.map((referral) => (
-                        <div
-                          key={referral.id}
-                          className={`rounded-lg border ${theme === 'dark' ? 'border-gray-600' : 'border-gray-300'} p-3 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} flex flex-col gap-2 transition-all hover:shadow-md`}
-                        >
-                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                            <div className="flex-1">
-                              <p className={`text-sm font-semibold ${headingColor} mb-1`}>
-                                {referral.name}
-                              </p>
-                              <div className="flex flex-wrap gap-2 text-xs">
-                                <span className={`px-2 py-1 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100'} ${subTextColor}`}>
-                                  ID: {referral.referralId}
-                                </span>
-                                {referral.age && (
-                                  <span className={`px-2 py-1 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100'} ${subTextColor}`}>
-                                    Возраст: {referral.age}
-                                  </span>
-                                )}
-                                <span className={`px-2 py-1 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100'} ${subTextColor}`}>
-                                  {new Date(referral.createdAt).toLocaleDateString('ru-RU')}
-                                </span>
-                              </div>
-                            </div>
-                            <button
-                              onClick={() => handleEditReferral(referral)}
-                              className="self-start sm:self-auto px-3 py-1.5 text-sm bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors font-medium"
-                            >
-                              Редактировать
-                            </button>
-                          </div>
-                          {referral.comment && (
-                            <div className={`mt-2 pt-2 border-t ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
-                              <p className={`text-xs ${subTextColor} italic`}>
-                                💬 {referral.comment}
-                              </p>
-                            </div>
-                          )}
-                        </div>
-                      ))}
+            <div className="grid gap-4 md:grid-cols-2">
+              {TEAM_MEMBERS.map((member) => {
+                const memberRefs = referrals.filter((referral) => referral.ownerId === member.id)
+                return (
+                  <div
+                    key={member.id}
+                    className={`p-4 rounded-lg border ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'} ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}
+                  >
+                    <div className="flex items-center justify-between mb-3">
+                      <span className={`${headingColor} font-semibold`}>{member.name}</span>
+                      <span className={`px-3 py-1 rounded-full text-sm font-bold ${
+                        memberRefs.length > 0 
+                          ? theme === 'dark' ? 'bg-pink-600 text-white' : 'bg-pink-100 text-pink-700'
+                          : theme === 'dark' ? 'bg-gray-700 text-gray-400' : 'bg-gray-200 text-gray-600'
+                      }`}>
+                        {memberRefs.length} {memberRefs.length === 1 ? 'реферал' : memberRefs.length < 5 ? 'реферала' : 'рефералов'}
+                      </span>
                     </div>
-                  )}
-                </div>
-              )
-            })}
+                    {memberRefs.length > 0 && (
+                      <div className="space-y-2">
+                        {memberRefs.map((referral) => (
+                          <div
+                            key={referral.id}
+                            className={`rounded-lg border ${theme === 'dark' ? 'border-gray-600' : 'border-gray-300'} p-3 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} flex flex-col gap-2 transition-all hover:shadow-md`}
+                          >
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                              <div className="flex-1">
+                                <p className={`text-sm font-semibold ${headingColor} mb-1`}>
+                                  {referral.name}
+                                </p>
+                                <div className="flex flex-wrap gap-2 text-xs">
+                                  <span className={`px-2 py-1 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100'} ${subTextColor}`}>
+                                    ID: {referral.referralId}
+                                  </span>
+                                  {referral.age && (
+                                    <span className={`px-2 py-1 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100'} ${subTextColor}`}>
+                                      Возраст: {referral.age}
+                                    </span>
+                                  )}
+                                  <span className={`px-2 py-1 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100'} ${subTextColor}`}>
+                                    {new Date(referral.createdAt).toLocaleDateString('ru-RU')}
+                                  </span>
+                                </div>
+                              </div>
+                              <button
+                                onClick={() => handleEditReferral(referral)}
+                                className="self-start sm:self-auto px-3 py-1.5 text-sm bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors font-medium"
+                              >
+                                Редактировать
+                              </button>
+                            </div>
+                            {referral.comment && (
+                              <div className={`mt-2 pt-2 border-t ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
+                                <p className={`text-xs ${subTextColor} italic`}>
+                                  💬 {referral.comment}
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
           </div>
         </div>
 
