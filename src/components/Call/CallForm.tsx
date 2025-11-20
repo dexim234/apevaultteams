@@ -121,9 +121,7 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit }: CallFormProps) => 
     }
   }
 
-  const bgColor = theme === 'dark' ? 'bg-gray-800' : 'bg-white'
   const textColor = theme === 'dark' ? 'text-white' : 'text-gray-900'
-  const subtleColor = theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
   const borderColor = theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
   const inputBg = theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'
 
