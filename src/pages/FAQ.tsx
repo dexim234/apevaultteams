@@ -205,7 +205,6 @@ const faqData: FAQItemWithCategory[] = [
     category: 'interface'
   }
 ]
-]
 
 export const FAQ = () => {
   const { theme } = useThemeStore()
