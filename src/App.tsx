@@ -4,7 +4,7 @@ import { useAuthStore } from './store/authStore'
 import { useThemeStore } from './store/themeStore'
 import { useEffect } from 'react'
 import { Login } from './pages/Login'
-import { Call } from './pages/Call'
+import { CallPage } from './pages/Call'
 import { Management } from './pages/Management'
 import { Earnings } from './pages/Earnings'
 import { Rating } from './pages/Rating'
@@ -35,7 +35,7 @@ function App() {
           path="/call"
           element={
             <ProtectedRoute>
-              <Call />
+              <CallPage />
             </ProtectedRoute>
           }
         />
