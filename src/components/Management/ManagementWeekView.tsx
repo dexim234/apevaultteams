@@ -333,30 +333,28 @@ export const ManagementWeekView = ({ selectedUserId, onEditSlot, onEditStatus }:
                         </div>
                       </div>
                       <div className="space-y-2">
-                        {slot.slots.map((s, slotIdx) => {
-                          return (
-                            <div key={slotIdx} className="space-y-1.5">
-                              {/* Main slot time */}
-                              <div className="bg-white/20 backdrop-blur-sm rounded-lg px-3 py-2 border border-white/30">
-                                <div className="flex items-center gap-2">
-                                  <Clock className="w-4 h-4 text-white" />
-                                  <span className="text-white font-semibold text-sm">{s.start} - {s.end}</span>
-                                </div>
+                        {slot.slots.map((s, slotIdx) => (
+                          <div key={slotIdx} className="space-y-1.5">
+                            {/* Main slot time */}
+                            <div className="bg-white/20 backdrop-blur-sm rounded-lg px-3 py-2 border border-white/30">
+                              <div className="flex items-center gap-2">
+                                <Clock className="w-4 h-4 text-white" />
+                                <span className="text-white font-semibold text-sm">{s.start} - {s.end}</span>
                               </div>
-                              {/* Breaks */}
-                              {s.breaks && s.breaks.length > 0 && (
-                                <div className="space-y-1 ml-6">
-                                  <div className="text-[10px] text-white/80 font-medium">Перерывы:</div>
-                                  {s.breaks.map((breakItem, breakIdx) => (
-                                    <div key={breakIdx} className="bg-orange-400/90 text-white rounded-lg px-2 py-1 text-xs font-medium border border-orange-300/50">
-                                      {breakItem.start} - {breakItem.end}
-                                    </div>
-                                  ))}
-                                </div>
-                              )}
                             </div>
-                          )
-                        })}
+                            {/* Breaks */}
+                            {s.breaks && s.breaks.length > 0 && (
+                              <div className="space-y-1 ml-6">
+                                <div className="text-[10px] text-white/80 font-medium">Перерывы:</div>
+                                {s.breaks.map((breakItem, breakIdx) => (
+                                  <div key={breakIdx} className="bg-orange-400/90 text-white rounded-lg px-2 py-1 text-xs font-medium border border-orange-300/50">
+                                    {breakItem.start} - {breakItem.end}
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        ))}
                         {slot.comment && (
                           <div className="relative group flex items-center gap-2 pt-2">
                             <Info className="w-4 h-4 text-white cursor-help" />
