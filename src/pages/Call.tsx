@@ -1,12 +1,13 @@
 // Call page for team - Trading signals management
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useThemeStore } from '@/store/themeStore'
 import { useAuthStore } from '@/store/authStore'
 import { Layout } from '@/components/Layout'
 import { CallForm } from '@/components/Call/CallForm'
 import { getCalls, deleteCall } from '@/services/firestoreService'
 import type { Call } from '@/types'
-import { Plus, X, Edit, Trash2, Copy, Check, Clock, Target, AlertCircle, FileText, Sparkles, Hash, Zap, Search } from 'lucide-react'
+import { TEAM_MEMBERS } from '@/types'
+import { Plus, X, Edit, Trash2, Copy, Check, Clock, Target, AlertCircle, FileText, Sparkles, Hash, Zap, Search, BarChart3, TrendingUp, Users, Award, Activity } from 'lucide-react'
 
 export const CallPage = () => {
   const { theme } = useThemeStore()
@@ -15,27 +16,26 @@ export const CallPage = () => {
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [showStats, setShowStats] = useState(true)
   const [deleteCallId, setDeleteCallId] = useState<string | null>(null)
   const [editingCall, setEditingCall] = useState<Call | null>(null)
   const [copiedTicker, setCopiedTicker] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
 
   useEffect(() => {
-    if (user?.id) {
-      loadCalls()
-    }
-  }, [user?.id])
+    loadCalls()
+  }, [])
 
   const loadCalls = async () => {
-    if (!user?.id) {
-      setLoading(false)
-      return
-    }
     setLoading(true)
     try {
-      const fetchedCalls = await getCalls({ userId: user.id })
+      // Load all calls (not filtered by userId) to show team's signals
+      const fetchedCalls = await getCalls()
       setCalls(fetchedCalls)
-      console.log('Loaded calls:', fetchedCalls.length)
+      console.log('Loaded calls:', fetchedCalls.length, 'User ID:', user?.id)
+      if (fetchedCalls.length > 0) {
+        console.log('First call userId:', fetchedCalls[0].userId)
+      }
     } catch (error) {
       console.error('Error loading calls:', error)
       setCalls([])
@@ -43,6 +43,79 @@ export const CallPage = () => {
       setLoading(false)
     }
   }
+
+  // Calculate statistics
+  const stats = useMemo(() => {
+    const traderStats: Record<string, {
+      name: string
+      totalCalls: number
+      activeCalls: number
+      completedCalls: number
+      cancelledCalls: number
+      avgPnL: number
+      totalPnL: number
+      maxProfit: number
+    }> = {}
+
+    calls.forEach((call) => {
+      const trader = TEAM_MEMBERS.find(t => t.id === call.userId)
+      const traderId = call.userId || 'unknown'
+      const traderName = trader?.name || 'Неизвестный'
+
+      if (!traderStats[traderId]) {
+        traderStats[traderId] = {
+          name: traderName,
+          totalCalls: 0,
+          activeCalls: 0,
+          completedCalls: 0,
+          cancelledCalls: 0,
+          avgPnL: 0,
+          totalPnL: 0,
+          maxProfit: 0
+        }
+      }
+
+      traderStats[traderId].totalCalls++
+      if (call.status === 'active') traderStats[traderId].activeCalls++
+      if (call.status === 'completed') traderStats[traderId].completedCalls++
+      if (call.status === 'cancelled') traderStats[traderId].cancelledCalls++
+
+      if (call.currentPnL !== undefined) {
+        traderStats[traderId].totalPnL += call.currentPnL
+      }
+      if (call.maxProfit !== undefined && call.maxProfit > traderStats[traderId].maxProfit) {
+        traderStats[traderId].maxProfit = call.maxProfit
+      }
+    })
+
+    // Calculate average PnL
+    Object.keys(traderStats).forEach((traderId) => {
+      const stat = traderStats[traderId]
+      if (stat.totalCalls > 0) {
+        stat.avgPnL = stat.totalPnL / stat.totalCalls
+      }
+    })
+
+    return Object.values(traderStats).sort((a, b) => b.totalCalls - a.totalCalls)
+  }, [calls])
+
+  const totalStats = useMemo(() => {
+    const total = calls.length
+    const active = calls.filter(c => c.status === 'active').length
+    const completed = calls.filter(c => c.status === 'completed').length
+    const cancelled = calls.filter(c => c.status === 'cancelled').length
+    const avgPnL = calls.length > 0
+      ? calls.reduce((sum, c) => sum + (c.currentPnL || 0), 0) / calls.length
+      : 0
+    const bestCall = calls.reduce((best, c) => {
+      if (c.maxProfit !== undefined && (!best || (best.maxProfit || 0) < c.maxProfit)) {
+        return c
+      }
+      return best
+    }, null as Call | null)
+
+    return { total, active, completed, cancelled, avgPnL, bestCall }
+  }, [calls])
 
   const handleSuccess = () => {
     setShowForm(false)
@@ -168,6 +241,145 @@ export const CallPage = () => {
           </div>
         </div>
 
+        {/* Statistics Section */}
+        {showStats && calls.length > 0 && (
+          <div className={`${bgColor} rounded-2xl p-6 shadow-xl border ${borderColor}`}>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className={`text-2xl font-bold ${textColor} flex items-center gap-2`}>
+                <BarChart3 className="w-6 h-6 text-green-500" />
+                Аналитика
+              </h2>
+              <button
+                onClick={() => setShowStats(!showStats)}
+                className={`p-2 rounded-lg ${theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}
+              >
+                <X className={`w-5 h-5 ${subtleColor}`} />
+              </button>
+            </div>
+
+            {/* Total Stats */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+              <div className={`p-4 rounded-xl ${theme === 'dark' ? 'bg-blue-500/10 border border-blue-500/20' : 'bg-blue-50 border border-blue-200'}`}>
+                <div className="flex items-center gap-2 mb-2">
+                  <Activity className="w-5 h-5 text-blue-500" />
+                  <p className={`text-xs font-semibold uppercase tracking-wider ${subtleColor}`}>Всего сигналов</p>
+                </div>
+                <p className={`text-2xl font-bold ${textColor}`}>{totalStats.total}</p>
+              </div>
+              <div className={`p-4 rounded-xl ${theme === 'dark' ? 'bg-green-500/10 border border-green-500/20' : 'bg-green-50 border border-green-200'}`}>
+                <div className="flex items-center gap-2 mb-2">
+                  <Zap className="w-5 h-5 text-green-500" />
+                  <p className={`text-xs font-semibold uppercase tracking-wider ${subtleColor}`}>Активных</p>
+                </div>
+                <p className={`text-2xl font-bold ${textColor}`}>{totalStats.active}</p>
+              </div>
+              <div className={`p-4 rounded-xl ${theme === 'dark' ? 'bg-purple-500/10 border border-purple-500/20' : 'bg-purple-50 border border-purple-200'}`}>
+                <div className="flex items-center gap-2 mb-2">
+                  <Check className="w-5 h-5 text-purple-500" />
+                  <p className={`text-xs font-semibold uppercase tracking-wider ${subtleColor}`}>Завершено</p>
+                </div>
+                <p className={`text-2xl font-bold ${textColor}`}>{totalStats.completed}</p>
+              </div>
+              <div className={`p-4 rounded-xl ${theme === 'dark' ? 'bg-orange-500/10 border border-orange-500/20' : 'bg-orange-50 border border-orange-200'}`}>
+                <div className="flex items-center gap-2 mb-2">
+                  <TrendingUp className="w-5 h-5 text-orange-500" />
+                  <p className={`text-xs font-semibold uppercase tracking-wider ${subtleColor}`}>Средний PNL</p>
+                </div>
+                <p className={`text-2xl font-bold ${totalStats.avgPnL >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                  {totalStats.avgPnL >= 0 ? '+' : ''}{totalStats.avgPnL.toFixed(2)}%
+                </p>
+              </div>
+            </div>
+
+            {/* Best Call */}
+            {totalStats.bestCall && (
+              <div className={`p-4 rounded-xl mb-6 ${theme === 'dark' ? 'bg-gradient-to-r from-green-500/10 to-green-600/10 border border-green-500/20' : 'bg-gradient-to-r from-green-50 to-green-100 border border-green-200'}`}>
+                <div className="flex items-center gap-2 mb-2">
+                  <Award className="w-5 h-5 text-green-500" />
+                  <p className={`text-sm font-semibold ${textColor}`}>Лучший сигнал</p>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className={`font-bold ${textColor}`}>{totalStats.bestCall.pair}</p>
+                    <p className={`text-xs ${subtleColor}`}>Тикер: {totalStats.bestCall.ticker}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className={`text-2xl font-bold text-green-500`}>
+                      +{totalStats.bestCall.maxProfit?.toFixed(2) || '0.00'}%
+                    </p>
+                    <p className={`text-xs ${subtleColor}`}>MAX прибыль</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Trader Statistics */}
+            <div>
+              <h3 className={`text-lg font-bold ${textColor} mb-4 flex items-center gap-2`}>
+                <Users className="w-5 h-5 text-green-500" />
+                Статистика по трейдерам
+              </h3>
+              <div className="space-y-3">
+                {stats.map((stat) => (
+                  <div
+                    key={stat.name}
+                    className={`p-4 rounded-xl border ${borderColor} ${theme === 'dark' ? 'bg-gray-700/30' : 'bg-gray-50'}`}
+                  >
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-r from-green-400 to-green-600 flex items-center justify-center text-white font-bold">
+                          {stat.name[0]}
+                        </div>
+                        <div>
+                          <p className={`font-bold ${textColor}`}>{stat.name}</p>
+                          <p className={`text-xs ${subtleColor}`}>Всего сигналов: {stat.totalCalls}</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className={`text-lg font-bold ${stat.avgPnL >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                          {stat.avgPnL >= 0 ? '+' : ''}{stat.avgPnL.toFixed(2)}%
+                        </p>
+                        <p className={`text-xs ${subtleColor}`}>Средний PNL</p>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-4 gap-2">
+                      <div className={`p-2 rounded-lg text-center ${theme === 'dark' ? 'bg-green-500/10' : 'bg-green-50'}`}>
+                        <p className={`text-sm font-bold ${textColor}`}>{stat.activeCalls}</p>
+                        <p className={`text-xs ${subtleColor}`}>Активных</p>
+                      </div>
+                      <div className={`p-2 rounded-lg text-center ${theme === 'dark' ? 'bg-blue-500/10' : 'bg-blue-50'}`}>
+                        <p className={`text-sm font-bold ${textColor}`}>{stat.completedCalls}</p>
+                        <p className={`text-xs ${subtleColor}`}>Завершено</p>
+                      </div>
+                      <div className={`p-2 rounded-lg text-center ${theme === 'dark' ? 'bg-red-500/10' : 'bg-red-50'}`}>
+                        <p className={`text-sm font-bold ${textColor}`}>{stat.cancelledCalls}</p>
+                        <p className={`text-xs ${subtleColor}`}>Отменено</p>
+                      </div>
+                      <div className={`p-2 rounded-lg text-center ${theme === 'dark' ? 'bg-purple-500/10' : 'bg-purple-50'}`}>
+                        <p className={`text-sm font-bold text-purple-500`}>+{stat.maxProfit.toFixed(1)}%</p>
+                        <p className={`text-xs ${subtleColor}`}>MAX</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Toggle Stats Button */}
+        {calls.length > 0 && !showStats && (
+          <button
+            onClick={() => setShowStats(true)}
+            className={`w-full ${bgColor} rounded-xl p-4 shadow-lg border ${borderColor} hover:shadow-xl transition-all flex items-center justify-center gap-2 ${
+              theme === 'dark' ? 'hover:bg-gray-700/50' : 'hover:bg-gray-50'
+            }`}
+          >
+            <BarChart3 className="w-5 h-5 text-green-500" />
+            <span className={`font-semibold ${textColor}`}>Показать аналитику</span>
+          </button>
+        )}
+
         {/* Form Modal */}
         {showForm && (
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
@@ -241,25 +453,14 @@ export const CallPage = () => {
             ) : calls.length === 0 ? (
               <div className={`${bgColor} rounded-2xl p-12 text-center ${borderColor} border shadow-xl`}>
                 <Sparkles className={`w-20 h-20 mx-auto mb-6 ${subtleColor}`} />
-                <h3 className={`text-2xl font-bold ${textColor} mb-2`}>
-                  Нет сигналов
-                </h3>
-                <p className={subtleColor}>
-                  Создайте первый торговый сигнал для команды
-                </p>
-                <p className={`${subtleColor} text-xs mt-2`}>
-                  User ID: {user?.id || 'не загружен'}
-                </p>
+                <h3 className={`text-2xl font-bold ${textColor} mb-2`}>Нет сигналов</h3>
+                <p className={subtleColor}>Создайте первый торговый сигнал для команды</p>
               </div>
             ) : filteredCalls.length === 0 ? (
               <div className={`${bgColor} rounded-2xl p-12 text-center ${borderColor} border shadow-xl`}>
                 <Sparkles className={`w-20 h-20 mx-auto mb-6 ${subtleColor}`} />
-                <h3 className={`text-2xl font-bold ${textColor} mb-2`}>
-                  Ничего не найдено
-                </h3>
-                <p className={subtleColor}>
-                  Попробуйте изменить запрос
-                </p>
+                <h3 className={`text-2xl font-bold ${textColor} mb-2`}>Ничего не найдено</h3>
+                <p className={subtleColor}>Попробуйте изменить запрос</p>
                 <p className={`${subtleColor} text-xs mt-2`}>
                   Найдено сигналов: {calls.length}, отфильтровано: {filteredCalls.length}
                 </p>
@@ -267,6 +468,7 @@ export const CallPage = () => {
             ) : (
               <div className="grid grid-cols-1 gap-6">
                 {filteredCalls.map((call: Call) => {
+                  const trader = TEAM_MEMBERS.find(t => t.id === call.userId)
                   const network = networkColors[call.network] || { bg: 'bg-gray-500/10', text: 'text-gray-400', icon: 'bg-gray-500' }
                   const strategy = strategyLabels[call.strategy] || strategyLabels.flip
                   const status = statusLabels[call.status] || statusLabels.active
@@ -283,7 +485,7 @@ export const CallPage = () => {
                       {/* Header Section */}
                       <div className="flex items-start justify-between mb-6">
                         <div className="flex-1">
-                          {/* Network Badge */}
+                          {/* Network Badge & Trader */}
                           <div className="flex items-center gap-3 mb-4">
                             <div className={`${network.bg} ${network.text} px-4 py-2 rounded-xl font-bold text-sm flex items-center gap-2 border ${borderColor}`}>
                               <div className={`w-2 h-2 rounded-full ${network.icon}`}></div>
@@ -292,6 +494,14 @@ export const CallPage = () => {
                             <span className={`px-3 py-1 rounded-lg text-xs font-medium border ${status.color}`}>
                               {status.label}
                             </span>
+                            {trader && (
+                              <div className="flex items-center gap-2">
+                                <div className="w-6 h-6 rounded-full bg-gradient-to-r from-green-400 to-green-600 flex items-center justify-center text-white text-xs font-bold">
+                                  {trader.name[0]}
+                                </div>
+                                <span className={`text-xs ${subtleColor}`}>{trader.name}</span>
+                              </div>
+                            )}
                           </div>
 
                           {/* Token Pair - Main Info */}
@@ -348,6 +558,26 @@ export const CallPage = () => {
                           </button>
                         </div>
                       </div>
+
+                      {/* Performance Metrics */}
+                      {(call.maxProfit !== undefined || call.currentPnL !== undefined) && (
+                        <div className="grid grid-cols-2 gap-3 mb-4">
+                          {call.maxProfit !== undefined && (
+                            <div className={`p-3 rounded-xl ${theme === 'dark' ? 'bg-green-500/10 border border-green-500/20' : 'bg-green-50 border border-green-200'}`}>
+                              <p className={`text-xs font-semibold uppercase tracking-wider ${subtleColor} mb-1`}>MAX прибыль</p>
+                              <p className={`text-xl font-bold text-green-500`}>+{call.maxProfit.toFixed(2)}%</p>
+                            </div>
+                          )}
+                          {call.currentPnL !== undefined && (
+                            <div className={`p-3 rounded-xl ${theme === 'dark' ? call.currentPnL >= 0 ? 'bg-green-500/10 border border-green-500/20' : 'bg-red-500/10 border border-red-500/20' : call.currentPnL >= 0 ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
+                              <p className={`text-xs font-semibold uppercase tracking-wider ${subtleColor} mb-1`}>Текущий PNL</p>
+                              <p className={`text-xl font-bold ${call.currentPnL >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                                {call.currentPnL >= 0 ? '+' : ''}{call.currentPnL.toFixed(2)}%
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      )}
 
                       {/* Details Grid */}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
