@@ -7,7 +7,7 @@ import { getWorkSlots, getDayStatuses, deleteWorkSlot, deleteDayStatus } from '@
 import { formatDate, calculateHours, getWeekDays } from '@/utils/dateUtils'
 import { WorkSlot, DayStatus } from '@/types'
 import { TEAM_MEMBERS } from '@/types'
-import { Edit, Trash2, Info } from 'lucide-react'
+import { Edit, Trash2, Info, Clock } from 'lucide-react'
 
 interface ManagementTableProps {
   selectedUserId: string | null
@@ -218,16 +218,29 @@ export const ManagementTable = ({ selectedUserId, onEditSlot, onEditStatus }: Ma
                     return (
                       <td key={dateStr} className="px-2 py-3 text-center">
                         {slot ? (
-                          <div className="space-y-1">
-                            <div className="bg-green-500 text-white rounded px-2 py-1 text-xs">
-                              {slot.slots.map((s) => {
-                                const timeStr = `${s.start}-${s.end}`
-                                const breaksStr = s.breaks && s.breaks.length > 0
-                                  ? ` (перерывы: ${s.breaks.map(b => `${b.start}-${b.end}`).join(', ')})`
-                                  : ''
-                                return timeStr + breaksStr
-                              }).join(', ')}
-                            </div>
+                          <div className="space-y-2">
+                            {slot.slots.map((s, slotIdx) => (
+                              <div key={slotIdx} className="space-y-1">
+                                {/* Main slot time */}
+                                <div className="bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg px-3 py-1.5 text-xs font-semibold shadow-sm">
+                                  <div className="flex items-center justify-center gap-1">
+                                    <Clock className="w-3 h-3" />
+                                    <span>{s.start} - {s.end}</span>
+                                  </div>
+                                </div>
+                                {/* Breaks */}
+                                {s.breaks && s.breaks.length > 0 && (
+                                  <div className="space-y-1">
+                                    <div className="text-[10px] text-gray-500 dark:text-gray-400 font-medium">Перерывы:</div>
+                                    {s.breaks.map((breakItem, breakIdx) => (
+                                      <div key={breakIdx} className="bg-orange-400 dark:bg-orange-500 text-white rounded px-2 py-1 text-[10px] font-medium shadow-sm">
+                                        {breakItem.start} - {breakItem.end}
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            ))}
                             {slot.comment && (
                               <div className="flex items-center justify-center group relative">
                                 <Info className="w-4 h-4 text-gray-400 cursor-help" />

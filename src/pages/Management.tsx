@@ -6,7 +6,6 @@ import { ManagementTable } from '@/components/Management/ManagementTable'
 import { ManagementWeekView } from '@/components/Management/ManagementWeekView'
 import { SlotForm } from '@/components/Management/SlotForm'
 import { DayStatusForm } from '@/components/Management/DayStatusForm'
-import { AdminModeButton } from '@/components/Management/AdminModeButton'
 import { Calendar, Table2, Plus, Trash2, Users, Clock, CalendarCheck, Sparkles, Heart } from 'lucide-react'
 import { TEAM_MEMBERS } from '@/types'
 import { DeleteSlotsForm } from '@/components/Management/DeleteSlotsForm'
@@ -271,8 +270,6 @@ export const Management = () => {
           </div>
         </div>
 
-        {/* Admin mode button */}
-        <AdminModeButton />
 
         {/* Content view */}
         {viewMode === 'table' ? (

@@ -10,6 +10,7 @@ import { Earnings } from './pages/Earnings'
 import { Rating } from './pages/Rating'
 import { About } from './pages/About'
 import { FAQ } from './pages/FAQ'
+import { Admin } from './pages/Admin'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { cleanupOldData } from './services/firestoreService'
 
@@ -75,6 +76,14 @@ function App() {
           element={
             <ProtectedRoute>
               <FAQ />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute>
+              <Admin />
             </ProtectedRoute>
           }
         />

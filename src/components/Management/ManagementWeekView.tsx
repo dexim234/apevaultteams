@@ -7,7 +7,7 @@ import { getWorkSlots, getDayStatuses, deleteWorkSlot, deleteDayStatus } from '@
 import { formatDate, getWeekDays } from '@/utils/dateUtils'
 import { WorkSlot, DayStatus } from '@/types'
 import { TEAM_MEMBERS } from '@/types'
-import { Edit, Trash2, Info } from 'lucide-react'
+import { Edit, Trash2, Info, Clock } from 'lucide-react'
 
 interface ManagementWeekViewProps {
   selectedUserId: string | null
@@ -290,19 +290,72 @@ export const ManagementWeekView = ({ selectedUserId, onEditSlot, onEditStatus }:
                   return (
                     <div
                       key={slot.id}
-                      className="flex items-center justify-between p-3 bg-green-500 rounded-lg"
+                      className="space-y-2 p-3 bg-gradient-to-r from-green-500 to-green-600 rounded-xl shadow-md border-2 border-green-400/30"
                     >
-                      <div className="flex items-center gap-2">
-                        <span className="text-white font-medium">{displayName}</span>
-                        <span className="text-white text-sm">
-                          {slot.slots.map((s) => {
-                            const timeStr = `${s.start}-${s.end}`
-                            const breaksStr = s.breaks && s.breaks.length > 0
-                              ? ` (перерывы: ${s.breaks.map(b => `${b.start}-${b.end}`).join(', ')})`
-                              : ''
-                            return timeStr + breaksStr
-                          }).join(', ')}
-                        </span>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="text-white font-semibold text-base">{displayName}</span>
+                        </div>
+                        <div className="flex gap-2">
+                          {(isAdmin || user?.id === slot.userId) ? (
+                            <>
+                              <button
+                                onClick={() => onEditSlot(slot)}
+                                className="p-1.5 bg-white/20 hover:bg-white/30 rounded-lg transition-colors"
+                              >
+                                <Edit className="w-4 h-4 text-white" />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteSlot(slot.id)}
+                                className="p-1.5 bg-white/20 hover:bg-white/30 rounded-lg transition-colors"
+                              >
+                                <Trash2 className="w-4 h-4 text-white" />
+                              </button>
+                            </>
+                          ) : (
+                            <>
+                              <button
+                                disabled
+                                className="p-1.5 bg-white/10 cursor-not-allowed rounded-lg"
+                                title="Вы можете редактировать только свои слоты"
+                              >
+                                <Edit className="w-4 h-4 text-white/50" />
+                              </button>
+                              <button
+                                disabled
+                                className="p-1.5 bg-white/10 cursor-not-allowed rounded-lg"
+                                title="Вы можете удалять только свои слоты"
+                              >
+                                <Trash2 className="w-4 h-4 text-white/50" />
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        {slot.slots.map((s, slotIdx) => (
+                          <div key={slotIdx} className="space-y-1.5">
+                            {/* Main slot time */}
+                            <div className="bg-white/20 backdrop-blur-sm rounded-lg px-3 py-2 border border-white/30">
+                              <div className="flex items-center gap-2">
+                                <Clock className="w-4 h-4 text-white" />
+                                <span className="text-white font-semibold text-sm">{s.start} - {s.end}</span>
+                              </div>
+                            </div>
+                            {/* Breaks */}
+                            {s.breaks && s.breaks.length > 0 && (
+                              <div className="space-y-1 ml-6">
+                                <div className="text-[10px] text-white/80 font-medium">Перерывы:</div>
+                                {s.breaks.map((breakItem, breakIdx) => (
+                                  <div key={breakIdx} className="bg-orange-400/90 text-white rounded-lg px-2 py-1 text-xs font-medium border border-orange-300/50">
+                                    {breakItem.start} - {breakItem.end}
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
                         {slot.comment && (
                           <div className="relative group">
                             <Info className="w-4 h-4 text-white cursor-help" />
@@ -310,41 +363,6 @@ export const ManagementWeekView = ({ selectedUserId, onEditSlot, onEditStatus }:
                               {slot.comment}
                             </div>
                           </div>
-                        )}
-                      </div>
-                      <div className="flex gap-2">
-                        {(isAdmin || user?.id === slot.userId) ? (
-                          <>
-                            <button
-                              onClick={() => onEditSlot(slot)}
-                              className="p-1 bg-white bg-opacity-20 hover:bg-opacity-30 rounded transition-colors"
-                            >
-                              <Edit className="w-4 h-4 text-white" />
-                            </button>
-                            <button
-                              onClick={() => handleDeleteSlot(slot.id)}
-                              className="p-1 bg-white bg-opacity-20 hover:bg-opacity-30 rounded transition-colors"
-                            >
-                              <Trash2 className="w-4 h-4 text-white" />
-                            </button>
-                          </>
-                        ) : (
-                          <>
-                            <button
-                              disabled
-                              className="p-1 bg-white bg-opacity-10 cursor-not-allowed rounded"
-                              title="Вы можете редактировать только свои слоты"
-                            >
-                              <Edit className="w-4 h-4 text-white opacity-50" />
-                            </button>
-                            <button
-                              disabled
-                              className="p-1 bg-white bg-opacity-10 cursor-not-allowed rounded"
-                              title="Вы можете удалять только свои слоты"
-                            >
-                              <Trash2 className="w-4 h-4 text-white opacity-50" />
-                            </button>
-                          </>
                         )}
                       </div>
                     </div>
