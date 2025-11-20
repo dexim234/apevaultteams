@@ -257,18 +257,48 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
                     }
                   `}
                 >
-                  <td className={`px-4 py-4 font-semibold ${headingColor} sticky left-0 z-10 ${
+                  <td className={`px-4 py-4 font-semibold ${headingColor} sticky left-0 z-10 transition-colors ${
                     isEven 
-                      ? theme === 'dark' ? 'bg-gray-800/30' : 'bg-gray-50/50'
-                      : theme === 'dark' ? 'bg-gray-800/10' : 'bg-white'
+                      ? theme === 'dark' ? 'bg-gray-800/30 hover:bg-gray-800/60' : 'bg-gray-50/50 hover:bg-gray-100/80'
+                      : theme === 'dark' ? 'bg-gray-800/10 hover:bg-gray-800/40' : 'bg-white hover:bg-gray-50'
                   }`}>
                     <div className="flex items-center gap-3">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
-                        theme === 'dark' 
-                          ? 'bg-gradient-to-br from-green-500 to-blue-500 text-white shadow-lg' 
-                          : 'bg-gradient-to-br from-green-400 to-blue-400 text-white shadow-md'
-                      }`}>
-                        {user.name.charAt(0).toUpperCase()}
+                      <div className="relative flex-shrink-0">
+                        {user.avatar ? (
+                          <img 
+                            src={user.avatar} 
+                            alt={user.name}
+                            className="w-10 h-10 rounded-full object-cover border-2 shadow-lg transition-all duration-200 hover:scale-110"
+                            style={{
+                              borderColor: theme === 'dark' ? 'rgba(34, 197, 94, 0.5)' : 'rgba(34, 197, 94, 0.3)',
+                              width: '2.5rem',
+                              height: '2.5rem',
+                              borderRadius: '50%',
+                              objectFit: 'cover'
+                            } as React.CSSProperties}
+                            onError={(e) => {
+                              // Fallback to letter if image fails to load
+                              const target = e.target as HTMLImageElement
+                              target.style.display = 'none'
+                              const fallback = target.nextElementSibling as HTMLElement
+                              if (fallback) fallback.style.display = 'flex'
+                            }}
+                          />
+                        ) : null}
+                        <div 
+                          className={`flex items-center justify-center font-bold text-sm transition-all duration-200 ${
+                            theme === 'dark' 
+                              ? 'bg-gradient-to-br from-green-500 to-blue-500 text-white shadow-lg' 
+                              : 'bg-gradient-to-br from-green-400 to-blue-400 text-white shadow-md'
+                          } ${user.avatar ? 'absolute inset-0 hidden' : ''}`}
+                          style={{
+                            width: '2.5rem',
+                            height: '2.5rem',
+                            borderRadius: '50%'
+                          } as React.CSSProperties}
+                        >
+                          {user.name.charAt(0).toUpperCase()}
+                        </div>
                       </div>
                       <span>{user.name}</span>
                     </div>

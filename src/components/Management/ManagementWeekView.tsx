@@ -340,12 +340,37 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
                     >
                       <div className="flex items-center justify-between border-b border-white/20 pb-3">
                         <div className="flex items-center gap-3">
-                          <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${
-                            isUpcoming 
-                              ? 'bg-white/20 backdrop-blur-sm border-2 border-white/30' 
-                              : 'bg-white/10 backdrop-blur-sm border-2 border-white/20'
-                          }`}>
-                            {displayName.charAt(0).toUpperCase()}
+                          <div className="relative flex-shrink-0">
+                            {slotUserFallback?.avatar ? (
+                              <img 
+                                src={slotUserFallback.avatar} 
+                                alt={displayName}
+                                className={`w-10 h-10 rounded-full object-cover border-2 shadow-lg ring-2 ring-offset-2 transition-all duration-200 hover:scale-110 ${
+                                  isUpcoming 
+                                    ? 'border-white/40' 
+                                    : 'border-white/30'
+                                }`}
+                                style={{
+                                  ringColor: isUpcoming ? 'rgba(255, 255, 255, 0.3)' : 'rgba(255, 255, 255, 0.2)',
+                                  ringOffsetColor: 'transparent'
+                                }}
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement
+                                  target.style.display = 'none'
+                                  const fallback = target.nextElementSibling as HTMLElement
+                                  if (fallback) fallback.style.display = 'flex'
+                                }}
+                              />
+                            ) : null}
+                            <div 
+                              className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${
+                                isUpcoming 
+                                  ? 'bg-white/20 backdrop-blur-sm border-2 border-white/30' 
+                                  : 'bg-white/10 backdrop-blur-sm border-2 border-white/20'
+                              } ${slotUserFallback?.avatar ? 'absolute inset-0 hidden' : ''}`}
+                            >
+                              {displayName.charAt(0).toUpperCase()}
+                            </div>
                           </div>
                           <span className="text-white font-bold text-base">{displayName}</span>
                         </div>

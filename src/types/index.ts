@@ -4,6 +4,7 @@ export interface User {
   name: string
   login: string
   password: string
+  avatar?: string // Путь к изображению аватара
 }
 
 // Slot types
@@ -105,11 +106,11 @@ export interface Call {
 
 // Team members
 export const TEAM_MEMBERS: User[] = [
-  { id: '1', name: 'Артём', login: 'artyom03', password: '248artdex' },
-  { id: '2', name: 'Адель', login: 'adel05', password: '058adeldex' },
-  { id: '3', name: 'Ксения', login: 'ksen03', password: '907ksendex' },
-  { id: '4', name: 'Ольга', login: 'olga04', password: '638olgadex' },
-  { id: '5', name: 'Анастасия', login: 'anastasia05', password: '638anastadex' },
+  { id: '1', name: 'Артём', login: 'artyom03', password: '248artdex', avatar: '/avatars/artyom.jpg' },
+  { id: '2', name: 'Адель', login: 'adel05', password: '058adeldex', avatar: '/avatars/adel.jpg' },
+  { id: '3', name: 'Ксения', login: 'ksen03', password: '907ksendex', avatar: '/avatars/kseniya.jpg' },
+  { id: '4', name: 'Ольга', login: 'olga04', password: '638olgadex', avatar: '/avatars/olga.jpg' },
+  { id: '5', name: 'Анастасия', login: 'anastasia05', password: '638anastadex', avatar: '/avatars/anastasia.jpg' },
 ]
 
 
