@@ -366,6 +366,7 @@ export const Management = () => {
               </div>
               </div>
             </div>
+          </div>
 
           {/* Participant filter */}
           <div className="mt-4 pt-4 border-t border-gray-700/50 dark:border-gray-700">
