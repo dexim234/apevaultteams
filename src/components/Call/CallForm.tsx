@@ -155,7 +155,7 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit }: CallFormProps) => 
       {/* Ticker */}
       <div>
         <label className={`block text-sm font-medium ${textColor} mb-2`}>
-          Тикер токена *
+          № Тикер токена *
         </label>
         <input
           type="text"
@@ -185,14 +185,14 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit }: CallFormProps) => 
       {/* Entry Point */}
       <div>
         <label className={`block text-sm font-medium ${textColor} mb-2`}>
-          Точка входа или диапазон *
+          Точка входа или диапазон капитализации *
         </label>
         <input
           type="text"
           value={formData.entryPoint}
           onChange={(e) => setFormData({ ...formData, entryPoint: e.target.value })}
           className={`w-full px-4 py-2 rounded-lg border ${borderColor} ${inputBg} ${textColor} focus:outline-none focus:ring-2 focus:ring-green-500`}
-          placeholder="0.001 или 0.001-0.002"
+          placeholder="10M или 10M-15M (в миллионах долларов)"
           required
         />
       </div>
@@ -200,14 +200,14 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit }: CallFormProps) => 
       {/* Target */}
       <div>
         <label className={`block text-sm font-medium ${textColor} mb-2`}>
-          Цель/ориентиры по прибыли *
+          Цель/ориентиры по капитализации *
         </label>
         <input
           type="text"
           value={formData.target}
           onChange={(e) => setFormData({ ...formData, target: e.target.value })}
           className={`w-full px-4 py-2 rounded-lg border ${borderColor} ${inputBg} ${textColor} focus:outline-none focus:ring-2 focus:ring-green-500`}
-          placeholder="0.002, 0.003, 0.005"
+          placeholder="20M, 30M, 50M (в миллионах долларов)"
           required
         />
       </div>

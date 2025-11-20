@@ -7,7 +7,7 @@ import { CallForm } from '@/components/Call/CallForm'
 import { getCalls, deleteCall } from '@/services/firestoreService'
 import type { Call } from '@/types'
 import { TEAM_MEMBERS } from '@/types'
-import { Plus, X, Edit, Trash2, Copy, Check, Clock, Target, AlertCircle, FileText, Sparkles, Hash, Zap, Search, BarChart3, TrendingUp, Users, Award, Activity } from 'lucide-react'
+import { Plus, X, Edit, Trash2, Copy, Check, Clock, Target, AlertCircle, FileText, Sparkles, Zap, Search, BarChart3, TrendingUp, Users, Award, Activity } from 'lucide-react'
 
 export const CallPage = () => {
   const { theme } = useThemeStore()
@@ -512,9 +512,8 @@ export const CallPage = () => {
 
                           {/* Ticker ID - Less Prominent */}
                           <div className="flex items-center gap-2 mb-4">
-                            <Hash className={`w-4 h-4 ${subtleColor}`} />
                             <span className={`font-mono text-sm ${subtleColor} bg-gray-100 dark:bg-gray-700/50 px-2 py-1 rounded`}>
-                              {call.ticker}
+                              № {call.ticker}
                             </span>
                             <button
                               onClick={() => copyTicker(call.ticker)}
@@ -585,7 +584,7 @@ export const CallPage = () => {
                         <div className={`p-4 rounded-xl ${theme === 'dark' ? 'bg-gray-700/30' : 'bg-green-50/50'} border ${borderColor}`}>
                           <div className="flex items-center gap-2 mb-2">
                             <Target className={`w-4 h-4 ${theme === 'dark' ? 'text-green-400' : 'text-green-600'}`} />
-                            <p className={`text-xs font-semibold uppercase tracking-wider ${subtleColor}`}>Вход</p>
+                            <p className={`text-xs font-semibold uppercase tracking-wider ${subtleColor}`}>Вход (капитализация)</p>
                           </div>
                           <p className={`${textColor} font-medium`}>{call.entryPoint}</p>
                         </div>
@@ -594,7 +593,7 @@ export const CallPage = () => {
                         <div className={`p-4 rounded-xl ${theme === 'dark' ? 'bg-gray-700/30' : 'bg-blue-50/50'} border ${borderColor}`}>
                           <div className="flex items-center gap-2 mb-2">
                             <Target className={`w-4 h-4 ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`} />
-                            <p className={`text-xs font-semibold uppercase tracking-wider ${subtleColor}`}>Цели</p>
+                            <p className={`text-xs font-semibold uppercase tracking-wider ${subtleColor}`}>Цели (капитализация)</p>
                           </div>
                           <p className={`${textColor} font-medium`}>{call.target}</p>
                         </div>
