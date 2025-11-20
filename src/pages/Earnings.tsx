@@ -23,6 +23,10 @@ export const Earnings = () => {
     monthPool: 0
   })
 
+  const headingColor = theme === 'dark' ? 'text-white' : 'text-gray-900'
+  const subTextColor = theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+  const cardBg = theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+
   const calculateStats = () => {
     const weekRange = getWeekRange()
     const weekStart = formatDate(weekRange.start, 'yyyy-MM-dd')
