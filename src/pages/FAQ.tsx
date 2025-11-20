@@ -4,7 +4,6 @@ import { useThemeStore } from '@/store/themeStore'
 import { 
   HelpCircle, 
   ChevronDown, 
-  ChevronUp, 
   LogIn, 
   Calendar, 
   FileText, 
@@ -315,7 +314,7 @@ export const FAQ = () => {
               <p className={textColor}>В этой категории пока нет вопросов</p>
             </div>
           ) : (
-            filteredFAQs.map((item, index) => {
+            filteredFAQs.map((item) => {
               const actualIndex = faqData.indexOf(item)
               const isOpen = openItems.has(actualIndex)
               const categoryInfo = categories.find(c => c.id === item.category)
@@ -326,15 +325,10 @@ export const FAQ = () => {
                   className={`${cardBg} rounded-xl shadow-lg border-2 ${
                     isOpen 
                       ? theme === 'dark' 
-                        ? 'border-blue-500/50 shadow-blue-500/10' 
-                        : 'border-blue-300 shadow-blue-200/50'
+                        ? 'border-blue-500/50 shadow-blue-500/10 ring-2 ring-blue-500/50' 
+                        : 'border-blue-300 shadow-blue-200/50 ring-2 ring-blue-300/50'
                       : borderColor
-                  } overflow-hidden transition-all duration-300 ${
-                    isOpen ? 'ring-2 ring-opacity-50' : ''
-                  }`}
-                  style={{
-                    ringColor: theme === 'dark' ? 'rgba(59, 130, 246, 0.5)' : 'rgba(59, 130, 246, 0.3)'
-                  }}
+                  } overflow-hidden transition-all duration-300`}
                 >
                   <button
                     onClick={() => toggleItem(item)}
