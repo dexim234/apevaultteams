@@ -238,22 +238,48 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
                   {formatDate(day, 'dd.MM')}
                 </th>
               ))}
-              <th className={`px-4 py-3 text-center text-sm font-semibold ${headingColor}`}>Статистика</th>
+              <th className={`px-4 py-4 text-center text-sm font-bold ${headingColor}`}>Статистика</th>
             </tr>
           </thead>
           <tbody>
-            {displayUsers.map((user) => {
+            {displayUsers.map((user, index) => {
               const stats = getUserStats(user.id)
+              const isEven = index % 2 === 0
               return (
-                <tr key={user.id} className={`border-b ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
-                  <td className={`px-4 py-3 font-medium ${headingColor}`}>{user.name}</td>
+                <tr 
+                  key={user.id} 
+                  className={`
+                    border-b transition-all duration-200
+                    ${theme === 'dark' ? 'border-gray-700/50' : 'border-gray-200/50'}
+                    ${isEven 
+                      ? theme === 'dark' ? 'bg-gray-800/30 hover:bg-gray-800/60' : 'bg-gray-50/50 hover:bg-gray-100/80'
+                      : theme === 'dark' ? 'bg-gray-800/10 hover:bg-gray-800/40' : 'bg-white hover:bg-gray-50'
+                    }
+                  `}
+                >
+                  <td className={`px-4 py-4 font-semibold ${headingColor} sticky left-0 z-10 ${
+                    isEven 
+                      ? theme === 'dark' ? 'bg-gray-800/30' : 'bg-gray-50/50'
+                      : theme === 'dark' ? 'bg-gray-800/10' : 'bg-white'
+                  }`}>
+                    <div className="flex items-center gap-3">
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
+                        theme === 'dark' 
+                          ? 'bg-gradient-to-br from-green-500 to-blue-500 text-white shadow-lg' 
+                          : 'bg-gradient-to-br from-green-400 to-blue-400 text-white shadow-md'
+                      }`}>
+                        {user.name.charAt(0).toUpperCase()}
+                      </div>
+                      <span>{user.name}</span>
+                    </div>
+                  </td>
                   {weekDays.map((day) => {
                     const dateStr = formatDate(day, 'yyyy-MM-dd')
                     const slot = getSlotForDay(user.id, dateStr)
                     const status = getStatusForDay(user.id, dateStr)
 
-                    return (
-                      <td key={dateStr} className="px-2 py-3 text-center">
+                      return (
+                        <td key={dateStr} className="px-2 py-3 text-center border-l border-r border-transparent hover:border-blue-500/20 transition-colors">
                         {slot ? (
                           <div className="space-y-2">
                             {(() => {

@@ -336,11 +336,18 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
                   return (
                     <div
                       key={slot.id}
-                      className={`space-y-2 p-3 ${slotBg} rounded-xl shadow-md border-2`}
+                      className={`space-y-3 p-4 ${slotBg} rounded-xl shadow-lg border-2 hover:shadow-xl transition-all duration-200 hover:scale-[1.02] mb-3`}
                     >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <span className="text-white font-semibold text-base">{displayName}</span>
+                      <div className="flex items-center justify-between border-b border-white/20 pb-3">
+                        <div className="flex items-center gap-3">
+                          <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${
+                            isUpcoming 
+                              ? 'bg-white/20 backdrop-blur-sm border-2 border-white/30' 
+                              : 'bg-white/10 backdrop-blur-sm border-2 border-white/20'
+                          }`}>
+                            {displayName.charAt(0).toUpperCase()}
+                          </div>
+                          <span className="text-white font-bold text-base">{displayName}</span>
                         </div>
                         <div className="flex gap-2">
                           {(isAdmin || user?.id === slot.userId) ? (
