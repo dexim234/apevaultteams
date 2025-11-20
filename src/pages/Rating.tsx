@@ -147,76 +147,155 @@ export const Rating = () => {
     <Layout>
       <div className="space-y-6">
         {/* Header */}
-        <div className={`rounded-xl p-6 ${cardBg} shadow-lg border ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex-1">
-              <div className="flex items-center gap-3 mb-2">
-                <div className={`p-2 rounded-lg ${theme === 'dark' ? 'bg-blue-600' : 'bg-blue-500'} text-white`}>
-                  <span className="text-2xl">🏆</span>
+        <div className={`rounded-2xl p-8 ${cardBg} shadow-xl border-2 ${
+          theme === 'dark' 
+            ? 'border-blue-500/30 bg-gradient-to-br from-gray-800 via-gray-800 to-gray-900' 
+            : 'border-blue-200 bg-gradient-to-br from-white via-blue-50/30 to-white'
+        } relative overflow-hidden`}>
+          {/* Decorative elements */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-full blur-3xl -mr-32 -mt-32" />
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-green-500/10 to-yellow-500/10 rounded-full blur-2xl -ml-24 -mb-24" />
+          
+          <div className="relative z-10">
+            <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+              <div className="flex-1">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className={`p-4 rounded-2xl shadow-lg ${
+                    theme === 'dark' 
+                      ? 'bg-gradient-to-br from-blue-600 to-purple-600' 
+                      : 'bg-gradient-to-br from-blue-500 to-purple-500'
+                  } text-white transform transition-transform hover:scale-110`}>
+                    <span className="text-4xl">🏆</span>
+                  </div>
+                  <div>
+                    <h1 className={`text-4xl font-extrabold mb-2 ${headingColor} flex items-center gap-3`}>
+                      <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-transparent bg-clip-text">
+                        Рейтинг участников
+                      </span>
+                      <span className="text-2xl">⭐</span>
+                    </h1>
+                    <p className={`text-base font-medium ${subTextColor} flex items-center gap-2`}>
+                      <span className="text-green-500">●</span>
+                      Система оценки эффективности команды
+                    </p>
+                  </div>
                 </div>
-                <h2 className={`text-3xl font-bold ${headingColor}`}>Рейтинг участников</h2>
+                <div className={`p-5 rounded-xl border-2 ${
+                  theme === 'dark' 
+                    ? 'bg-gray-800/50 border-blue-500/20' 
+                    : 'bg-blue-50/50 border-blue-200'
+                } mb-4`}>
+                  <p className={`text-sm leading-relaxed ${subTextColor}`}>
+                    Рейтинг рассчитывается на основе <strong className={headingColor}>7 параметров</strong>: 
+                    выходные, больничные, отпуск (за месяц), часы работы, заработок, рефералы и сообщения в группе (за неделю). 
+                    Каждый параметр дает определенное количество баллов. 
+                    <strong className={headingColor}> Максимальный рейтинг - 100%</strong>. 
+                    Рейтинг обновляется автоматически при изменении данных.
+                  </p>
+                </div>
               </div>
-              <p className={`text-sm leading-relaxed ${subTextColor} ml-12`}>
-                Рейтинг рассчитывается на основе <strong>7 параметров</strong>: выходные, больничные, отпуск (за месяц), 
-                часы работы, заработок, рефералы и сообщения в группе (за неделю). Каждый параметр дает определенное 
-                количество баллов. Максимальный рейтинг - <strong>100%</strong>. Рейтинг обновляется автоматически при изменении данных.
-              </p>
+              <button
+                onClick={handleAddReferral}
+                className={`w-full lg:w-auto px-6 py-4 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-xl transition-all duration-200 flex items-center justify-center gap-2 font-semibold shadow-lg hover:shadow-xl hover:scale-105 transform`}
+              >
+                <span className="text-xl">➕</span>
+                <span>Добавить реферала</span>
+              </button>
             </div>
-            <button
-              onClick={handleAddReferral}
-              className="w-full sm:w-auto px-4 py-3 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors flex items-center justify-center gap-2 font-semibold shadow-md hover:shadow-lg"
-            >
-              <span className="text-lg">➕</span>
-              Добавить реферала
-            </button>
           </div>
         </div>
 
         {/* Team KPD */}
-        <div className={`rounded-xl p-6 ${cardBg} shadow-lg border ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
-          <div className="flex items-center gap-3 mb-4">
-            <div className={`p-3 rounded-lg ${theme === 'dark' ? 'bg-green-600' : 'bg-green-500'} text-white`}>
-              <span className="text-2xl">📊</span>
-            </div>
-            <div className="flex-1">
-              <h3 className={`text-xl font-bold mb-1 ${headingColor}`}>Средний КПД команды</h3>
-              <p className={`text-sm ${subTextColor}`}>Средний рейтинг всех участников команды</p>
-            </div>
-            <div className="text-right">
-              <div className={`text-3xl font-bold ${theme === 'dark' ? 'text-green-400' : 'text-green-600'}`}>
-                {teamKPD.toFixed(1)}%
+        <div className={`rounded-2xl p-8 ${cardBg} shadow-xl border-2 ${
+          theme === 'dark' 
+            ? 'border-green-500/30 bg-gradient-to-br from-gray-800 to-gray-900' 
+            : 'border-green-200 bg-gradient-to-br from-white to-green-50/20'
+        } relative overflow-hidden`}>
+          {/* Decorative background */}
+          <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-green-500/10 to-emerald-500/10 rounded-full blur-2xl -mr-20 -mt-20" />
+          
+          <div className="relative z-10">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-6 mb-6">
+              <div className={`p-4 rounded-2xl shadow-lg ${
+                theme === 'dark' 
+                  ? 'bg-gradient-to-br from-green-600 to-emerald-600' 
+                  : 'bg-gradient-to-br from-green-500 to-emerald-500'
+              } text-white flex-shrink-0`}>
+                <span className="text-3xl">📊</span>
+              </div>
+              <div className="flex-1">
+                <h3 className={`text-2xl font-extrabold mb-2 ${headingColor} flex items-center gap-2`}>
+                  <span className="bg-gradient-to-r from-green-600 to-emerald-600 text-transparent bg-clip-text">
+                    Средний КПД команды
+                  </span>
+                </h3>
+                <p className={`text-sm ${subTextColor} font-medium`}>
+                  Средний рейтинг всех участников команды за текущий период
+                </p>
+              </div>
+              <div className="text-center sm:text-right">
+                <div className={`text-5xl font-extrabold mb-1 ${
+                  theme === 'dark' 
+                    ? 'text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-400' 
+                    : 'text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-emerald-600'
+                }`}>
+                  {teamKPD.toFixed(1)}%
+                </div>
+                <p className={`text-xs ${subTextColor}`}>из 100%</p>
               </div>
             </div>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-10 overflow-hidden shadow-inner">
-              <div
-                className="h-full bg-gradient-to-r from-green-500 to-green-600 transition-all duration-500 flex items-center justify-center shadow-md"
-                style={{ width: `${Math.min(teamKPD, 100)}%` }}
-              >
-                {teamKPD >= 10 && (
-                  <span className="text-white text-sm font-bold">
-                    {teamKPD.toFixed(1)}%
-                  </span>
-                )}
+            <div className="flex items-center gap-4">
+              <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-12 overflow-hidden shadow-inner border-2 border-gray-300 dark:border-gray-600">
+                <div
+                  className={`h-full bg-gradient-to-r ${
+                    teamKPD >= 80 
+                      ? 'from-green-500 to-emerald-500' 
+                      : teamKPD >= 50
+                      ? 'from-yellow-500 to-orange-500'
+                      : 'from-blue-500 to-purple-500'
+                  } transition-all duration-500 flex items-center justify-center shadow-lg`}
+                  style={{ width: `${Math.min(teamKPD, 100)}%` }}
+                >
+                  {teamKPD >= 10 && (
+                    <span className="text-white text-sm font-bold px-3">
+                      {teamKPD.toFixed(1)}%
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
           </div>
         </div>
 
         {/* Referral stats */}
-        <div className={`rounded-xl p-6 ${cardBg} shadow-lg border ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
-          <div className="flex items-center gap-3 mb-6">
-            <div className={`p-2 rounded-lg ${theme === 'dark' ? 'bg-pink-600' : 'bg-pink-500'} text-white`}>
-              <span className="text-2xl">👥</span>
+        <div className={`rounded-2xl p-8 ${cardBg} shadow-xl border-2 ${
+          theme === 'dark' 
+            ? 'border-pink-500/30 bg-gradient-to-br from-gray-800 to-gray-900' 
+            : 'border-pink-200 bg-gradient-to-br from-white to-pink-50/20'
+        } relative overflow-hidden`}>
+          {/* Decorative background */}
+          <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-pink-500/10 to-rose-500/10 rounded-full blur-2xl -mr-20 -mt-20" />
+          
+          <div className="relative z-10">
+            <div className="flex items-center gap-4 mb-6">
+              <div className={`p-4 rounded-2xl shadow-lg ${
+                theme === 'dark' 
+                  ? 'bg-gradient-to-br from-pink-600 to-rose-600' 
+                  : 'bg-gradient-to-br from-pink-500 to-rose-500'
+              } text-white flex-shrink-0`}>
+                <span className="text-3xl">👥</span>
+              </div>
+              <div className="flex-1">
+                <h3 className={`text-2xl font-extrabold mb-2 ${headingColor} flex items-center gap-2`}>
+                  <span className="bg-gradient-to-r from-pink-600 to-rose-600 text-transparent bg-clip-text">
+                    Рефералы за 30 дней
+                  </span>
+                </h3>
+                <p className={`text-sm ${subTextColor} font-medium`}>
+                  Всего добавлено: <strong className={`text-lg ${headingColor}`}>{referrals.length}</strong> рефералов
+                </p>
+              </div>
             </div>
-            <div className="flex-1">
-              <h3 className={`text-xl font-bold mb-1 ${headingColor}`}>Рефералы за 30 дней</h3>
-              <p className={`text-sm ${subTextColor}`}>
-                Всего добавлено: <strong className={headingColor}>{referrals.length}</strong> рефералов
-              </p>
-            </div>
-          </div>
           <div className="grid gap-4 md:grid-cols-2">
             {TEAM_MEMBERS.map((member) => {
               const memberRefs = referrals.filter((referral) => referral.ownerId === member.id)
@@ -285,33 +364,80 @@ export const Rating = () => {
           </div>
         </div>
 
-        {/* Rating cards */}
-        {loading ? (
-          <div className={`rounded-xl p-12 text-center ${cardBg} shadow-lg border ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto mb-4"></div>
-            <p className={`text-lg ${subTextColor}`}>Загрузка рейтинга...</p>
-          </div>
-        ) : (
-          <>
-            <div className="flex items-center gap-2 mb-4">
-              <span className={`text-sm font-semibold ${subTextColor}`}>
-                Показано участников: {ratings.length}
-              </span>
+        {/* Rating cards section */}
+        <div className={`rounded-2xl p-8 ${cardBg} shadow-xl border-2 ${
+          theme === 'dark' 
+            ? 'border-purple-500/30 bg-gradient-to-br from-gray-800 to-gray-900' 
+            : 'border-purple-200 bg-gradient-to-br from-white to-purple-50/20'
+        } relative overflow-hidden`}>
+          {/* Decorative background */}
+          <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-purple-500/10 to-indigo-500/10 rounded-full blur-2xl -mr-20 -mt-20" />
+          
+          <div className="relative z-10">
+            <div className="flex items-center gap-4 mb-6">
+              <div className={`p-4 rounded-2xl shadow-lg ${
+                theme === 'dark' 
+                  ? 'bg-gradient-to-br from-purple-600 to-indigo-600' 
+                  : 'bg-gradient-to-br from-purple-500 to-indigo-500'
+              } text-white flex-shrink-0`}>
+                <span className="text-3xl">⭐</span>
+              </div>
+              <div className="flex-1">
+                <h3 className={`text-2xl font-extrabold mb-2 ${headingColor} flex items-center gap-2`}>
+                  <span className="bg-gradient-to-r from-purple-600 to-indigo-600 text-transparent bg-clip-text">
+                    Рейтинг участников
+                  </span>
+                </h3>
+                <p className={`text-sm ${subTextColor} font-medium`}>
+                  Детальная статистика по каждому участнику команды
+                </p>
+              </div>
             </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-              {ratings.map((rating, index) => (
-                <div key={rating.userId} className="relative">
-                  {index === 0 && ratings.length > 1 && (
-                    <div className="absolute -top-3 -right-3 z-10 bg-yellow-400 text-yellow-900 text-xs font-bold px-3 py-1 rounded-full shadow-lg animate-pulse">
-                      🥇 Лидер
-                    </div>
-                  )}
-                  <RatingCard rating={rating} />
+
+            {loading ? (
+              <div className={`rounded-xl p-12 text-center ${theme === 'dark' ? 'bg-gray-700/50' : 'bg-gray-50'} border-2 ${theme === 'dark' ? 'border-gray-600' : 'border-gray-200'}`}>
+                <div className="animate-spin rounded-full h-16 w-16 border-4 border-purple-500 border-t-transparent mx-auto mb-4"></div>
+                <p className={`text-lg font-semibold ${headingColor}`}>Загрузка рейтинга...</p>
+                <p className={`text-sm ${subTextColor} mt-2`}>Подождите, собираем статистику</p>
+              </div>
+            ) : (
+              <>
+                <div className="flex items-center justify-between mb-6">
+                  <div className={`px-4 py-2 rounded-xl ${theme === 'dark' ? 'bg-gray-700/50' : 'bg-gray-100'} border ${theme === 'dark' ? 'border-gray-600' : 'border-gray-200'}`}>
+                    <span className={`text-sm font-semibold ${headingColor}`}>
+                      Показано участников: <span className="text-purple-500 dark:text-purple-400">{ratings.length}</span>
+                    </span>
+                  </div>
                 </div>
-              ))}
-            </div>
-          </>
-        )}
+                <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                  {ratings.map((rating, index) => (
+                    <div key={rating.userId} className="relative transform transition-all duration-300 hover:scale-105">
+                      {index === 0 && ratings.length > 1 && (
+                        <div className="absolute -top-4 -right-4 z-20 bg-gradient-to-r from-yellow-400 to-yellow-500 text-yellow-900 text-xs font-extrabold px-4 py-2 rounded-full shadow-xl animate-pulse border-2 border-yellow-300 flex items-center gap-1">
+                          <span className="text-base">🥇</span>
+                          <span>ЛИДЕР</span>
+                        </div>
+                      )}
+                      {index === 1 && ratings.length > 2 && (
+                        <div className="absolute -top-4 -right-4 z-20 bg-gradient-to-r from-gray-300 to-gray-400 text-gray-800 text-xs font-extrabold px-4 py-2 rounded-full shadow-xl border-2 border-gray-200 flex items-center gap-1">
+                          <span className="text-base">🥈</span>
+                          <span>2-е место</span>
+                        </div>
+                      )}
+                      {index === 2 && ratings.length > 3 && (
+                        <div className="absolute -top-4 -right-4 z-20 bg-gradient-to-r from-orange-300 to-orange-400 text-orange-900 text-xs font-extrabold px-4 py-2 rounded-full shadow-xl border-2 border-orange-200 flex items-center gap-1">
+                          <span className="text-base">🥉</span>
+                          <span>3-е место</span>
+                        </div>
+                      )}
+                      <RatingCard rating={rating} />
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        </div>
       </div>
       {showReferralForm && (
         <ReferralForm

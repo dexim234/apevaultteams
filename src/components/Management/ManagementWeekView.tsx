@@ -7,15 +7,18 @@ import { getWorkSlots, getDayStatuses, deleteWorkSlot, deleteDayStatus } from '@
 import { formatDate, getWeekDays } from '@/utils/dateUtils'
 import { WorkSlot, DayStatus } from '@/types'
 import { TEAM_MEMBERS } from '@/types'
-import { Edit, Trash2, Info, Clock } from 'lucide-react'
+import { Edit, Trash2, Info, Clock, CheckCircle2, Calendar as CalendarIcon } from 'lucide-react'
+
+type SlotFilter = 'all' | 'upcoming' | 'completed'
 
 interface ManagementWeekViewProps {
   selectedUserId: string | null
+  slotFilter: SlotFilter
   onEditSlot: (slot: WorkSlot) => void
   onEditStatus: (status: DayStatus) => void
 }
 
-export const ManagementWeekView = ({ selectedUserId, onEditSlot, onEditStatus }: ManagementWeekViewProps) => {
+export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onEditStatus }: ManagementWeekViewProps) => {
   const { theme } = useThemeStore()
   const { user } = useAuthStore()
   const { isAdmin } = useAdminStore()
@@ -117,8 +120,45 @@ export const ManagementWeekView = ({ selectedUserId, onEditSlot, onEditStatus }:
     }
   }
 
+  const isSlotUpcoming = (slot: WorkSlot): boolean => {
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const slotDate = new Date(slot.date)
+    slotDate.setHours(0, 0, 0, 0)
+    
+    // If slot date is in the future, it's upcoming
+    if (slotDate > today) return true
+    
+    // If slot date is today, check if any slot time hasn't ended yet
+    if (slotDate.getTime() === today.getTime()) {
+      const now = new Date()
+      const currentTime = now.getHours() * 60 + now.getMinutes() // minutes since midnight
+      
+      // Check if any slot hasn't ended yet
+      return slot.slots.some((s) => {
+        const [endHour, endMin] = s.end.split(':').map(Number)
+        const endTime = endHour * 60 + endMin
+        return endTime > currentTime
+      })
+    }
+    
+    return false
+  }
+
   const getSlotsForDay = (date: string): WorkSlot[] => {
-    return slots.filter((s) => s.date === date)
+    let daySlots = slots.filter((s) => s.date === date)
+    
+    // Apply filter
+    if (slotFilter !== 'all') {
+      daySlots = daySlots.filter(slot => {
+        const isUpcoming = isSlotUpcoming(slot)
+        if (slotFilter === 'upcoming') return isUpcoming
+        if (slotFilter === 'completed') return !isUpcoming
+        return true
+      })
+    }
+    
+    return daySlots
   }
 
   const getStatusesForDay = (date: string): DayStatus[] => {
@@ -287,10 +327,16 @@ export const ManagementWeekView = ({ selectedUserId, onEditSlot, onEditStatus }:
                     return oldIdMap[slot.userId] === u.id
                   })
                   const displayName = slotUserFallback?.name || slot.userId
+                  const isUpcoming = isSlotUpcoming(slot)
+                  const slotBg = isUpcoming 
+                    ? 'bg-gradient-to-r from-blue-500 to-blue-600 border-blue-400/30' 
+                    : 'bg-gradient-to-r from-gray-500 to-gray-600 border-gray-400/30'
+                  const SlotIcon = isUpcoming ? CalendarIcon : CheckCircle2
+                  
                   return (
                     <div
                       key={slot.id}
-                      className="space-y-2 p-3 bg-gradient-to-r from-green-500 to-green-600 rounded-xl shadow-md border-2 border-green-400/30"
+                      className={`space-y-2 p-3 ${slotBg} rounded-xl shadow-md border-2`}
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
@@ -338,7 +384,7 @@ export const ManagementWeekView = ({ selectedUserId, onEditSlot, onEditStatus }:
                             {/* Main slot time */}
                             <div className="bg-white/20 backdrop-blur-sm rounded-lg px-3 py-2 border border-white/30">
                               <div className="flex items-center gap-2">
-                                <Clock className="w-4 h-4 text-white" />
+                                <SlotIcon className="w-4 h-4 text-white" />
                                 <span className="text-white font-semibold text-sm">{s.start} - {s.end}</span>
                               </div>
                             </div>

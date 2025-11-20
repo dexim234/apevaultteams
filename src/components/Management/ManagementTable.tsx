@@ -7,15 +7,18 @@ import { getWorkSlots, getDayStatuses, deleteWorkSlot, deleteDayStatus } from '@
 import { formatDate, calculateHours, getWeekDays } from '@/utils/dateUtils'
 import { WorkSlot, DayStatus } from '@/types'
 import { TEAM_MEMBERS } from '@/types'
-import { Edit, Trash2, Info, Clock } from 'lucide-react'
+import { Edit, Trash2, Info, Clock, CheckCircle2, Calendar as CalendarIcon } from 'lucide-react'
+
+type SlotFilter = 'all' | 'upcoming' | 'completed'
 
 interface ManagementTableProps {
   selectedUserId: string | null
+  slotFilter: SlotFilter
   onEditSlot: (slot: WorkSlot) => void
   onEditStatus: (status: DayStatus) => void
 }
 
-export const ManagementTable = ({ selectedUserId, onEditSlot, onEditStatus }: ManagementTableProps) => {
+export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEditStatus }: ManagementTableProps) => {
   const { theme } = useThemeStore()
   const { user } = useAuthStore()
   const { isAdmin } = useAdminStore()
@@ -219,28 +222,37 @@ export const ManagementTable = ({ selectedUserId, onEditSlot, onEditStatus }: Ma
                       <td key={dateStr} className="px-2 py-3 text-center">
                         {slot ? (
                           <div className="space-y-2">
-                            {slot.slots.map((s, slotIdx) => (
-                              <div key={slotIdx} className="space-y-1">
-                                {/* Main slot time */}
-                                <div className="bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg px-3 py-1.5 text-xs font-semibold shadow-sm">
-                                  <div className="flex items-center justify-center gap-1">
-                                    <Clock className="w-3 h-3" />
-                                    <span>{s.start} - {s.end}</span>
+                            {(() => {
+                              const isUpcoming = isSlotUpcoming(slot)
+                              const slotBg = isUpcoming 
+                                ? 'bg-gradient-to-r from-blue-500 to-blue-600' 
+                                : 'bg-gradient-to-r from-gray-500 to-gray-600'
+                              const slotIcon = isUpcoming ? CalendarIcon : CheckCircle2
+                              const SlotIcon = slotIcon
+                              
+                              return slot.slots.map((s, slotIdx) => (
+                                <div key={slotIdx} className="space-y-1">
+                                  {/* Main slot time */}
+                                  <div className={`${slotBg} text-white rounded-lg px-3 py-1.5 text-xs font-semibold shadow-sm`}>
+                                    <div className="flex items-center justify-center gap-1">
+                                      <SlotIcon className="w-3 h-3" />
+                                      <span>{s.start} - {s.end}</span>
+                                    </div>
                                   </div>
+                                  {/* Breaks */}
+                                  {s.breaks && s.breaks.length > 0 && (
+                                    <div className="space-y-1">
+                                      <div className="text-[10px] text-gray-500 dark:text-gray-400 font-medium">Перерывы:</div>
+                                      {s.breaks.map((breakItem, breakIdx) => (
+                                        <div key={breakIdx} className="bg-orange-400 dark:bg-orange-500 text-white rounded px-2 py-1 text-[10px] font-medium shadow-sm">
+                                          {breakItem.start} - {breakItem.end}
+                                        </div>
+                                      ))}
+                                    </div>
+                                  )}
                                 </div>
-                                {/* Breaks */}
-                                {s.breaks && s.breaks.length > 0 && (
-                                  <div className="space-y-1">
-                                    <div className="text-[10px] text-gray-500 dark:text-gray-400 font-medium">Перерывы:</div>
-                                    {s.breaks.map((breakItem, breakIdx) => (
-                                      <div key={breakIdx} className="bg-orange-400 dark:bg-orange-500 text-white rounded px-2 py-1 text-[10px] font-medium shadow-sm">
-                                        {breakItem.start} - {breakItem.end}
-                                      </div>
-                                    ))}
-                                  </div>
-                                )}
-                              </div>
-                            ))}
+                              ))
+                            })()}
                             {slot.comment && (
                               <div className="flex items-center justify-center group relative">
                                 <Info className="w-4 h-4 text-gray-400 cursor-help" />

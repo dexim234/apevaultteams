@@ -13,10 +13,12 @@ import { getWorkSlots, getDayStatuses } from '@/services/firestoreService'
 import { getWeekDays, formatDate } from '@/utils/dateUtils'
 
 type ViewMode = 'table' | 'week'
+type SlotFilter = 'all' | 'upcoming' | 'completed'
 
 export const Management = () => {
   const { theme } = useThemeStore()
   const [viewMode, setViewMode] = useState<ViewMode>('table')
+  const [slotFilter, setSlotFilter] = useState<SlotFilter>('all')
   const [showSlotForm, setShowSlotForm] = useState(false)
   const [showDeleteSlotsForm, setShowDeleteSlotsForm] = useState(false)
   const [showStatusForm, setShowStatusForm] = useState(false)
@@ -24,11 +26,41 @@ export const Management = () => {
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null)
   const [editingSlot, setEditingSlot] = useState<any>(null)
   const [editingStatus, setEditingStatus] = useState<any>(null)
-  const [stats, setStats] = useState({ slotsThisWeek: 0, activeMembers: 0 })
+  const [stats, setStats] = useState({ 
+    slotsThisWeek: 0, 
+    activeMembers: 0,
+    upcomingSlots: 0,
+    completedSlots: 0
+  })
 
   useEffect(() => {
     loadStats()
   }, [])
+
+  const isSlotUpcoming = (slot: any): boolean => {
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const slotDate = new Date(slot.date)
+    slotDate.setHours(0, 0, 0, 0)
+    
+    // If slot date is in the future, it's upcoming
+    if (slotDate > today) return true
+    
+    // If slot date is today, check if any slot time hasn't ended yet
+    if (slotDate.getTime() === today.getTime()) {
+      const now = new Date()
+      const currentTime = now.getHours() * 60 + now.getMinutes() // minutes since midnight
+      
+      // Check if any slot hasn't ended yet
+      return slot.slots.some((s: any) => {
+        const [endHour, endMin] = s.end.split(':').map(Number)
+        const endTime = endHour * 60 + endMin
+        return endTime > currentTime
+      })
+    }
+    
+    return false
+  }
 
   const loadStats = async () => {
     try {
@@ -44,9 +76,15 @@ export const Management = () => {
       const weekSlots = allSlots.filter((s) => s.date >= weekStart && s.date <= weekEnd)
       const uniqueMembers = new Set([...weekSlots.map(s => s.userId), ...allStatuses.map(s => s.userId)])
 
+      // Calculate upcoming and completed slots
+      const upcomingSlots = weekSlots.filter(isSlotUpcoming).length
+      const completedSlots = weekSlots.length - upcomingSlots
+
       setStats({
         slotsThisWeek: weekSlots.length,
-        activeMembers: uniqueMembers.size
+        activeMembers: uniqueMembers.size,
+        upcomingSlots,
+        completedSlots
       })
     } catch (error) {
       console.error('Error loading stats:', error)
@@ -128,7 +166,7 @@ export const Management = () => {
           </div>
 
           {/* Stats cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <div className={`p-4 rounded-xl border-2 ${
               theme === 'dark' 
                 ? 'bg-green-500/10 border-green-500/30' 
@@ -141,9 +179,47 @@ export const Management = () => {
                   <Clock className={`w-5 h-5 ${theme === 'dark' ? 'text-green-400' : 'text-green-600'}`} />
                 </div>
                 <div>
-                  <p className={`text-sm ${labelColor}`}>Слотов на этой неделе</p>
+                  <p className={`text-sm ${labelColor}`}>Всего слотов</p>
                   <p className={`text-2xl font-bold ${theme === 'dark' ? 'text-green-400' : 'text-green-600'}`}>
                     {stats.slotsThisWeek}
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className={`p-4 rounded-xl border-2 ${
+              theme === 'dark' 
+                ? 'bg-blue-500/10 border-blue-500/30' 
+                : 'bg-blue-50 border-blue-200'
+            }`}>
+              <div className="flex items-center gap-3">
+                <div className={`p-2 rounded-lg ${
+                  theme === 'dark' ? 'bg-blue-500/20' : 'bg-blue-100'
+                }`}>
+                  <Calendar className={`w-5 h-5 ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`} />
+                </div>
+                <div>
+                  <p className={`text-sm ${labelColor}`}>Предстоящих</p>
+                  <p className={`text-2xl font-bold ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}>
+                    {stats.upcomingSlots}
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className={`p-4 rounded-xl border-2 ${
+              theme === 'dark' 
+                ? 'bg-gray-500/10 border-gray-500/30' 
+                : 'bg-gray-50 border-gray-200'
+            }`}>
+              <div className="flex items-center gap-3">
+                <div className={`p-2 rounded-lg ${
+                  theme === 'dark' ? 'bg-gray-500/20' : 'bg-gray-100'
+                }`}>
+                  <CalendarCheck className={`w-5 h-5 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`} />
+                </div>
+                <div>
+                  <p className={`text-sm ${labelColor}`}>Завершенных</p>
+                  <p className={`text-2xl font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                    {stats.completedSlots}
                   </p>
                 </div>
               </div>
@@ -169,41 +245,87 @@ export const Management = () => {
             </div>
           </div>
 
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <h2 className={`text-xl font-semibold ${headingColor}`}>Инструменты управления</h2>
-
-            <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
-              {/* View mode toggle */}
-              <div className={`flex rounded-xl p-1.5 w-full sm:w-auto shadow-inner ${
+          <div className="flex flex-col gap-4">
+            {/* Slot Filter Tabs */}
+            <div className="flex items-center gap-2">
+              <h2 className={`text-lg font-semibold ${headingColor} mr-4`}>Фильтр слотов:</h2>
+              <div className={`flex rounded-xl p-1.5 shadow-inner ${
                 theme === 'dark' ? 'bg-gray-700/50 border border-gray-600' : 'bg-gray-200/50 border border-gray-300'
               }`}>
                 <button
-                  onClick={() => setViewMode('table')}
-                  className={`flex-1 sm:flex-none px-4 py-2.5 text-sm sm:text-base rounded-lg transition-all duration-200 flex items-center justify-center gap-2 font-medium ${
-                    viewMode === 'table'
-                      ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg shadow-green-500/50 scale-105'
+                  onClick={() => setSlotFilter('all')}
+                  className={`px-4 py-2 rounded-lg transition-all duration-200 text-sm font-medium ${
+                    slotFilter === 'all'
+                      ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg shadow-green-500/50'
                       : theme === 'dark'
                       ? 'text-gray-300 hover:bg-gray-600/50 hover:text-white'
                       : 'text-gray-700 hover:bg-gray-300 hover:text-gray-900'
                   }`}
                 >
-                  <Table2 className="w-4 h-4" />
-                  Таблица
+                  Все
                 </button>
                 <button
-                  onClick={() => setViewMode('week')}
-                  className={`flex-1 sm:flex-none px-4 py-2.5 text-sm sm:text-base rounded-lg transition-all duration-200 flex items-center justify-center gap-2 font-medium ${
-                    viewMode === 'week'
-                      ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg shadow-green-500/50 scale-105'
+                  onClick={() => setSlotFilter('upcoming')}
+                  className={`px-4 py-2 rounded-lg transition-all duration-200 text-sm font-medium ${
+                    slotFilter === 'upcoming'
+                      ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/50'
                       : theme === 'dark'
                       ? 'text-gray-300 hover:bg-gray-600/50 hover:text-white'
                       : 'text-gray-700 hover:bg-gray-300 hover:text-gray-900'
                   }`}
                 >
-                  <Calendar className="w-4 h-4" />
-                  Неделя
+                  Предстоящие
+                </button>
+                <button
+                  onClick={() => setSlotFilter('completed')}
+                  className={`px-4 py-2 rounded-lg transition-all duration-200 text-sm font-medium ${
+                    slotFilter === 'completed'
+                      ? 'bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-lg shadow-gray-500/50'
+                      : theme === 'dark'
+                      ? 'text-gray-300 hover:bg-gray-600/50 hover:text-white'
+                      : 'text-gray-700 hover:bg-gray-300 hover:text-gray-900'
+                  }`}
+                >
+                  Завершенные
                 </button>
               </div>
+            </div>
+
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <h2 className={`text-xl font-semibold ${headingColor}`}>Инструменты управления</h2>
+
+              <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
+                {/* View mode toggle */}
+                <div className={`flex rounded-xl p-1.5 w-full sm:w-auto shadow-inner ${
+                  theme === 'dark' ? 'bg-gray-700/50 border border-gray-600' : 'bg-gray-200/50 border border-gray-300'
+                }`}>
+                  <button
+                    onClick={() => setViewMode('table')}
+                    className={`flex-1 sm:flex-none px-4 py-2.5 text-sm sm:text-base rounded-lg transition-all duration-200 flex items-center justify-center gap-2 font-medium ${
+                      viewMode === 'table'
+                        ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg shadow-green-500/50 scale-105'
+                        : theme === 'dark'
+                        ? 'text-gray-300 hover:bg-gray-600/50 hover:text-white'
+                        : 'text-gray-700 hover:bg-gray-300 hover:text-gray-900'
+                    }`}
+                  >
+                    <Table2 className="w-4 h-4" />
+                    Таблица
+                  </button>
+                  <button
+                    onClick={() => setViewMode('week')}
+                    className={`flex-1 sm:flex-none px-4 py-2.5 text-sm sm:text-base rounded-lg transition-all duration-200 flex items-center justify-center gap-2 font-medium ${
+                      viewMode === 'week'
+                        ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg shadow-green-500/50 scale-105'
+                        : theme === 'dark'
+                        ? 'text-gray-300 hover:bg-gray-600/50 hover:text-white'
+                        : 'text-gray-700 hover:bg-gray-300 hover:text-gray-900'
+                    }`}
+                  >
+                    <Calendar className="w-4 h-4" />
+                    Неделя
+                  </button>
+                </div>
 
               {/* Add buttons */}
               <button
@@ -275,12 +397,14 @@ export const Management = () => {
         {viewMode === 'table' ? (
           <ManagementTable
             selectedUserId={selectedUserId}
+            slotFilter={slotFilter}
             onEditSlot={handleEditSlot}
             onEditStatus={handleEditStatus}
           />
         ) : (
           <ManagementWeekView
             selectedUserId={selectedUserId}
+            slotFilter={slotFilter}
             onEditSlot={handleEditSlot}
             onEditStatus={handleEditStatus}
           />
