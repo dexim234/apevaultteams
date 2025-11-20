@@ -7,6 +7,7 @@ type Theme = 'light' | 'dark'
 interface ThemeState {
   theme: Theme
   toggleTheme: () => void
+  setTheme: (theme: Theme) => void
 }
 
 export const useThemeStore = create<ThemeState>()(
@@ -16,6 +17,11 @@ export const useThemeStore = create<ThemeState>()(
       toggleTheme: () =>
         set((state) => {
           const newTheme = state.theme === 'light' ? 'dark' : 'light'
+          document.body.classList.toggle('dark', newTheme === 'dark')
+          return { theme: newTheme }
+        }),
+      setTheme: (newTheme: Theme) =>
+        set(() => {
           document.body.classList.toggle('dark', newTheme === 'dark')
           return { theme: newTheme }
         }),
