@@ -21,16 +21,24 @@ export const CallPage = () => {
   const [searchQuery, setSearchQuery] = useState('')
 
   useEffect(() => {
-    loadCalls()
-  }, [])
+    if (user?.id) {
+      loadCalls()
+    }
+  }, [user?.id])
 
   const loadCalls = async () => {
+    if (!user?.id) {
+      setLoading(false)
+      return
+    }
     setLoading(true)
     try {
-      const fetchedCalls = await getCalls({ userId: user?.id })
+      const fetchedCalls = await getCalls({ userId: user.id })
       setCalls(fetchedCalls)
+      console.log('Loaded calls:', fetchedCalls.length)
     } catch (error) {
       console.error('Error loading calls:', error)
+      setCalls([])
     } finally {
       setLoading(false)
     }
@@ -230,14 +238,30 @@ export const CallPage = () => {
                 <div className="animate-spin rounded-full h-16 w-16 border-4 border-green-500 border-t-transparent mx-auto mb-4"></div>
                 <p className={`${subtleColor} text-lg`}>Загрузка сигналов...</p>
               </div>
+            ) : calls.length === 0 ? (
+              <div className={`${bgColor} rounded-2xl p-12 text-center ${borderColor} border shadow-xl`}>
+                <Sparkles className={`w-20 h-20 mx-auto mb-6 ${subtleColor}`} />
+                <h3 className={`text-2xl font-bold ${textColor} mb-2`}>
+                  Нет сигналов
+                </h3>
+                <p className={subtleColor}>
+                  Создайте первый торговый сигнал для команды
+                </p>
+                <p className={`${subtleColor} text-xs mt-2`}>
+                  User ID: {user?.id || 'не загружен'}
+                </p>
+              </div>
             ) : filteredCalls.length === 0 ? (
               <div className={`${bgColor} rounded-2xl p-12 text-center ${borderColor} border shadow-xl`}>
                 <Sparkles className={`w-20 h-20 mx-auto mb-6 ${subtleColor}`} />
                 <h3 className={`text-2xl font-bold ${textColor} mb-2`}>
-                  {searchQuery ? 'Ничего не найдено' : 'Нет сигналов'}
+                  Ничего не найдено
                 </h3>
                 <p className={subtleColor}>
-                  {searchQuery ? 'Попробуйте изменить запрос' : 'Создайте первый торговый сигнал для команды'}
+                  Попробуйте изменить запрос
+                </p>
+                <p className={`${subtleColor} text-xs mt-2`}>
+                  Найдено сигналов: {calls.length}, отфильтровано: {filteredCalls.length}
                 </p>
               </div>
             ) : (

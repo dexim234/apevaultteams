@@ -440,23 +440,37 @@ export const getCalls = async (filters?: {
   activeOnly?: boolean
 }): Promise<Call[]> => {
   const callsRef = collection(db, 'calls')
-  let q: ReturnType<typeof query> = query(callsRef, orderBy('createdAt', 'desc'))
-
+  
+  // Build query constraints
+  const constraints: any[] = []
+  
+  // Add userId filter if provided
   if (filters?.userId) {
-    q = query(callsRef, where('userId', '==', filters.userId), orderBy('createdAt', 'desc'))
+    constraints.push(where('userId', '==', filters.userId))
   }
-  if (filters?.status) {
-    q = query(callsRef, where('status', '==', filters.status), orderBy('createdAt', 'desc'))
+  
+  // Add status filter if provided (don't combine with activeOnly status)
+  if (filters?.status && !filters?.activeOnly) {
+    constraints.push(where('status', '==', filters.status))
   }
+  
+  // Add activeOnly filters
   if (filters?.activeOnly) {
+    constraints.push(where('status', '==', 'active'))
     const yesterday = new Date()
     yesterday.setHours(yesterday.getHours() - 24)
-    q = query(
-      callsRef,
-      where('status', '==', 'active'),
-      where('createdAt', '>=', yesterday.toISOString()),
-      orderBy('createdAt', 'desc')
-    )
+    constraints.push(where('createdAt', '>=', yesterday.toISOString()))
+  }
+  
+  // Always add orderBy
+  constraints.push(orderBy('createdAt', 'desc'))
+  
+  // Build query
+  let q: ReturnType<typeof query>
+  if (constraints.length > 0) {
+    q = query(callsRef, ...constraints) as ReturnType<typeof query>
+  } else {
+    q = query(callsRef, orderBy('createdAt', 'desc'))
   }
 
   const snapshot = await getDocs(q)
