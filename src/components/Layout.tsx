@@ -13,10 +13,12 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation()
 
   const handleLogout = () => {
-    logout()
+    // Deactivate admin mode first
     if (isAdmin) {
       deactivateAdmin()
     }
+    // Then logout
+    logout()
   }
 
   const navItems: Array<{
@@ -101,9 +103,11 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
 
               {/* User info and logout */}
               <div className="flex items-center space-x-2">
-                <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                  {user?.name}
-                </span>
+                {(user?.name || isAdmin) && (
+                  <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                    {user?.name || 'Администратор'}
+                  </span>
+                )}
                 <button
                   onClick={handleLogout}
                   className={`p-2 rounded-lg transition-colors ${

@@ -200,44 +200,65 @@ export const CallPage = () => {
     <Layout>
       <div className="space-y-6">
         {/* Header */}
-        <div className={`${bgColor} rounded-2xl p-6 shadow-xl border ${borderColor} backdrop-blur-sm`}>
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h1 className={`text-4xl font-bold ${textColor} mb-2 flex items-center gap-3`}>
-                <span className="bg-gradient-to-r from-green-500 via-green-400 to-green-600 text-transparent bg-clip-text">
-                  Trading Signals
-                </span>
-              </h1>
-              <p className={`${subtleColor} text-sm`}>Управление торговыми сигналами для команды</p>
+        <div className={`rounded-2xl p-8 ${bgColor} shadow-xl border-2 ${
+          theme === 'dark' 
+            ? 'border-green-500/30 bg-gradient-to-br from-gray-800 via-gray-800 to-gray-900' 
+            : 'border-green-200 bg-gradient-to-br from-white via-green-50/30 to-white'
+        } relative overflow-hidden`}>
+          {/* Decorative elements */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-green-500/10 to-emerald-500/10 rounded-full blur-3xl -mr-32 -mt-32" />
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-blue-500/10 to-purple-500/10 rounded-full blur-2xl -ml-24 -mb-24" />
+          
+          <div className="relative z-10">
+            <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between mb-6">
+              <div className="flex-1">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className={`p-4 rounded-2xl shadow-lg ${
+                    theme === 'dark' 
+                      ? 'bg-gradient-to-br from-green-600 to-emerald-600' 
+                      : 'bg-gradient-to-br from-green-500 to-emerald-500'
+                  } text-white transform transition-transform hover:scale-110`}>
+                    <Zap className="w-8 h-8" />
+                  </div>
+                  <div>
+                    <h1 className={`text-4xl font-extrabold mb-2 ${textColor} flex items-center gap-3`}>
+                      <span className="bg-gradient-to-r from-green-600 via-emerald-600 to-blue-600 text-transparent bg-clip-text">
+                        Trading Signals
+                      </span>
+                      <Sparkles className={`w-6 h-6 ${theme === 'dark' ? 'text-yellow-400' : 'text-yellow-500'} animate-pulse`} />
+                    </h1>
+                    <p className={`text-base font-medium ${subtleColor} flex items-center gap-2`}>
+                      <span className="text-green-500">●</span>
+                      Управление торговыми сигналами для команды
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <button
+                onClick={() => {
+                  setEditingCall(null)
+                  setShowForm(true)
+                }}
+                className={`w-full lg:w-auto px-6 py-4 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-xl transition-all duration-200 flex items-center justify-center gap-2 font-semibold shadow-lg hover:shadow-xl hover:scale-105 transform`}
+              >
+                <Plus className="w-5 h-5" />
+                <span>Создать сигнал</span>
+              </button>
             </div>
-            <button
-              onClick={() => {
-                setEditingCall(null)
-                setShowForm(true)
-              }}
-              className={`px-6 py-3 rounded-xl font-semibold transition-all duration-200 flex items-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-105 ${
-                theme === 'dark'
-                  ? 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white'
-                  : 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white'
-              }`}
-            >
-              <Plus className="w-5 h-5" />
-              Создать сигнал
-            </button>
-          </div>
 
-          {/* Search */}
-          <div className="relative">
-            <Search className={`absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 ${subtleColor}`} />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
-              placeholder="Поиск по тикеру, паре или сети..."
-              className={`w-full pl-12 pr-4 py-3 rounded-xl border ${borderColor} ${
-                theme === 'dark' ? 'bg-gray-700/50' : 'bg-gray-50'
-              } ${textColor} focus:outline-none focus:ring-2 focus:ring-green-500/50 transition-all`}
-            />
+            {/* Search */}
+            <div className="relative">
+              <Search className={`absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 ${subtleColor}`} />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
+                placeholder="Поиск по тикеру, паре или сети..."
+                className={`w-full pl-12 pr-4 py-3 rounded-xl border-2 ${borderColor} ${
+                  theme === 'dark' ? 'bg-gray-700/50' : 'bg-gray-50'
+                } ${textColor} focus:outline-none focus:ring-2 focus:ring-green-500/50 transition-all`}
+              />
+            </div>
           </div>
         </div>
 

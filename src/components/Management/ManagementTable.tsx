@@ -276,9 +276,9 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
                                   {/* Breaks */}
                                   {s.breaks && s.breaks.length > 0 && (
                                     <div className="space-y-1">
-                                      <div className="text-[10px] text-gray-500 dark:text-gray-400 font-medium">Перерывы:</div>
+                                      <div className={`text-[10px] ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} font-medium`}>Перерывы:</div>
                                       {s.breaks.map((breakItem, breakIdx) => (
-                                        <div key={breakIdx} className="bg-orange-400 dark:bg-orange-500 text-white rounded px-2 py-1 text-[10px] font-medium shadow-sm">
+                                        <div key={breakIdx} className={`${theme === 'dark' ? 'bg-gray-700' : 'bg-white'} ${theme === 'dark' ? 'text-gray-200' : 'text-gray-900'} border ${theme === 'dark' ? 'border-orange-500/50' : 'border-orange-300'} rounded px-2 py-1 text-[10px] font-medium shadow-sm`}>
                                           {breakItem.start} - {breakItem.end}
                                         </div>
                                       ))}

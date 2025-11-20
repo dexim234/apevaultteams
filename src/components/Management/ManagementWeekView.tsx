@@ -391,9 +391,9 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
                             {/* Breaks */}
                             {s.breaks && s.breaks.length > 0 && (
                               <div className="space-y-1 ml-6">
-                                <div className="text-[10px] text-white/80 font-medium">Перерывы:</div>
+                                <div className={`text-[10px] ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} font-medium`}>Перерывы:</div>
                                 {s.breaks.map((breakItem, breakIdx) => (
-                                  <div key={breakIdx} className="bg-orange-400/90 text-white rounded-lg px-2 py-1 text-xs font-medium border border-orange-300/50">
+                                  <div key={breakIdx} className={`${theme === 'dark' ? 'bg-gray-700' : 'bg-white'} ${theme === 'dark' ? 'text-gray-200' : 'text-gray-900'} border ${theme === 'dark' ? 'border-orange-500/50' : 'border-orange-300'} rounded-lg px-2 py-1 text-xs font-medium shadow-sm`}>
                                     {breakItem.start} - {breakItem.end}
                                   </div>
                                 ))}

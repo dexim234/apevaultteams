@@ -141,27 +141,37 @@ export const Management = () => {
         <div className={`rounded-2xl p-6 ${cardBg} shadow-lg border-2 ${
           theme === 'dark' ? 'border-blue-500/30 bg-gradient-to-br from-gray-800 to-gray-800/90' : 'border-blue-200 bg-gradient-to-br from-white to-blue-50/30'
         }`}>
-          <div className="flex items-start gap-4 mb-6">
-            <div className={`p-3 rounded-xl ${
-              theme === 'dark' ? 'bg-blue-500/20' : 'bg-blue-100'
-            }`}>
-              <CalendarCheck className={`w-8 h-8 ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`} />
-            </div>
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-2">
-                <h1 className={`text-3xl font-bold bg-gradient-to-r ${
+          <div className="relative overflow-hidden">
+            {/* Decorative elements */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-full blur-3xl -mr-32 -mt-32" />
+            <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-green-500/10 to-yellow-500/10 rounded-full blur-2xl -ml-24 -mb-24" />
+            
+            <div className="relative z-10">
+              <div className="flex items-start gap-4 mb-6">
+                <div className={`p-4 rounded-2xl shadow-lg ${
                   theme === 'dark' 
-                    ? 'from-blue-400 to-purple-400 text-transparent bg-clip-text' 
-                    : 'from-blue-600 to-purple-600 text-transparent bg-clip-text'
-                }`}>
-                  Управление командой
-                </h1>
-                <Sparkles className={`w-5 h-5 ${theme === 'dark' ? 'text-yellow-400' : 'text-yellow-500'} animate-pulse`} />
+                    ? 'bg-gradient-to-br from-blue-600 to-purple-600' 
+                    : 'bg-gradient-to-br from-blue-500 to-purple-500'
+                } text-white transform transition-transform hover:scale-110`}>
+                  <CalendarCheck className="w-8 h-8" />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-2">
+                    <h1 className={`text-4xl font-extrabold bg-gradient-to-r ${
+                      theme === 'dark' 
+                        ? 'from-blue-400 via-purple-400 to-pink-400 text-transparent bg-clip-text' 
+                        : 'from-blue-600 via-purple-600 to-pink-600 text-transparent bg-clip-text'
+                    }`}>
+                      Управление командой
+                    </h1>
+                    <Sparkles className={`w-6 h-6 ${theme === 'dark' ? 'text-yellow-400' : 'text-yellow-500'} animate-pulse`} />
+                  </div>
+                  <p className={`${labelColor} text-base font-medium flex items-center gap-2`}>
+                    <Heart className="w-5 h-5 text-red-500" />
+                    Забота о каждом участнике нашей команды ApeVault
+                  </p>
+                </div>
               </div>
-              <p className={`${labelColor} text-sm flex items-center gap-2`}>
-                <Heart className="w-4 h-4 text-red-500" />
-                Забота о каждом участнике нашей команды ApeVault
-              </p>
             </div>
           </div>
 

@@ -3,7 +3,8 @@ import { useState, useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
 import { useThemeStore } from '@/store/themeStore'
-import { Moon, Sun, Shield, Sparkles } from 'lucide-react'
+import { useAdminStore } from '@/store/adminStore'
+import { Moon, Sun, Shield, Sparkles, User, Users } from 'lucide-react'
 import logo from '@/assets/logo.png'
 
 // Declare Telegram WebApp types
@@ -27,12 +28,16 @@ declare global {
   }
 }
 
+type UserType = 'member' | 'admin'
+
 export const Login = () => {
+  const [userType, setUserType] = useState<UserType>('member')
   const [login, setLogin] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const { login: loginUser, user, isAuthenticated } = useAuthStore()
   const { theme, toggleTheme } = useThemeStore()
+  const { activateAdmin } = useAdminStore()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
 
@@ -125,16 +130,32 @@ export const Login = () => {
     e.preventDefault()
     setError('')
 
-    if (!login || !password) {
-      setError('Пожалуйста, заполните все поля')
+    if (!password) {
+      setError('Пожалуйста, введите пароль')
       return
     }
 
-    const success = loginUser(login, password)
-    if (success) {
-      navigate('/management')
+    if (userType === 'admin') {
+      // Admin login - only password needed
+      const adminSuccess = activateAdmin(password)
+      if (adminSuccess) {
+        // Admin login successful - no need to set user, just navigate
+        navigate('/management')
+      } else {
+        setError('Неверный пароль администратора')
+      }
     } else {
-      setError('Неверный логин или пароль')
+      // Member login - login and password needed
+      if (!login) {
+        setError('Пожалуйста, введите логин')
+        return
+      }
+      const success = loginUser(login, password)
+      if (success) {
+        navigate('/management')
+      } else {
+        setError('Неверный логин или пароль')
+      }
     }
   }
 
@@ -211,28 +232,88 @@ export const Login = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* User type selection */}
           <div>
-            <label htmlFor="login" className={`block text-sm font-semibold mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-              Логин
+            <label className={`block text-sm font-semibold mb-3 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+              Тип пользователя
             </label>
-            <div className="relative">
-              <input
-                id="login"
-                type="text"
-                value={login}
-                onChange={(e) => setLogin(e.target.value)}
-                className={`w-full px-4 py-3 rounded-xl border-2 transition-all ${
-                  theme === 'dark'
-                    ? 'bg-gray-700/50 border-gray-600 text-white placeholder-gray-500 focus:border-green-500'
-                    : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400 focus:border-green-500'
-                } focus:outline-none focus:ring-4 focus:ring-green-500/20`}
-                placeholder="Введите ваш логин"
-              />
+            <div className={`grid grid-cols-2 gap-3 p-1 rounded-xl ${
+              theme === 'dark' ? 'bg-gray-700/50' : 'bg-gray-100'
+            }`}>
+              <button
+                type="button"
+                onClick={() => {
+                  setUserType('member')
+                  setLogin('')
+                  setPassword('')
+                  setError('')
+                }}
+                className={`flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
+                  userType === 'member'
+                    ? theme === 'dark'
+                      ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg'
+                      : 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg'
+                    : theme === 'dark'
+                    ? 'text-gray-400 hover:text-white hover:bg-gray-600'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
+                }`}
+              >
+                <Users className="w-5 h-5" />
+                <span>Участник</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setUserType('admin')
+                  setLogin('')
+                  setPassword('')
+                  setError('')
+                }}
+                className={`flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
+                  userType === 'admin'
+                    ? theme === 'dark'
+                      ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-lg'
+                      : 'bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-lg'
+                    : theme === 'dark'
+                    ? 'text-gray-400 hover:text-white hover:bg-gray-600'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
+                }`}
+              >
+                <Shield className="w-5 h-5" />
+                <span>Админ</span>
+              </button>
             </div>
           </div>
 
+          {/* Login field - only for members */}
+          {userType === 'member' && (
+            <div>
+              <label htmlFor="login" className={`block text-sm font-semibold mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                <User className="w-4 h-4 inline mr-2" />
+                Логин
+              </label>
+              <div className="relative">
+                <input
+                  id="login"
+                  type="text"
+                  value={login}
+                  onChange={(e) => setLogin(e.target.value)}
+                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all ${
+                    theme === 'dark'
+                      ? 'bg-gray-700/50 border-gray-600 text-white placeholder-gray-500 focus:border-green-500'
+                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400 focus:border-green-500'
+                  } focus:outline-none focus:ring-4 focus:ring-green-500/20`}
+                  placeholder="Введите ваш логин"
+                  autoComplete="username"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Password field */}
           <div>
             <label htmlFor="password" className={`block text-sm font-semibold mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+              <Shield className="w-4 h-4 inline mr-2" />
               Пароль
             </label>
             <div className="relative">
@@ -246,9 +327,15 @@ export const Login = () => {
                     ? 'bg-gray-700/50 border-gray-600 text-white placeholder-gray-500 focus:border-green-500'
                     : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400 focus:border-green-500'
                 } focus:outline-none focus:ring-4 focus:ring-green-500/20`}
-                placeholder="Введите ваш пароль"
+                placeholder={userType === 'admin' ? 'Введите пароль администратора' : 'Введите ваш пароль'}
+                autoComplete={userType === 'admin' ? 'off' : 'current-password'}
               />
             </div>
+            {userType === 'admin' && (
+              <p className={`mt-2 text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                Для входа в режим администратора требуется специальный пароль
+              </p>
+            )}
           </div>
 
           {error && (

@@ -1,6 +1,7 @@
 // Main App component with routing
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useAuthStore } from './store/authStore'
+import { useAdminStore } from './store/adminStore'
 import { useThemeStore } from './store/themeStore'
 import { useEffect } from 'react'
 import { Login } from './pages/Login'
@@ -16,6 +17,7 @@ import { cleanupOldData } from './services/firestoreService'
 
 function App() {
   const { isAuthenticated } = useAuthStore()
+  const { isAdmin } = useAdminStore()
   const { theme } = useThemeStore()
 
   useEffect(() => {
@@ -30,7 +32,16 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/management" replace />} />
+        <Route 
+          path="/login" 
+          element={
+            (!isAuthenticated && !isAdmin) ? (
+              <Login />
+            ) : (
+              <Navigate to="/management" replace />
+            )
+          } 
+        />
         <Route
           path="/call"
           element={
@@ -87,7 +98,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route path="/" element={<Navigate to={isAuthenticated ? "/management" : "/login"} replace />} />
+        <Route path="/" element={<Navigate to={(isAuthenticated || isAdmin) ? "/management" : "/login"} replace />} />
       </Routes>
     </BrowserRouter>
   )
