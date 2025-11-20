@@ -247,7 +247,7 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
                 <th className={`px-2 sm:px-3 md:px-4 py-2 sm:py-2.5 md:py-3 text-center text-xs sm:text-sm font-bold ${headingColor} whitespace-nowrap`}>Статистика</th>
               </tr>
             </thead>
-          <tbody>
+            <tbody>
             {displayUsers.map((user, index) => {
               const stats = getUserStats(user.id)
               const isEven = index % 2 === 0
@@ -476,8 +476,9 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
                 </tr>
               )
             })}
-          </tbody>
-        </table>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   )
