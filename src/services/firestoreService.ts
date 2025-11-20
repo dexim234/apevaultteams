@@ -460,10 +460,30 @@ export const getCalls = async (filters?: {
   }
 
   const snapshot = await getDocs(q)
-  let calls = snapshot.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data()
-  })) as Call[]
+  let calls = snapshot.docs.map((doc) => {
+    const data = doc.data() as any
+    return {
+      id: doc.id,
+      userId: data.userId || '',
+      network: data.network || '',
+      ticker: data.ticker || '',
+      pair: data.pair || '',
+      entryPoint: data.entryPoint || '',
+      target: data.target || '',
+      strategy: data.strategy || 'flip',
+      risks: data.risks || '',
+      cancelConditions: data.cancelConditions,
+      comment: data.comment,
+      createdAt: data.createdAt || new Date().toISOString(),
+      status: data.status || 'active',
+      maxProfit: data.maxProfit,
+      currentPnL: data.currentPnL,
+      currentMarketCap: data.currentMarketCap,
+      signalMarketCap: data.signalMarketCap,
+      currentPrice: data.currentPrice,
+      entryPrice: data.entryPrice
+    } as Call
+  })
 
   // Apply additional filters in memory
   if (filters?.network) {
