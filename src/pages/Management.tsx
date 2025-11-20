@@ -136,39 +136,39 @@ export const Management = () => {
 
   return (
     <Layout>
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         {/* Header with welcome message and stats */}
-        <div className={`rounded-2xl p-6 ${cardBg} shadow-lg border-2 ${
+        <div className={`rounded-xl sm:rounded-2xl p-4 sm:p-5 md:p-6 ${cardBg} shadow-lg border-2 ${
           theme === 'dark' ? 'border-blue-500/30 bg-gradient-to-br from-gray-800 to-gray-800/90' : 'border-blue-200 bg-gradient-to-br from-white to-blue-50/30'
         }`}>
           <div className="relative overflow-hidden">
             {/* Decorative elements */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-full blur-3xl -mr-32 -mt-32" />
-            <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-green-500/10 to-yellow-500/10 rounded-full blur-2xl -ml-24 -mb-24" />
+            <div className="absolute top-0 right-0 w-32 h-32 sm:w-64 sm:h-64 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-full blur-3xl -mr-16 sm:-mr-32 -mt-16 sm:-mt-32" />
+            <div className="absolute bottom-0 left-0 w-24 h-24 sm:w-48 sm:h-48 bg-gradient-to-tr from-green-500/10 to-yellow-500/10 rounded-full blur-2xl -ml-12 sm:-ml-24 -mb-12 sm:-mb-24" />
             
             <div className="relative z-10">
-              <div className="flex items-start gap-4 mb-6">
-                <div className={`p-4 rounded-2xl shadow-lg ${
+              <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4 mb-4 sm:mb-6">
+                <div className={`p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-lg flex-shrink-0 ${
                   theme === 'dark' 
                     ? 'bg-gradient-to-br from-blue-600 to-purple-600' 
                     : 'bg-gradient-to-br from-blue-500 to-purple-500'
-                } text-white transform transition-transform hover:scale-110`}>
-                  <CalendarCheck className="w-8 h-8" />
+                } text-white transform transition-transform active:scale-95 sm:hover:scale-110`}>
+                  <CalendarCheck className="w-6 h-6 sm:w-8 sm:h-8" />
                 </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <h1 className={`text-4xl font-extrabold bg-gradient-to-r ${
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
+                    <h1 className={`text-2xl sm:text-3xl md:text-4xl font-extrabold bg-gradient-to-r ${
                       theme === 'dark' 
                         ? 'from-blue-400 via-purple-400 to-pink-400 text-transparent bg-clip-text' 
                         : 'from-blue-600 via-purple-600 to-pink-600 text-transparent bg-clip-text'
                     }`}>
                       Управление командой
                     </h1>
-                    <Sparkles className={`w-6 h-6 ${theme === 'dark' ? 'text-yellow-400' : 'text-yellow-500'} animate-pulse`} />
+                    <Sparkles className={`w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0 ${theme === 'dark' ? 'text-yellow-400' : 'text-yellow-500'} animate-pulse`} />
                   </div>
-                  <p className={`${labelColor} text-base font-medium flex items-center gap-2`}>
-                    <Heart className="w-5 h-5 text-red-500" />
-                    Забота о каждом участнике нашей команды ApeVault
+                  <p className={`${labelColor} text-sm sm:text-base font-medium flex flex-wrap items-center gap-2`}>
+                    <Heart className="w-4 h-4 sm:w-5 sm:h-5 text-red-500 flex-shrink-0" />
+                    <span>Забота о каждом участнике нашей команды ApeVault</span>
                   </p>
                 </div>
               </div>
@@ -176,78 +176,78 @@ export const Management = () => {
           </div>
 
           {/* Stats cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <div className={`p-4 rounded-xl border-2 ${
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-4 mb-4 sm:mb-6">
+            <div className={`p-3 sm:p-4 rounded-lg sm:rounded-xl border-2 ${
               theme === 'dark' 
                 ? 'bg-green-500/10 border-green-500/30' 
                 : 'bg-green-50 border-green-200'
             }`}>
-              <div className="flex items-center gap-3">
-                <div className={`p-2 rounded-lg ${
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className={`p-1.5 sm:p-2 rounded-lg flex-shrink-0 ${
                   theme === 'dark' ? 'bg-green-500/20' : 'bg-green-100'
                 }`}>
-                  <Clock className={`w-5 h-5 ${theme === 'dark' ? 'text-green-400' : 'text-green-600'}`} />
+                  <Clock className={`w-4 h-4 sm:w-5 sm:h-5 ${theme === 'dark' ? 'text-green-400' : 'text-green-600'}`} />
                 </div>
-                <div>
-                  <p className={`text-sm ${labelColor}`}>Всего слотов</p>
-                  <p className={`text-2xl font-bold ${theme === 'dark' ? 'text-green-400' : 'text-green-600'}`}>
+                <div className="min-w-0 flex-1">
+                  <p className={`text-xs sm:text-sm ${labelColor} truncate`}>Всего слотов</p>
+                  <p className={`text-xl sm:text-2xl font-bold ${theme === 'dark' ? 'text-green-400' : 'text-green-600'}`}>
                     {stats.slotsThisWeek}
                   </p>
                 </div>
               </div>
             </div>
-            <div className={`p-4 rounded-xl border-2 ${
+            <div className={`p-3 sm:p-4 rounded-lg sm:rounded-xl border-2 ${
               theme === 'dark' 
                 ? 'bg-blue-500/10 border-blue-500/30' 
                 : 'bg-blue-50 border-blue-200'
             }`}>
-              <div className="flex items-center gap-3">
-                <div className={`p-2 rounded-lg ${
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className={`p-1.5 sm:p-2 rounded-lg flex-shrink-0 ${
                   theme === 'dark' ? 'bg-blue-500/20' : 'bg-blue-100'
                 }`}>
-                  <Calendar className={`w-5 h-5 ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`} />
+                  <Calendar className={`w-4 h-4 sm:w-5 sm:h-5 ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`} />
                 </div>
-                <div>
-                  <p className={`text-sm ${labelColor}`}>Предстоящих</p>
-                  <p className={`text-2xl font-bold ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}>
+                <div className="min-w-0 flex-1">
+                  <p className={`text-xs sm:text-sm ${labelColor} truncate`}>Предстоящих</p>
+                  <p className={`text-xl sm:text-2xl font-bold ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}>
                     {stats.upcomingSlots}
                   </p>
                 </div>
               </div>
             </div>
-            <div className={`p-4 rounded-xl border-2 ${
+            <div className={`p-3 sm:p-4 rounded-lg sm:rounded-xl border-2 ${
               theme === 'dark' 
                 ? 'bg-gray-500/10 border-gray-500/30' 
                 : 'bg-gray-50 border-gray-200'
             }`}>
-              <div className="flex items-center gap-3">
-                <div className={`p-2 rounded-lg ${
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className={`p-1.5 sm:p-2 rounded-lg flex-shrink-0 ${
                   theme === 'dark' ? 'bg-gray-500/20' : 'bg-gray-100'
                 }`}>
-                  <CalendarCheck className={`w-5 h-5 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`} />
+                  <CalendarCheck className={`w-4 h-4 sm:w-5 sm:h-5 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`} />
                 </div>
-                <div>
-                  <p className={`text-sm ${labelColor}`}>Завершенных</p>
-                  <p className={`text-2xl font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                <div className="min-w-0 flex-1">
+                  <p className={`text-xs sm:text-sm ${labelColor} truncate`}>Завершенных</p>
+                  <p className={`text-xl sm:text-2xl font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                     {stats.completedSlots}
                   </p>
                 </div>
               </div>
             </div>
-            <div className={`p-4 rounded-xl border-2 ${
+            <div className={`p-3 sm:p-4 rounded-lg sm:rounded-xl border-2 ${
               theme === 'dark' 
                 ? 'bg-purple-500/10 border-purple-500/30' 
                 : 'bg-purple-50 border-purple-200'
             }`}>
-              <div className="flex items-center gap-3">
-                <div className={`p-2 rounded-lg ${
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className={`p-1.5 sm:p-2 rounded-lg flex-shrink-0 ${
                   theme === 'dark' ? 'bg-purple-500/20' : 'bg-purple-100'
                 }`}>
-                  <Users className={`w-5 h-5 ${theme === 'dark' ? 'text-purple-400' : 'text-purple-600'}`} />
+                  <Users className={`w-4 h-4 sm:w-5 sm:h-5 ${theme === 'dark' ? 'text-purple-400' : 'text-purple-600'}`} />
                 </div>
-                <div>
-                  <p className={`text-sm ${labelColor}`}>Активных участников</p>
-                  <p className={`text-2xl font-bold ${theme === 'dark' ? 'text-purple-400' : 'text-purple-600'}`}>
+                <div className="min-w-0 flex-1">
+                  <p className={`text-xs sm:text-sm ${labelColor} truncate`}>Активных участников</p>
+                  <p className={`text-xl sm:text-2xl font-bold ${theme === 'dark' ? 'text-purple-400' : 'text-purple-600'}`}>
                     {stats.activeMembers}
                   </p>
                 </div>
@@ -257,17 +257,17 @@ export const Management = () => {
 
           <div className="flex flex-col gap-4">
             {/* Slot Filter Tabs */}
-            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-              <h2 className={`text-lg font-bold ${headingColor} flex items-center gap-2`}>
-                <CalendarCheck className="w-5 h-5 text-green-500" />
-                Фильтр слотов:
+            <div className="flex flex-col gap-3 sm:gap-4">
+              <h2 className={`text-base sm:text-lg font-bold ${headingColor} flex items-center gap-2`}>
+                <CalendarCheck className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 flex-shrink-0" />
+                <span>Фильтр слотов:</span>
               </h2>
-              <div className={`flex rounded-xl p-1.5 shadow-lg ${
+              <div className={`flex flex-col sm:flex-row rounded-lg sm:rounded-xl p-1 sm:p-1.5 shadow-lg gap-1 ${
                 theme === 'dark' ? 'bg-gray-700/50 border-2 border-gray-600' : 'bg-gray-200/50 border-2 border-gray-300'
               }`}>
                 <button
                   onClick={() => setSlotFilter('all')}
-                  className={`px-5 py-2.5 rounded-lg transition-all duration-300 text-sm font-semibold flex items-center gap-2 relative ${
+                  className={`flex-1 sm:flex-none px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 rounded-lg transition-all duration-300 text-xs sm:text-sm font-semibold flex items-center justify-center gap-1.5 sm:gap-2 relative touch-manipulation active:scale-95 ${
                     slotFilter === 'all'
                       ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg shadow-green-500/50 scale-105'
                       : theme === 'dark'
@@ -275,15 +275,15 @@ export const Management = () => {
                       : 'text-gray-700 hover:bg-gray-300 hover:text-gray-900 hover:scale-105'
                   }`}
                 >
-                  <Calendar className="w-4 h-4" />
-                  Все
+                  <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
+                  <span className="whitespace-nowrap">Все</span>
                   {slotFilter === 'all' && (
-                    <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-green-400 rounded-full animate-pulse"></span>
+                    <span className="absolute -top-0.5 -right-0.5 w-2 h-2 sm:w-2.5 sm:h-2.5 bg-green-400 rounded-full animate-pulse"></span>
                   )}
                 </button>
                 <button
                   onClick={() => setSlotFilter('upcoming')}
-                  className={`px-5 py-2.5 rounded-lg transition-all duration-300 text-sm font-semibold flex items-center gap-2 relative ${
+                  className={`flex-1 sm:flex-none px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 rounded-lg transition-all duration-300 text-xs sm:text-sm font-semibold flex items-center justify-center gap-1.5 sm:gap-2 relative touch-manipulation active:scale-95 ${
                     slotFilter === 'upcoming'
                       ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/50 scale-105'
                       : theme === 'dark'
@@ -291,15 +291,15 @@ export const Management = () => {
                       : 'text-gray-700 hover:bg-gray-300 hover:text-gray-900 hover:scale-105'
                   }`}
                 >
-                  <Clock className="w-4 h-4" />
-                  Предстоящие
+                  <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
+                  <span className="whitespace-nowrap">Предстоящие</span>
                   {slotFilter === 'upcoming' && (
-                    <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-blue-400 rounded-full animate-pulse"></span>
+                    <span className="absolute -top-0.5 -right-0.5 w-2 h-2 sm:w-2.5 sm:h-2.5 bg-blue-400 rounded-full animate-pulse"></span>
                   )}
                 </button>
                 <button
                   onClick={() => setSlotFilter('completed')}
-                  className={`px-5 py-2.5 rounded-lg transition-all duration-300 text-sm font-semibold flex items-center gap-2 relative ${
+                  className={`flex-1 sm:flex-none px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 rounded-lg transition-all duration-300 text-xs sm:text-sm font-semibold flex items-center justify-center gap-1.5 sm:gap-2 relative touch-manipulation active:scale-95 ${
                     slotFilter === 'completed'
                       ? 'bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-lg shadow-gray-500/50 scale-105'
                       : theme === 'dark'
@@ -307,26 +307,26 @@ export const Management = () => {
                       : 'text-gray-700 hover:bg-gray-300 hover:text-gray-900 hover:scale-105'
                   }`}
                 >
-                  <CalendarCheck className="w-4 h-4" />
-                  Завершенные
+                  <CalendarCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
+                  <span className="whitespace-nowrap">Завершенные</span>
                   {slotFilter === 'completed' && (
-                    <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-gray-400 rounded-full animate-pulse"></span>
+                    <span className="absolute -top-0.5 -right-0.5 w-2 h-2 sm:w-2.5 sm:h-2.5 bg-gray-400 rounded-full animate-pulse"></span>
                   )}
                 </button>
               </div>
             </div>
 
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-              <h2 className={`text-xl font-semibold ${headingColor}`}>Инструменты управления</h2>
+            <div className="flex flex-col gap-3 sm:gap-4">
+              <h2 className={`text-base sm:text-lg md:text-xl font-semibold ${headingColor}`}>Инструменты управления</h2>
 
-              <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
+              <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-2 sm:gap-3 w-full">
                 {/* View mode toggle */}
-                <div className={`flex rounded-xl p-1.5 w-full sm:w-auto shadow-inner ${
+                <div className={`flex rounded-lg sm:rounded-xl p-1 sm:p-1.5 w-full sm:w-auto shadow-inner ${
                   theme === 'dark' ? 'bg-gray-700/50 border border-gray-600' : 'bg-gray-200/50 border border-gray-300'
                 }`}>
                   <button
                     onClick={() => setViewMode('table')}
-                    className={`flex-1 sm:flex-none px-4 py-2.5 text-sm sm:text-base rounded-lg transition-all duration-200 flex items-center justify-center gap-2 font-medium ${
+                    className={`flex-1 px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm md:text-base rounded-lg transition-all duration-200 flex items-center justify-center gap-1.5 sm:gap-2 font-medium touch-manipulation active:scale-95 ${
                       viewMode === 'table'
                         ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg shadow-green-500/50 scale-105'
                         : theme === 'dark'
@@ -334,12 +334,12 @@ export const Management = () => {
                         : 'text-gray-700 hover:bg-gray-300 hover:text-gray-900'
                     }`}
                   >
-                    <Table2 className="w-4 h-4" />
-                    Таблица
+                    <Table2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
+                    <span className="whitespace-nowrap">Таблица</span>
                   </button>
                   <button
                     onClick={() => setViewMode('week')}
-                    className={`flex-1 sm:flex-none px-4 py-2.5 text-sm sm:text-base rounded-lg transition-all duration-200 flex items-center justify-center gap-2 font-medium ${
+                    className={`flex-1 px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm md:text-base rounded-lg transition-all duration-200 flex items-center justify-center gap-1.5 sm:gap-2 font-medium touch-manipulation active:scale-95 ${
                       viewMode === 'week'
                         ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg shadow-green-500/50 scale-105'
                         : theme === 'dark'
@@ -347,44 +347,44 @@ export const Management = () => {
                         : 'text-gray-700 hover:bg-gray-300 hover:text-gray-900'
                     }`}
                   >
-                    <Calendar className="w-4 h-4" />
-                    Неделя
+                    <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
+                    <span className="whitespace-nowrap">Неделя</span>
                   </button>
                 </div>
 
               {/* Add buttons */}
               <button
                 onClick={handleAddSlot}
-                className="flex-1 sm:flex-none px-4 py-2.5 text-sm sm:text-base bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-xl transition-all duration-200 flex items-center justify-center gap-2 font-medium shadow-lg shadow-green-500/30 hover:shadow-green-500/50 hover:scale-105"
+                className="w-full sm:flex-1 sm:w-auto px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm md:text-base bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-lg sm:rounded-xl transition-all duration-200 flex items-center justify-center gap-1.5 sm:gap-2 font-medium shadow-lg shadow-green-500/30 hover:shadow-green-500/50 active:scale-95 sm:hover:scale-105 touch-manipulation"
               >
-                <Plus className="w-4 h-4" />
-                Добавить слот
+                <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
+                <span className="whitespace-nowrap">Добавить слот</span>
               </button>
 
               <button
                 onClick={handleDeleteSlots}
-                className="flex-1 sm:flex-none px-4 py-2.5 text-sm sm:text-base bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-xl transition-all duration-200 flex items-center justify-center gap-2 font-medium shadow-lg shadow-red-500/30 hover:shadow-red-500/50 hover:scale-105"
+                className="w-full sm:flex-1 sm:w-auto px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm md:text-base bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-lg sm:rounded-xl transition-all duration-200 flex items-center justify-center gap-1.5 sm:gap-2 font-medium shadow-lg shadow-red-500/30 hover:shadow-red-500/50 active:scale-95 sm:hover:scale-105 touch-manipulation"
               >
-                <Trash2 className="w-4 h-4" />
-                Удалить слоты
+                <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
+                <span className="whitespace-nowrap">Удалить слоты</span>
               </button>
 
-              <div className="flex gap-2 w-full sm:w-auto">
+              <div className="flex gap-2 w-full sm:w-auto sm:flex-1">
                 <button
                   onClick={() => handleAddStatus('dayoff')}
-                  className="flex-1 sm:flex-none px-4 py-2.5 bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white rounded-xl transition-all duration-200 text-sm font-medium shadow-lg shadow-yellow-500/30 hover:shadow-yellow-500/50 hover:scale-105"
+                  className="flex-1 px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white rounded-lg sm:rounded-xl transition-all duration-200 font-medium shadow-lg shadow-yellow-500/30 hover:shadow-yellow-500/50 active:scale-95 sm:hover:scale-105 touch-manipulation whitespace-nowrap"
                 >
                   Выходной
                 </button>
                 <button
                   onClick={() => handleAddStatus('sick')}
-                  className="flex-1 sm:flex-none px-4 py-2.5 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white rounded-xl transition-all duration-200 text-sm font-medium shadow-lg shadow-purple-500/30 hover:shadow-purple-500/50 hover:scale-105"
+                  className="flex-1 px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white rounded-lg sm:rounded-xl transition-all duration-200 font-medium shadow-lg shadow-purple-500/30 hover:shadow-purple-500/50 active:scale-95 sm:hover:scale-105 touch-manipulation whitespace-nowrap"
                 >
                   Больничный
                 </button>
                 <button
                   onClick={() => handleAddStatus('vacation')}
-                  className="flex-1 sm:flex-none px-4 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-xl transition-all duration-200 text-sm font-medium shadow-lg shadow-orange-500/30 hover:shadow-orange-500/50 hover:scale-105"
+                  className="flex-1 px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-lg sm:rounded-xl transition-all duration-200 font-medium shadow-lg shadow-orange-500/30 hover:shadow-orange-500/50 active:scale-95 sm:hover:scale-105 touch-manipulation whitespace-nowrap"
                 >
                   Отпуск
                 </button>
@@ -394,40 +394,40 @@ export const Management = () => {
           </div>
 
           {/* Participant filter */}
-          <div className={`mt-6 pt-6 border-t-2 ${theme === 'dark' ? 'border-gray-700/50' : 'border-gray-200/50'}`}>
-            <label className={`block text-base font-bold mb-4 flex items-center gap-2 ${headingColor}`}>
-              <Users className="w-5 h-5 text-green-500" />
-              Фильтр по участникам
+          <div className={`mt-4 sm:mt-6 pt-4 sm:pt-6 border-t-2 ${theme === 'dark' ? 'border-gray-700/50' : 'border-gray-200/50'}`}>
+            <label className={`block text-sm sm:text-base font-bold mb-3 sm:mb-4 flex items-center gap-2 ${headingColor}`}>
+              <Users className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 flex-shrink-0" />
+              <span>Фильтр по участникам</span>
             </label>
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
               <button
                 onClick={() => setSelectedUserId(null)}
-                className={`group relative px-5 py-3 rounded-xl transition-all duration-300 font-medium text-sm shadow-lg ${
+                className={`group relative px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 md:py-3 rounded-lg sm:rounded-xl transition-all duration-300 font-medium text-xs sm:text-sm shadow-lg touch-manipulation active:scale-95 sm:hover:scale-105 ${
                   selectedUserId === null
                     ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-green-500/50 scale-105'
                     : theme === 'dark'
-                    ? 'bg-gray-700/50 border-2 border-gray-600 text-gray-300 hover:bg-gray-600/70 hover:border-green-500/50 hover:text-white hover:scale-105'
-                    : 'bg-white border-2 border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-green-500/50 hover:text-green-600 hover:scale-105'
+                    ? 'bg-gray-700/50 border-2 border-gray-600 text-gray-300 hover:bg-gray-600/70 hover:border-green-500/50 hover:text-white'
+                    : 'bg-white border-2 border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-green-500/50 hover:text-green-600'
                 }`}
               >
-                <span className="flex items-center gap-2">
-                  <Users className="w-4 h-4" />
-                  Все участники
+                <span className="flex items-center gap-1.5 sm:gap-2">
+                  <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
+                  <span className="whitespace-nowrap">Все участники</span>
                 </span>
                 {selectedUserId === null && (
-                  <span className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-white animate-pulse"></span>
+                  <span className="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 w-2 h-2 sm:w-3 sm:h-3 bg-green-400 rounded-full border border-white sm:border-2 animate-pulse"></span>
                 )}
               </button>
               {TEAM_MEMBERS.map((member) => (
                 <button
                   key={member.id}
                   onClick={() => setSelectedUserId(member.id)}
-                  className={`group relative px-5 py-3 rounded-xl transition-all duration-300 font-medium text-sm shadow-lg flex items-center gap-3 ${
+                  className={`group relative px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 md:py-3 rounded-lg sm:rounded-xl transition-all duration-300 font-medium text-xs sm:text-sm shadow-lg flex items-center gap-2 sm:gap-3 touch-manipulation active:scale-95 sm:hover:scale-105 ${
                     selectedUserId === member.id
                       ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-green-500/50 scale-105 ring-2 ring-green-400/50'
                       : theme === 'dark'
-                      ? 'bg-gray-700/50 border-2 border-gray-600 text-gray-300 hover:bg-gray-600/70 hover:border-green-500/50 hover:text-white hover:scale-105'
-                      : 'bg-white border-2 border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-green-500/50 hover:text-green-600 hover:scale-105'
+                      ? 'bg-gray-700/50 border-2 border-gray-600 text-gray-300 hover:bg-gray-600/70 hover:border-green-500/50 hover:text-white'
+                      : 'bg-white border-2 border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-green-500/50 hover:text-green-600'
                   }`}
                 >
                   <div className="relative flex-shrink-0">
@@ -435,7 +435,7 @@ export const Management = () => {
                       <img
                         src={member.avatar}
                         alt={member.name}
-                        className={`w-8 h-8 rounded-full object-cover border-2 transition-all duration-300 ${
+                        className={`w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 rounded-full object-cover border-2 transition-all duration-300 ${
                           selectedUserId === member.id
                             ? 'border-white ring-2 ring-white/50 scale-110'
                             : theme === 'dark'
@@ -451,7 +451,7 @@ export const Management = () => {
                       />
                     ) : null}
                     <div
-                      className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs transition-all duration-300 ${
+                      className={`w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center font-bold text-xs transition-all duration-300 ${
                         selectedUserId === member.id
                           ? 'bg-white/20 text-white ring-2 ring-white/50 scale-110'
                           : theme === 'dark'
@@ -462,9 +462,9 @@ export const Management = () => {
                       {member.name.charAt(0).toUpperCase()}
                     </div>
                   </div>
-                  <span>{member.name}</span>
+                  <span className="whitespace-nowrap truncate max-w-[100px] sm:max-w-none">{member.name}</span>
                   {selectedUserId === member.id && (
-                    <span className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-white animate-pulse"></span>
+                    <span className="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 w-2 h-2 sm:w-3 sm:h-3 bg-green-400 rounded-full border border-white sm:border-2 animate-pulse"></span>
                   )}
                 </button>
               ))}

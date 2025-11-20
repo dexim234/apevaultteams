@@ -228,19 +228,25 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
       </div>
 
       {/* Table */}
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead>
-            <tr className={`${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100'}`}>
-              <th className={`px-4 py-3 text-left text-sm font-semibold ${headingColor}`}>Участник</th>
-              {weekDays.map((day) => (
-                <th key={day.toISOString()} className={`px-4 py-3 text-center text-sm font-semibold ${headingColor}`}>
-                  {formatDate(day, 'dd.MM')}
-                </th>
-              ))}
-              <th className={`px-4 py-4 text-center text-sm font-bold ${headingColor}`}>Статистика</th>
-            </tr>
-          </thead>
+      <div className="overflow-x-auto -mx-3 sm:-mx-4 md:-mx-6 lg:-mx-8 px-3 sm:px-4 md:px-6 lg:px-8">
+        <div className="min-w-full inline-block align-middle">
+          <table className="w-full min-w-[640px]">
+            <thead>
+              <tr className={`${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100'}`}>
+                <th className={`px-2 sm:px-3 md:px-4 py-2 sm:py-2.5 md:py-3 text-left text-xs sm:text-sm font-semibold ${headingColor} sticky left-0 z-20 ${
+                  theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100'
+                }`}>Участник</th>
+                {weekDays.map((day) => (
+                  <th key={day.toISOString()} className={`px-1.5 sm:px-2 md:px-3 lg:px-4 py-2 sm:py-2.5 md:py-3 text-center text-xs sm:text-sm font-semibold ${headingColor} whitespace-nowrap`}>
+                    <div className="flex flex-col items-center gap-0.5">
+                      <span className="text-[10px] sm:text-xs opacity-70">{formatDate(day, 'EEE')}</span>
+                      <span>{formatDate(day, 'dd.MM')}</span>
+                    </div>
+                  </th>
+                ))}
+                <th className={`px-2 sm:px-3 md:px-4 py-2 sm:py-2.5 md:py-3 text-center text-xs sm:text-sm font-bold ${headingColor} whitespace-nowrap`}>Статистика</th>
+              </tr>
+            </thead>
           <tbody>
             {displayUsers.map((user, index) => {
               const stats = getUserStats(user.id)
@@ -262,7 +268,7 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
                     hover:scale-[1.01] hover:-translate-y-0.5
                   `}
                 >
-                  <td className={`px-4 py-4 font-semibold ${headingColor} sticky left-0 z-10 transition-all duration-300 backdrop-blur-sm ${
+                  <td className={`px-2 sm:px-3 md:px-4 py-2 sm:py-3 md:py-4 font-semibold text-xs sm:text-sm ${headingColor} sticky left-0 z-10 transition-all duration-300 backdrop-blur-sm min-w-[140px] sm:min-w-[160px] ${
                     isEven 
                       ? theme === 'dark' 
                         ? 'bg-gradient-to-r from-gray-800/40 via-gray-800/20 to-transparent group-hover:from-gray-800/70 group-hover:via-gray-800/50' 
@@ -271,19 +277,15 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
                         ? 'bg-gradient-to-r from-gray-800/10 via-gray-800/5 to-transparent group-hover:from-gray-800/50 group-hover:via-gray-800/30' 
                         : 'bg-gradient-to-r from-white via-gray-50/30 to-transparent group-hover:from-gray-50 group-hover:via-gray-50/60'
                   }`}>
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2 sm:gap-3">
                       <div className="relative flex-shrink-0 group/avatar">
                         {user.avatar ? (
                           <img 
                             src={user.avatar} 
                             alt={user.name}
-                            className="w-11 h-11 rounded-full object-cover border-2 shadow-lg transition-all duration-300 group-hover:scale-110 group-hover:shadow-xl group-hover:shadow-green-500/30 ring-2 ring-transparent group-hover:ring-green-500/50"
+                            className="w-8 h-8 sm:w-10 sm:h-10 md:w-11 md:h-11 rounded-full object-cover border-2 shadow-lg transition-all duration-300 group-hover:scale-110 group-hover:shadow-xl group-hover:shadow-green-500/30 ring-2 ring-transparent group-hover:ring-green-500/50"
                             style={{
                               borderColor: theme === 'dark' ? 'rgba(34, 197, 94, 0.6)' : 'rgba(34, 197, 94, 0.4)',
-                              width: '2.75rem',
-                              height: '2.75rem',
-                              borderRadius: '50%',
-                              objectFit: 'cover'
                             } as React.CSSProperties}
                             onError={(e) => {
                               // Fallback to letter if image fails to load
@@ -295,22 +297,18 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
                           />
                         ) : null}
                         <div 
-                          className={`w-11 h-11 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300 shadow-lg ring-2 ring-transparent group-hover/avatar:scale-110 group-hover/avatar:shadow-xl group-hover/avatar:ring-green-500/50 ${
+                          className={`w-8 h-8 sm:w-10 sm:h-10 md:w-11 md:h-11 rounded-full flex items-center justify-center font-bold text-xs sm:text-sm transition-all duration-300 shadow-lg ring-2 ring-transparent group-hover/avatar:scale-110 group-hover/avatar:shadow-xl group-hover/avatar:ring-green-500/50 ${
                             theme === 'dark' 
                               ? 'bg-gradient-to-br from-green-500 via-green-600 to-blue-500 text-white group-hover/avatar:shadow-green-500/40' 
                               : 'bg-gradient-to-br from-green-400 via-green-500 to-blue-400 text-white group-hover/avatar:shadow-green-400/40'
                           } ${user.avatar ? 'absolute inset-0 hidden' : ''}`}
-                          style={{
-                            width: '2.75rem',
-                            height: '2.75rem',
-                            borderRadius: '50%'
-                          } as React.CSSProperties}
                         >
                           {user.name.charAt(0).toUpperCase()}
                         </div>
-                        <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-white shadow-lg animate-pulse opacity-0 group-hover/avatar:opacity-100 transition-opacity duration-300"></div>
+                        <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 sm:w-3 sm:h-3 md:w-3.5 md:h-3.5 bg-green-500 rounded-full border border-white sm:border-2 shadow-lg animate-pulse opacity-0 group-hover/avatar:opacity-100 transition-opacity duration-300"></div>
                       </div>
-                      <span className="font-semibold group-hover:text-green-500 transition-colors duration-300">{user.name}</span>
+                      <span className="font-semibold group-hover:text-green-500 transition-colors duration-300 truncate hidden sm:inline">{user.name}</span>
+                      <span className="font-semibold group-hover:text-green-500 transition-colors duration-300 sm:hidden">{(user.name.split(' ')[0] || user.name).substring(0, 8)}</span>
                     </div>
                   </td>
                   {weekDays.map((day) => {
@@ -319,7 +317,7 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
                     const status = getStatusForDay(user.id, dateStr)
 
                       return (
-                        <td key={dateStr} className="px-2 py-3 text-center border-l border-r border-transparent hover:border-blue-500/20 transition-colors">
+                        <td key={dateStr} className="px-1 sm:px-2 py-2 sm:py-3 text-center border-l border-r border-transparent hover:border-blue-500/20 transition-colors min-w-[80px] sm:min-w-[100px]">
                         {slot ? (
                           <div className="space-y-2">
                             {(() => {
@@ -333,12 +331,12 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
                               return slot.slots.map((s, slotIdx) => (
                                 <div key={slotIdx} className="space-y-1">
                                   {/* Main slot time */}
-                                  <div className={`${slotBg} text-white rounded-lg px-3 py-1.5 text-xs font-semibold shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl ${
+                                  <div className={`${slotBg} text-white rounded-md sm:rounded-lg px-2 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-xs font-semibold shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl ${
                                     isUpcoming ? 'hover:shadow-blue-500/50 ring-2 ring-blue-400/30' : 'hover:shadow-gray-500/50 ring-2 ring-gray-400/30'
                                   }`}>
-                                    <div className="flex items-center justify-center gap-1">
-                                      <SlotIcon className="w-3 h-3 animate-pulse" />
-                                      <span>{s.start} - {s.end}</span>
+                                    <div className="flex items-center justify-center gap-0.5 sm:gap-1 flex-wrap">
+                                      <SlotIcon className="w-2.5 h-2.5 sm:w-3 sm:h-3 animate-pulse flex-shrink-0" />
+                                      <span className="whitespace-nowrap">{s.start} - {s.end}</span>
                                     </div>
                                   </div>
                                   {/* Breaks */}
@@ -346,12 +344,12 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
                                     <div className="space-y-1">
                                       <div className={`text-[10px] ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} font-medium`}>Перерывы:</div>
                                       {s.breaks.map((breakItem, breakIdx) => (
-                                        <div key={breakIdx} className={`${theme === 'dark' ? 'bg-gray-700/90' : 'bg-white'} ${theme === 'dark' ? 'text-gray-200' : 'text-gray-900'} border-2 ${theme === 'dark' ? 'border-orange-500/50' : 'border-orange-300'} rounded-lg px-2 py-1 text-[10px] font-medium shadow-md transition-all duration-300 hover:scale-105 hover:shadow-lg ${
+                                        <div key={breakIdx} className={`${theme === 'dark' ? 'bg-gray-700/90' : 'bg-white'} ${theme === 'dark' ? 'text-gray-200' : 'text-gray-900'} border-2 ${theme === 'dark' ? 'border-orange-500/50' : 'border-orange-300'} rounded-md sm:rounded-lg px-1.5 sm:px-2 py-0.5 sm:py-1 text-[9px] sm:text-[10px] font-medium shadow-md transition-all duration-300 hover:scale-105 hover:shadow-lg ${
                                           theme === 'dark' ? 'hover:border-orange-400/70 hover:shadow-orange-500/20' : 'hover:border-orange-400 hover:shadow-orange-400/20'
                                         }`}>
-                                          <span className="flex items-center gap-1 justify-center">
-                                            <span className="w-1 h-1 rounded-full bg-orange-500"></span>
-                                            {breakItem.start} - {breakItem.end}
+                                          <span className="flex items-center gap-0.5 sm:gap-1 justify-center flex-wrap">
+                                            <span className="w-0.5 h-0.5 sm:w-1 sm:h-1 rounded-full bg-orange-500 flex-shrink-0"></span>
+                                            <span className="whitespace-nowrap">{breakItem.start} - {breakItem.end}</span>
                                           </span>
                                         </div>
                                       ))}
