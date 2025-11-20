@@ -251,12 +251,12 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
                   return (
                     <div
                       key={status.id}
-                      className={`flex items-center justify-between p-3 rounded-lg ${
+                      className={`group relative flex items-center justify-between p-4 rounded-xl shadow-xl border-2 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl ${
                         status.type === 'dayoff'
-                          ? 'bg-yellow-500'
+                          ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 border-yellow-400/40 ring-2 ring-yellow-500/20 hover:ring-4 hover:ring-yellow-400/30'
                           : status.type === 'sick'
-                          ? 'bg-purple-500'
-                          : 'bg-orange-500'
+                          ? 'bg-gradient-to-r from-purple-500 to-purple-600 border-purple-400/40 ring-2 ring-purple-500/20 hover:ring-4 hover:ring-purple-400/30'
+                          : 'bg-gradient-to-r from-orange-500 to-orange-600 border-orange-400/40 ring-2 ring-orange-500/20 hover:ring-4 hover:ring-orange-400/30'
                       }`}
                     >
                       <div className="flex items-center gap-2">
@@ -336,19 +336,23 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
                   return (
                     <div
                       key={slot.id}
-                      className={`space-y-3 p-4 ${slotBg} rounded-xl shadow-lg border-2 hover:shadow-xl transition-all duration-200 hover:scale-[1.02] mb-3`}
+                      className={`group relative space-y-3 p-4 ${slotBg} rounded-xl shadow-xl border-2 transition-all duration-300 hover:shadow-2xl hover:scale-[1.03] mb-3 ${
+                        isUpcoming 
+                          ? 'border-blue-400/40 hover:border-blue-300/60 ring-2 ring-blue-500/20 hover:ring-4 hover:ring-blue-400/30' 
+                          : 'border-gray-400/30 hover:border-gray-300/50 ring-2 ring-gray-500/10 hover:ring-4 hover:ring-gray-400/20'
+                      }`}
                     >
                       <div className="flex items-center justify-between border-b border-white/20 pb-3">
                         <div className="flex items-center gap-3">
-                          <div className="relative flex-shrink-0">
+                          <div className="relative flex-shrink-0 group/avatar">
                             {slotUserFallback?.avatar ? (
                               <img 
                                 src={slotUserFallback.avatar} 
                                 alt={displayName}
-                                className={`w-10 h-10 rounded-full object-cover border-2 shadow-lg transition-all duration-200 hover:scale-110 ${
+                                className={`w-11 h-11 rounded-full object-cover border-2 shadow-xl transition-all duration-300 group-hover/avatar:scale-110 group-hover/avatar:shadow-2xl ${
                                   isUpcoming 
-                                    ? 'border-white/40 ring-2 ring-white/30 ring-offset-2 ring-offset-transparent' 
-                                    : 'border-white/30 ring-2 ring-white/20 ring-offset-2 ring-offset-transparent'
+                                    ? 'border-white/50 ring-2 ring-white/40 ring-offset-2 ring-offset-blue-500/20 group-hover/avatar:ring-4 group-hover/avatar:ring-white/60' 
+                                    : 'border-white/40 ring-2 ring-white/30 ring-offset-2 ring-offset-gray-500/20 group-hover/avatar:ring-4 group-hover/avatar:ring-white/50'
                                 }`}
                                 onError={(e) => {
                                   const target = e.target as HTMLImageElement
@@ -359,16 +363,19 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
                               />
                             ) : null}
                             <div 
-                              className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${
+                              className={`w-11 h-11 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300 shadow-xl group-hover/avatar:scale-110 group-hover/avatar:shadow-2xl ${
                                 isUpcoming 
-                                  ? 'bg-white/20 backdrop-blur-sm border-2 border-white/30' 
-                                  : 'bg-white/10 backdrop-blur-sm border-2 border-white/20'
+                                  ? 'bg-white/25 backdrop-blur-md border-2 border-white/40 ring-2 ring-white/30 group-hover/avatar:ring-4 group-hover/avatar:ring-white/60' 
+                                  : 'bg-white/15 backdrop-blur-md border-2 border-white/30 ring-2 ring-white/20 group-hover/avatar:ring-4 group-hover/avatar:ring-white/50'
                               } ${slotUserFallback?.avatar ? 'absolute inset-0 hidden' : ''}`}
                             >
                               {displayName.charAt(0).toUpperCase()}
                             </div>
+                            <div className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-white shadow-lg animate-pulse opacity-0 group-hover/avatar:opacity-100 transition-opacity duration-300 ${
+                              isUpcoming ? 'bg-blue-400' : 'bg-gray-400'
+                            }`}></div>
                           </div>
-                          <span className="text-white font-bold text-base">{displayName}</span>
+                          <span className="text-white font-bold text-base group-hover:scale-105 transition-transform duration-300">{displayName}</span>
                         </div>
                         <div className="flex gap-2">
                           {(isAdmin || user?.id === slot.userId) ? (
@@ -410,10 +417,14 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
                         {slot.slots.map((s, slotIdx) => (
                           <div key={slotIdx} className="space-y-1.5">
                             {/* Main slot time */}
-                            <div className="bg-white/20 backdrop-blur-sm rounded-lg px-3 py-2 border border-white/30">
+                            <div className={`bg-white/25 backdrop-blur-md rounded-lg px-3 py-2 border-2 transition-all duration-300 hover:scale-105 hover:shadow-xl ${
+                              isUpcoming 
+                                ? 'border-white/40 ring-2 ring-white/20 hover:border-white/60 hover:ring-4 hover:ring-white/40' 
+                                : 'border-white/30 ring-2 ring-white/10 hover:border-white/50 hover:ring-4 hover:ring-white/30'
+                            }`}>
                               <div className="flex items-center gap-2">
-                                <SlotIcon className="w-4 h-4 text-white" />
-                                <span className="text-white font-semibold text-sm">{s.start} - {s.end}</span>
+                                <SlotIcon className={`w-4 h-4 text-white ${isUpcoming ? 'animate-pulse' : ''}`} />
+                                <span className="text-white font-bold text-sm">{s.start} - {s.end}</span>
                               </div>
                             </div>
                             {/* Breaks */}
@@ -421,8 +432,15 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
                               <div className="space-y-1 ml-6">
                                 <div className={`text-[10px] ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} font-medium`}>Перерывы:</div>
                                 {s.breaks.map((breakItem, breakIdx) => (
-                                  <div key={breakIdx} className={`${theme === 'dark' ? 'bg-gray-700' : 'bg-white'} ${theme === 'dark' ? 'text-gray-200' : 'text-gray-900'} border ${theme === 'dark' ? 'border-orange-500/50' : 'border-orange-300'} rounded-lg px-2 py-1 text-xs font-medium shadow-sm`}>
-                                    {breakItem.start} - {breakItem.end}
+                                  <div key={breakIdx} className={`${theme === 'dark' ? 'bg-gray-700/95' : 'bg-white'} ${theme === 'dark' ? 'text-gray-200' : 'text-gray-900'} border-2 ${theme === 'dark' ? 'border-orange-500/60' : 'border-orange-300'} rounded-lg px-3 py-1.5 text-xs font-semibold shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl ${
+                                    theme === 'dark' 
+                                      ? 'hover:border-orange-400/80 hover:shadow-orange-500/30 ring-2 ring-orange-500/20 hover:ring-4 hover:ring-orange-400/40' 
+                                      : 'hover:border-orange-400 hover:shadow-orange-400/30 ring-2 ring-orange-300/20 hover:ring-4 hover:ring-orange-300/40'
+                                  }`}>
+                                    <span className="flex items-center gap-1.5 justify-center">
+                                      <span className={`w-1.5 h-1.5 rounded-full ${theme === 'dark' ? 'bg-orange-400' : 'bg-orange-500'} animate-pulse`}></span>
+                                      {breakItem.start} - {breakItem.end}
+                                    </span>
                                   </div>
                                 ))}
                               </div>

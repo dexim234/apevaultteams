@@ -257,46 +257,61 @@ export const Management = () => {
 
           <div className="flex flex-col gap-4">
             {/* Slot Filter Tabs */}
-            <div className="flex items-center gap-2">
-              <h2 className={`text-lg font-semibold ${headingColor} mr-4`}>Фильтр слотов:</h2>
-              <div className={`flex rounded-xl p-1.5 shadow-inner ${
-                theme === 'dark' ? 'bg-gray-700/50 border border-gray-600' : 'bg-gray-200/50 border border-gray-300'
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+              <h2 className={`text-lg font-bold ${headingColor} flex items-center gap-2`}>
+                <CalendarCheck className="w-5 h-5 text-green-500" />
+                Фильтр слотов:
+              </h2>
+              <div className={`flex rounded-xl p-1.5 shadow-lg ${
+                theme === 'dark' ? 'bg-gray-700/50 border-2 border-gray-600' : 'bg-gray-200/50 border-2 border-gray-300'
               }`}>
                 <button
                   onClick={() => setSlotFilter('all')}
-                  className={`px-4 py-2 rounded-lg transition-all duration-200 text-sm font-medium ${
+                  className={`px-5 py-2.5 rounded-lg transition-all duration-300 text-sm font-semibold flex items-center gap-2 relative ${
                     slotFilter === 'all'
-                      ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg shadow-green-500/50'
+                      ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg shadow-green-500/50 scale-105'
                       : theme === 'dark'
-                      ? 'text-gray-300 hover:bg-gray-600/50 hover:text-white'
-                      : 'text-gray-700 hover:bg-gray-300 hover:text-gray-900'
+                      ? 'text-gray-300 hover:bg-gray-600/50 hover:text-white hover:scale-105'
+                      : 'text-gray-700 hover:bg-gray-300 hover:text-gray-900 hover:scale-105'
                   }`}
                 >
+                  <Calendar className="w-4 h-4" />
                   Все
+                  {slotFilter === 'all' && (
+                    <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-green-400 rounded-full animate-pulse"></span>
+                  )}
                 </button>
                 <button
                   onClick={() => setSlotFilter('upcoming')}
-                  className={`px-4 py-2 rounded-lg transition-all duration-200 text-sm font-medium ${
+                  className={`px-5 py-2.5 rounded-lg transition-all duration-300 text-sm font-semibold flex items-center gap-2 relative ${
                     slotFilter === 'upcoming'
-                      ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/50'
+                      ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/50 scale-105'
                       : theme === 'dark'
-                      ? 'text-gray-300 hover:bg-gray-600/50 hover:text-white'
-                      : 'text-gray-700 hover:bg-gray-300 hover:text-gray-900'
+                      ? 'text-gray-300 hover:bg-gray-600/50 hover:text-white hover:scale-105'
+                      : 'text-gray-700 hover:bg-gray-300 hover:text-gray-900 hover:scale-105'
                   }`}
                 >
+                  <Clock className="w-4 h-4" />
                   Предстоящие
+                  {slotFilter === 'upcoming' && (
+                    <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-blue-400 rounded-full animate-pulse"></span>
+                  )}
                 </button>
                 <button
                   onClick={() => setSlotFilter('completed')}
-                  className={`px-4 py-2 rounded-lg transition-all duration-200 text-sm font-medium ${
+                  className={`px-5 py-2.5 rounded-lg transition-all duration-300 text-sm font-semibold flex items-center gap-2 relative ${
                     slotFilter === 'completed'
-                      ? 'bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-lg shadow-gray-500/50'
+                      ? 'bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-lg shadow-gray-500/50 scale-105'
                       : theme === 'dark'
-                      ? 'text-gray-300 hover:bg-gray-600/50 hover:text-white'
-                      : 'text-gray-700 hover:bg-gray-300 hover:text-gray-900'
+                      ? 'text-gray-300 hover:bg-gray-600/50 hover:text-white hover:scale-105'
+                      : 'text-gray-700 hover:bg-gray-300 hover:text-gray-900 hover:scale-105'
                   }`}
                 >
+                  <CalendarCheck className="w-4 h-4" />
                   Завершенные
+                  {slotFilter === 'completed' && (
+                    <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-gray-400 rounded-full animate-pulse"></span>
+                  )}
                 </button>
               </div>
             </div>
@@ -379,27 +394,81 @@ export const Management = () => {
           </div>
 
           {/* Participant filter */}
-          <div className="mt-4 pt-4 border-t border-gray-700/50 dark:border-gray-700">
-            <label className={`block text-sm font-semibold mb-3 flex items-center gap-2 ${labelColor}`}>
-              <Users className="w-4 h-4" />
+          <div className={`mt-6 pt-6 border-t-2 ${theme === 'dark' ? 'border-gray-700/50' : 'border-gray-200/50'}`}>
+            <label className={`block text-base font-bold mb-4 flex items-center gap-2 ${headingColor}`}>
+              <Users className="w-5 h-5 text-green-500" />
               Фильтр по участникам
             </label>
-            <select
-              value={selectedUserId || ''}
-              onChange={(e) => setSelectedUserId(e.target.value || null)}
-              className={`w-full md:w-72 px-4 py-2.5 rounded-xl border-2 transition-all duration-200 ${
-                theme === 'dark'
-                  ? 'bg-gray-700/50 border-gray-600 text-white focus:border-green-500 focus:ring-4 focus:ring-green-500/20'
-                  : 'bg-white border-gray-300 text-gray-900 focus:border-green-500 focus:ring-4 focus:ring-green-500/20'
-              } focus:outline-none font-medium`}
-            >
-              <option value="">Все участники команды</option>
+            <div className="flex flex-wrap items-center gap-3">
+              <button
+                onClick={() => setSelectedUserId(null)}
+                className={`group relative px-5 py-3 rounded-xl transition-all duration-300 font-medium text-sm shadow-lg ${
+                  selectedUserId === null
+                    ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-green-500/50 scale-105'
+                    : theme === 'dark'
+                    ? 'bg-gray-700/50 border-2 border-gray-600 text-gray-300 hover:bg-gray-600/70 hover:border-green-500/50 hover:text-white hover:scale-105'
+                    : 'bg-white border-2 border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-green-500/50 hover:text-green-600 hover:scale-105'
+                }`}
+              >
+                <span className="flex items-center gap-2">
+                  <Users className="w-4 h-4" />
+                  Все участники
+                </span>
+                {selectedUserId === null && (
+                  <span className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-white animate-pulse"></span>
+                )}
+              </button>
               {TEAM_MEMBERS.map((member) => (
-                <option key={member.id} value={member.id}>
-                  {member.name}
-                </option>
+                <button
+                  key={member.id}
+                  onClick={() => setSelectedUserId(member.id)}
+                  className={`group relative px-5 py-3 rounded-xl transition-all duration-300 font-medium text-sm shadow-lg flex items-center gap-3 ${
+                    selectedUserId === member.id
+                      ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-green-500/50 scale-105 ring-2 ring-green-400/50'
+                      : theme === 'dark'
+                      ? 'bg-gray-700/50 border-2 border-gray-600 text-gray-300 hover:bg-gray-600/70 hover:border-green-500/50 hover:text-white hover:scale-105'
+                      : 'bg-white border-2 border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-green-500/50 hover:text-green-600 hover:scale-105'
+                  }`}
+                >
+                  <div className="relative flex-shrink-0">
+                    {member.avatar ? (
+                      <img
+                        src={member.avatar}
+                        alt={member.name}
+                        className={`w-8 h-8 rounded-full object-cover border-2 transition-all duration-300 ${
+                          selectedUserId === member.id
+                            ? 'border-white ring-2 ring-white/50 scale-110'
+                            : theme === 'dark'
+                            ? 'border-gray-500 group-hover:border-green-400'
+                            : 'border-gray-300 group-hover:border-green-400'
+                        }`}
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement
+                          target.style.display = 'none'
+                          const fallback = target.nextElementSibling as HTMLElement
+                          if (fallback) fallback.style.display = 'flex'
+                        }}
+                      />
+                    ) : null}
+                    <div
+                      className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs transition-all duration-300 ${
+                        selectedUserId === member.id
+                          ? 'bg-white/20 text-white ring-2 ring-white/50 scale-110'
+                          : theme === 'dark'
+                          ? 'bg-gradient-to-br from-green-500/30 to-blue-500/30 text-gray-300 group-hover:from-green-500/50 group-hover:to-blue-500/50'
+                          : 'bg-gradient-to-br from-green-400/30 to-blue-400/30 text-gray-600 group-hover:from-green-400/50 group-hover:to-blue-400/50'
+                      } ${member.avatar ? 'absolute inset-0 hidden' : ''}`}
+                    >
+                      {member.name.charAt(0).toUpperCase()}
+                    </div>
+                  </div>
+                  <span>{member.name}</span>
+                  {selectedUserId === member.id && (
+                    <span className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-white animate-pulse"></span>
+                  )}
+                </button>
               ))}
-            </select>
+            </div>
           </div>
         </div>
 

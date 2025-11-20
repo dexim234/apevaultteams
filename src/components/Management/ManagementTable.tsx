@@ -245,34 +245,44 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
             {displayUsers.map((user, index) => {
               const stats = getUserStats(user.id)
               const isEven = index % 2 === 0
+              const isCurrentUser = user?.id === user?.id
               return (
                 <tr 
                   key={user.id} 
                   className={`
-                    border-b transition-all duration-200
-                    ${theme === 'dark' ? 'border-gray-700/50' : 'border-gray-200/50'}
+                    group border-b transition-all duration-300 relative
+                    ${theme === 'dark' ? 'border-gray-700/30' : 'border-gray-200/30'}
                     ${isEven 
-                      ? theme === 'dark' ? 'bg-gray-800/30 hover:bg-gray-800/60' : 'bg-gray-50/50 hover:bg-gray-100/80'
-                      : theme === 'dark' ? 'bg-gray-800/10 hover:bg-gray-800/40' : 'bg-white hover:bg-gray-50'
+                      ? theme === 'dark' 
+                        ? 'bg-gradient-to-r from-gray-800/40 via-gray-800/20 to-transparent hover:from-gray-800/70 hover:via-gray-800/50 hover:shadow-lg hover:shadow-green-500/10' 
+                        : 'bg-gradient-to-r from-gray-50/70 via-gray-50/40 to-transparent hover:from-gray-100/90 hover:via-gray-100/70 hover:shadow-lg hover:shadow-green-500/5'
+                      : theme === 'dark' 
+                        ? 'bg-gradient-to-r from-gray-800/10 via-gray-800/5 to-transparent hover:from-gray-800/50 hover:via-gray-800/30 hover:shadow-lg hover:shadow-green-500/10' 
+                        : 'bg-gradient-to-r from-white via-gray-50/30 to-transparent hover:from-gray-50 hover:via-gray-50/60 hover:shadow-lg hover:shadow-green-500/5'
                     }
+                    hover:scale-[1.01] hover:-translate-y-0.5
                   `}
                 >
-                  <td className={`px-4 py-4 font-semibold ${headingColor} sticky left-0 z-10 transition-colors ${
+                  <td className={`px-4 py-4 font-semibold ${headingColor} sticky left-0 z-10 transition-all duration-300 backdrop-blur-sm ${
                     isEven 
-                      ? theme === 'dark' ? 'bg-gray-800/30 hover:bg-gray-800/60' : 'bg-gray-50/50 hover:bg-gray-100/80'
-                      : theme === 'dark' ? 'bg-gray-800/10 hover:bg-gray-800/40' : 'bg-white hover:bg-gray-50'
+                      ? theme === 'dark' 
+                        ? 'bg-gradient-to-r from-gray-800/40 via-gray-800/20 to-transparent group-hover:from-gray-800/70 group-hover:via-gray-800/50' 
+                        : 'bg-gradient-to-r from-gray-50/70 via-gray-50/40 to-transparent group-hover:from-gray-100/90 group-hover:via-gray-100/70'
+                      : theme === 'dark' 
+                        ? 'bg-gradient-to-r from-gray-800/10 via-gray-800/5 to-transparent group-hover:from-gray-800/50 group-hover:via-gray-800/30' 
+                        : 'bg-gradient-to-r from-white via-gray-50/30 to-transparent group-hover:from-gray-50 group-hover:via-gray-50/60'
                   }`}>
-                    <div className="flex items-center gap-3">
-                      <div className="relative flex-shrink-0">
+                      <div className="flex items-center gap-3">
+                      <div className="relative flex-shrink-0 group/avatar">
                         {user.avatar ? (
                           <img 
                             src={user.avatar} 
                             alt={user.name}
-                            className="w-10 h-10 rounded-full object-cover border-2 shadow-lg transition-all duration-200 hover:scale-110"
+                            className="w-11 h-11 rounded-full object-cover border-2 shadow-lg transition-all duration-300 group-hover:scale-110 group-hover:shadow-xl group-hover:shadow-green-500/30 ring-2 ring-transparent group-hover:ring-green-500/50"
                             style={{
-                              borderColor: theme === 'dark' ? 'rgba(34, 197, 94, 0.5)' : 'rgba(34, 197, 94, 0.3)',
-                              width: '2.5rem',
-                              height: '2.5rem',
+                              borderColor: theme === 'dark' ? 'rgba(34, 197, 94, 0.6)' : 'rgba(34, 197, 94, 0.4)',
+                              width: '2.75rem',
+                              height: '2.75rem',
                               borderRadius: '50%',
                               objectFit: 'cover'
                             } as React.CSSProperties}
@@ -286,21 +296,22 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
                           />
                         ) : null}
                         <div 
-                          className={`flex items-center justify-center font-bold text-sm transition-all duration-200 ${
+                          className={`w-11 h-11 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300 shadow-lg ring-2 ring-transparent group-hover/avatar:scale-110 group-hover/avatar:shadow-xl group-hover/avatar:ring-green-500/50 ${
                             theme === 'dark' 
-                              ? 'bg-gradient-to-br from-green-500 to-blue-500 text-white shadow-lg' 
-                              : 'bg-gradient-to-br from-green-400 to-blue-400 text-white shadow-md'
+                              ? 'bg-gradient-to-br from-green-500 via-green-600 to-blue-500 text-white group-hover/avatar:shadow-green-500/40' 
+                              : 'bg-gradient-to-br from-green-400 via-green-500 to-blue-400 text-white group-hover/avatar:shadow-green-400/40'
                           } ${user.avatar ? 'absolute inset-0 hidden' : ''}`}
                           style={{
-                            width: '2.5rem',
-                            height: '2.5rem',
+                            width: '2.75rem',
+                            height: '2.75rem',
                             borderRadius: '50%'
                           } as React.CSSProperties}
                         >
                           {user.name.charAt(0).toUpperCase()}
                         </div>
+                        <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-white shadow-lg animate-pulse opacity-0 group-hover/avatar:opacity-100 transition-opacity duration-300"></div>
                       </div>
-                      <span>{user.name}</span>
+                      <span className="font-semibold group-hover:text-green-500 transition-colors duration-300">{user.name}</span>
                     </div>
                   </td>
                   {weekDays.map((day) => {
@@ -323,9 +334,11 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
                               return slot.slots.map((s, slotIdx) => (
                                 <div key={slotIdx} className="space-y-1">
                                   {/* Main slot time */}
-                                  <div className={`${slotBg} text-white rounded-lg px-3 py-1.5 text-xs font-semibold shadow-sm`}>
+                                  <div className={`${slotBg} text-white rounded-lg px-3 py-1.5 text-xs font-semibold shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl ${
+                                    isUpcoming ? 'hover:shadow-blue-500/50 ring-2 ring-blue-400/30' : 'hover:shadow-gray-500/50 ring-2 ring-gray-400/30'
+                                  }`}>
                                     <div className="flex items-center justify-center gap-1">
-                                      <SlotIcon className="w-3 h-3" />
+                                      <SlotIcon className="w-3 h-3 animate-pulse" />
                                       <span>{s.start} - {s.end}</span>
                                     </div>
                                   </div>
@@ -334,8 +347,13 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
                                     <div className="space-y-1">
                                       <div className={`text-[10px] ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} font-medium`}>Перерывы:</div>
                                       {s.breaks.map((breakItem, breakIdx) => (
-                                        <div key={breakIdx} className={`${theme === 'dark' ? 'bg-gray-700' : 'bg-white'} ${theme === 'dark' ? 'text-gray-200' : 'text-gray-900'} border ${theme === 'dark' ? 'border-orange-500/50' : 'border-orange-300'} rounded px-2 py-1 text-[10px] font-medium shadow-sm`}>
-                                          {breakItem.start} - {breakItem.end}
+                                        <div key={breakIdx} className={`${theme === 'dark' ? 'bg-gray-700/90' : 'bg-white'} ${theme === 'dark' ? 'text-gray-200' : 'text-gray-900'} border-2 ${theme === 'dark' ? 'border-orange-500/50' : 'border-orange-300'} rounded-lg px-2 py-1 text-[10px] font-medium shadow-md transition-all duration-300 hover:scale-105 hover:shadow-lg ${
+                                          theme === 'dark' ? 'hover:border-orange-400/70 hover:shadow-orange-500/20' : 'hover:border-orange-400 hover:shadow-orange-400/20'
+                                        }`}>
+                                          <span className="flex items-center gap-1 justify-center">
+                                            <span className="w-1 h-1 rounded-full bg-orange-500"></span>
+                                            {breakItem.start} - {breakItem.end}
+                                          </span>
                                         </div>
                                       ))}
                                     </div>
