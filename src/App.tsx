@@ -8,6 +8,8 @@ import { Call } from './pages/Call'
 import { Management } from './pages/Management'
 import { Earnings } from './pages/Earnings'
 import { Rating } from './pages/Rating'
+import { About } from './pages/About'
+import { FAQ } from './pages/FAQ'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { cleanupOldData } from './services/firestoreService'
 
@@ -57,6 +59,22 @@ function App() {
           element={
             <ProtectedRoute>
               <Rating />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/about"
+          element={
+            <ProtectedRoute>
+              <About />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/faq"
+          element={
+            <ProtectedRoute>
+              <FAQ />
             </ProtectedRoute>
           }
         />

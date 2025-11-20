@@ -24,6 +24,8 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
     { path: '/management', label: 'Management' },
     { path: '/earnings', label: 'Заработок' },
     { path: '/rating', label: 'Рейтинг' },
+    { path: '/about', label: 'О сообществе' },
+    { path: '/faq', label: 'FAQ' },
   ]
 
   return (
