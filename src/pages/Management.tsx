@@ -298,12 +298,17 @@ export const Management = () => {
                 <CalendarCheck className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 flex-shrink-0" />
                 <span>Фильтр слотов:</span>
               </h2>
-              <div className={`flex flex-col sm:flex-row rounded-lg sm:rounded-xl p-1 sm:p-1.5 shadow-lg gap-1 ${
-                theme === 'dark' ? 'bg-gray-700/50 border-2 border-gray-600' : 'bg-gray-200/50 border-2 border-gray-300'
-              }`}>
-                <button
+              <div className="flex justify-center sm:justify-start">
+                <div
+                  className={`inline-flex flex-col sm:flex-row flex-wrap rounded-lg sm:rounded-xl p-1 sm:p-1.5 shadow-lg gap-1 ${
+                    theme === 'dark'
+                      ? 'bg-gray-700/50 border-2 border-gray-600'
+                      : 'bg-gray-200/50 border-2 border-gray-300'
+                  }`}
+                >
+                  <button
                   onClick={() => setSlotFilter('all')}
-                  className={`flex-1 sm:flex-none px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 rounded-lg transition-all duration-300 text-xs sm:text-sm font-semibold flex items-center justify-center gap-1.5 sm:gap-2 relative touch-manipulation active:scale-95 ${
+                    className={`px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 rounded-lg transition-all duration-300 text-xs sm:text-sm font-semibold flex items-center justify-center gap-1.5 sm:gap-2 relative touch-manipulation active:scale-95 ${
                     slotFilter === 'all'
                       ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg shadow-green-500/50 scale-105'
                       : theme === 'dark'
@@ -316,10 +321,10 @@ export const Management = () => {
                   {slotFilter === 'all' && (
                     <span className="absolute -top-0.5 -right-0.5 w-2 h-2 sm:w-2.5 sm:h-2.5 bg-green-400 rounded-full animate-pulse"></span>
                   )}
-                </button>
-                <button
+                  </button>
+                  <button
                   onClick={() => setSlotFilter('upcoming')}
-                  className={`flex-1 sm:flex-none px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 rounded-lg transition-all duration-300 text-xs sm:text-sm font-semibold flex items-center justify-center gap-1.5 sm:gap-2 relative touch-manipulation active:scale-95 ${
+                    className={`px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 rounded-lg transition-all duration-300 text-xs sm:text-sm font-semibold flex items-center justify-center gap-1.5 sm:gap-2 relative touch-manipulation active:scale-95 ${
                     slotFilter === 'upcoming'
                       ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/50 scale-105'
                       : theme === 'dark'
@@ -332,10 +337,10 @@ export const Management = () => {
                   {slotFilter === 'upcoming' && (
                     <span className="absolute -top-0.5 -right-0.5 w-2 h-2 sm:w-2.5 sm:h-2.5 bg-blue-400 rounded-full animate-pulse"></span>
                   )}
-                </button>
-                <button
+                  </button>
+                  <button
                   onClick={() => setSlotFilter('completed')}
-                  className={`flex-1 sm:flex-none px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 rounded-lg transition-all duration-300 text-xs sm:text-sm font-semibold flex items-center justify-center gap-1.5 sm:gap-2 relative touch-manipulation active:scale-95 ${
+                    className={`px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 rounded-lg transition-all duration-300 text-xs sm:text-sm font-semibold flex items-center justify-center gap-1.5 sm:gap-2 relative touch-manipulation active:scale-95 ${
                     slotFilter === 'completed'
                       ? 'bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-lg shadow-gray-500/50 scale-105'
                       : theme === 'dark'
@@ -348,7 +353,8 @@ export const Management = () => {
                   {slotFilter === 'completed' && (
                     <span className="absolute -top-0.5 -right-0.5 w-2 h-2 sm:w-2.5 sm:h-2.5 bg-gray-400 rounded-full animate-pulse"></span>
                   )}
-                </button>
+                  </button>
+                </div>
               </div>
             </div>
 

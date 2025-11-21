@@ -57,26 +57,59 @@ export const About = () => {
           {/* Decorative background */}
           <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-cyan-500/10 to-blue-500/10 rounded-full blur-2xl -mr-20 -mt-20" />
           
-          <div className="relative z-10">
-            <div className="flex items-start gap-6 mb-6">
-              <div className={`p-4 rounded-2xl shadow-lg ${
-                theme === 'dark' 
-                  ? 'bg-gradient-to-br from-cyan-600 to-blue-600' 
-                  : 'bg-gradient-to-br from-cyan-500 to-blue-500'
-              } text-white flex-shrink-0`}>
-                <Info className="w-8 h-8" />
+          <div className="relative z-10 space-y-6">
+            <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 items-start">
+              <div
+                className={`p-3 sm:p-4 rounded-2xl shadow-lg ${
+                  theme === 'dark'
+                    ? 'bg-gradient-to-br from-cyan-600 to-blue-600'
+                    : 'bg-gradient-to-br from-cyan-500 to-blue-500'
+                } text-white flex-shrink-0`}
+              >
+                <Info className="w-5 h-5 sm:w-7 sm:h-7" />
               </div>
-              <div className="flex-1">
-                <h2 className={`text-2xl font-extrabold mb-4 ${headingColor} flex items-center gap-2`}>
+              <div className="flex-1 space-y-3">
+                <h2 className={`text-2xl sm:text-3xl font-extrabold ${headingColor}`}>
                   <span className="bg-gradient-to-r from-cyan-600 to-blue-600 text-transparent bg-clip-text">
                     Что такое ApeVault?
                   </span>
                 </h2>
-                <p className={`text-base leading-relaxed ${subTextColor}`}>
-                  ApeVault — это закрытое профессиональное сообщество трейдеров и коллеров, объединяющее опытных специалистов 
-                  в области финансовых рынков. Мы создаем среду для эффективной работы, обмена опытом и совместного роста.
+                <p className={`text-sm sm:text-base leading-relaxed ${subTextColor}`}>
+                  ApeVault — закрытое профессиональное сообщество трейдеров и коллеров. Мы объединяем экспертизу, строгие
+                  регламенты и командную поддержку, чтобы ускорять результаты каждого участника и строить прозрачную культуру
+                  трейдинга.
                 </p>
+                <div className="flex flex-wrap gap-2">
+                  {['Профессиональные коллеры', 'Командные сессии', 'Прозрачная аналитика'].map((tag) => (
+                    <span
+                      key={tag}
+                      className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                        theme === 'dark' ? 'bg-cyan-500/10 text-cyan-200 border border-cyan-500/30' : 'bg-cyan-50 text-cyan-700 border border-cyan-200'
+                      }`}
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
               </div>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {[
+                { label: 'Участников', value: '120+' },
+                { label: 'Сессий в неделю', value: '60+' },
+                { label: 'Коллов в клубе', value: '40+' },
+                { label: 'Городов', value: '15' }
+              ].map((item) => (
+                <div
+                  key={item.label}
+                  className={`p-3 rounded-xl border ${
+                    theme === 'dark' ? 'border-cyan-500/20 bg-white/5 text-white' : 'border-cyan-200 bg-white text-gray-900'
+                  }`}
+                >
+                  <p className="text-xs uppercase tracking-wide opacity-70">{item.label}</p>
+                  <p className="text-xl font-bold">{item.value}</p>
+                </div>
+              ))}
             </div>
           </div>
         </div>

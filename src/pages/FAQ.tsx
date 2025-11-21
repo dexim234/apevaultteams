@@ -329,7 +329,7 @@ export const FAQ = () => {
                     Часто задаваемые вопросы
                   </span>
                   <Sparkles
-                    className={`w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0 ${
+                    className={`hidden sm:inline-flex w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0 ${
                       theme === 'dark' ? 'text-yellow-400' : 'text-yellow-500'
                     } animate-pulse`}
                   />
@@ -408,6 +408,13 @@ export const FAQ = () => {
               const actualIndex = faqData.indexOf(item)
               const isOpen = openItems.has(actualIndex)
               const categoryInfo = categories.find(c => c.id === item.category)
+              const badgeColor = categoryInfo
+                ? theme === 'dark'
+                  ? categoryInfo.darkColor
+                  : categoryInfo.color
+                : theme === 'dark'
+                ? 'text-gray-300'
+                : 'text-gray-600'
               
               return (
                 <div
@@ -422,33 +429,52 @@ export const FAQ = () => {
                 >
                   <button
                     onClick={() => toggleItem(item)}
-                    className={`w-full p-6 flex items-start justify-between text-left ${hoverBg} transition-colors group`}
+                    className={`w-full p-5 sm:p-6 flex flex-col gap-3 text-left ${hoverBg} transition-colors group`}
                   >
-                    <div className="flex-1 pr-4">
-                      <div className="flex items-center gap-3 mb-2">
+                    <div className="flex items-center justify-between gap-3">
+                      <div
+                        className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-semibold border ${
+                          theme === 'dark' ? 'bg-gray-800/80 border-gray-700' : 'bg-gray-100 border-gray-200'
+                        } ${badgeColor}`}
+                      >
                         {categoryInfo && (
-                          <span className={`${theme === 'dark' ? categoryInfo.darkColor : categoryInfo.color}`}>
+                          <span className="flex items-center gap-1 text-sm">
                             {categoryInfo.icon}
                           </span>
                         )}
-                        <h3 className={`text-lg font-bold ${headingColor} group-hover:${
-                          theme === 'dark' ? 'text-blue-400' : 'text-blue-600'
-                        } transition-colors`}>
-                          {item.question}
-                        </h3>
+                        <span className="uppercase tracking-wide">
+                          {categoryInfo ? categoryInfo.name : 'Общее'}
+                        </span>
+                      </div>
+                      <div
+                        className={`flex-shrink-0 p-2 rounded-lg transition-all ${
+                          isOpen
+                            ? theme === 'dark'
+                              ? 'bg-blue-500/20 text-blue-400 rotate-180'
+                              : 'bg-blue-100 text-blue-600 rotate-180'
+                            : theme === 'dark'
+                            ? 'text-gray-400 group-hover:text-gray-300'
+                            : 'text-gray-400 group-hover:text-gray-600'
+                        }`}
+                      >
+                        <ChevronDown className="w-5 h-5" />
                       </div>
                     </div>
-                    <div className={`flex-shrink-0 p-2 rounded-lg transition-all ${
-                      isOpen 
-                        ? theme === 'dark' ? 'bg-blue-500/20 text-blue-400 rotate-180' : 'bg-blue-100 text-blue-600 rotate-180'
-                        : theme === 'dark' ? 'text-gray-400 group-hover:text-gray-300' : 'text-gray-400 group-hover:text-gray-600'
-                    }`}>
-                      <ChevronDown className="w-5 h-5" />
-                    </div>
+                    <h3
+                      className={`text-lg sm:text-xl font-bold ${headingColor} group-hover:${
+                        theme === 'dark' ? 'text-blue-400' : 'text-blue-600'
+                      } transition-colors`}
+                    >
+                      {item.question}
+                    </h3>
                   </button>
                   {isOpen && (
-                    <div className={`px-6 pb-6 border-t ${borderColor} pt-4 animate-fade-in`}>
-                      <div className={`${textColor} leading-relaxed`}>
+                    <div className={`px-5 sm:px-6 pb-5 sm:pb-6 border-t ${borderColor} pt-4 animate-fade-in`}>
+                      <div
+                        className={`rounded-lg p-4 text-sm leading-relaxed ${
+                          theme === 'dark' ? 'bg-gray-800/70 text-gray-200' : 'bg-blue-50/80 text-gray-800'
+                        }`}
+                      >
                         {formatAnswer(item.answer)}
                       </div>
                     </div>
