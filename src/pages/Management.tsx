@@ -33,9 +33,32 @@ export const Management = () => {
     completedSlots: 0
   })
 
+  const [isMobile, setIsMobile] = useState(false)
+
   useEffect(() => {
     loadStats()
   }, [])
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(max-width: 1023px)')
+    const handleChange = (event: MediaQueryListEvent | MediaQueryList) => {
+      setIsMobile(event.matches)
+    }
+
+    // Initial check
+    handleChange(mediaQuery)
+
+    const listener = (event: MediaQueryListEvent) => handleChange(event)
+    mediaQuery.addEventListener('change', listener)
+
+    return () => mediaQuery.removeEventListener('change', listener)
+  }, [])
+
+  useEffect(() => {
+    if (isMobile && viewMode === 'table') {
+      setViewMode('week')
+    }
+  }, [isMobile, viewMode])
 
   const isSlotUpcoming = (slot: any): boolean => {
     const today = new Date()
@@ -133,6 +156,19 @@ export const Management = () => {
   const cardBg = theme === 'dark' ? 'bg-gray-800' : 'bg-white'
   const headingColor = theme === 'dark' ? 'text-white' : 'text-gray-900'
   const labelColor = theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+  const contentCardClass = `rounded-xl sm:rounded-2xl p-4 sm:p-5 border ${
+    theme === 'dark'
+      ? 'bg-gray-900/40 border-gray-700 shadow-[0_20px_60px_rgba(0,0,0,0.5)]'
+      : 'bg-white border-gray-200 shadow-[0_20px_60px_rgba(15,23,42,0.08)]'
+  }`
+
+  const handleViewModeChange = (mode: ViewMode) => {
+    if (mode === 'table' && isMobile) {
+      alert('Этот вид недоступен на мобильных устройствах. Пожалуйста, воспользуйтесь ПК.')
+      return
+    }
+    setViewMode(mode)
+  }
 
   return (
     <Layout>
@@ -325,20 +361,23 @@ export const Management = () => {
                   theme === 'dark' ? 'bg-gray-700/50 border border-gray-600' : 'bg-gray-200/50 border border-gray-300'
                 }`}>
                   <button
-                    onClick={() => setViewMode('table')}
-                    className={`flex-1 px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm md:text-base rounded-lg transition-all duration-200 flex items-center justify-center gap-1.5 sm:gap-2 font-medium touch-manipulation active:scale-95 ${
-                      viewMode === 'table'
+                    onClick={() => handleViewModeChange('table')}
+                    aria-disabled={isMobile}
+                    className={`flex-1 px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm md:text-base rounded-lg transition-all duration-200 flex items-center justify-center gap-1.5 sm:gap-2 font-medium touch-manipulation ${
+                      viewMode === 'table' && !isMobile
                         ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg shadow-green-500/50 scale-105'
+                        : isMobile
+                        ? 'bg-gray-200/60 text-gray-400 cursor-not-allowed'
                         : theme === 'dark'
-                        ? 'text-gray-300 hover:bg-gray-600/50 hover:text-white'
-                        : 'text-gray-700 hover:bg-gray-300 hover:text-gray-900'
+                        ? 'text-gray-300 hover:bg-gray-600/50 hover:text-white active:scale-95'
+                        : 'text-gray-700 hover:bg-gray-300 hover:text-gray-900 active:scale-95'
                     }`}
                   >
                     <Table2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
                     <span className="whitespace-nowrap">Таблица</span>
                   </button>
                   <button
-                    onClick={() => setViewMode('week')}
+                    onClick={() => handleViewModeChange('week')}
                     className={`flex-1 px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm md:text-base rounded-lg transition-all duration-200 flex items-center justify-center gap-1.5 sm:gap-2 font-medium touch-manipulation active:scale-95 ${
                       viewMode === 'week'
                         ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg shadow-green-500/50 scale-105'
@@ -474,21 +513,52 @@ export const Management = () => {
 
 
         {/* Content view */}
-        {viewMode === 'table' ? (
-          <ManagementTable
-            selectedUserId={selectedUserId}
-            slotFilter={slotFilter}
-            onEditSlot={handleEditSlot}
-            onEditStatus={handleEditStatus}
-          />
-        ) : (
-          <ManagementWeekView
-            selectedUserId={selectedUserId}
-            slotFilter={slotFilter}
-            onEditSlot={handleEditSlot}
-            onEditStatus={handleEditStatus}
-          />
-        )}
+        <div className={contentCardClass}>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 mb-4">
+            <div>
+              <p className={`text-sm sm:text-base font-semibold ${headingColor}`}>Расписание команды</p>
+              <p className={`text-xs sm:text-sm ${labelColor}`}>
+                Выберите удобный формат отображения и управляйте слотами в одном месте
+              </p>
+            </div>
+            {isMobile && (
+              <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold text-amber-700 bg-amber-100 dark:text-amber-300 dark:bg-amber-500/10">
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Мобильный вид</span>
+              </div>
+            )}
+          </div>
+
+          {viewMode === 'table' ? (
+            isMobile ? (
+              <div
+                className={`rounded-lg border-2 border-dashed p-4 text-center ${theme === 'dark' ? 'bg-gray-800/60 border-gray-700 text-gray-300' : 'bg-gray-50 border-gray-200 text-gray-600'}`}
+              >
+                <div className="flex flex-col items-center gap-2">
+                  <Table2 className={`w-8 h-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`} />
+                  <p className="text-sm font-semibold">Табличный вид недоступен на мобильных устройствах</p>
+                  <p className="text-xs">
+                    Пожалуйста, откройте ApeVault Panel на ПК или ноутбуке, чтобы использовать расширенную таблицу.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <ManagementTable
+                selectedUserId={selectedUserId}
+                slotFilter={slotFilter}
+                onEditSlot={handleEditSlot}
+                onEditStatus={handleEditStatus}
+              />
+            )
+          ) : (
+            <ManagementWeekView
+              selectedUserId={selectedUserId}
+              slotFilter={slotFilter}
+              onEditSlot={handleEditSlot}
+              onEditStatus={handleEditStatus}
+            />
+          )}
+        </div>
 
         {/* Forms */}
         {showSlotForm && (
