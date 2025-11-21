@@ -18,7 +18,7 @@ export const DeleteSlotsForm = ({ onClose, onSave }: DeleteSlotsFormProps) => {
   const { theme } = useThemeStore()
   const { isAdmin } = useAdminStore()
   const headingColor = theme === 'dark' ? 'text-white' : 'text-gray-900'
-  const [selectedUserIds, setSelectedUserIds] = useState<string[]>(user?.id ? [user.id] : [])
+  const [selectedUserIds, setSelectedUserIds] = useState<string[]>(isAdmin ? [] : (user?.id ? [user.id] : []))
   const [deleteByWeekDay, setDeleteByWeekDay] = useState(false)
   const [deleteByDates, setDeleteByDates] = useState(false)
   const [deleteByDateRange, setDeleteByDateRange] = useState(false)
@@ -103,12 +103,13 @@ export const DeleteSlotsForm = ({ onClose, onSave }: DeleteSlotsFormProps) => {
   }
 
   const handleDelete = async () => {
-    if (!user) {
+    // Allow admin to delete slots even without user
+    if (!isAdmin && !user) {
       setError('Пользователь не найден')
       return
     }
 
-    const targetUserIds = isAdmin ? selectedUserIds : [user.id]
+    const targetUserIds = isAdmin ? selectedUserIds : (user ? [user.id] : [])
     if (targetUserIds.length === 0) {
       setError('Выберите хотя бы одного участника')
       return

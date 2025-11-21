@@ -36,12 +36,13 @@ export const EarningsForm = ({ onClose, onSave, editingEarning }: EarningsFormPr
   }, [date, user, isEditing])
 
   const loadSlots = async () => {
-    if (!user && !isEditing) return
+    // Allow admin to load slots even without user, or when editing
+    if (!isAdmin && !user && !isEditing) return
 
     try {
-      // When editing, load all slots for the date (not filtered by user)
+      // When editing or admin, load all slots for the date (not filtered by user)
       // When creating, load slots for current user
-      const slots = isEditing 
+      const slots = (isEditing || isAdmin) 
         ? await getWorkSlots(undefined, date)
         : await getWorkSlots(user!.id, date)
       
@@ -77,7 +78,9 @@ export const EarningsForm = ({ onClose, onSave, editingEarning }: EarningsFormPr
   }
 
   const handleSave = async () => {
-    if (!user && !isEditing) {
+    // Allow admin to save earnings even without user, or when editing
+    if (!isAdmin && !user && !isEditing) {
+      setError('Пользователь не найден')
       return
     }
 
@@ -145,9 +148,20 @@ export const EarningsForm = ({ onClose, onSave, editingEarning }: EarningsFormPr
         })
       } else {
         // Create new earnings for selected participants
-        const participants = multipleParticipants && selectedParticipants.length > 0
-          ? [...selectedParticipants, user!.id]
-          : [user!.id]
+        // For admin without user, use selectedParticipants only
+        const participants = (isAdmin && !user)
+          ? selectedParticipants.length > 0 
+            ? selectedParticipants 
+            : []
+          : multipleParticipants && selectedParticipants.length > 0
+            ? [...selectedParticipants, user!.id]
+            : [user!.id]
+
+        if (participants.length === 0) {
+          setError('Выберите хотя бы одного участника')
+          setLoading(false)
+          return
+        }
 
         for (const participantId of participants) {
           await addEarnings({
@@ -299,9 +313,9 @@ export const EarningsForm = ({ onClose, onSave, editingEarning }: EarningsFormPr
                   </span>
                 </label>
 
-                {multipleParticipants && (
+                {(multipleParticipants || (isAdmin && !user)) && (
                   <div className="ml-6 space-y-2">
-                    {TEAM_MEMBERS.filter((u) => u.id !== user?.id).map((member) => (
+                    {TEAM_MEMBERS.filter((u) => !user || u.id !== user.id).map((member) => (
                       <label key={member.id} className="flex items-center gap-2">
                         <input
                           type="checkbox"

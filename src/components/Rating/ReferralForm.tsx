@@ -46,9 +46,16 @@ export const ReferralForm = ({ referral, onClose, onSave }: ReferralFormProps) =
   const headingColor = theme === 'dark' ? 'text-white' : 'text-gray-900'
 
   const handleSave = async () => {
-    if (!user) {
-      setError('Пользователь не найден')
-      return
+    // When editing, allow admin to edit without user
+    // When creating, require user (referral must belong to someone)
+    if (referral) {
+      // Editing - admin can edit any referral
+    } else {
+      // Creating - requires user
+      if (!user) {
+        setError('Пользователь не найден. Для добавления реферала необходимо войти как участник.')
+        return
+      }
     }
 
     if (!name.trim() || !age.trim()) {
@@ -67,7 +74,7 @@ export const ReferralForm = ({ referral, onClose, onSave }: ReferralFormProps) =
 
     const payload = {
       referralId: customId,
-      ownerId: user.id,
+      ownerId: referral?.ownerId || user!.id,
       name: name.trim(),
       age: parsedAge,
       createdAt: referral?.createdAt || new Date().toISOString(),

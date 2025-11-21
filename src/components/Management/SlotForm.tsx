@@ -309,6 +309,10 @@ export const SlotForm = ({ slot, onClose, onSave }: SlotFormProps) => {
     if (adminBulkMode) {
       return selectedUserIds
     }
+    // Allow admin to work without user (they can select users via adminBulkMode)
+    if (isAdmin && !user) {
+      return selectedUserIds.length > 0 ? selectedUserIds : []
+    }
     return user?.id ? [user.id] : []
   }
 
@@ -338,8 +342,10 @@ export const SlotForm = ({ slot, onClose, onSave }: SlotFormProps) => {
 
   const handleSave = async () => {
     console.log('handleSave called')
-    if (!user) {
+    // Allow admin to save slots even without user
+    if (!isAdmin && !user) {
       console.log('No user found')
+      setError('Пользователь не найден')
       return
     }
 
@@ -349,7 +355,7 @@ export const SlotForm = ({ slot, onClose, onSave }: SlotFormProps) => {
     }
 
     // Check if user can edit this slot
-    if (slot && !isAdmin && slot.userId !== user.id) {
+    if (slot && !isAdmin && user && slot.userId !== user.id) {
       setError('Вы можете редактировать только свои слоты')
       setLoading(false)
       return

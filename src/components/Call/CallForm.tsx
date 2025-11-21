@@ -80,14 +80,9 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit }: CallFormProps) => 
     }
 
     try {
-      if (!user) {
-        setError('Вы не авторизованы')
-        setLoading(false)
-        return
-      }
-
+      // Allow admin to edit calls even without user, but creating requires user
       if (callToEdit) {
-        // Update existing call
+        // Update existing call - admin can edit any call
         const updates: Partial<Call> = {
           network: formData.network,
           ticker: formData.ticker,
@@ -101,7 +96,12 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit }: CallFormProps) => 
         }
         await updateCall(callToEdit.id, updates)
       } else {
-        // Create new call
+        // Create new call - requires user
+        if (!user) {
+          setError('Вы не авторизованы. Для создания сигнала необходимо войти как участник.')
+          setLoading(false)
+          return
+        }
         const callData: Omit<Call, 'id'> = {
           ...formData,
           userId: user.id,

@@ -85,6 +85,10 @@ export const DayStatusForm = ({ type, status, onClose, onSave }: DayStatusFormPr
     if (adminBulkMode) {
       return selectedUserIds
     }
+    // Allow admin to work without user (they can select users via adminBulkMode)
+    if (isAdmin && !user) {
+      return selectedUserIds.length > 0 ? selectedUserIds : []
+    }
     return user?.id ? [user.id] : []
   }
 
@@ -117,7 +121,8 @@ export const DayStatusForm = ({ type, status, onClose, onSave }: DayStatusFormPr
   }
 
   const validateStatus = async (targetUserId: string, startDate: string, endDateValue?: string): Promise<string | null> => {
-    if (!user) return 'Пользователь не найден'
+    // Allow admin to validate without user
+    if (!isAdmin && !user) return 'Пользователь не найден'
 
     const today = new Date()
     const selectedDate = new Date(startDate)
@@ -227,12 +232,14 @@ export const DayStatusForm = ({ type, status, onClose, onSave }: DayStatusFormPr
 
   const handleSave = async () => {
     console.log('handleSave called (DayStatusForm)')
-    if (!user) {
+    // Allow admin to save statuses even without user
+    if (!isAdmin && !user) {
       console.log('No user found')
+      setError('Пользователь не найден')
       return
     }
 
-    if (status && !isAdmin && status.userId !== user.id) {
+    if (status && !isAdmin && user && status.userId !== user.id) {
       setError('Вы можете редактировать только свои статусы')
       setLoading(false)
       return
