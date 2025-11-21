@@ -158,28 +158,31 @@ export const Rating = () => {
           
           <div className="relative z-10">
             <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-              <div className="flex-1">
-                <div className="flex items-center gap-4 mb-4">
-                  <div className={`p-4 rounded-2xl shadow-lg ${
-                    theme === 'dark' 
-                      ? 'bg-gradient-to-br from-blue-600 to-purple-600' 
-                      : 'bg-gradient-to-br from-blue-500 to-purple-500'
-                  } text-white transform transition-transform hover:scale-110`}>
-                    <span className="text-4xl">🏆</span>
+              <div className="flex-1 space-y-4">
+                <div className="flex items-center gap-3 sm:gap-4">
+                  <div
+                    className={`p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-lg ${
+                      theme === 'dark'
+                        ? 'bg-gradient-to-br from-blue-600 to-purple-600'
+                        : 'bg-gradient-to-br from-blue-500 to-purple-500'
+                    } text-white transform transition-transform active:scale-95 sm:hover:scale-110`}
+                  >
+                    <span className="text-2xl sm:text-3xl md:text-4xl">🏆</span>
                   </div>
-                  <div>
-                    <h1 className={`text-4xl font-extrabold mb-2 ${headingColor} flex items-center gap-3`}>
+                  <div className="flex-1">
+                    <h1
+                      className={`text-2xl sm:text-3xl md:text-4xl font-extrabold ${headingColor} flex items-center gap-2 sm:gap-3`}
+                    >
                       <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-transparent bg-clip-text">
                         Рейтинг участников
                       </span>
-                      <span className="text-2xl">⭐</span>
+                      <span className="text-xl sm:text-2xl">⭐</span>
                     </h1>
-                    <p className={`text-base font-medium ${subTextColor} flex items-center gap-2`}>
-                      <span className="text-green-500">●</span>
-                      Система оценки эффективности команды
-                    </p>
                   </div>
                 </div>
+                <p className={`text-sm sm:text-base font-medium ${subTextColor}`}>
+                  Система оценки эффективности команды на основе ключевых метрик
+                </p>
                 <div className={`p-5 rounded-xl border-2 ${
                   theme === 'dark' 
                     ? 'bg-gray-800/50 border-blue-500/20' 

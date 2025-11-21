@@ -202,7 +202,7 @@ export const Management = () => {
                     </h1>
                     <Sparkles className={`w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0 ${theme === 'dark' ? 'text-yellow-400' : 'text-yellow-500'} animate-pulse`} />
                   </div>
-                  <p className={`${labelColor} text-sm sm:text-base font-medium flex flex-wrap items-center gap-2`}>
+                  <p className={`${labelColor} text-sm sm:text-base font-medium hidden sm:flex flex-wrap items-center gap-2`}>
                     <Heart className="w-4 h-4 sm:w-5 sm:h-5 text-red-500 flex-shrink-0" />
                     <span>Забота о каждом участнике нашей команды ApeVault</span>
                   </p>

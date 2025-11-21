@@ -98,28 +98,35 @@ export const Earnings = () => {
           
           <div className="relative z-10">
             <div className="flex flex-col gap-4 sm:gap-6 lg:flex-row lg:items-start lg:justify-between mb-4 sm:mb-6">
-              <div className="flex-1">
-                <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
-                  <div className={`p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-lg flex-shrink-0 ${
-                    theme === 'dark' 
-                      ? 'bg-gradient-to-br from-green-600 to-emerald-600' 
-                      : 'bg-gradient-to-br from-green-500 to-emerald-500'
-                  } text-white transform transition-transform active:scale-95 sm:hover:scale-110`}>
-                    <DollarSign className="w-6 h-6 sm:w-8 sm:h-8" />
+              <div className="flex-1 min-w-0 space-y-3 sm:space-y-4">
+                <div className="flex items-center gap-3 sm:gap-4">
+                  <div
+                    className={`p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-lg flex-shrink-0 ${
+                      theme === 'dark'
+                        ? 'bg-gradient-to-br from-green-600 to-emerald-600'
+                        : 'bg-gradient-to-br from-green-500 to-emerald-500'
+                    } text-white transform transition-transform active:scale-95 sm:hover:scale-110`}
+                  >
+                    <DollarSign className="w-5 h-5 sm:w-7 sm:h-7" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h1 className={`text-2xl sm:text-3xl md:text-4xl font-extrabold mb-2 ${headingColor} flex flex-wrap items-center gap-2 sm:gap-3`}>
+                    <h1
+                      className={`text-2xl sm:text-3xl md:text-4xl font-extrabold ${headingColor} flex items-center gap-2 sm:gap-3`}
+                    >
                       <span className="bg-gradient-to-r from-green-600 via-emerald-600 to-yellow-600 text-transparent bg-clip-text">
                         Заработок команды
                       </span>
-                      <Sparkles className={`w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0 ${theme === 'dark' ? 'text-yellow-400' : 'text-yellow-500'} animate-pulse`} />
+                      <Sparkles
+                        className={`w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0 ${
+                          theme === 'dark' ? 'text-yellow-400' : 'text-yellow-500'
+                        } animate-pulse`}
+                      />
                     </h1>
-                    <p className={`text-sm sm:text-base font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} flex flex-wrap items-center gap-2`}>
-                      <span className="text-green-500 flex-shrink-0">●</span>
-                      <span>Отслеживайте доходы и вклад каждого участника в общий успех</span>
-                    </p>
                   </div>
                 </div>
+                <p className={`text-sm sm:text-base font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                  Отслеживайте доходы и вклад каждого участника в общий успех
+                </p>
               </div>
               <button
                 onClick={() => setShowForm(true)}
@@ -203,7 +210,7 @@ export const Earnings = () => {
             </div>
           </div>
 
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pt-4 border-t border-gray-700/50 dark:border-gray-700">
+          <div className="hidden sm:flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pt-4 border-t border-gray-700/50 dark:border-gray-700">
             <h2 className={`text-base sm:text-lg md:text-xl font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Управление заработком</h2>
           </div>
         </div>
