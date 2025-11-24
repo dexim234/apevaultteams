@@ -21,6 +21,7 @@ import {
   MessageSquare
 } from 'lucide-react'
 import { formatDate } from '@/utils/dateUtils'
+import { TaskChat } from './TaskChat'
 
 interface TaskCardProps {
   task: Task
@@ -482,6 +483,18 @@ export const TaskCard = ({ task, onEdit, onDelete, onUpdate, unreadNotifications
             </div>
           </div>
         </div>
+      )}
+
+      {/* Chat Modal */}
+      {showChat && (
+        <TaskChat
+          task={task}
+          onClose={() => setShowChat(false)}
+          onUpdate={() => {
+            onUpdate()
+            setShowChat(false)
+          }}
+        />
       )}
     </>
   )
