@@ -27,6 +27,7 @@ import {
   MoreVertical,
   Clock,
   AlertCircle,
+  MessageSquare,
 } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import { ru } from 'date-fns/locale'
