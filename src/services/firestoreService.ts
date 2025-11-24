@@ -1109,31 +1109,33 @@ export const addTaskChatMessage = async (messageData: Omit<TaskChatMessage, 'id'
 
 export const getTaskChatMessages = async (taskId: string): Promise<TaskChatMessage[]> => {
   const messagesRef = collection(db, 'taskChatMessages')
+  // Use only taskId and orderBy to avoid index issues, filter deleted in code
   const q = query(
     messagesRef,
     where('taskId', '==', taskId),
-    where('deleted', '==', false),
     orderBy('createdAt', 'asc')
   )
   
   const snapshot = await getDocs(q)
-  return snapshot.docs.map((doc) => {
-    const data = doc.data() as any
-    return {
-      id: doc.id,
-      taskId: data.taskId || '',
-      userId: data.userId || '',
-      userName: data.userName || '',
-      message: data.message || '',
-      imageUrl: data.imageUrl,
-      documentUrl: data.documentUrl,
-      documentName: data.documentName,
-      createdAt: data.createdAt || new Date().toISOString(),
-      updatedAt: data.updatedAt,
-      edited: data.edited || false,
-      deleted: data.deleted || false,
-    } as TaskChatMessage
-  })
+  return snapshot.docs
+    .map((doc) => {
+      const data = doc.data() as any
+      return {
+        id: doc.id,
+        taskId: data.taskId || '',
+        userId: data.userId || '',
+        userName: data.userName || '',
+        message: data.message || '',
+        imageUrl: data.imageUrl,
+        documentUrl: data.documentUrl,
+        documentName: data.documentName,
+        createdAt: data.createdAt || new Date().toISOString(),
+        updatedAt: data.updatedAt,
+        edited: data.edited || false,
+        deleted: data.deleted || false,
+      } as TaskChatMessage
+    })
+    .filter(msg => !msg.deleted) // Filter deleted messages in code
 }
 
 export const updateTaskChatMessage = async (id: string, updates: Partial<TaskChatMessage>): Promise<void> => {

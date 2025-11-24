@@ -25,6 +25,8 @@ import {
   Save,
   Trash,
   MoreVertical,
+  Clock,
+  AlertCircle,
 } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import { ru } from 'date-fns/locale'
@@ -49,6 +51,7 @@ export const TaskChat = ({ task, onClose, onUpdate }: TaskChatProps) => {
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [messageMenu, setMessageMenu] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -82,7 +85,9 @@ export const TaskChat = ({ task, onClose, onUpdate }: TaskChatProps) => {
   }
 
   const handleSendMessage = async () => {
-    if (!user || (!newMessage.trim() && !selectedImage && !selectedDocument)) return
+    if (!user || (!newMessage.trim() && !selectedImage && !selectedDocument)) {
+      return
+    }
 
     setLoading(true)
     try {
@@ -92,18 +97,34 @@ export const TaskChat = ({ task, onClose, onUpdate }: TaskChatProps) => {
 
       // Upload files to Firebase Storage
       if (selectedImage) {
-        imageUrl = await uploadChatImage(task.id, selectedImage)
+        try {
+          imageUrl = await uploadChatImage(task.id, selectedImage)
+        } catch (error) {
+          console.error('Error uploading image:', error)
+          alert('Ошибка загрузки изображения. Попробуйте еще раз.')
+          setLoading(false)
+          return
+        }
       }
       if (selectedDocument) {
-        documentUrl = await uploadChatDocument(task.id, selectedDocument)
-        documentName = selectedDocument.name
+        try {
+          documentUrl = await uploadChatDocument(task.id, selectedDocument)
+          documentName = selectedDocument.name
+        } catch (error) {
+          console.error('Error uploading document:', error)
+          alert('Ошибка загрузки документа. Попробуйте еще раз.')
+          setLoading(false)
+          return
+        }
       }
 
+      const messageText = newMessage.trim() || (selectedImage || selectedDocument ? '📎 Файл' : '')
+      
       await addTaskChatMessage({
         taskId: task.id,
         userId: user.id,
         userName: user.name || 'Пользователь',
-        message: newMessage.trim(),
+        message: messageText,
         imageUrl,
         documentUrl,
         documentName,
@@ -115,10 +136,21 @@ export const TaskChat = ({ task, onClose, onUpdate }: TaskChatProps) => {
       setNewMessage('')
       setSelectedImage(null)
       setSelectedDocument(null)
+      
+      // Clear file inputs
+      if (imageInputRef.current) {
+        imageInputRef.current.value = ''
+      }
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
+      
       await loadMessages()
       onUpdate?.()
     } catch (error) {
       console.error('Error sending message:', error)
+      setError('Ошибка отправки сообщения. Попробуйте еще раз.')
+      setTimeout(() => setError(null), 5000)
     } finally {
       setLoading(false)
     }
@@ -288,11 +320,29 @@ export const TaskChat = ({ task, onClose, onUpdate }: TaskChatProps) => {
           </div>
         </div>
 
+        {/* Error Message */}
+        {error && (
+          <div className={`mx-4 mt-4 p-3 rounded-lg border-2 ${
+            theme === 'dark' ? 'bg-red-500/20 border-red-500/50 text-red-300' : 'bg-red-50 border-red-200 text-red-700'
+          } flex items-center gap-2`}>
+            <AlertCircle className="w-5 h-5" />
+            <span className="text-sm">{error}</span>
+            <button
+              onClick={() => setError(null)}
+              className="ml-auto p-1 rounded hover:bg-red-500/20"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        )}
+
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-transparent to-transparent">
           {messages.length === 0 ? (
-            <div className={`text-center py-8 ${textColor}`}>
-              <p>Нет сообщений. Начните обсуждение!</p>
+            <div className={`text-center py-12 ${textColor}`}>
+              <MessageSquare className={`w-12 h-12 mx-auto mb-4 ${theme === 'dark' ? 'text-gray-600' : 'text-gray-400'} opacity-50`} />
+              <p className="text-lg font-medium mb-1">Нет сообщений</p>
+              <p className="text-sm opacity-75">Начните обсуждение задачи!</p>
             </div>
           ) : (
             messages.map((message) => (
@@ -302,14 +352,16 @@ export const TaskChat = ({ task, onClose, onUpdate }: TaskChatProps) => {
                   message.userId === user?.id ? 'flex-row-reverse' : 'flex-row'
                 }`}
               >
-                <div className={`flex-1 max-w-[70%] ${message.userId === user?.id ? 'items-end' : 'items-start'} flex flex-col`}>
-                  <div className={`flex items-center gap-2 mb-1 ${message.userId === user?.id ? 'flex-row-reverse' : 'flex-row'}`}>
-                    <span className={`text-xs font-medium ${headingColor}`}>{message.userName}</span>
+                <div className={`flex-1 max-w-[75%] sm:max-w-[70%] ${message.userId === user?.id ? 'items-end' : 'items-start'} flex flex-col`}>
+                  <div className={`flex items-center gap-2 mb-1.5 ${message.userId === user?.id ? 'flex-row-reverse' : 'flex-row'}`}>
+                    <span className={`text-xs font-semibold ${message.userId === user?.id ? (theme === 'dark' ? 'text-green-400' : 'text-green-600') : (theme === 'dark' ? 'text-blue-400' : 'text-blue-600')}`}>
+                      {message.userName}
+                    </span>
                     <span className={`text-xs ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>
                       {formatDistanceToNow(new Date(message.createdAt), { addSuffix: true, locale: ru })}
                     </span>
                     {message.edited && (
-                      <span className={`text-xs ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>
+                      <span className={`text-xs italic ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>
                         (изменено)
                       </span>
                     )}
@@ -343,11 +395,11 @@ export const TaskChat = ({ task, onClose, onUpdate }: TaskChatProps) => {
                       </div>
                     </div>
                   ) : (
-                    <div className={`${cardBg} rounded-lg p-3 border-2 ${
+                    <div className={`${cardBg} rounded-xl p-3 sm:p-4 border-2 shadow-sm ${
                       message.userId === user?.id
-                        ? theme === 'dark' ? 'border-green-500/50 bg-green-500/10' : 'border-green-200 bg-green-50'
-                        : borderColor
-                    } relative group`}>
+                        ? theme === 'dark' ? 'border-green-500/50 bg-green-500/10' : 'border-green-300 bg-green-50'
+                        : theme === 'dark' ? 'border-gray-600 bg-gray-700/50' : 'border-gray-300 bg-gray-50'
+                    } relative group transition-all hover:shadow-md`}>
                       {canEditOrDelete(message) && (
                         <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
                           <div className="relative">
@@ -391,11 +443,14 @@ export const TaskChat = ({ task, onClose, onUpdate }: TaskChatProps) => {
                         </div>
                       )}
                       {message.imageUrl && (
-                        <img
-                          src={message.imageUrl}
-                          alt="Attached"
-                          className="max-w-full h-auto rounded-lg mb-2"
-                        />
+                        <div className="mb-2 rounded-lg overflow-hidden">
+                          <img
+                            src={message.imageUrl}
+                            alt="Attached"
+                            className="max-w-full h-auto rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
+                            onClick={() => window.open(message.imageUrl, '_blank')}
+                          />
+                        </div>
                       )}
                       {message.documentUrl && (
                         <a
@@ -426,7 +481,11 @@ export const TaskChat = ({ task, onClose, onUpdate }: TaskChatProps) => {
                           <span className="text-sm">{selectedDocument.name}</span>
                         </div>
                       )}
-                      <p className={`text-sm ${textColor} break-words`}>{message.message}</p>
+                      {message.message && (
+                        <p className={`text-sm ${textColor} break-words whitespace-pre-wrap leading-relaxed`}>
+                          {message.message}
+                        </p>
+                      )}
                     </div>
                   )}
                 </div>
@@ -437,9 +496,9 @@ export const TaskChat = ({ task, onClose, onUpdate }: TaskChatProps) => {
         </div>
 
         {/* Input */}
-        <div className={`p-4 border-t ${borderColor} space-y-2`}>
+        <div className={`p-4 border-t ${borderColor} space-y-2 bg-gradient-to-t ${theme === 'dark' ? 'from-gray-800 to-gray-800' : 'from-white to-gray-50'}`}>
           {(selectedImage || selectedDocument) && (
-            <div className={`flex items-center gap-2 p-2 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100'}`}>
+            <div className={`flex items-center gap-2 p-2.5 rounded-lg border-2 ${borderColor} ${theme === 'dark' ? 'bg-gray-700/50' : 'bg-gray-100'}`}>
               {selectedImage && (
                 <>
                   <img
@@ -508,23 +567,31 @@ export const TaskChat = ({ task, onClose, onUpdate }: TaskChatProps) => {
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                   e.preventDefault()
-                  handleSendMessage()
+                  if (!loading && (newMessage.trim() || selectedImage || selectedDocument)) {
+                    handleSendMessage()
+                  }
                 }
               }}
-              placeholder="Напишите сообщение..."
+              placeholder="Напишите сообщение... (Enter для отправки, Shift+Enter для новой строки)"
               rows={2}
-              className={`flex-1 px-4 py-2 rounded-lg border ${borderColor} ${inputBg} ${headingColor} focus:outline-none focus:ring-2 focus:ring-green-500/50 resize-none`}
+              className={`flex-1 px-4 py-2.5 rounded-lg border-2 ${borderColor} ${inputBg} ${headingColor} focus:outline-none focus:ring-2 focus:ring-green-500/50 resize-none transition-all placeholder:${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}
+              disabled={loading}
             />
             <button
               onClick={handleSendMessage}
               disabled={loading || (!newMessage.trim() && !selectedImage && !selectedDocument)}
-              className={`p-2 rounded-lg transition-colors ${
+              className={`p-2.5 rounded-lg transition-all ${
                 loading || (!newMessage.trim() && !selectedImage && !selectedDocument)
-                  ? 'bg-gray-400 cursor-not-allowed'
-                  : 'bg-green-500 hover:bg-green-600'
-              } text-white disabled:opacity-50`}
+                  ? 'bg-gray-400 cursor-not-allowed opacity-50'
+                  : 'bg-green-500 hover:bg-green-600 hover:shadow-lg active:scale-95'
+              } text-white disabled:opacity-50 flex items-center justify-center`}
+              title="Отправить сообщение"
             >
-              <Send className="w-5 h-5" />
+              {loading ? (
+                <Clock className="w-5 h-5 animate-spin" />
+              ) : (
+                <Send className="w-5 h-5" />
+              )}
             </button>
           </div>
         </div>
