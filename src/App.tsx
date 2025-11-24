@@ -10,10 +10,10 @@ import { Management } from './pages/Management'
 import { Earnings } from './pages/Earnings'
 import { Rating } from './pages/Rating'
 import { Tasks } from './pages/Tasks'
-import { About } from './pages/About'
 import { FAQ } from './pages/FAQ'
 import { Admin } from './pages/Admin'
 import { Profile } from './pages/Profile'
+import { Notifications } from './pages/Notifications'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { cleanupOldData } from './services/firestoreService'
 
@@ -85,14 +85,6 @@ function App() {
           }
         />
         <Route
-          path="/about"
-          element={
-            <ProtectedRoute>
-              <About />
-            </ProtectedRoute>
-          }
-        />
-        <Route
           path="/faq"
           element={
             <ProtectedRoute>
@@ -113,6 +105,14 @@ function App() {
           element={
             <ProtectedRoute>
               <Profile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/notifications"
+          element={
+            <ProtectedRoute>
+              <Notifications />
             </ProtectedRoute>
           }
         />

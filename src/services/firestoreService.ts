@@ -12,7 +12,7 @@ import {
   orderBy,
 } from 'firebase/firestore'
 import { db } from '@/firebase/config'
-import { WorkSlot, DayStatus, Earnings, RatingData, Referral, Call, Task, TaskNotification, TaskStatus } from '@/types'
+import { WorkSlot, DayStatus, Earnings, RatingData, Referral, Call, Task, TaskNotification, TaskStatus, Notification, NotificationCategory } from '@/types'
 
 const DATA_RETENTION_DAYS = 30
 
@@ -119,6 +119,27 @@ export const addWorkSlot = async (slot: Omit<WorkSlot, 'id'>) => {
     console.log('addWorkSlot: Calling addDoc...')
     const result = await addDoc(slotsRef, cleanSlot)
     console.log('addWorkSlot: Work slot added successfully:', result.id)
+    
+    // Create notification
+    try {
+      await addNotification({
+        userId: slot.userId,
+        type: 'slot_added',
+        category: 'schedule',
+        title: 'Добавлен рабочий слот',
+        message: `Добавлен рабочий слот на ${slot.date}`,
+        read: false,
+        createdAt: new Date().toISOString(),
+        relatedId: result.id,
+        relatedType: 'slot',
+        actionUrl: '/management',
+        icon: '📅',
+        priority: 'medium',
+      })
+    } catch (notifError) {
+      console.error('Error creating notification for slot:', notifError)
+    }
+    
     return result
   } catch (error: any) {
     console.error('addWorkSlot: Error caught:', error)
@@ -139,8 +160,34 @@ export const updateWorkSlot = async (id: string, updates: Partial<WorkSlot>) => 
 }
 
 export const deleteWorkSlot = async (id: string) => {
+  // Get slot data before deleting to create notification
   const slotRef = doc(db, 'workSlots', id)
-  return await deleteDoc(slotRef)
+  const slotDoc = await getDoc(slotRef)
+  const slotData = slotDoc.data() as WorkSlot | undefined
+  
+  await deleteDoc(slotRef)
+  
+  // Create notification
+  if (slotData) {
+    try {
+      await addNotification({
+        userId: slotData.userId,
+        type: 'slot_deleted',
+        category: 'schedule',
+        title: 'Удален рабочий слот',
+        message: `Удален рабочий слот на ${slotData.date}`,
+        read: false,
+        createdAt: new Date().toISOString(),
+        relatedId: id,
+        relatedType: 'slot',
+        actionUrl: '/management',
+        icon: '🗑️',
+        priority: 'medium',
+      })
+    } catch (notifError) {
+      console.error('Error creating notification for deleted slot:', notifError)
+    }
+  }
 }
 
 // Day Statuses
@@ -274,6 +321,27 @@ export const addEarnings = async (earning: Omit<Earnings, 'id'>) => {
     console.log('Adding earnings:', cleanEarning)
     const result = await addDoc(earningsRef, cleanEarning)
     console.log('Earnings added successfully:', result.id)
+    
+    // Create notification
+    try {
+      await addNotification({
+        userId: earning.userId,
+        type: 'earnings_added',
+        category: 'earnings',
+        title: 'Добавлен заработок',
+        message: `Добавлен заработок: ${earning.amount} ₽ на ${earning.date}`,
+        read: false,
+        createdAt: new Date().toISOString(),
+        relatedId: result.id,
+        relatedType: 'earning',
+        actionUrl: '/earnings',
+        icon: '💰',
+        priority: 'high',
+      })
+    } catch (notifError) {
+      console.error('Error creating notification for earnings:', notifError)
+    }
+    
     return result
   } catch (error) {
     console.error('Error in addEarnings:', error)
@@ -674,5 +742,92 @@ export const markAllNotificationsAsRead = async (userId: string): Promise<void> 
   const q = query(notificationsRef, where('userId', '==', userId), where('read', '==', false))
   const snapshot = await getDocs(q)
   await Promise.all(snapshot.docs.map((doc) => updateDoc(doc.ref, { read: true })))
+}
+
+// General Notification functions
+export const addNotification = async (notificationData: Omit<Notification, 'id'>): Promise<string> => {
+  const notificationsRef = collection(db, 'notifications')
+  const docRef = await addDoc(notificationsRef, {
+    ...notificationData,
+    createdAt: notificationData.createdAt || new Date().toISOString(),
+  })
+  return docRef.id
+}
+
+export const getNotifications = async (
+  userId?: string, 
+  category?: NotificationCategory,
+  unreadOnly?: boolean
+): Promise<Notification[]> => {
+  const notificationsRef = collection(db, 'notifications')
+  
+  const constraints: any[] = []
+  
+  if (userId) {
+    constraints.push(where('userId', '==', userId))
+  }
+  
+  if (category) {
+    constraints.push(where('category', '==', category))
+  }
+  
+  if (unreadOnly) {
+    constraints.push(where('read', '==', false))
+  }
+  
+  constraints.push(orderBy('createdAt', 'desc'))
+  
+  let q: ReturnType<typeof query>
+  if (constraints.length > 0) {
+    q = query(notificationsRef, ...constraints) as ReturnType<typeof query>
+  } else {
+    q = query(notificationsRef, orderBy('createdAt', 'desc'))
+  }
+  
+  const snapshot = await getDocs(q)
+  return snapshot.docs.map((doc) => {
+    const data = doc.data() as any
+    return {
+      id: doc.id,
+      userId: data.userId || '',
+      type: data.type || 'task_added',
+      category: data.category || 'tasks',
+      title: data.title || '',
+      message: data.message || '',
+      read: data.read || false,
+      createdAt: data.createdAt || new Date().toISOString(),
+      relatedId: data.relatedId,
+      relatedType: data.relatedType,
+      actionUrl: data.actionUrl,
+      icon: data.icon,
+      priority: data.priority || 'medium',
+    } as Notification
+  })
+}
+
+export const markNotificationAsReadGeneral = async (id: string): Promise<void> => {
+  const notificationRef = doc(db, 'notifications', id)
+  await updateDoc(notificationRef, { read: true })
+}
+
+export const markAllNotificationsAsReadGeneral = async (userId: string, category?: NotificationCategory): Promise<void> => {
+  const notificationsRef = collection(db, 'notifications')
+  const constraints: any[] = [
+    where('userId', '==', userId),
+    where('read', '==', false)
+  ]
+  
+  if (category) {
+    constraints.push(where('category', '==', category))
+  }
+  
+  const q = query(notificationsRef, ...constraints) as ReturnType<typeof query>
+  const snapshot = await getDocs(q)
+  await Promise.all(snapshot.docs.map((doc) => updateDoc(doc.ref, { read: true })))
+}
+
+export const deleteNotification = async (id: string): Promise<void> => {
+  const notificationRef = doc(db, 'notifications', id)
+  await deleteDoc(notificationRef)
 }
 

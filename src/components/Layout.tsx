@@ -2,7 +2,7 @@
 import { Link, useLocation } from 'react-router-dom'
 import { useThemeStore } from '@/store/themeStore'
 import { useAdminStore } from '@/store/adminStore'
-import { Moon, Sun, Shield, Zap, Settings, Calendar, DollarSign, CheckSquare, TrendingUp, Info, HelpCircle, User, ChevronDown } from 'lucide-react'
+import { Moon, Sun, Shield, Zap, Settings, Calendar, DollarSign, CheckSquare, TrendingUp, HelpCircle, User, ChevronDown } from 'lucide-react'
 import logo from '@/assets/logo.png'
 import { useState, useEffect } from 'react'
 
@@ -103,21 +103,6 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                   </>
                 )}
               </div>
-
-              {/* О сообществе */}
-              <Link
-                to="/about"
-                className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-2 text-base ${
-                  location.pathname === '/about'
-                    ? 'bg-green-500 text-white'
-                    : theme === 'dark'
-                    ? 'text-gray-300 hover:bg-gray-700'
-                    : 'text-gray-700 hover:bg-gray-100'
-                }`}
-              >
-                <Info className="w-4 h-4 flex-shrink-0" />
-                <span>О сообществе</span>
-              </Link>
 
               {/* FAQ */}
               <Link
@@ -258,19 +243,6 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                 </>
               )}
             </div>
-
-            {/* О сообществе */}
-            <Link
-              to="/about"
-              className={`flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-lg transition-colors touch-manipulation ${
-                location.pathname === '/about'
-                  ? theme === 'dark' ? 'bg-green-500/20 text-green-400' : 'bg-green-50 text-green-700'
-                  : theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-              }`}
-            >
-              <Info className="w-5 h-5" />
-              <span className="text-xs font-medium">О нас</span>
-            </Link>
 
             {/* FAQ */}
             <Link

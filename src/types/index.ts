@@ -107,7 +107,7 @@ export interface Call {
 
 // Task types
 export type TaskCategory = 'trading' | 'learning' | 'technical' | 'stream' | 'research' | 'organization'
-export type TaskStatus = 'pending' | 'in_progress' | 'completed' | 'closed'
+export type TaskStatus = 'pending' | 'in_progress' | 'completed' | 'closed' | 'rejected'
 export type TaskNotificationType = 'task_added' | 'task_moved' | 'task_completion_request'
 
 export interface TaskNotification {
@@ -119,6 +119,39 @@ export interface TaskNotification {
   read: boolean
   createdAt: string
   movedBy?: string // Имя пользователя, который переместил задачу
+}
+
+// General notifications (not just tasks)
+export type NotificationType = 
+  | 'task_added' 
+  | 'task_moved' 
+  | 'task_completion_request'
+  | 'slot_added'
+  | 'slot_deleted'
+  | 'slot_updated'
+  | 'earnings_added'
+  | 'earnings_updated'
+  | 'day_status_changed'
+  | 'referral_added'
+  | 'rating_updated'
+  | 'message_received'
+
+export type NotificationCategory = 'tasks' | 'schedule' | 'earnings' | 'rating' | 'referrals' | 'messages' | 'system'
+
+export interface Notification {
+  id: string
+  userId: string // Кому уведомление
+  type: NotificationType
+  category: NotificationCategory
+  title: string
+  message: string
+  read: boolean
+  createdAt: string
+  relatedId?: string // ID связанного объекта (taskId, slotId, etc.)
+  relatedType?: 'task' | 'slot' | 'earning' | 'day_status' | 'referral' | 'rating' | 'message'
+  actionUrl?: string // URL для перехода при клике
+  icon?: string // Emoji или название иконки
+  priority?: 'low' | 'medium' | 'high'
 }
 
 export interface TaskApproval {
@@ -170,6 +203,7 @@ export const TASK_STATUSES: Record<TaskStatus, { label: string; color: string }>
   in_progress: { label: 'В работе', color: 'blue' },
   completed: { label: 'Выполнена', color: 'green' },
   closed: { label: 'Закрыта', color: 'gray' },
+  rejected: { label: 'Отклонена', color: 'red' },
 }
 
 

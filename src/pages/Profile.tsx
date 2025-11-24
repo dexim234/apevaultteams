@@ -34,7 +34,13 @@ import {
   Shield,
   Sparkles,
   Copy,
-  Check
+  Check,
+  Info,
+  Users,
+  Target,
+  Award,
+  BookOpen,
+  Mail
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
@@ -312,94 +318,182 @@ export const Profile = () => {
               </div>
             </div>
 
-            {/* Rating */}
+            {/* Rating - Enhanced */}
             {rating && ratingBreakdown && (
-              <div className={`${cardBg} rounded-xl border-2 ${borderColor} p-4 sm:p-6 shadow-lg`}>
-                <h2 className={`text-xl font-bold ${headingColor} mb-4 flex items-center gap-2`}>
+              <div className={`${cardBg} rounded-xl border-2 ${borderColor} p-4 sm:p-6 shadow-lg lg:col-span-2`}>
+                <h2 className={`text-xl font-bold ${headingColor} mb-6 flex items-center gap-2`}>
                   <TrendingUp className="w-5 h-5" />
-                  Рейтинг
+                  Рейтинг эффективности
                 </h2>
-                <div className="space-y-4">
-                  <div className={`p-4 rounded-lg border-2 ${
+                <div className="space-y-6">
+                  {/* Main Rating Display */}
+                  <div className={`p-6 sm:p-8 rounded-xl border-2 ${
                     rating.rating >= 70
-                      ? theme === 'dark' ? 'bg-green-500/20 border-green-500/50' : 'bg-green-50 border-green-200'
+                      ? theme === 'dark' ? 'bg-gradient-to-br from-green-500/20 to-emerald-500/20 border-green-500/50' : 'bg-gradient-to-br from-green-50 to-emerald-50 border-green-200'
                       : rating.rating >= 50
-                      ? theme === 'dark' ? 'bg-yellow-500/20 border-yellow-500/50' : 'bg-yellow-50 border-yellow-200'
-                      : theme === 'dark' ? 'bg-blue-500/20 border-blue-500/50' : 'bg-blue-50 border-blue-200'
-                  }`}>
-                    <div className="text-center">
-                      <div className={`text-4xl font-extrabold ${
-                        rating.rating >= 70
-                          ? theme === 'dark' ? 'text-green-400' : 'text-green-700'
-                          : rating.rating >= 50
-                          ? theme === 'dark' ? 'text-yellow-400' : 'text-yellow-700'
-                          : theme === 'dark' ? 'text-blue-400' : 'text-blue-700'
-                      }`}>
-                        {rating.rating.toFixed(1)}%
-                      </div>
-                      <div className={`text-sm font-medium mt-1 ${
-                        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-                      }`}>
-                        Эффективность
+                      ? theme === 'dark' ? 'bg-gradient-to-br from-yellow-500/20 to-orange-500/20 border-yellow-500/50' : 'bg-gradient-to-br from-yellow-50 to-orange-50 border-yellow-200'
+                      : theme === 'dark' ? 'bg-gradient-to-br from-blue-500/20 to-indigo-500/20 border-blue-500/50' : 'bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200'
+                  } relative overflow-hidden`}>
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-white/10 to-transparent rounded-full blur-2xl -mr-16 -mt-16" />
+                    <div className="relative z-10">
+                      <div className="text-center">
+                        <div className={`text-5xl sm:text-6xl md:text-7xl font-extrabold mb-2 ${
+                          rating.rating >= 70
+                            ? theme === 'dark' ? 'text-green-400' : 'text-green-700'
+                            : rating.rating >= 50
+                            ? theme === 'dark' ? 'text-yellow-400' : 'text-yellow-700'
+                            : theme === 'dark' ? 'text-blue-400' : 'text-blue-700'
+                        }`}>
+                          {rating.rating.toFixed(1)}%
+                        </div>
+                        <div className={`text-lg sm:text-xl font-semibold ${
+                          theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                        }`}>
+                          Общая эффективность
+                        </div>
+                        <div className={`text-sm mt-2 ${
+                          theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                        }`}>
+                          {rating.rating >= 70 ? 'Отличный результат! 🎉' : rating.rating >= 50 ? 'Хороший результат! 👍' : 'Есть над чем поработать 💪'}
+                        </div>
                       </div>
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                        Выходные
-                      </span>
-                      <span className={`text-sm font-semibold ${headingColor}`}>
-                        {ratingBreakdown.daysOffPoints}%
-                      </span>
+
+                  {/* Rating Breakdown Grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {/* Выходные */}
+                    <div className={`p-4 rounded-lg border-2 ${
+                      theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-50 border-gray-200'
+                    }`}>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                          Выходные
+                        </span>
+                        <span className="text-lg">📅</span>
+                      </div>
+                      <div className={`text-2xl font-bold ${headingColor}`}>
+                        {ratingBreakdown.daysOffPoints.toFixed(1)}%
+                      </div>
+                      <div className={`text-xs mt-1 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>
+                        {rating.daysOff} дней
+                      </div>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                        Больничные
-                      </span>
-                      <span className={`text-sm font-semibold ${headingColor}`}>
-                        {ratingBreakdown.sickDaysPoints}%
-                      </span>
+
+                    {/* Больничные */}
+                    <div className={`p-4 rounded-lg border-2 ${
+                      theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-50 border-gray-200'
+                    }`}>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                          Больничные
+                        </span>
+                        <span className="text-lg">🏥</span>
+                      </div>
+                      <div className={`text-2xl font-bold ${headingColor}`}>
+                        {ratingBreakdown.sickDaysPoints.toFixed(1)}%
+                      </div>
+                      <div className={`text-xs mt-1 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>
+                        {rating.sickDays} дней
+                      </div>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                        Отпуск
-                      </span>
-                      <span className={`text-sm font-semibold ${headingColor}`}>
-                        {ratingBreakdown.vacationDaysPoints}%
-                      </span>
+
+                    {/* Отпуск */}
+                    <div className={`p-4 rounded-lg border-2 ${
+                      theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-50 border-gray-200'
+                    }`}>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                          Отпуск
+                        </span>
+                        <span className="text-lg">🏖️</span>
+                      </div>
+                      <div className={`text-2xl font-bold ${headingColor}`}>
+                        {ratingBreakdown.vacationDaysPoints.toFixed(1)}%
+                      </div>
+                      <div className={`text-xs mt-1 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>
+                        {rating.vacationDays} дней
+                      </div>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                        Часы работы
-                      </span>
-                      <span className={`text-sm font-semibold ${headingColor}`}>
-                        {ratingBreakdown.weeklyHoursPoints}%
-                      </span>
+
+                    {/* Часы работы */}
+                    <div className={`p-4 rounded-lg border-2 ${
+                      theme === 'dark' ? 'bg-blue-500/10 border-blue-500/30' : 'bg-blue-50 border-blue-200'
+                    }`}>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className={`text-sm font-medium ${theme === 'dark' ? 'text-blue-300' : 'text-blue-700'}`}>
+                          Часы работы
+                        </span>
+                        <span className="text-lg">⏰</span>
+                      </div>
+                      <div className={`text-2xl font-bold ${
+                        theme === 'dark' ? 'text-blue-400' : 'text-blue-700'
+                      }`}>
+                        {ratingBreakdown.weeklyHoursPoints.toFixed(1)}%
+                      </div>
+                      <div className={`text-xs mt-1 ${theme === 'dark' ? 'text-blue-400/70' : 'text-blue-600'}`}>
+                        {ratingBreakdown.weeklyHours.toFixed(1)} ч/нед
+                      </div>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                        Заработок
-                      </span>
-                      <span className={`text-sm font-semibold ${headingColor}`}>
-                        {ratingBreakdown.weeklyEarningsPoints}%
-                      </span>
+
+                    {/* Заработок */}
+                    <div className={`p-4 rounded-lg border-2 ${
+                      theme === 'dark' ? 'bg-green-500/10 border-green-500/30' : 'bg-green-50 border-green-200'
+                    }`}>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className={`text-sm font-medium ${theme === 'dark' ? 'text-green-300' : 'text-green-700'}`}>
+                          Заработок
+                        </span>
+                        <span className="text-lg">💰</span>
+                      </div>
+                      <div className={`text-2xl font-bold ${
+                        theme === 'dark' ? 'text-green-400' : 'text-green-700'
+                      }`}>
+                        {ratingBreakdown.weeklyEarningsPoints.toFixed(1)}%
+                      </div>
+                      <div className={`text-xs mt-1 ${theme === 'dark' ? 'text-green-400/70' : 'text-green-600'}`}>
+                        {ratingBreakdown.weeklyEarnings.toFixed(0)} ₽/нед
+                      </div>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                        Рефералы
-                      </span>
-                      <span className={`text-sm font-semibold ${headingColor}`}>
-                        {ratingBreakdown.referralsPoints}%
-                      </span>
+
+                    {/* Рефералы */}
+                    <div className={`p-4 rounded-lg border-2 ${
+                      theme === 'dark' ? 'bg-purple-500/10 border-purple-500/30' : 'bg-purple-50 border-purple-200'
+                    }`}>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className={`text-sm font-medium ${theme === 'dark' ? 'text-purple-300' : 'text-purple-700'}`}>
+                          Рефералы
+                        </span>
+                        <span className="text-lg">👥</span>
+                      </div>
+                      <div className={`text-2xl font-bold ${
+                        theme === 'dark' ? 'text-purple-400' : 'text-purple-700'
+                      }`}>
+                        {ratingBreakdown.referralsPoints.toFixed(1)}%
+                      </div>
+                      <div className={`text-xs mt-1 ${theme === 'dark' ? 'text-purple-400/70' : 'text-purple-600'}`}>
+                        {rating.referrals} рефералов
+                      </div>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                        Сообщения
-                      </span>
-                      <span className={`text-sm font-semibold ${headingColor}`}>
-                        {ratingBreakdown.weeklyMessagesPoints}%
-                      </span>
+
+                    {/* Сообщения */}
+                    <div className={`p-4 rounded-lg border-2 ${
+                      theme === 'dark' ? 'bg-orange-500/10 border-orange-500/30' : 'bg-orange-50 border-orange-200'
+                    }`}>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className={`text-sm font-medium ${theme === 'dark' ? 'text-orange-300' : 'text-orange-700'}`}>
+                          Сообщения
+                        </span>
+                        <span className="text-lg">💬</span>
+                      </div>
+                      <div className={`text-2xl font-bold ${
+                        theme === 'dark' ? 'text-orange-400' : 'text-orange-700'
+                      }`}>
+                        {ratingBreakdown.weeklyMessagesPoints.toFixed(1)}%
+                      </div>
+                      <div className={`text-xs mt-1 ${theme === 'dark' ? 'text-orange-400/70' : 'text-orange-600'}`}>
+                        {ratingBreakdown.weeklyMessages} сообщ/нед
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -514,18 +608,191 @@ export const Profile = () => {
                     </div>
                   </div>
                   <button
-                    onClick={() => navigate('/tasks')}
+                    onClick={() => navigate('/notifications')}
                     className={`w-full px-4 py-2 rounded-lg font-medium transition-colors ${
                       theme === 'dark'
                         ? 'bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 border border-blue-500/50'
                         : 'bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200'
                     }`}
                   >
-                    Просмотреть уведомления
+                    Просмотреть все уведомления
                   </button>
                 </div>
               </div>
             )}
+
+            {/* About Community */}
+            <div className={`lg:col-span-2 ${cardBg} rounded-xl border-2 ${borderColor} p-4 sm:p-6 shadow-lg`}>
+              <h2 className={`text-xl font-bold ${headingColor} mb-4 flex items-center gap-2`}>
+                <Info className="w-5 h-5" />
+                О сообществе ApeVault
+              </h2>
+              <div className="space-y-4">
+                <div className={`p-4 rounded-lg border-2 ${
+                  theme === 'dark' 
+                    ? 'border-cyan-500/30 bg-gradient-to-br from-gray-800 to-gray-900' 
+                    : 'border-cyan-200 bg-gradient-to-br from-white to-cyan-50/20'
+                }`}>
+                  <div className="flex items-start gap-3">
+                    <div className={`p-2 rounded-lg ${
+                      theme === 'dark'
+                        ? 'bg-gradient-to-br from-cyan-600 to-blue-600'
+                        : 'bg-gradient-to-br from-cyan-500 to-blue-500'
+                    } text-white flex-shrink-0`}>
+                      <Info className="w-4 h-4" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className={`text-lg font-bold mb-2 ${headingColor}`}>
+                        Что такое ApeVault?
+                      </h3>
+                      <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                        ApeVault — закрытое профессиональное сообщество трейдеров и коллеров. Мы объединяем экспертизу, строгие
+                        регламенты и командную поддержку, чтобы ускорять результаты каждого участника и строить прозрачную культуру
+                        трейдинга.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  {[
+                    { label: 'Участников', value: '50+', icon: Users },
+                    { label: 'Уроков', value: '100+', icon: BookOpen },
+                    { label: 'Сессий в неделю', value: '10+', icon: Target },
+                    { label: 'Продуктов', value: '3', icon: Award }
+                  ].map((item) => (
+                    <div
+                      key={item.label}
+                      className={`p-3 rounded-lg border ${
+                        theme === 'dark' ? 'border-cyan-500/20 bg-white/5' : 'border-cyan-200 bg-white'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2 mb-1">
+                        <item.icon className={`w-4 h-4 ${theme === 'dark' ? 'text-cyan-400' : 'text-cyan-600'}`} />
+                        <p className={`text-xs uppercase tracking-wide ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                          {item.label}
+                        </p>
+                      </div>
+                      <p className={`text-xl font-bold ${headingColor}`}>{item.value}</p>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="grid md:grid-cols-3 gap-3">
+                  <div className={`p-3 rounded-lg border-2 ${
+                    theme === 'dark' 
+                      ? 'border-green-500/30 bg-gradient-to-br from-gray-800 to-gray-900' 
+                      : 'border-green-200 bg-gradient-to-br from-white to-green-50/20'
+                  }`}>
+                    <div className={`p-2 rounded-lg mb-2 inline-block ${
+                      theme === 'dark' 
+                        ? 'bg-gradient-to-br from-green-600 to-emerald-600' 
+                        : 'bg-gradient-to-br from-green-500 to-emerald-500'
+                    } text-white`}>
+                      <Users className="w-4 h-4" />
+                    </div>
+                    <h4 className={`text-sm font-bold mb-1 ${headingColor}`}>Командная работа</h4>
+                    <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                      Слаженная работа команды профессионалов
+                    </p>
+                  </div>
+
+                  <div className={`p-3 rounded-lg border-2 ${
+                    theme === 'dark' 
+                      ? 'border-purple-500/30 bg-gradient-to-br from-gray-800 to-gray-900' 
+                      : 'border-purple-200 bg-gradient-to-br from-white to-purple-50/20'
+                  }`}>
+                    <div className={`p-2 rounded-lg mb-2 inline-block ${
+                      theme === 'dark' 
+                        ? 'bg-gradient-to-br from-purple-600 to-pink-600' 
+                        : 'bg-gradient-to-br from-purple-500 to-pink-500'
+                    } text-white`}>
+                      <Target className="w-4 h-4" />
+                    </div>
+                    <h4 className={`text-sm font-bold mb-1 ${headingColor}`}>Профессионализм</h4>
+                    <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                      Высокие стандарты работы и строгий регламент
+                    </p>
+                  </div>
+
+                  <div className={`p-3 rounded-lg border-2 ${
+                    theme === 'dark' 
+                      ? 'border-yellow-500/30 bg-gradient-to-br from-gray-800 to-gray-900' 
+                      : 'border-yellow-200 bg-gradient-to-br from-white to-yellow-50/20'
+                  }`}>
+                    <div className={`p-2 rounded-lg mb-2 inline-block ${
+                      theme === 'dark' 
+                        ? 'bg-gradient-to-br from-yellow-600 to-orange-600' 
+                        : 'bg-gradient-to-br from-yellow-500 to-orange-500'
+                    } text-white`}>
+                      <Award className="w-4 h-4" />
+                    </div>
+                    <h4 className={`text-sm font-bold mb-1 ${headingColor}`}>Рейтинг</h4>
+                    <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                      Система рейтинга и мотивация к результатам
+                    </p>
+                  </div>
+                </div>
+
+                <div className={`p-4 rounded-lg border-2 ${
+                  theme === 'dark' 
+                    ? 'border-indigo-500/30 bg-gradient-to-br from-gray-800 to-gray-900' 
+                    : 'border-indigo-200 bg-gradient-to-br from-white to-indigo-50/20'
+                }`}>
+                  <div className="flex items-start gap-3">
+                    <div className={`p-2 rounded-lg ${
+                      theme === 'dark' 
+                        ? 'bg-gradient-to-br from-indigo-600 to-purple-600' 
+                        : 'bg-gradient-to-br from-indigo-500 to-purple-500'
+                    } text-white flex-shrink-0`}>
+                      <BookOpen className="w-4 h-4" />
+                    </div>
+                    <div className="flex-1">
+                      <h4 className={`text-sm font-bold mb-2 ${headingColor}`}>Правила сообщества</h4>
+                      <p className={`text-xs mb-3 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                        Подробный регламент торговых сессий и правила сообщества
+                      </p>
+                      <a
+                        href="https://telegra.ph/Reglament-provedeniya-torgovyh-sessij-pravila-soobshchestva-ApeVault-dlya-trejderov-i-kollerov-11-20"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
+                          theme === 'dark'
+                            ? 'bg-green-500/20 hover:bg-green-500/30 text-green-400 border border-green-500/50'
+                            : 'bg-green-50 hover:bg-green-100 text-green-700 border border-green-200'
+                        }`}
+                      >
+                        <BookOpen className="w-3 h-3" />
+                        Ознакомиться с правилами
+                      </a>
+                    </div>
+                  </div>
+                </div>
+
+                <div className={`p-4 rounded-lg border-2 ${
+                  theme === 'dark' 
+                    ? 'border-pink-500/30 bg-gradient-to-br from-gray-800 to-gray-900' 
+                    : 'border-pink-200 bg-gradient-to-br from-white to-pink-50/20'
+                }`}>
+                  <div className="flex items-start gap-3">
+                    <div className={`p-2 rounded-lg ${
+                      theme === 'dark' 
+                        ? 'bg-gradient-to-br from-pink-600 to-rose-600' 
+                        : 'bg-gradient-to-br from-pink-500 to-rose-500'
+                    } text-white flex-shrink-0`}>
+                      <Mail className="w-4 h-4" />
+                    </div>
+                    <div className="flex-1">
+                      <h4 className={`text-sm font-bold mb-1 ${headingColor}`}>Контакты</h4>
+                      <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                        По вопросам работы системы обращайтесь к администратору:{' '}
+                        <span className={`font-bold ${headingColor}`}>@artyommedoed</span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
 
             {/* Logout Button */}
             <div className={`lg:col-span-2 ${cardBg} rounded-xl border-2 ${borderColor} p-4 sm:p-6 shadow-lg`}>
