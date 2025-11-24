@@ -13,6 +13,7 @@ import { Tasks } from './pages/Tasks'
 import { About } from './pages/About'
 import { FAQ } from './pages/FAQ'
 import { Admin } from './pages/Admin'
+import { Profile } from './pages/Profile'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { cleanupOldData } from './services/firestoreService'
 
@@ -104,6 +105,14 @@ function App() {
           element={
             <ProtectedRoute>
               <Admin />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
             </ProtectedRoute>
           }
         />

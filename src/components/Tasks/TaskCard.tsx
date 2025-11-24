@@ -304,15 +304,21 @@ export const TaskCard = ({ task, onEdit, onDelete, onUpdate, unreadNotifications
             </span>
           </div>
 
-          {/* Due date */}
-          {task.dueDate && (
-            <div className="flex items-center gap-2 text-xs sm:text-sm">
-              <Calendar className={`w-4 h-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`} />
-              <span className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
-                Срок: {formatDate(new Date(task.dueDate), 'dd.MM.yyyy')}
-              </span>
-            </div>
-          )}
+          {/* Due date and time */}
+          <div className="flex items-center gap-2 text-xs sm:text-sm">
+            <Calendar className={`w-4 h-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`} />
+            <span className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+              Срок: {formatDate(new Date(task.dueDate), 'dd.MM.yyyy')} {task.dueTime}
+              {(() => {
+                const now = new Date()
+                const dueDateTime = new Date(`${task.dueDate}T${task.dueTime}`)
+                if (dueDateTime < now && task.status !== 'completed' && task.status !== 'closed') {
+                  return <span className="text-red-500 font-semibold ml-1">⚠️ Просрочено</span>
+                }
+                return null
+              })()}
+            </span>
+          </div>
 
           {/* Approvals status */}
           {task.status === 'pending' && task.approvals.length > 0 && (

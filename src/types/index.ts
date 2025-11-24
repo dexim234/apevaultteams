@@ -143,7 +143,8 @@ export interface Task {
   closedAt?: string
   completedBy?: string // user ID
   priority?: 'low' | 'medium' | 'high'
-  dueDate?: string // YYYY-MM-DD format
+  dueDate: string // YYYY-MM-DD format (обязательно)
+  dueTime: string // HH:mm format (обязательно)
 }
 
 // Team members

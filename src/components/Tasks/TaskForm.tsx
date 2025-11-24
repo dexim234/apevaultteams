@@ -6,7 +6,7 @@ import { useThemeStore } from '@/store/themeStore'
 import { addTask, updateTask } from '@/services/firestoreService'
 import { addTaskNotification } from '@/services/firestoreService'
 import { Task, TaskCategory, TEAM_MEMBERS, TASK_CATEGORIES } from '@/types'
-import { X, Calendar, Users, Tag, FileText, AlertCircle } from 'lucide-react'
+import { X, Calendar, Users, Tag, FileText, AlertCircle, Clock } from 'lucide-react'
 import { formatDate } from '@/utils/dateUtils'
 
 interface TaskFormProps {
@@ -30,7 +30,8 @@ export const TaskForm = ({ onClose, onSave, editingTask }: TaskFormProps) => {
   const [description, setDescription] = useState(editingTask?.description || '')
   const [category, setCategory] = useState<TaskCategory>(editingTask?.category || 'trading')
   const [priority, setPriority] = useState<'low' | 'medium' | 'high'>(editingTask?.priority || 'medium')
-  const [dueDate, setDueDate] = useState(editingTask?.dueDate || '')
+  const [dueDate, setDueDate] = useState(editingTask?.dueDate || formatDate(new Date(), 'yyyy-MM-dd'))
+  const [dueTime, setDueTime] = useState(editingTask?.dueTime || '12:00')
   const [selectedParticipants, setSelectedParticipants] = useState<string[]>(
     editingTask ? editingTask.assignedTo : []
   )
@@ -75,6 +76,18 @@ export const TaskForm = ({ onClose, onSave, editingTask }: TaskFormProps) => {
         return
       }
 
+      if (!dueDate) {
+        setError('Укажите дату дедлайна')
+        setLoading(false)
+        return
+      }
+
+      if (!dueTime) {
+        setError('Укажите время дедлайна')
+        setLoading(false)
+        return
+      }
+
       const now = new Date().toISOString()
       const currentUserId = user?.id || 'admin'
 
@@ -86,7 +99,8 @@ export const TaskForm = ({ onClose, onSave, editingTask }: TaskFormProps) => {
           category,
           priority,
           assignedTo: selectedParticipants,
-          dueDate: dueDate || undefined,
+          dueDate,
+          dueTime,
           updatedAt: now,
         }
 
@@ -111,7 +125,8 @@ export const TaskForm = ({ onClose, onSave, editingTask }: TaskFormProps) => {
           createdAt: now,
           updatedAt: now,
           priority,
-          dueDate: dueDate || undefined,
+          dueDate,
+          dueTime,
         }
 
         const taskId = await addTask(newTask)
@@ -235,19 +250,35 @@ export const TaskForm = ({ onClose, onSave, editingTask }: TaskFormProps) => {
             </div>
           </div>
 
-          {/* Due Date */}
-          <div>
-            <label className={`block text-sm font-medium mb-2 ${headingColor} flex items-center gap-2`}>
-              <Calendar className="w-4 h-4" />
-              Срок выполнения (необязательно)
-            </label>
-            <input
-              type="date"
-              value={dueDate}
-              onChange={(e) => setDueDate(e.target.value)}
-              min={formatDate(new Date(), 'yyyy-MM-dd')}
-              className={`w-full px-4 py-2.5 rounded-lg border ${borderColor} ${inputBg} ${headingColor} focus:outline-none focus:ring-2 focus:ring-green-500/50 transition-all`}
-            />
+          {/* Due Date and Time */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className={`block text-sm font-medium mb-2 ${headingColor} flex items-center gap-2`}>
+                <Calendar className="w-4 h-4" />
+                Дата дедлайна *
+              </label>
+              <input
+                type="date"
+                value={dueDate}
+                onChange={(e) => setDueDate(e.target.value)}
+                min={formatDate(new Date(), 'yyyy-MM-dd')}
+                required
+                className={`w-full px-4 py-2.5 rounded-lg border ${borderColor} ${inputBg} ${headingColor} focus:outline-none focus:ring-2 focus:ring-green-500/50 transition-all`}
+              />
+            </div>
+            <div>
+              <label className={`block text-sm font-medium mb-2 ${headingColor} flex items-center gap-2`}>
+                <Clock className="w-4 h-4" />
+                Время дедлайна *
+              </label>
+              <input
+                type="time"
+                value={dueTime}
+                onChange={(e) => setDueTime(e.target.value)}
+                required
+                className={`w-full px-4 py-2.5 rounded-lg border ${borderColor} ${inputBg} ${headingColor} focus:outline-none focus:ring-2 focus:ring-green-500/50 transition-all`}
+              />
+            </div>
           </div>
 
           {/* Participants */}

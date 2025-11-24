@@ -6,6 +6,8 @@ import { useAuthStore } from '@/store/authStore'
 import { TaskForm } from '@/components/Tasks/TaskForm'
 import { TaskCard } from '@/components/Tasks/TaskCard'
 import { TaskFilters } from '@/components/Tasks/TaskFilters'
+import { TaskKanban } from '@/components/Tasks/TaskKanban'
+import { TaskNotifications } from '@/components/Tasks/TaskNotifications'
 import { 
   getTasks, 
   deleteTask, 
@@ -13,7 +15,7 @@ import {
   markAllNotificationsAsRead 
 } from '@/services/firestoreService'
 import { Task, TaskCategory, TaskStatus, TaskNotification } from '@/types'
-import { Plus, CheckSquare, Bell, Sparkles } from 'lucide-react'
+import { Plus, CheckSquare, Bell, Sparkles, List, LayoutGrid } from 'lucide-react'
 
 export const Tasks = () => {
   const { theme } = useThemeStore()
@@ -27,6 +29,7 @@ export const Tasks = () => {
   const [selectedCategory, setSelectedCategory] = useState<TaskCategory | 'all'>('all')
   const [selectedStatus, setSelectedStatus] = useState<TaskStatus | 'all'>('all')
   const [selectedUser, setSelectedUser] = useState<string | 'all'>('all')
+  const [viewMode, setViewMode] = useState<'list' | 'kanban'>('kanban')
 
   const headingColor = theme === 'dark' ? 'text-white' : 'text-gray-900'
   const cardBg = theme === 'dark' ? 'bg-gray-800' : 'bg-white'
@@ -171,19 +174,16 @@ export const Tasks = () => {
               </div>
 
               {/* Notifications */}
-              {user && getUnreadCount() > 0 && (
+              {user && (
                 <div className="flex items-center gap-3">
-                  <button
-                    onClick={handleMarkAllRead}
-                    className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${
-                      theme === 'dark'
-                        ? 'bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-400 border border-yellow-500/50'
-                        : 'bg-yellow-50 hover:bg-yellow-100 text-yellow-700 border border-yellow-200'
-                    }`}
-                  >
-                    <Bell className="w-4 h-4" />
-                    Отметить все прочитанными ({getUnreadCount()})
-                  </button>
+                  <TaskNotifications
+                    onTaskClick={(taskId) => {
+                      const task = tasks.find(t => t.id === taskId)
+                      if (task) {
+                        handleEdit(task)
+                      }
+                    }}
+                  />
                 </div>
               )}
             </div>
@@ -265,20 +265,47 @@ export const Tasks = () => {
             />
           </div>
 
-          {/* Tasks List */}
+          {/* Tasks List/Kanban */}
           <div className="flex-1">
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-4 gap-3">
               <h2 className={`text-xl font-bold ${headingColor}`}>
                 Задачи ({filteredTasks.length})
               </h2>
-              <button
-                onClick={() => setShowForm(true)}
-                className="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-lg font-semibold transition-all shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center gap-2"
-              >
-                <Plus className="w-5 h-5" />
-                <span className="hidden sm:inline">Новая задача</span>
-                <span className="sm:hidden">Добавить</span>
-              </button>
+              <div className="flex items-center gap-2">
+                {/* View Mode Toggle */}
+                <div className={`flex rounded-lg border-2 ${theme === 'dark' ? 'border-gray-600' : 'border-gray-300'} overflow-hidden`}>
+                  <button
+                    onClick={() => setViewMode('kanban')}
+                    className={`px-3 py-2 transition-colors ${
+                      viewMode === 'kanban'
+                        ? 'bg-green-500 text-white'
+                        : theme === 'dark' ? 'bg-gray-800 text-gray-300 hover:bg-gray-700' : 'bg-white text-gray-700 hover:bg-gray-50'
+                    }`}
+                    title="Kanban доска"
+                  >
+                    <LayoutGrid className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => setViewMode('list')}
+                    className={`px-3 py-2 transition-colors ${
+                      viewMode === 'list'
+                        ? 'bg-green-500 text-white'
+                        : theme === 'dark' ? 'bg-gray-800 text-gray-300 hover:bg-gray-700' : 'bg-white text-gray-700 hover:bg-gray-50'
+                    }`}
+                    title="Список"
+                  >
+                    <List className="w-4 h-4" />
+                  </button>
+                </div>
+                <button
+                  onClick={() => setShowForm(true)}
+                  className="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-lg font-semibold transition-all shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center gap-2"
+                >
+                  <Plus className="w-5 h-5" />
+                  <span className="hidden sm:inline">Новая задача</span>
+                  <span className="sm:hidden">Добавить</span>
+                </button>
+              </div>
             </div>
 
             {loading ? (
@@ -297,6 +324,17 @@ export const Tasks = () => {
                     : 'Создайте первую задачу'}
                 </p>
               </div>
+            ) : viewMode === 'kanban' ? (
+              <TaskKanban
+                tasks={filteredTasks}
+                onUpdate={() => {
+                  loadTasks()
+                  loadNotifications()
+                }}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+                getUnreadNotifications={getTaskNotificationsCount}
+              />
             ) : (
               <div className="grid grid-cols-1 gap-4 sm:gap-6">
                 {filteredTasks.map((task) => (

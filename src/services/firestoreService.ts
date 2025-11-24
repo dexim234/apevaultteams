@@ -586,7 +586,8 @@ export const getTasks = async (filters?: {
       closedAt: data.closedAt,
       completedBy: data.completedBy,
       priority: data.priority,
-      dueDate: data.dueDate,
+      dueDate: data.dueDate || new Date().toISOString().split('T')[0],
+      dueTime: data.dueTime || '12:00',
     } as Task
   })
   
