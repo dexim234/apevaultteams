@@ -40,8 +40,7 @@ import {
   Target,
   Award,
   BookOpen,
-  Mail,
-  HelpCircle
+  Mail
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
