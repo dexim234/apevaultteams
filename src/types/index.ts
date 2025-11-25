@@ -108,7 +108,7 @@ export interface Call {
 // Task types
 export type TaskCategory = 'trading' | 'learning' | 'technical' | 'stream' | 'research' | 'organization'
 export type TaskStatus = 'pending' | 'in_progress' | 'completed' | 'closed' | 'rejected'
-export type TaskNotificationType = 'task_added' | 'task_moved' | 'task_completion_request'
+export type TaskNotificationType = 'task_added' | 'task_moved' | 'task_completion_request' | 'task_rejected'
 
 export interface TaskNotification {
   id: string
