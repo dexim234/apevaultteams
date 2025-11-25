@@ -34,14 +34,14 @@ export const Earnings = () => {
     const monthStart = formatDate(new Date(new Date().getFullYear(), new Date().getMonth(), 1), 'yyyy-MM-dd')
     const monthEnd = formatDate(new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0), 'yyyy-MM-dd')
 
-    const weekEarnings = earnings.filter(e => e.date >= weekStart && e.date <= weekEnd)
-    const monthEarnings = earnings.filter(e => e.date >= monthStart && e.date <= monthEnd)
+    const weekEarnings = earnings.filter((e: EarningsType) => e.date >= weekStart && e.date <= weekEnd)
+    const monthEarnings = earnings.filter((e: EarningsType) => e.date >= monthStart && e.date <= monthEnd)
 
     setStats({
-      weekTotal: weekEarnings.reduce((sum, e) => sum + e.amount, 0),
-      weekPool: weekEarnings.reduce((sum, e) => sum + e.poolAmount, 0),
-      monthTotal: monthEarnings.reduce((sum, e) => sum + e.amount, 0),
-      monthPool: monthEarnings.reduce((sum, e) => sum + e.poolAmount, 0)
+      weekTotal: weekEarnings.reduce((sum: number, e: EarningsType) => sum + e.amount, 0),
+      weekPool: weekEarnings.reduce((sum: number, e: EarningsType) => sum + e.poolAmount, 0),
+      monthTotal: monthEarnings.reduce((sum: number, e: EarningsType) => sum + e.amount, 0),
+      monthPool: monthEarnings.reduce((sum: number, e: EarningsType) => sum + e.poolAmount, 0)
     })
   }
 

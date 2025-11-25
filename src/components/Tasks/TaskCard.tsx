@@ -21,6 +21,7 @@ import {
   MessageSquare
 } from 'lucide-react'
 import { formatDate } from '@/utils/dateUtils'
+import { TaskDeadlineBadge } from './TaskDeadlineBadge'
 import { TaskChat } from './TaskChat'
 
 interface TaskCardProps {
@@ -144,22 +145,83 @@ export const TaskCard = ({ task, onEdit, onDelete, onUpdate, unreadNotifications
         })
       }
 
-      await updateTask(task.id, {
+      const updates: Partial<Task> = {
         approvals: updatedApprovals,
         updatedAt: now,
-      })
+      }
 
-      // If all approved, automatically move to in_progress
-      const allNowApproved = updatedApprovals.every(a => a.status === 'approved')
-      if (allNowApproved && action === 'approve') {
-        await handleStatusChange('in_progress')
-      } else {
-        onUpdate()
+      // If rejected, change task status
+      if (action === 'reject') {
+        updates.status = 'rejected'
+      } else if (action === 'approve') {
+        // When approving, immediately move to in_progress
+        updates.status = 'in_progress'
+      }
+
+      await updateTask(task.id, updates)
+
+      // Create notifications
+      if (action === 'approve') {
+        // Notify author when task is approved and moved to in_progress
+        if (task.createdBy !== user.id) {
+          await addTaskNotification({
+            userId: task.createdBy,
+            taskId: task.id,
+            type: 'task_moved',
+            message: `Задача "${task.title}" согласована и перемещена в работу пользователем ${user.name || 'Пользователь'}`,
+            read: false,
+            createdAt: now,
+            movedBy: user.name || 'Пользователь',
+          })
+        }
+        // Notify other assigned users
+        for (const userId of task.assignedTo) {
+          if (userId !== user.id && userId !== task.createdBy) {
+            await addTaskNotification({
+              userId,
+              taskId: task.id,
+              type: 'task_moved',
+              message: `Задача "${task.title}" согласована и перемещена в работу`,
+              read: false,
+              createdAt: now,
+              movedBy: user.name || 'Пользователь',
+            })
+          }
+        }
+      } else if (action === 'reject') {
+        const rejectedBy = user.name || 'Пользователь'
+        // Notify author when task is rejected
+        if (task.createdBy !== user.id) {
+          await addTaskNotification({
+            userId: task.createdBy,
+            taskId: task.id,
+            type: 'task_rejected',
+            message: `Задача "${task.title}" отклонена пользователем ${rejectedBy}. ${approvalComment || ''}`,
+            read: false,
+            createdAt: now,
+            movedBy: rejectedBy,
+          })
+        }
+        // Notify other assigned users
+        for (const userId of task.assignedTo) {
+          if (userId !== user.id && userId !== task.createdBy) {
+            await addTaskNotification({
+              userId,
+              taskId: task.id,
+              type: 'task_rejected',
+              message: `Задача "${task.title}" отклонена пользователем ${rejectedBy}`,
+              read: false,
+              createdAt: now,
+              movedBy: rejectedBy,
+            })
+          }
+        }
       }
 
       setShowApprovalDialog(false)
       setApprovalComment('')
       setApprovalAction(null)
+      onUpdate()
     } catch (error) {
       console.error('Error approving task:', error)
     } finally {
@@ -333,19 +395,12 @@ export const TaskCard = ({ task, onEdit, onDelete, onUpdate, unreadNotifications
           </div>
 
           {/* Due date and time */}
-          <div className="flex items-center gap-2 text-xs sm:text-sm">
+          <div className="flex items-center gap-2 flex-wrap text-xs sm:text-sm">
             <Calendar className={`w-4 h-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`} />
             <span className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
               Срок: {formatDate(new Date(task.dueDate), 'dd.MM.yyyy')} {task.dueTime}
-              {(() => {
-                const now = new Date()
-                const dueDateTime = new Date(`${task.dueDate}T${task.dueTime}`)
-                if (dueDateTime < now && task.status !== 'completed' && task.status !== 'closed') {
-                  return <span className="text-red-500 font-semibold ml-1">⚠️ Просрочено</span>
-                }
-                return null
-              })()}
             </span>
+            <TaskDeadlineBadge dueDate={task.dueDate} dueTime={task.dueTime} theme={theme} />
           </div>
 
           {/* Approvals status */}

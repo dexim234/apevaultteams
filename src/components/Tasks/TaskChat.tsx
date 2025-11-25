@@ -86,42 +86,70 @@ export const TaskChat = ({ task, onClose, onUpdate }: TaskChatProps) => {
   }
 
   const handleSendMessage = async () => {
-    if (!user || (!newMessage.trim() && !selectedImage && !selectedDocument)) {
+    if (!user) {
+      setError('Пользователь не авторизован')
+      setTimeout(() => setError(null), 5000)
+      return
+    }
+
+    if (!newMessage.trim() && !selectedImage && !selectedDocument) {
+      setError('Введите сообщение или выберите файл')
+      setTimeout(() => setError(null), 5000)
       return
     }
 
     setLoading(true)
+    setError(null)
+    
     try {
       let imageUrl: string | undefined
       let documentUrl: string | undefined
       let documentName: string | undefined
 
-      // Upload files to Firebase Storage
+      // Upload files to Firebase Storage (if any)
       if (selectedImage) {
         try {
+          console.log('Uploading image...', selectedImage.name)
           imageUrl = await uploadChatImage(task.id, selectedImage)
-        } catch (error) {
+          console.log('Image uploaded successfully:', imageUrl)
+        } catch (error: any) {
           console.error('Error uploading image:', error)
-          alert('Ошибка загрузки изображения. Попробуйте еще раз.')
+          const errorMsg = error?.message || 'Неизвестная ошибка'
+          setError(`Ошибка загрузки изображения: ${errorMsg}`)
+          setTimeout(() => setError(null), 5000)
           setLoading(false)
           return
         }
       }
+      
       if (selectedDocument) {
         try {
+          console.log('Uploading document...', selectedDocument.name)
           documentUrl = await uploadChatDocument(task.id, selectedDocument)
           documentName = selectedDocument.name
-        } catch (error) {
+          console.log('Document uploaded successfully:', documentUrl)
+        } catch (error: any) {
           console.error('Error uploading document:', error)
-          alert('Ошибка загрузки документа. Попробуйте еще раз.')
+          const errorMsg = error?.message || 'Неизвестная ошибка'
+          setError(`Ошибка загрузки документа: ${errorMsg}`)
+          setTimeout(() => setError(null), 5000)
           setLoading(false)
           return
         }
       }
 
+      // Prepare message text
       const messageText = newMessage.trim() || (selectedImage || selectedDocument ? '📎 Файл' : '')
       
-      await addTaskChatMessage({
+      if (!messageText && !imageUrl && !documentUrl) {
+        setError('Невозможно отправить пустое сообщение')
+        setTimeout(() => setError(null), 5000)
+        setLoading(false)
+        return
+      }
+
+      // Prepare message data
+      const messageData = {
         taskId: task.id,
         userId: user.id,
         userName: user.name || 'Пользователь',
@@ -132,8 +160,16 @@ export const TaskChat = ({ task, onClose, onUpdate }: TaskChatProps) => {
         createdAt: new Date().toISOString(),
         edited: false,
         deleted: false,
-      })
+      }
 
+      console.log('Sending message to Firestore...', messageData)
+      
+      // Send message to Firestore
+      await addTaskChatMessage(messageData)
+      
+      console.log('Message sent successfully')
+
+      // Clear form
       setNewMessage('')
       setSelectedImage(null)
       setSelectedDocument(null)
@@ -146,11 +182,14 @@ export const TaskChat = ({ task, onClose, onUpdate }: TaskChatProps) => {
         fileInputRef.current.value = ''
       }
       
+      // Reload messages
       await loadMessages()
       onUpdate?.()
-    } catch (error) {
+      
+    } catch (error: any) {
       console.error('Error sending message:', error)
-      setError('Ошибка отправки сообщения. Попробуйте еще раз.')
+      const errorMsg = error?.message || 'Неизвестная ошибка'
+      setError(`Ошибка отправки сообщения: ${errorMsg}. Проверьте консоль для деталей.`)
       setTimeout(() => setError(null), 5000)
     } finally {
       setLoading(false)

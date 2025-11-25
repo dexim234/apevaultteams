@@ -8,6 +8,7 @@ import { Task, TaskStatus, TASK_STATUSES, TEAM_MEMBERS } from '@/types'
 import { MoreVertical, CheckSquare, Check, X, RotateCcw, MessageSquare } from 'lucide-react'
 import { formatDate } from '@/utils/dateUtils'
 import { TaskChat } from './TaskChat'
+import { TaskDeadlineBadge } from './TaskDeadlineBadge'
 
 interface TaskKanbanProps {
   tasks: Task[]
@@ -608,9 +609,7 @@ export const TaskKanban = ({ tasks, onUpdate, onEdit, onDelete, getUnreadNotific
                           <div className={`flex items-center gap-1 flex-wrap ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                             <span>📅 {formatDate(new Date(task.dueDate), 'dd.MM.yyyy')}</span>
                             <span>🕐 {task.dueTime}</span>
-                            {overdue && (
-                              <span className="text-red-500 font-semibold ml-1">⚠️ Просрочено</span>
-                            )}
+                            <TaskDeadlineBadge dueDate={task.dueDate} dueTime={task.dueTime} theme={theme} size="compact" />
                           </div>
                           {task.description && (
                             <p className={`line-clamp-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>

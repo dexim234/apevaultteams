@@ -1098,13 +1098,30 @@ export const deleteNotification = async (id: string): Promise<void> => {
 
 // Task Chat functions
 export const addTaskChatMessage = async (messageData: Omit<TaskChatMessage, 'id'>): Promise<string> => {
-  const messagesRef = collection(db, 'taskChatMessages')
-  const docRef = await addDoc(messagesRef, {
-    ...messageData,
-    deleted: false,
-    edited: false,
-  })
-  return docRef.id
+  try {
+    const messagesRef = collection(db, 'taskChatMessages')
+    const dataToSave = {
+      taskId: messageData.taskId,
+      userId: messageData.userId,
+      userName: messageData.userName,
+      message: messageData.message || '',
+      imageUrl: messageData.imageUrl || null,
+      documentUrl: messageData.documentUrl || null,
+      documentName: messageData.documentName || null,
+      createdAt: messageData.createdAt || new Date().toISOString(),
+      updatedAt: null,
+      edited: messageData.edited || false,
+      deleted: messageData.deleted || false,
+    }
+    
+    console.log('Adding task chat message to Firestore:', dataToSave)
+    const docRef = await addDoc(messagesRef, dataToSave)
+    console.log('Task chat message added with ID:', docRef.id)
+    return docRef.id
+  } catch (error: any) {
+    console.error('Error adding task chat message:', error)
+    throw new Error(`Failed to add message: ${error?.message || 'Unknown error'}`)
+  }
 }
 
 export const getTaskChatMessages = async (taskId: string): Promise<TaskChatMessage[]> => {
@@ -1250,23 +1267,47 @@ export const cleanupExpiredChats = async (): Promise<void> => {
 
 // File upload functions
 export const uploadChatImage = async (taskId: string, file: File): Promise<string> => {
-  const timestamp = Date.now()
-  const fileName = `task-chat/${taskId}/images/${timestamp}-${file.name}`
-  const storageRef = ref(storage, fileName)
-  
-  await uploadBytes(storageRef, file)
-  const downloadURL = await getDownloadURL(storageRef)
-  return downloadURL
+  try {
+    if (!storage) {
+      throw new Error('Firebase Storage не инициализирован')
+    }
+    
+    const timestamp = Date.now()
+    const sanitizedFileName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_')
+    const fileName = `task-chat/${taskId}/images/${timestamp}-${sanitizedFileName}`
+    const storageRef = ref(storage, fileName)
+    
+    console.log('Uploading image to storage:', fileName, 'Size:', file.size)
+    await uploadBytes(storageRef, file)
+    const downloadURL = await getDownloadURL(storageRef)
+    console.log('Image uploaded, URL:', downloadURL)
+    return downloadURL
+  } catch (error: any) {
+    console.error('Error in uploadChatImage:', error)
+    throw new Error(`Ошибка загрузки изображения: ${error?.message || 'Unknown error'}`)
+  }
 }
 
 export const uploadChatDocument = async (taskId: string, file: File): Promise<string> => {
-  const timestamp = Date.now()
-  const fileName = `task-chat/${taskId}/documents/${timestamp}-${file.name}`
-  const storageRef = ref(storage, fileName)
-  
-  await uploadBytes(storageRef, file)
-  const downloadURL = await getDownloadURL(storageRef)
-  return downloadURL
+  try {
+    if (!storage) {
+      throw new Error('Firebase Storage не инициализирован')
+    }
+    
+    const timestamp = Date.now()
+    const sanitizedFileName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_')
+    const fileName = `task-chat/${taskId}/documents/${timestamp}-${sanitizedFileName}`
+    const storageRef = ref(storage, fileName)
+    
+    console.log('Uploading document to storage:', fileName, 'Size:', file.size)
+    await uploadBytes(storageRef, file)
+    const downloadURL = await getDownloadURL(storageRef)
+    console.log('Document uploaded, URL:', downloadURL)
+    return downloadURL
+  } catch (error: any) {
+    console.error('Error in uploadChatDocument:', error)
+    throw new Error(`Ошибка загрузки документа: ${error?.message || 'Unknown error'}`)
+  }
 }
 
 export const deleteChatFile = async (fileUrl: string): Promise<void> => {
