@@ -3,22 +3,9 @@ import { useState } from 'react'
 import { useAuthStore } from '@/store/authStore'
 import { useAdminStore } from '@/store/adminStore'
 import { useThemeStore } from '@/store/themeStore'
-import { updateTask, addTaskNotification } from '@/services/firestoreService'
+import { updateTask } from '@/services/firestoreService'
 import { Task, TaskStatus, TEAM_MEMBERS, TASK_CATEGORIES, TASK_STATUSES } from '@/types'
-import {
-  Edit,
-  Trash2,
-  CheckCircle2,
-  Clock,
-  XCircle,
-  Bell,
-  User,
-  Users,
-  Calendar,
-  AlertCircle,
-  Check,
-  X,
-} from 'lucide-react'
+import { Edit, Trash2, CheckCircle2, Clock, XCircle, User, Users, Calendar, AlertCircle, Check, X } from 'lucide-react'
 import { formatDate } from '@/utils/dateUtils'
 import { TaskDeadlineBadge } from './TaskDeadlineBadge'
 
@@ -27,10 +14,9 @@ interface TaskCardProps {
   onEdit: (task: Task) => void
   onDelete: (taskId: string) => void
   onUpdate: () => void
-  unreadNotifications?: number
 }
 
-export const TaskCard = ({ task, onEdit, onDelete, onUpdate, unreadNotifications = 0 }: TaskCardProps) => {
+export const TaskCard = ({ task, onEdit, onDelete, onUpdate }: TaskCardProps) => {
   const { user } = useAuthStore()
   const { isAdmin } = useAdminStore()
   const { theme } = useThemeStore()
@@ -63,7 +49,6 @@ export const TaskCard = ({ task, onEdit, onDelete, onUpdate, unreadNotifications
   const canApprove = task.status === 'pending' && assigneeIds.includes(user?.id || '')
   const userApproval = task.approvals.find((a) => a.userId === user?.id)
   const allApproved = task.status === 'pending' && task.approvals.length > 0 && task.approvals.every((a) => a.status === 'approved')
-  const hasMultipleParticipants = assignees.length > 1
 
   const handleStatusChange = async (newStatus: TaskStatus) => {
     if (!user && !isAdmin) return
@@ -90,35 +75,6 @@ export const TaskCard = ({ task, onEdit, onDelete, onUpdate, unreadNotifications
       }
 
       await updateTask(task.id, updates)
-
-      // Create notifications for status changes - send to all assigned users
-      if (newStatus !== task.status && assigneeIds.length > 0) {
-        const movedBy = user?.name || 'Администратор'
-        for (const userId of assigneeIds) {
-          if (userId !== user?.id) {
-            let message = ''
-            if (newStatus === 'in_progress') {
-              message = `Задача "${task.title}" перемещена в работу пользователем ${movedBy}`
-            } else if (newStatus === 'completed') {
-              message = `Задача "${task.title}" выполнена. Подтвердите выполнение.`
-            } else if (newStatus === 'closed') {
-              message = `Задача "${task.title}" закрыта пользователем ${movedBy}`
-            }
-
-            if (message) {
-              await addTaskNotification({
-                userId,
-                taskId: task.id,
-                type: newStatus === 'completed' ? 'task_completion_request' : 'task_moved',
-                message,
-                read: false,
-                createdAt: now,
-                movedBy,
-              })
-            }
-          }
-        }
-      }
 
       onUpdate()
     } catch (error) {
@@ -166,64 +122,6 @@ export const TaskCard = ({ task, onEdit, onDelete, onUpdate, unreadNotifications
       }
 
       await updateTask(task.id, updates)
-
-      // Create notifications
-      if (action === 'approve') {
-        // Notify author when task is approved and moved to in_progress
-        if (task.createdBy !== user.id) {
-          await addTaskNotification({
-            userId: task.createdBy,
-            taskId: task.id,
-            type: 'task_moved',
-            message: `Задача "${task.title}" согласована и перемещена в работу пользователем ${user.name || 'Пользователь'}`,
-            read: false,
-            createdAt: now,
-            movedBy: user.name || 'Пользователь',
-          })
-        }
-        // Notify other assigned users
-        for (const userId of assigneeIds) {
-          if (userId !== user.id && userId !== task.createdBy) {
-            await addTaskNotification({
-              userId,
-              taskId: task.id,
-              type: 'task_moved',
-              message: `Задача "${task.title}" согласована и перемещена в работу`,
-              read: false,
-              createdAt: now,
-              movedBy: user.name || 'Пользователь',
-            })
-          }
-        }
-      } else if (action === 'reject') {
-        const rejectedBy = user.name || 'Пользователь'
-        // Notify author when task is rejected
-        if (task.createdBy !== user.id) {
-          await addTaskNotification({
-            userId: task.createdBy,
-            taskId: task.id,
-            type: 'task_rejected',
-            message: `Задача "${task.title}" отклонена пользователем ${rejectedBy}. ${rejectionComment || ''}`,
-            read: false,
-            createdAt: now,
-            movedBy: rejectedBy,
-          })
-        }
-        // Notify other assigned users
-        for (const userId of assigneeIds) {
-          if (userId !== user.id && userId !== task.createdBy) {
-            await addTaskNotification({
-              userId,
-              taskId: task.id,
-              type: 'task_rejected',
-              message: `Задача "${task.title}" отклонена пользователем ${rejectedBy}`,
-              read: false,
-              createdAt: now,
-              movedBy: rejectedBy,
-            })
-          }
-        }
-      }
 
       if (action === 'reject') {
         setShowRejectDialog(false)
@@ -321,14 +219,6 @@ export const TaskCard = ({ task, onEdit, onDelete, onUpdate, unreadNotifications
               <h3 className={`text-lg sm:text-xl font-bold ${headingColor} truncate`}>
                 {task.title}
               </h3>
-              {hasMultipleParticipants && unreadNotifications > 0 && (
-                <div className="relative">
-                  <Bell className={`w-5 h-5 ${theme === 'dark' ? 'text-yellow-400' : 'text-yellow-600'}`} />
-                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
-                    {unreadNotifications}
-                  </span>
-                </div>
-              )}
             </div>
             <div className="flex flex-wrap items-center gap-2 sm:gap-3">
               {/* Category */}

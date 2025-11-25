@@ -7,13 +7,8 @@ import { TaskForm } from '@/components/Tasks/TaskForm'
 import { TaskCard } from '@/components/Tasks/TaskCard'
 import { TaskFilters } from '@/components/Tasks/TaskFilters'
 import { TaskKanban } from '@/components/Tasks/TaskKanban'
-import { TaskNotifications } from '@/components/Tasks/TaskNotifications'
-import { 
-  getTasks, 
-  deleteTask, 
-  getTaskNotifications
-} from '@/services/firestoreService'
-import { Task, TaskCategory, TaskStatus, TaskNotification } from '@/types'
+import { getTasks, deleteTask } from '@/services/firestoreService'
+import { Task, TaskCategory, TaskStatus } from '@/types'
 import { Plus, CheckSquare, Sparkles, List, LayoutGrid } from 'lucide-react'
 
 export const Tasks = () => {
@@ -23,7 +18,6 @@ export const Tasks = () => {
   const [showForm, setShowForm] = useState(false)
   const [editingTask, setEditingTask] = useState<Task | null>(null)
   const [tasks, setTasks] = useState<Task[]>([])
-  const [notifications, setNotifications] = useState<TaskNotification[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedCategory, setSelectedCategory] = useState<TaskCategory | 'all'>('all')
   const [selectedStatus, setSelectedStatus] = useState<TaskStatus | 'all'>('all')
@@ -35,7 +29,6 @@ export const Tasks = () => {
 
   useEffect(() => {
     loadTasks()
-    loadNotifications()
   }, [user])
 
   useEffect(() => {
@@ -65,17 +58,6 @@ export const Tasks = () => {
     }
   }
 
-  const loadNotifications = async () => {
-    if (!user) return
-    
-    try {
-      const userNotifications = await getTaskNotifications(user.id)
-      setNotifications(userNotifications)
-    } catch (error) {
-      console.error('Error loading notifications:', error)
-    }
-  }
-
   const handleEdit = (task: Task) => {
     setEditingTask(task)
     setShowForm(true)
@@ -87,7 +69,6 @@ export const Tasks = () => {
     try {
       await deleteTask(taskId)
       loadTasks()
-      loadNotifications()
     } catch (error) {
       console.error('Error deleting task:', error)
     }
@@ -102,17 +83,12 @@ export const Tasks = () => {
     setShowForm(false)
     setEditingTask(null)
     loadTasks()
-    loadNotifications()
   }
 
   const handleClearFilters = () => {
     setSelectedCategory('all')
     setSelectedStatus('all')
     setSelectedUsers([])
-  }
-
-  const getTaskNotificationsCount = (taskId: string) => {
-    return notifications.filter(n => n.taskId === taskId && !n.read).length
   }
 
   const filteredTasks = tasks.filter(task => {
@@ -156,20 +132,6 @@ export const Tasks = () => {
                   Управление задачами и заданиями команды
                 </p>
               </div>
-
-              {/* Notifications */}
-              {user && (
-                <div className="flex items-center gap-3">
-                  <TaskNotifications
-                    onTaskClick={(taskId) => {
-                      const task = tasks.find(t => t.id === taskId)
-                      if (task) {
-                        handleEdit(task)
-                      }
-                    }}
-                  />
-                </div>
-              )}
             </div>
 
             {/* Stats */}
@@ -311,13 +273,9 @@ export const Tasks = () => {
             ) : viewMode === 'kanban' ? (
               <TaskKanban
                 tasks={filteredTasks}
-                onUpdate={() => {
-                  loadTasks()
-                  loadNotifications()
-                }}
+                onUpdate={loadTasks}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
-                getUnreadNotifications={getTaskNotificationsCount}
               />
             ) : (
               <div className="grid grid-cols-1 gap-4 sm:gap-6">
@@ -327,11 +285,7 @@ export const Tasks = () => {
                     task={task}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
-                    onUpdate={() => {
-                      loadTasks()
-                      loadNotifications()
-                    }}
-                    unreadNotifications={getTaskNotificationsCount(task.id)}
+                    onUpdate={loadTasks}
                   />
                 ))}
               </div>

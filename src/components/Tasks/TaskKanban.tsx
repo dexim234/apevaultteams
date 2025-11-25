@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { useThemeStore } from '@/store/themeStore'
 import { useAuthStore } from '@/store/authStore'
 import { useAdminStore } from '@/store/adminStore'
-import { updateTask, addTaskNotification } from '@/services/firestoreService'
+import { updateTask } from '@/services/firestoreService'
 import { Task, TaskStatus, TASK_STATUSES, TEAM_MEMBERS } from '@/types'
 import { MoreVertical, CheckSquare, Check, X, RotateCcw } from 'lucide-react'
 import { formatDate } from '@/utils/dateUtils'
@@ -14,10 +14,9 @@ interface TaskKanbanProps {
   onUpdate: () => void
   onEdit: (task: Task) => void
   onDelete: (taskId: string) => void
-  getUnreadNotifications: (taskId: string) => number
 }
 
-export const TaskKanban = ({ tasks, onUpdate, onEdit, onDelete, getUnreadNotifications }: TaskKanbanProps) => {
+export const TaskKanban = ({ tasks, onUpdate, onEdit, onDelete }: TaskKanbanProps) => {
   const { theme } = useThemeStore()
   const { user } = useAuthStore()
   const { isAdmin } = useAdminStore()
@@ -161,38 +160,6 @@ export const TaskKanban = ({ tasks, onUpdate, onEdit, onDelete, getUnreadNotific
 
       await updateTask(draggedTask.id, updates)
 
-      // Send notifications to all assigned users
-      const draggedAssigneeIds = resolveAssigneeIds(draggedTask)
-      if (targetStatus !== draggedTask.status && draggedAssigneeIds.length > 0) {
-        const movedBy = user?.name || 'Администратор'
-        for (const userId of draggedAssigneeIds) {
-          if (userId !== user?.id) {
-            let message = ''
-            if (targetStatus === 'in_progress') {
-              message = `Задача "${draggedTask.title}" перемещена в работу пользователем ${movedBy}`
-            } else if (targetStatus === 'completed') {
-              message = `Задача "${draggedTask.title}" выполнена. Подтвердите выполнение.`
-            } else if (targetStatus === 'closed') {
-              message = `Задача "${draggedTask.title}" закрыта пользователем ${movedBy}`
-            } else if (targetStatus === 'pending' && draggedTask.status === 'rejected') {
-              message = `Задача "${draggedTask.title}" отправлена на повторное согласование`
-            }
-
-            if (message) {
-              await addTaskNotification({
-                userId,
-                taskId: draggedTask.id,
-                type: targetStatus === 'completed' ? 'task_completion_request' : 'task_moved',
-                message,
-                read: false,
-                createdAt: now,
-                movedBy,
-              })
-            }
-          }
-        }
-      }
-
       onUpdate()
     } catch (error) {
       console.error('Error updating task status:', error)
@@ -237,38 +204,6 @@ export const TaskKanban = ({ tasks, onUpdate, onEdit, onDelete, getUnreadNotific
       }
 
       await updateTask(task.id, updates)
-
-      // Send notifications to all assigned users
-      const taskAssigneeIds = resolveAssigneeIds(task)
-      if (newStatus !== task.status && taskAssigneeIds.length > 0) {
-        const movedBy = user?.name || 'Администратор'
-        for (const userId of taskAssigneeIds) {
-          if (userId !== user?.id) {
-            let message = ''
-            if (newStatus === 'in_progress') {
-              message = `Задача "${task.title}" перемещена в работу пользователем ${movedBy}`
-            } else if (newStatus === 'completed') {
-              message = `Задача "${task.title}" выполнена. Подтвердите выполнение.`
-            } else if (newStatus === 'closed') {
-              message = `Задача "${task.title}" закрыта пользователем ${movedBy}`
-            } else if (newStatus === 'pending' && task.status === 'rejected') {
-              message = `Задача "${task.title}" отправлена на повторное согласование`
-            }
-
-            if (message) {
-              await addTaskNotification({
-                userId,
-                taskId: task.id,
-                type: newStatus === 'completed' ? 'task_completion_request' : 'task_moved',
-                message,
-                read: false,
-                createdAt: now,
-                movedBy,
-              })
-            }
-          }
-        }
-      }
 
       onUpdate()
       setMobileMenuTask(null)
@@ -317,64 +252,6 @@ export const TaskKanban = ({ tasks, onUpdate, onEdit, onDelete, getUnreadNotific
 
       await updateTask(task.id, updates)
 
-      // Create notifications
-      if (action === 'approve') {
-        // Notify author when task is approved and moved to in_progress
-        if (task.createdBy !== user.id) {
-          await addTaskNotification({
-            userId: task.createdBy,
-            taskId: task.id,
-            type: 'task_moved',
-            message: `Задача "${task.title}" согласована и перемещена в работу пользователем ${user.name || 'Пользователь'}`,
-            read: false,
-            createdAt: now,
-            movedBy: user.name || 'Пользователь',
-          })
-        }
-        // Notify other assigned users
-        for (const userId of resolveAssigneeIds(task)) {
-          if (userId !== user.id && userId !== task.createdBy) {
-            await addTaskNotification({
-              userId,
-              taskId: task.id,
-              type: 'task_moved',
-              message: `Задача "${task.title}" согласована и перемещена в работу`,
-              read: false,
-              createdAt: now,
-              movedBy: user.name || 'Пользователь',
-            })
-          }
-        }
-      } else if (action === 'reject') {
-        const rejectedBy = user.name || 'Пользователь'
-        // Notify author when task is rejected
-        if (task.createdBy !== user.id) {
-          await addTaskNotification({
-            userId: task.createdBy,
-            taskId: task.id,
-            type: 'task_moved',
-            message: `Задача "${task.title}" отклонена пользователем ${rejectedBy}. ${rejectionComment || ''}`,
-            read: false,
-            createdAt: now,
-            movedBy: rejectedBy,
-          })
-        }
-        // Notify other assigned users
-        for (const userId of resolveAssigneeIds(task)) {
-          if (userId !== user.id && userId !== task.createdBy) {
-            await addTaskNotification({
-              userId,
-              taskId: task.id,
-              type: 'task_moved',
-              message: `Задача "${task.title}" отклонена пользователем ${rejectedBy}`,
-              read: false,
-              createdAt: now,
-              movedBy: rejectedBy,
-            })
-          }
-        }
-      }
-
       onUpdate()
       if (action === 'reject') {
         setRejectDialog(null)
@@ -402,18 +279,6 @@ export const TaskKanban = ({ tasks, onUpdate, onEdit, onDelete, getUnreadNotific
         })),
         updatedAt: now,
       })
-
-      // Notify assigned users
-      for (const userId of resolveAssigneeIds(task)) {
-        await addTaskNotification({
-          userId,
-          taskId: task.id,
-          type: 'task_added',
-          message: `Задача "${task.title}" отправлена на повторное согласование`,
-          read: false,
-          createdAt: now,
-        })
-      }
 
       onUpdate()
     } catch (error) {
@@ -500,7 +365,6 @@ export const TaskKanban = ({ tasks, onUpdate, onEdit, onDelete, getUnreadNotific
                 {/* Tasks */}
                 <div className="space-y-2 sm:space-y-3 max-h-[calc(100vh-280px)] sm:max-h-[calc(100vh-300px)] overflow-y-auto">
                   {statusTasks.map((task) => {
-                    const unreadCount = getUnreadNotifications(task.id)
                     const overdue = isOverdue(task)
                     const canEdit = isAdmin || user?.id === task.createdBy
                     const canApproveTask = canApprove(task)
@@ -534,9 +398,6 @@ export const TaskKanban = ({ tasks, onUpdate, onEdit, onDelete, getUnreadNotific
                             {task.title}
                           </h4>
                           <div className="flex items-center gap-1 flex-shrink-0">
-                            {unreadCount > 0 && (
-                              <span className="w-2 h-2 bg-red-500 rounded-full" />
-                            )}
                             {/* Mobile Menu */}
                             <div className="relative lg:hidden">
                               <button

@@ -6,7 +6,6 @@ import { useAuthStore } from '@/store/authStore'
 import { useAdminStore } from '@/store/adminStore'
 import { 
   getTasks, 
-  getTaskNotifications,
   getRatingData,
   getEarnings,
   getDayStatuses,
@@ -22,14 +21,13 @@ import {
   countDaysInPeriod 
 } from '@/utils/dateUtils'
 import { calculateRating, getRatingBreakdown } from '@/utils/ratingUtils'
-import { Task, TaskNotification, RatingData } from '@/types'
+import { Task, RatingData } from '@/types'
 import { 
   User, 
   LogOut, 
   Eye, 
   EyeOff, 
   CheckSquare, 
-  Bell, 
   TrendingUp, 
   Shield,
   Sparkles,
@@ -53,7 +51,6 @@ export const Profile = () => {
   const [showPassword, setShowPassword] = useState(false)
   const [passwordCopied, setPasswordCopied] = useState(false)
   const [tasks, setTasks] = useState<Task[]>([])
-  const [notifications, setNotifications] = useState<TaskNotification[]>([])
   const [rating, setRating] = useState<RatingData | null>(null)
   const [ratingBreakdown, setRatingBreakdown] = useState<ReturnType<typeof getRatingBreakdown> | null>(null)
   const [loading, setLoading] = useState(true)
@@ -78,12 +75,6 @@ export const Profile = () => {
       // Load tasks
       const userTasks = await getTasks({ assignedTo: userId })
       setTasks(userTasks)
-
-      // Load notifications
-      if (user) {
-        const userNotifications = await getTaskNotifications(user.id)
-        setNotifications(userNotifications)
-      }
 
       // Load rating data
       if (user) {
@@ -202,7 +193,6 @@ export const Profile = () => {
   }
 
   const userData = user || (isAdmin ? { name: 'Администратор', login: 'admin', password: 'admin' } : null)
-  const unreadNotifications = notifications.filter(n => !n.read).length
   const pendingTasks = tasks.filter(t => t.status === 'pending').length
   const inProgressTasks = tasks.filter(t => t.status === 'in_progress').length
   const completedTasks = tasks.filter(t => t.status === 'completed').length
@@ -649,59 +639,6 @@ export const Profile = () => {
                 Перейти к задачам
               </button>
             </div>
-
-            {/* Notifications */}
-            {user && (
-              <div className={`${cardBg} rounded-xl border-2 ${borderColor} p-4 sm:p-6 shadow-lg`}>
-                <h2 className={`text-xl font-bold ${headingColor} mb-4 flex items-center gap-2`}>
-                  <Bell className="w-5 h-5" />
-                  Уведомления
-                </h2>
-                <div className="space-y-3">
-                  <div className={`p-4 rounded-lg border-2 ${
-                    theme === 'dark' ? 'bg-blue-500/10 border-blue-500/30' : 'bg-blue-50 border-blue-200'
-                  }`}>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className={`text-sm font-medium ${headingColor}`}>
-                          Непрочитанных
-                        </div>
-                        <div className={`text-2xl font-bold mt-1 ${
-                          theme === 'dark' ? 'text-blue-400' : 'text-blue-700'
-                        }`}>
-                          {unreadNotifications}
-                        </div>
-                      </div>
-                      <Bell className={`w-8 h-8 ${theme === 'dark' ? 'text-blue-400' : 'text-blue-700'}`} />
-                    </div>
-                  </div>
-                  <div className={`p-4 rounded-lg border-2 ${
-                    theme === 'dark' ? 'bg-gray-500/10 border-gray-500/30' : 'bg-gray-50 border-gray-200'
-                  }`}>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className={`text-sm font-medium ${headingColor}`}>
-                          Всего уведомлений
-                        </div>
-                        <div className={`text-2xl font-bold mt-1 ${headingColor}`}>
-                          {notifications.length}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => navigate('/notifications')}
-                    className={`w-full px-4 py-2 rounded-lg font-medium transition-colors ${
-                      theme === 'dark'
-                        ? 'bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 border border-blue-500/50'
-                        : 'bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200'
-                    }`}
-                  >
-                    Просмотреть все уведомления
-                  </button>
-                </div>
-              </div>
-            )}
 
             {/* About Community */}
             <div className={`lg:col-span-2 ${cardBg} rounded-xl border-2 ${borderColor} p-4 sm:p-6 shadow-lg`}>

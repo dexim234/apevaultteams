@@ -2,7 +2,7 @@
 import { Link, useLocation } from 'react-router-dom'
 import { useThemeStore } from '@/store/themeStore'
 import { useAdminStore } from '@/store/adminStore'
-import { Moon, Sun, Shield, Zap, Settings, Calendar, DollarSign, CheckSquare, TrendingUp, HelpCircle, User, ChevronDown } from 'lucide-react'
+import { Moon, Sun, Shield, Zap, Settings, Calendar, DollarSign, CheckSquare, TrendingUp, HelpCircle, User, ChevronDown, Info } from 'lucide-react'
 import logo from '@/assets/logo.png'
 import { useState, useEffect } from 'react'
 
@@ -11,6 +11,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
   const { isAdmin } = useAdminStore()
   const location = useLocation()
   const [showFunctionalityMenu, setShowFunctionalityMenu] = useState(false)
+  const [showAboutMenu, setShowAboutMenu] = useState(false)
 
   const functionalitySubItems = [
     { path: '/management', label: 'Расписание', icon: Calendar },
@@ -19,12 +20,20 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
     { path: '/rating', label: 'Рейтинг', icon: TrendingUp },
   ]
 
+  const aboutSubItems = [
+    { path: '/about', label: 'О сообществе', icon: Info },
+    { path: '/faq', label: 'FAQ', icon: HelpCircle },
+  ]
+
   const isFunctionalityActive = functionalitySubItems.some(item => location.pathname === item.path)
   const isFunctionalitySubItemActive = (path: string) => location.pathname === path
+  const isAboutActive = aboutSubItems.some(item => location.pathname === item.path)
+  const isAboutSubItemActive = (path: string) => location.pathname === path
 
   // Close menu when route changes
   useEffect(() => {
     setShowFunctionalityMenu(false)
+    setShowAboutMenu(false)
   }, [location.pathname])
 
   return (
@@ -104,20 +113,46 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                 )}
               </div>
 
-              {/* FAQ */}
-              <Link
-                to="/faq"
-                className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-2 text-base ${
-                  location.pathname === '/faq'
-                    ? 'bg-green-500 text-white'
-                    : theme === 'dark'
-                    ? 'text-gray-300 hover:bg-gray-700'
-                    : 'text-gray-700 hover:bg-gray-100'
-                }`}
-              >
-                <HelpCircle className="w-4 h-4 flex-shrink-0" />
-                <span>FAQ</span>
-              </Link>
+              {/* About menu */}
+              <div className="relative">
+                <button
+                  onClick={() => setShowAboutMenu(!showAboutMenu)}
+                  className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-2 text-base ${
+                    isAboutActive
+                      ? 'bg-green-500 text-white'
+                      : theme === 'dark'
+                      ? 'text-gray-300 hover:bg-gray-700'
+                      : 'text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  <Info className="w-4 h-4 flex-shrink-0" />
+                  <span>О нас</span>
+                  <ChevronDown className={`w-4 h-4 transition-transform ${showAboutMenu ? 'rotate-180' : ''}`} />
+                </button>
+
+                {showAboutMenu && (
+                  <>
+                    <div className="fixed inset-0 z-40" onClick={() => setShowAboutMenu(false)} />
+                    <div className={`absolute top-full left-0 mt-2 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-xl border-2 ${theme === 'dark' ? 'border-gray-600' : 'border-gray-300'} min-w-[200px] z-50`}>
+                      {aboutSubItems.map((item, index) => (
+                        <Link
+                          key={item.path}
+                          to={item.path}
+                          onClick={() => setShowAboutMenu(false)}
+                          className={`flex items-center gap-3 px-4 py-3 transition-colors ${
+                            isAboutSubItemActive(item.path)
+                              ? theme === 'dark' ? 'bg-green-500/20 text-green-400' : 'bg-green-50 text-green-700'
+                              : theme === 'dark' ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-gray-100 text-gray-700'
+                          } ${index === 0 ? 'rounded-t-lg' : ''} ${index === aboutSubItems.length - 1 ? 'rounded-b-lg' : ''}`}
+                        >
+                          <item.icon className="w-4 h-4 flex-shrink-0" />
+                          <span>{item.label}</span>
+                        </Link>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
 
               {/* ЛК */}
               <Link
@@ -244,18 +279,46 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
               )}
             </div>
 
-            {/* FAQ */}
-            <Link
-              to="/faq"
-              className={`flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-lg transition-colors touch-manipulation ${
-                location.pathname === '/faq'
-                  ? theme === 'dark' ? 'bg-green-500/20 text-green-400' : 'bg-green-50 text-green-700'
-                  : theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-              }`}
-            >
-              <HelpCircle className="w-5 h-5" />
-              <span className="text-xs font-medium">FAQ</span>
-            </Link>
+            {/* О нас */}
+            <div className="relative">
+              <button
+                onClick={() => setShowAboutMenu(!showAboutMenu)}
+                className={`flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-lg transition-colors touch-manipulation ${
+                  isAboutActive
+                    ? theme === 'dark' ? 'bg-green-500/20 text-green-400' : 'bg-green-50 text-green-700'
+                    : theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                }`}
+              >
+                <Info className="w-5 h-5" />
+                <span className="text-xs font-medium">О нас</span>
+              </button>
+
+              {showAboutMenu && (
+                <>
+                  <div
+                    className="fixed inset-0 z-40 bg-black/50"
+                    onClick={() => setShowAboutMenu(false)}
+                  />
+                  <div className={`absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-xl border-2 ${theme === 'dark' ? 'border-gray-600' : 'border-gray-300'} min-w-[200px] z-50`}>
+                    {aboutSubItems.map((item, index) => (
+                      <Link
+                        key={item.path}
+                        to={item.path}
+                        onClick={() => setShowAboutMenu(false)}
+                        className={`flex items-center gap-3 px-4 py-3 transition-colors ${
+                          isAboutSubItemActive(item.path)
+                            ? theme === 'dark' ? 'bg-green-500/20 text-green-400' : 'bg-green-50 text-green-700'
+                            : theme === 'dark' ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-gray-100 text-gray-700'
+                        } ${index === 0 ? 'rounded-t-lg' : ''} ${index === aboutSubItems.length - 1 ? 'rounded-b-lg' : ''}`}
+                      >
+                        <item.icon className="w-4 h-4 flex-shrink-0" />
+                        <span>{item.label}</span>
+                      </Link>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
 
             {/* ЛК */}
             <Link

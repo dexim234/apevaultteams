@@ -4,7 +4,6 @@ import { useAuthStore } from '@/store/authStore'
 import { useAdminStore } from '@/store/adminStore'
 import { useThemeStore } from '@/store/themeStore'
 import { addTask, updateTask } from '@/services/firestoreService'
-import { addTaskNotification } from '@/services/firestoreService'
 import { Task, TaskAssignee, TaskCategory, TEAM_MEMBERS, TASK_CATEGORIES } from '@/types'
 import { X, Calendar, Users, Tag, FileText, AlertCircle, Clock } from 'lucide-react'
 import { formatDate } from '@/utils/dateUtils'
@@ -137,8 +136,7 @@ export const TaskForm = ({ onClose, onSave, editingTask }: TaskFormProps) => {
 
         await updateTask(editingTask.id, updates)
 
-        // If status changed, create notifications
-        // (Status changes are handled separately in TaskCard)
+        // Status changes handled separately in task views
       } else {
         // Create new task
         const newTask: Omit<Task, 'id'> = {
@@ -161,19 +159,7 @@ export const TaskForm = ({ onClose, onSave, editingTask }: TaskFormProps) => {
           dueTime,
         }
 
-        const taskId = await addTask(newTask)
-
-        // Create notifications for all assigned users
-        for (const userId of participantIds) {
-          await addTaskNotification({
-            userId,
-            taskId,
-            type: 'task_added',
-            message: `Новая задача "${title.trim()}" добавлена. Просмотрите и согласуйте.`,
-            read: false,
-            createdAt: now,
-          })
-        }
+        await addTask(newTask)
       }
 
       onSave()
