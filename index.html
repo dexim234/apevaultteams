@@ -1,17 +1,1948 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ApeVault - Командная панель управления</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ApeVault - Сообщество дикий криптанов</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="header">
+        <div class="header-container">
+            <div class="logo-section">
+                <div class="logo">
+                    <svg width="50" height="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="25" cy="25" r="23" fill="#456F44" stroke="#FFFFFF" stroke-width="2"/>
+                        <path d="M25 10 L30 20 L20 20 Z" fill="#FFFFFF"/>
+                        <circle cx="25" cy="25" r="8" fill="#101010"/>
+                        <path d="M25 17 L25 33 M17 25 L33 25" stroke="#456F44" stroke-width="2"/>
+                    </svg>
+                </div>
+                <div class="brand">
+                    <h1 class="brand-name">ApeVault</h1>
+                </div>
+            </div>
+            
+            <nav class="main-nav">
+                <ul class="nav-list">
+                    <li class="nav-item dropdown">
+                        <a href="#" class="nav-link">
+                            <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="3"></circle>
+                                <path d="M12 1v6m0 6v6M5.64 5.64l4.24 4.24m4.24 4.24l4.24 4.24M1 12h6m6 0h6M5.64 18.36l4.24-4.24m4.24-4.24l4.24-4.24"></path>
+                            </svg>
+                            Наша экосистема <svg class="dropdown-arrow" width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M1 1.5L6 6.5L11 1.5" stroke="url(#arrowGradient)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                                <defs>
+                                    <linearGradient id="arrowGradient" x1="1" y1="1.5" x2="11" y2="1.5" gradientUnits="userSpaceOnUse">
+                                        <stop offset="0%" stop-color="#456F44"/>
+                                        <stop offset="100%" stop-color="#5a8f58"/>
+                                    </linearGradient>
+                                </defs>
+                            </svg>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#about">
+                                <svg class="dropdown-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <path d="M12 16v-4M12 8h.01"></path>
+                                </svg>
+                                О проекте
+                            </a></li>
+                            <li><a href="#we-are">
+                                <svg class="dropdown-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="9" cy="7" r="4"></circle>
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                </svg>
+                                В цифрах
+                            </a></li>
+                            <li><a href="#values">
+                                <svg class="dropdown-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                                    <path d="M2 17l10 5 10-5"></path>
+                                    <path d="M2 12l10 5 10-5"></path>
+                                </svg>
+                                Наши ценности
+                            </a></li>
+                            <li><a href="#community">
+                                <svg class="dropdown-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="9" cy="7" r="4"></circle>
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                </svg>
+                                Наше комьюнити
+                            </a></li>
+                            <li><a href="#team">
+                                <svg class="dropdown-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="9" cy="7" r="4"></circle>
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                </svg>
+                                Наша команда
+                            </a></li>
+                            <li><a href="#wallets">
+                                <svg class="dropdown-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 12V7H5a2 2 0 0 1 2-2h7v5"></path>
+                                    <path d="M3 5v14a2 2 0 0 0 2 2h16v-5"></path>
+                                    <path d="M18 12a2 2 0 0 0 0 4h4v-4Z"></path>
+                                </svg>
+                                Наши кошельки
+                            </a></li>
+                            <li><a href="#products">
+                                <svg class="dropdown-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="3" width="7" height="7"></rect>
+                                    <rect x="14" y="3" width="7" height="7"></rect>
+                                    <rect x="14" y="14" width="7" height="7"></rect>
+                                    <rect x="3" y="14" width="7" height="7"></rect>
+                                </svg>
+                                Наши продукты
+                            </a></li>
+                            <li><a href="#students">
+                                <svg class="dropdown-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="9" cy="7" r="4"></circle>
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                </svg>
+                                Мы с учениками
+                            </a></li>
+                            <li><a href="#faq">
+                                <svg class="dropdown-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                                </svg>
+                                FAQ
+                            </a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a href="#" class="nav-link">
+                            <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                            </svg>
+                            Всё по обучению <svg class="dropdown-arrow" width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M1 1.5L6 6.5L11 1.5" stroke="url(#arrowGradient3)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                                <defs>
+                                    <linearGradient id="arrowGradient3" x1="1" y1="1.5" x2="11" y2="1.5" gradientUnits="userSpaceOnUse">
+                                        <stop offset="0%" stop-color="#456F44"/>
+                                        <stop offset="100%" stop-color="#5a8f58"/>
+                                    </linearGradient>
+                                </defs>
+                            </svg>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#roadmap">
+                                <svg class="dropdown-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
+                                    <line x1="8" y1="2" x2="8" y2="18"></line>
+                                    <line x1="16" y1="6" x2="16" y2="22"></line>
+                                </svg>
+                                Крипто-карта
+                            </a></li>
+                            <li><a href="#learning-tips">
+                                <svg class="dropdown-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                                    <polyline points="10 9 9 9 8 9"></polyline>
+                                </svg>
+                                Фишки обучения
+                            </a></li>
+                            <li><a href="#pricing">
+                                <svg class="dropdown-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="12" y1="1" x2="12" y2="23"></line>
+                                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                                </svg>
+                                Тарифы обучения
+                            </a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#contact" class="nav-link">
+                            <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                            Контакты
+                        </a>
+                    </li>
+                </ul>
+                
+                <div class="mobile-menu-buttons">
+                    <a href="#start" class="btn btn-primary">Старт</a>
+                    <a href="https://t.me/apevault_ecosystem_bot" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">Напиши нам</a>
+                </div>
+            </nav>
+            
+            <div class="header-buttons">
+                <a href="#start" class="btn btn-primary">Старт</a>
+                <a href="https://t.me/apevault_ecosystem_bot" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">Напиши нам</a>
+            </div>
+            
+            <button class="mobile-menu-toggle" aria-label="Toggle menu">
+                <svg class="menu-icon" width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="6" width="20" height="2" rx="1" fill="currentColor"/>
+                    <rect x="4" y="13" width="20" height="2" rx="1" fill="currentColor"/>
+                    <rect x="4" y="20" width="20" height="2" rx="1" fill="currentColor"/>
+                </svg>
+            </button>
+        </div>
+        
+        <div class="mobile-menu-overlay"></div>
+    </header>
+
+    <main>
+        <section id="about" class="project-section">
+            <div class="project-container">
+                <div class="project-content">
+                    <div class="project-text-wrapper">
+                        <div class="project-intro-card">
+                            <h2 class="project-title">О проекте</h2>
+                            <p class="project-description">
+                                Сообщество криптоэнтузиастов, объединяющее знания, опыт и проверенные стратегии для безопасного входа в мир крипты
+                            </p>
+                        </div>
+                        
+                        <div class="project-mission-block project-mission-mobile-order">
+                            <div class="project-mission-decoration">
+                                <div class="project-mission-corner project-mission-corner-tl"></div>
+                                <div class="project-mission-corner project-mission-corner-tr"></div>
+                                <div class="project-mission-corner project-mission-corner-bl"></div>
+                                <div class="project-mission-corner project-mission-corner-br"></div>
+                            </div>
+                            <h3 class="project-mission-title">Наша миссия</h3>
+                            <p class="project-mission-lead">
+                                Создать продукт, где хаос крипторынка превращается в систему знаний, доверия и движения вперёд
+                            </p>
+                            <div class="project-mission-text">
+                                <p>
+                                    Крипторынок перегружен шумом, спамом и псевдоэкспертами. Новички теряются, а опытные трейдеры остаются в изоляции.
+                                </p>
+                                <p>
+                                    Мы создаём экосистему, где обучение, инсайды и капитал соединяются с чувством принадлежности. Наша цель — превратить крипту в пространство смысла, прозрачности и правильного азарта. Когда торговля становится игрой, обучение — приключением, а комьюнити — домом, рождается новая культура цифрового участия.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="project-image-wrapper project-image-mobile-order">
+                        <div class="project-image-placeholder">
+                            <svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect width="100" height="100" fill="rgba(69, 111, 68, 0.1)"/>
+                                <path d="M50 30 L65 50 L50 70 L35 50 Z" fill="rgba(90, 143, 88, 0.3)"/>
+                            </svg>
+                        </div>
+                    </div>
+                        </div>
+                    </div>
+                    
+            <!-- Крипто-декоративные элементы -->
+            <div class="crypto-decoration">
+                <div class="crypto-coin coin-1"></div>
+                <div class="crypto-coin coin-2"></div>
+            </div>
+        </section>
+        
+        <section id="we-are" class="about-section">
+            <div class="about-container">
+                <h2 class="about-title">В цифрах</h2>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                            </svg>
+                        </div>
+                        <div class="stat-number" data-target="50">0</div>
+                        <div class="stat-label">участников</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                            </svg>
+                        </div>
+                        <div class="stat-number" data-target="20">0</div>
+                        <div class="stat-label">кейс-стратегий</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                            </svg>
+                        </div>
+                        <div class="stat-number" data-target="100">0</div>
+                        <div class="stat-label">уроков и материалов</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                        </div>
+                        <div class="stat-number" data-target="2">0</div>
+                        <div class="stat-label">АМА-сессии в неделю</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="7" height="7"></rect>
+                                <rect x="14" y="3" width="7" height="7"></rect>
+                                <rect x="14" y="14" width="7" height="7"></rect>
+                                <rect x="3" y="14" width="7" height="7"></rect>
+                            </svg>
+                        </div>
+                        <div class="stat-number" data-target="3">0</div>
+                        <div class="stat-label">собственных продуктов для торговли и анализа</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                <path d="M12 11v6M12 17l-2-2 2-2"></path>
+                            </svg>
+                        </div>
+                        <div class="stat-number" data-target="8">0</div>
+                        <div class="stat-label">профессиональных коллеров и аналитиков</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Крипто-декоративные элементы -->
+            <div class="crypto-decoration">
+                <div class="crypto-coin coin-1"></div>
+                <div class="crypto-coin coin-2"></div>
+                <div class="crypto-coin coin-3"></div>
+                <div class="crypto-line line-1"></div>
+                <div class="crypto-line line-2"></div>
+            </div>
+        </section>
+        
+        <section id="values" class="values-section">
+            <div class="values-container">
+                <h2 class="values-title">Наши ценности</h2>
+                
+                <div class="values-features">
+                    <div class="project-feature-card">
+                        <div class="project-feature-icon-wrapper">
+                            <svg class="project-feature-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                                <path d="M2 17l10 5 10-5"></path>
+                                <path d="M2 12l10 5 10-5"></path>
+                            </svg>
+                        </div>
+                        <h3 class="project-feature-title">Единая экосистема</h3>
+                        <p class="project-feature-description">
+                            Все инструменты и сервисы объединены в одну платформу для максимального удобства
+                        </p>
+                        <div class="project-feature-glow"></div>
+                </div>
+                
+                    <div class="project-feature-card">
+                        <div class="project-feature-icon-wrapper">
+                            <svg class="project-feature-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                            </svg>
+                        </div>
+                        <h3 class="project-feature-title">Живое сообщество</h3>
+                        <p class="project-feature-description">
+                            Активное комьюнити, где всегда готовы помочь, разобрать ошибки и поделиться опытом
+                        </p>
+                        <div class="project-feature-glow"></div>
+                    </div>
+                    
+                    <div class="project-feature-card">
+                        <div class="project-feature-icon-wrapper">
+                            <svg class="project-feature-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                            </svg>
+                        </div>
+                        <h3 class="project-feature-title">Проверенные стратегии</h3>
+                        <p class="project-feature-description">
+                            Только реальные кейсы и методы, которые работают на практике в рынке, который сейчас
+                        </p>
+                        <div class="project-feature-glow"></div>
+                    </div>
+                    
+                    <div class="project-feature-card">
+                        <div class="project-feature-icon-wrapper">
+                            <svg class="project-feature-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="7" height="7"></rect>
+                                <rect x="14" y="3" width="7" height="7"></rect>
+                                <rect x="14" y="14" width="7" height="7"></rect>
+                                <rect x="3" y="14" width="7" height="7"></rect>
+                            </svg>
+                        </div>
+                        <h3 class="project-feature-title">Демо-торговля</h3>
+                        <p class="project-feature-description">
+                            Возможность пройти на демо-торговле буквально всё: от тренировок P2P до торговли мемкоинами, спотовыми и фьючерсными активами
+                        </p>
+                        <div class="project-feature-glow"></div>
+                    </div>
+                </div>
+                
+                <div class="values-education">
+                    <div class="values-education-header">
+                        <h3 class="values-education-title">Выбери свой путь в крипте: от базовых знаний до профессионального уровня</h3>
+                    </div>
+                    
+                    <div class="education-cards">
+                        <div class="education-card education-card-free">
+                            <div class="education-card-header">
+                                <div class="education-card-icon">
+                                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M5 12h14"></path>
+                                        <path d="M12 5l7 7-7 7"></path>
+                                    </svg>
+                                </div>
+                                <h4 class="education-card-title">Базовое обучение ApeVault</h4>
+                            </div>
+                            <p class="education-card-description">
+                                Мы понимаем, что не все могут здесь и сейчас оплатить обучение, поэтому даём доступ ко многим нашим сервисам и материалам буквально бесплатно.
+                            </p>
+                            <ul class="education-card-features">
+                                <li>
+                                    <svg class="feature-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <polyline points="12 6 12 12 16 14"></polyline>
+                                    </svg>
+                                    Информация для понимания рынка: что это, почему именно сейчас, о блокчейне и многом другом
+                                </li>
+                                <li>
+                                    <svg class="feature-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="12" y1="20" x2="12" y2="4"></line>
+                                        <path d="M5 12h14"></path>
+                                        <path d="M12 5l7 7-7 7"></path>
+                                    </svg>
+                                    Метрики, фильтры и рекомендации
+                                </li>
+                                <li>
+                                    <svg class="feature-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                                        <line x1="12" y1="9" x2="12" y2="13"></line>
+                                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                                    </svg>
+                                    Общее понимание рисков, опасностей и нюансов
+                                </li>
+                                <li>
+                                    <svg class="feature-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="9" cy="7" r="4"></circle>
+                                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                    </svg>
+                                    Наработка опыта самостоятельно
+                                </li>
+                                <li>
+                                    <svg class="feature-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                                    </svg>
+                                    Эксклюзивные скидки на платное обучение для выпускников базового курса
+                                </li>
+                                <li>
+                                    <svg class="feature-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                                    </svg>
+                                    Еженедельная поддержка экспертов: возможность задать 3 вопроса в неделю и получить персональные рекомендации
+                                </li>
+                            </ul>
+                            <a href="#education-free" class="education-card-button education-card-button-free">
+                                Education ApeVault (Базовое)
+                            </a>
+                        </div>
+                        
+                        <div class="education-card education-card-paid">
+                            <div class="education-card-header">
+                                <div class="education-card-icon">
+                                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                                        <path d="M2 17l10 5 10-5"></path>
+                                        <path d="M2 12l10 5 10-5"></path>
+                                    </svg>
+                                </div>
+                                <h4 class="education-card-title">Академия ApeVault+</h4>
+                            </div>
+                            <p class="education-card-description">
+                                Полностью продукт, который охватывает все более подробно с расширенными возможностями и поддержкой.
+                            </p>
+                            <ul class="education-card-features">
+                                <li>
+                                    <svg class="feature-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                                    </svg>
+                                    Больше модулей и уроков, постоянная практика
+                                </li>
+                                <li>
+                                    <svg class="feature-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="9" cy="7" r="4"></circle>
+                                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                    </svg>
+                                    Консультации с юристом и финансовым аналитиком
+                                </li>
+                                <li>
+                                    <svg class="feature-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <polyline points="12 6 12 12 16 14"></polyline>
+                                    </svg>
+                                    Постоянные AMA-сессии
+                                </li>
+                                <li>
+                                    <svg class="feature-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                                        <line x1="1" y1="10" x2="23" y2="10"></line>
+                                    </svg>
+                                    Программа резервного пула
+                                </li>
+                                <li>
+                                    <svg class="feature-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="12" y1="1" x2="12" y2="23"></line>
+                                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                                    </svg>
+                                    Сумма для обучения без обязательства возврата
+                                </li>
+                                <li>
+                                    <svg class="feature-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                                    </svg>
+                                    Пониженные комиссии на сервисы
+                                </li>
+                                <li>
+                                    <svg class="feature-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="9" cy="7" r="4"></circle>
+                                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                    </svg>
+                                    Личный куратор на время обучения + 3 месяца после
+                                </li>
+                                <li>
+                                    <svg class="feature-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="8.5" cy="7" r="4"></circle>
+                                        <path d="M20 8v6M23 11h-6"></path>
+                                    </svg>
+                                    Реферальная программа
+                                </li>
+                                <li>
+                                    <svg class="feature-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="9" cy="7" r="4"></circle>
+                                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                        <path d="M12 11v6M12 17l-2-2 2-2"></path>
+                                    </svg>
+                                    Возможность стать коллером и вступить в команду ApeVault
+                                </li>
+                            </ul>
+                            <a href="#education-plus" class="education-card-button education-card-button-paid">
+                                Education ApeVault+
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="values-education-footer">
+                        <p class="values-education-footer-text">
+                            Ты получаешь не просто теорию, но и практику – конкретные инструкции, обоснованные коллы, живые эфиры с экспертами «здесь и сейчас», совместную торговлю, живое обсуждение рынка и сообщество, где всегда готовы помочь.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Крипто-декоративные элементы -->
+            <div class="crypto-decoration">
+                <div class="crypto-coin coin-1"></div>
+                <div class="crypto-coin coin-3"></div>
+            </div>
+        </section>
+        
+        <section id="community" class="community-section">
+            <div class="community-container">
+                <h2 class="community-title">Наше комьюнити</h2>
+                
+                <div class="community-grid">
+                    <div class="community-card">
+                        <div class="community-card-icon">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                                <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                            </svg>
+                        </div>
+                        <h3 class="community-card-title">Зачем мы это сделали</h3>
+                        <p class="community-card-text">
+                            Создать пространство, где криптовалюта становится понятной и даёт реальную пользу каждому участнику - от новичка до профи
+                        </p>
+                    </div>
+                    
+                    <div class="community-card">
+                        <div class="community-card-icon">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                            </svg>
+                        </div>
+                        <h3 class="community-card-title">Кто мы</h3>
+                        <p class="community-card-text">
+                            Команда практиков: трейдеры, инвесторы, коллеры, аналитики и энтузиасты сферы криптовалюты, которые делятся опытом и инструментами
+                        </p>
+                    </div>
+                    
+                    <div class="community-card">
+                        <div class="community-card-icon">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="7" height="7"></rect>
+                                <rect x="14" y="3" width="7" height="7"></rect>
+                                <rect x="14" y="14" width="7" height="7"></rect>
+                                <rect x="3" y="14" width="7" height="7"></rect>
+                            </svg>
+                        </div>
+                        <h3 class="community-card-title">Наши проекты</h3>
+                        <p class="community-card-text">
+                            Обучающие кейсы, стратегии, безопасные гайды и комьюнити-ивенты для участников, а ещё - собственная платформа для торговли, аналитики, разные полезные боты и платформа для обучения
+                        </p>
+                    </div>
+                    
+                    <div class="community-card">
+                        <div class="community-card-icon">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                            </svg>
+                        </div>
+                        <h3 class="community-card-title">Активности</h3>
+                        <p class="community-card-text">
+                            Вебинары, челленджи, турниры и AMA-сессии с экспертами — участвуй и развивайся вместе с комьюнити
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Крипто-декоративные элементы -->
+            <div class="crypto-decoration">
+                <div class="crypto-coin coin-1"></div>
+                <div class="crypto-coin coin-2"></div>
+                <div class="crypto-coin coin-3"></div>
+                <div class="crypto-line line-1"></div>
+                <div class="crypto-line line-2"></div>
+            </div>
+        </section>
+        
+        <!-- Team Section -->
+        <section id="team" class="team-section">
+            <div class="team-container">
+                <h2 class="team-title">Наша команда</h2>
+                <p class="team-subtitle">Люди, которые создают и развивают ApeVault</p>
+
+                <div class="team-grid">
+                    <!-- Ксения -->
+                    <div class="team-card team-card-gold">
+                        <div class="team-decorations">
+                            <div class="decor-icon decor-icon-1">★</div>
+                            <div class="decor-icon decor-icon-2">●</div>
+                            <div class="decor-icon decor-icon-3">◆</div>
+                        </div>
+                        <div class="team-photo">
+                            <img src="kseniya.jpg5" alt="Ксения">
+                        </div>
+                        <h3 class="team-name team-name-gold">Ксения</h3>
+                        <ul class="team-description-list">
+                            <li>
+                                <svg class="team-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"></path>
+                                </svg>
+                                <span>Основательница проекта</span>
+                            </li>
+                            <li>
+                                <svg class="team-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="22 6 13.5 15.5 8.5 10.5 2 17"></polyline>
+                                    <polyline points="16 6 22 6 22 12"></polyline>
+                                </svg>
+                                <span>Эксперт в спотовой и фьючерсной торговле</span>
+                            </li>
+                            <li>
+                                <svg class="team-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                                </svg>
+                                <span>Эксперт в сфере арбитража</span>
+                            </li>
+                            <li>
+                                <svg class="team-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                                </svg>
+                                <span>Коллер Ultima</span>
+                            </li>
+            </ul>
+    </div>
+    
+                    <!-- Артём -->
+                    <div class="team-card team-card-green">
+                        <div class="team-decorations">
+                            <div class="decor-icon decor-icon-1">★</div>
+                            <div class="decor-icon decor-icon-2">●</div>
+                            <div class="decor-icon decor-icon-3">◆</div>
+                        </div>
+                        <div class="team-photo">
+                            <img src="artem.jpg5" alt="Артём">
+            </div>
+                        <h3 class="team-name team-name-green">Артём</h3>
+                        <ul class="team-description-list">
+                            <li>
+                                <svg class="team-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"></path>
+                                </svg>
+                                <span>Основатель проекта</span>
+                            </li>
+                            <li>
+                                <svg class="team-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="16 18 22 12 16 6"></polyline>
+                                    <polyline points="8 6 2 12 8 18"></polyline>
+                                </svg>
+                                <span>Разработчик и координатор обучения</span>
+                            </li>
+                            <li>
+                                <svg class="team-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="22 6 13.5 15.5 8.5 10.5 2 17"></polyline>
+                                    <polyline points="16 6 22 6 22 12"></polyline>
+                                </svg>
+                                <span>Эксперт по торговле мемкоинами, TG-маркетплейсу и спотовой торговле</span>
+                            </li>
+                            <li>
+                                <svg class="team-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                                </svg>
+                                <span>Коллер Ultima</span>
+                            </li>
+                        </ul>
+    </div>
+    
+                    <!-- Ольга -->
+                    <div class="team-card team-card-purple">
+                        <div class="team-decorations">
+                            <div class="decor-icon decor-icon-1">◆</div>
+                            <div class="decor-icon decor-icon-2">●</div>
+                            <div class="decor-icon decor-icon-3">★</div>
+                        </div>
+                        <div class="team-photo">
+                            <img src="olga.jpg5" alt="Ольга">
+                        </div>
+                        <h3 class="team-name team-name-purple">Ольга</h3>
+                        <ul class="team-description-list">
+                            <li>
+                                <svg class="team-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"></path>
+                                </svg>
+                                <span>Основательница проекта</span>
+                </li>
+                <li>
+                                <svg class="team-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="3" width="7" height="7"></rect>
+                                    <rect x="14" y="3" width="7" height="7"></rect>
+                                    <rect x="14" y="14" width="7" height="7"></rect>
+                                    <rect x="3" y="14" width="7" height="7"></rect>
+                                </svg>
+                                <span>Эксперт по фьючерсной и NFT торговле</span>
+                </li>
+                <li>
+                                <svg class="team-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <path d="M12 6v6l4 2"></path>
+                                </svg>
+                                <span>Эксперт в DeFi</span>
+                            </li>
+                            <li>
+                                <svg class="team-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                                </svg>
+                                <span>Коллер Ultima</span>
+                </li>
+            </ul>
+                    </div>
+        </div>
+    </div>
+    
+            <!-- Крипто-декоративные элементы -->
+            <div class="crypto-decoration">
+                <div class="crypto-coin coin-1"></div>
+                <div class="crypto-coin coin-2"></div>
+                <div class="crypto-coin coin-3"></div>
+            </div>
+        </section>
+        
+        <section id="wallets" class="wallets-section">
+            <div class="wallets-container">
+                <h2 class="wallets-title">Наши кошельки</h2>
+                <p class="wallets-subtitle">Ты можешь проверить нашу честность и доходность</p>
+
+                <div class="wallets-categories-grid">
+                    <!-- Карточка 1: Наши кошельки по мемкоинам (SOL) -->
+                    <div class="wallet-category-card">
+                        <h3 class="wallet-category-title">Наши кошельки по мемкоинам (SOL)</h3>
+                        <div class="wallets-grid">
+                            <div class="wallet-item" onclick="copyWallet('FrNUmnQitcFcQMhHjf5P5ApsQzcPYJJRfWqSpfMYuGiL', this)">
+                                <div class="wallet-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M21 12V7H5a2 2 0 0 1 2-2h7v5"></path>
+                                        <path d="M3 5v14a2 2 0 0 0 2 2h16v-5"></path>
+                                        <path d="M18 12a2 2 0 0 0 0 4h4v-4Z"></path>
+                                    </svg>
+                                </div>
+                                <div class="wallet-text">
+                                    <strong>Артём</strong>
+                                    <span class="wallet-address" title="FrNUmnQitcFcQMhHjf5P5ApsQzcPYJJRfWqSpfMYuGiL">FrNUmn...GiL</span>
+                                </div>
+                                <button class="copy-btn" title="Скопировать">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                    </svg>
+                                </button>
+                                <span class="copy-popup">скопировано</span>
+                            </div>
+
+                            <div class="wallet-item" onclick="copyWallet('FXB9hydZNnrRAyTT2U99JnhPxj2F4Toth7w6u2FC3dqe', this)">
+                                <div class="wallet-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M21 12V7H5a2 2 0 0 1 2-2h7v5"></path>
+                                        <path d="M3 5v14a2 2 0 0 0 2 2h16v-5"></path>
+                                        <path d="M18 12a2 2 0 0 0 0 4h4v-4Z"></path>
+                                    </svg>
+                                </div>
+                                <div class="wallet-text">
+                                    <strong>Ольга</strong>
+                                    <span class="wallet-address" title="FXB9hydZNnrRAyTT2U99JnhPxj2F4Toth7w6u2FC3dqe">FXB9hy...dqe</span>
+                                </div>
+                                <button class="copy-btn" title="Скопировать">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                    </svg>
+                                </button>
+                                <span class="copy-popup">скопировано</span>
+                            </div>
+
+                            <div class="wallet-item" onclick="copyWallet('6D1pgmz2hHLhgNTrhfTidQTRfvrJBtB1Rr1ZMzett4bi', this)">
+                                <div class="wallet-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M21 12V7H5a2 2 0 0 1 2-2h7v5"></path>
+                                        <path d="M3 5v14a2 2 0 0 0 2 2h16v-5"></path>
+                                        <path d="M18 12a2 2 0 0 0 0 4h4v-4Z"></path>
+                                    </svg>
+                                </div>
+                                <div class="wallet-text">
+                                    <strong>Ксения</strong>
+                                    <span class="wallet-address" title="6D1pgmz2hHLhgNTrhfTidQTRfvrJBtB1Rr1ZMzett4bi">6D1pgm...4bi</span>
+                                </div>
+                                <button class="copy-btn" title="Скопировать">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                    </svg>
+                                </button>
+                                <span class="copy-popup">скопировано</span>
+                            </div>
+
+                            <div class="wallet-item" onclick="copyWallet('nrKoADDJMMPrZ72B4KCbjg4uzNQCqwDWcCKCFuAe6KP', this)">
+                                <div class="wallet-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M21 12V7H5a2 2 0 0 1 2-2h7v5"></path>
+                                        <path d="M3 5v14a2 2 0 0 0 2 2h16v-5"></path>
+                                        <path d="M18 12a2 2 0 0 0 0 4h4v-4Z"></path>
+                                    </svg>
+                                </div>
+                                <div class="wallet-text">
+                                    <strong>Адель</strong>
+                                    <span class="wallet-address" title="nrKoADDJMMPrZ72B4KCbjg4uzNQCqwDWcCKCFuAe6KP">nrKoAD...6KP</span>
+                                </div>
+                                <button class="copy-btn" title="Скопировать">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                    </svg>
+                                </button>
+                                <span class="copy-popup">скопировано</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Карточка 2: Наши аккаунты на бирже Bingix -->
+                    <div class="wallet-category-card">
+                        <h3 class="wallet-category-title">Наши аккаунты на бирже BingX</h3>
+                        <div class="wallets-grid">
+                            <!-- Здесь можно добавить аккаунты Bingix -->
+                        </div>
+                    </div>
+
+                    <!-- Карточка 3: Наши аккаунты на PolyMarket -->
+                    <div class="wallet-category-card">
+                        <h3 class="wallet-category-title">Наши аккаунты на PolyMarket</h3>
+                        <div class="wallets-grid">
+                            <!-- Здесь можно добавить аккаунты PolyMarket -->
+                        </div>
+                    </div>
+
+                    <!-- Карточка 4: Наши аккаунты на OpenSea -->
+                    <div class="wallet-category-card">
+                        <h3 class="wallet-category-title">Наши аккаунты на OpenSea</h3>
+                        <div class="wallets-grid">
+                            <!-- Здесь можно добавить аккаунты OpenSea -->
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            
+            <!-- Крипто-декоративные элементы -->
+            <div class="crypto-decoration">
+                <div class="crypto-coin coin-1"></div>
+                <div class="crypto-coin coin-2"></div>
+                <div class="crypto-coin coin-3"></div>
+            </div>
+        </section>
+        
+        <section id="products" class="products-section">
+            <div class="products-container">
+                <h2 class="products-title">Наши продукты</h2>
+                <p class="products-subtitle">Для тех, кто уже прошёл обучение или понимает, как работает рынок</p>
+
+                <div class="product-grid">
+                    <div class="product-card">
+                        <div class="product-number">01</div>
+                        <h3 class="product-name">Бот с новостями</h3>
+                        <p class="product-desc">Следи за ключевыми инсайтами и событиями рынка в реальном времени</p>
+                        <div class="price-options">
+                            <button class="plan" data-price="299" data-period="1">1 мес — 299₽</button>
+                            <button class="plan" data-price="799" data-period="3">3 мес — 799₽</button>
+                            <button class="plan" data-price="1399" data-period="6">6 мес — 1 399₽</button>
+                        </div>
+                        <button class="select-btn">Выбрать</button>
+                    </div>
+
+                    <div class="product-card">
+                        <div class="product-number">02</div>
+                        <h3 class="product-name">Бот с сигналами</h3>
+                        <p class="product-desc">Получай торговые сигналы и точки входа по мемкоинам по нашим фильтрам</p>
+                        <div class="price-options">
+                            <button class="plan" data-price="299" data-period="1">1 мес — 299₽</button>
+                            <button class="plan" data-price="799" data-period="3">3 мес — 799₽</button>
+                            <button class="plan" data-price="1399" data-period="6">6 мес — 1 399₽</button>
+                        </div>
+                        <button class="select-btn">Выбрать</button>
+                    </div>
+
+                    <div class="product-card">
+                        <div class="product-number">03</div>
+                        <h3 class="product-name">Модули обучения</h3>
+                        <p class="product-desc">Выбери необходимое количество модулей для полноценного обучения</p>
+                        <div class="price-options">
+                            <button class="plan" data-price="4690" data-modules="1">1 — 4 690₽</button>
+                            <button class="plan" data-price="7690" data-modules="2">2 — 7 690₽</button>
+                            <button class="plan" data-price="12690" data-modules="3">3 — 12 690₽</button>
+                        </div>
+                        <button class="select-btn">Выбрать</button>
+                    </div>
+
+                    <div class="product-card">
+                        <div class="product-number">04</div>
+                        <h3 class="product-name">Разбор твоих сделок</h3>
+                        <p class="product-desc">Анализ твоих сделок в созвоне с профессиональным трейдером или спикером сообщества</p>
+                        <div class="price-options">
+                            <button class="plan" data-price="1790" data-deals="10">10 — 1 790₽</button>
+                            <button class="plan" data-price="2790" data-deals="20">20 — 2 790₽</button>
+                            <button class="plan" data-price="4790" data-deals="30">30 — 4 790₽</button>
+                        </div>
+                        <button class="select-btn">Выбрать</button>
+                    </div>
+
+                    <div class="product-card">
+                        <div class="product-number">05</div>
+                        <h3 class="product-name">Резервный пул сообщества</h3>
+                        <p class="product-desc">Минимальное участие — 5 000₽ в месяц. Защищай свой депозит, получай поддержку в случае ошибок и помогай сообществу</p>
+                        <div class="price-single">от 5 000₽ / мес</div>
+                        <button class="select-btn">Выбрать</button>
+                    </div>
+
+                    <div class="product-card">
+                        <div class="product-number">06</div>
+                        <h3 class="product-name">Доступ к чату с опытными трейдерами</h3>
+                        <p class="product-desc">Сигналы, аналитика, совместные созвоны и общение с опытными трейдерами и основателями ApeVault</p>
+                        <div class="price-single">7 990₽ / мес</div>
+                        <button class="select-btn">Выбрать</button>
+                    </div>
+
+                    <div class="product-card">
+                        <div class="product-number">07</div>
+                        <h3 class="product-name">Участие в AMA-сессии</h3>
+                        <p class="product-desc">Эксклюзивные эфиры с инсайтами, живая торговля, стратегиями и ответами от основателей проекта и топовых трейдеров сообщества</p>
+                        <div class="price-single">1 990₽</div>
+                        <button class="select-btn">Выбрать</button>
+                    </div>
+
+                    <div class="product-card">
+                        <div class="product-number">08</div>
+                        <h3 class="product-name">Сборка / анализ портфеля</h3>
+                        <p class="product-desc">Индивидуальный анализ и стратегия под твои цели, риск-профиль и активы</p>
+                        <div class="price-single">15 000₽</div>
+                        <button class="select-btn">Выбрать</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Крипто-декоративные элементы -->
+            <div class="crypto-decoration">
+                <div class="crypto-coin coin-1"></div>
+                <div class="crypto-coin coin-2"></div>
+                <div class="crypto-coin coin-3"></div>
+            </div>
+        </section>
+        
+        <section id="students" class="students-section">
+            <div class="students-container">
+                <h2 class="students-title">Мы с учениками</h2>
+                <p class="students-subtitle">Настоящее сообщество трейдеров — вместе растём, учимся и делимся опытом</p>
+
+                <div class="carousel">
+                    <div class="carousel-row">
+                        <img src="images/student1.jpg" alt="ученики">
+                        <img src="images/student2.jpg" alt="ученики">
+                        <img src="images/student3.jpg" alt="ученики">
+                        <img src="images/student4.jpg" alt="ученики">
+                        <img src="images/student5.jpg" alt="ученики">
+                        <img src="images/student6.jpg" alt="ученики">
+                        <!-- Дублируем для бесшовной анимации -->
+                        <img src="images/student1.jpg" alt="ученики">
+                        <img src="images/student2.jpg" alt="ученики">
+                        <img src="images/student3.jpg" alt="ученики">
+                        <img src="images/student4.jpg" alt="ученики">
+                        <img src="images/student5.jpg" alt="ученики">
+                        <img src="images/student6.jpg" alt="ученики">
+                    </div>
+                    <div class="carousel-row reverse">
+                        <img src="images/student7.jpg" alt="ученики">
+                        <img src="images/student8.jpg" alt="ученики">
+                        <img src="images/student9.jpg" alt="ученики">
+                        <img src="images/student10.jpg" alt="ученики">
+                        <img src="images/student11.jpg" alt="ученики">
+                        <img src="images/student12.jpg" alt="ученики">
+                        <!-- Дублируем для бесшовной анимации -->
+                        <img src="images/student7.jpg" alt="ученики">
+                        <img src="images/student8.jpg" alt="ученики">
+                        <img src="images/student9.jpg" alt="ученики">
+                        <img src="images/student10.jpg" alt="ученики">
+                        <img src="images/student11.jpg" alt="ученики">
+                        <img src="images/student12.jpg" alt="ученики">
+                    </div>
+                    <div class="carousel-row">
+                        <img src="images/student13.jpg" alt="ученики">
+                        <img src="images/student14.jpg" alt="ученики">
+                        <img src="images/student15.jpg" alt="ученики">
+                        <img src="images/student16.jpg" alt="ученики">
+                        <img src="images/student17.jpg" alt="ученики">
+                        <img src="images/student18.jpg" alt="ученики">
+                        <!-- Дублируем для бесшовной анимации -->
+                        <img src="images/student13.jpg" alt="ученики">
+                        <img src="images/student14.jpg" alt="ученики">
+                        <img src="images/student15.jpg" alt="ученики">
+                        <img src="images/student16.jpg" alt="ученики">
+                        <img src="images/student17.jpg" alt="ученики">
+                        <img src="images/student18.jpg" alt="ученики">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Крипто-декоративные элементы -->
+            <div class="crypto-decoration">
+                <div class="crypto-coin coin-1"></div>
+                <div class="crypto-coin coin-2"></div>
+                <div class="crypto-coin coin-3"></div>
+            </div>
+        </section>
+        
+        <section id="learning-features" class="learning-features-section">
+            <div class="features-container">
+                <h2 class="features-title">Фишки обучения</h2>
+                <p class="features-subtitle">Наш курс построен так, чтобы ты не просто читал теорию, а сразу внедрял знания в практику. Мы собрали инструменты, поддержку комьюнити и практику, чтобы твой путь в крипте был максимально эффективным</p>
+
+                <div class="features-grid">
+                    <div class="feature-card left">
+                        <div class="learning-feature-icon">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 2C8.13 2 5 5.13 5 9C5 14.25 12 22 12 22C12 22 19 14.25 19 9C19 5.13 15.87 2 12 2ZM12 11.5C10.62 11.5 9.5 10.38 9.5 9C9.5 7.62 10.62 6.5 12 6.5C13.38 6.5 14.5 7.62 14.5 9C14.5 10.38 13.38 11.5 12 11.5Z"/>
+                            </svg>
+                        </div>
+                        <h3 class="feature-name">Боты с сигналами и новостями</h3>
+                        <p class="feature-desc">Доступ к ботам с сигналами и новостям на период обучения без дополнительной платы</p>
+                    </div>
+
+                    <div class="feature-card right">
+                        <div class="learning-feature-icon">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="4" y="4" width="16" height="16" rx="2"/>
+                                <rect x="6" y="6" width="12" height="12" rx="1"/>
+                                <rect x="8" y="8" width="8" height="8" rx="1"/>
+                            </svg>
+                        </div>
+                        <h3 class="feature-name">Мониторинг кошельков</h3>
+                        <p class="feature-desc">Доступ к боту с мониторингом кошельков и профилей в X на период обучения</p>
+                    </div>
+
+                    <div class="feature-card left">
+                        <div class="learning-feature-icon">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 3L2 12H5V20H10V14H14V20H19V12H22L12 3Z"/>
+                            </svg>
+                        </div>
+                        <h3 class="feature-name">Комиссия в торговом терминале</h3>
+                        <p class="feature-desc">0.4% за транзакцию на период обучения; Elite — 12 месяцев, далее 0.8%</p>
+                    </div>
+
+                    <div class="feature-card right">
+                        <div class="learning-feature-icon">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                                <rect x="5" y="5" width="14" height="14" rx="1"/>
+                                <line x1="7" y1="7" x2="9" y2="17"/>
+                                <line x1="11" y1="7" x2="13" y2="17"/>
+                                <line x1="15" y1="7" x2="17" y2="17"/>
+                            </svg>
+                        </div>
+                        <h3 class="feature-name">Практика</h3>
+                        <p class="feature-desc">Все модули курса заточены на реальную практику: ты сразу пробуешь на деле то, о чём говорим, а еще имеешь возможность проводить многие операции на демо-счетах, без рисков потерь</p>
+                    </div>
+
+                    <div class="feature-card left">
+                        <div class="learning-feature-icon">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                                <rect x="5" y="5" width="14" height="14" rx="1"/>
+                            </svg>
+                        </div>
+                        <h3 class="feature-name">Единая программа</h3>
+                        <p class="feature-desc">От базы по покупке и продаже крипты до спота, фьючерсов и DeFi, от мемкоинов до NFT — весь мир крипты в одном курсе</p>
+                    </div>
+
+                    <div class="feature-card right">
+                        <div class="learning-feature-icon">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="4" y="4" width="16" height="16" rx="2"/>
+                                <rect x="6" y="6" width="12" height="12" rx="1"/>
+                                <rect x="8" y="8" width="8" height="8" rx="1"/>
+                            </svg>
+                        </div>
+                        <h3 class="feature-name">Гибкость по модулям</h3>
+                        <p class="feature-desc">Можно взять отдельный модуль или несколько модулей и изучить именно нужное тебе</p>
+                    </div>
+
+                    <div class="feature-card left">
+                        <div class="learning-feature-icon">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="8" r="4"/>
+                                <path d="M4 20C4 16 8 14 12 14C16 14 20 16 20 20"/>
+                            </svg>
+                        </div>
+                        <h3 class="feature-name">Личный куратор</h3>
+                        <p class="feature-desc">За каждым учеником закрепляется наставник, помогает по программе и разбирает ошибки</p>
+                    </div>
+
+                    <div class="feature-card right">
+                        <div class="learning-feature-icon">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 2L2 7L12 12L22 7L12 2ZM12 13L2 8V17H22V8L12 13Z"/>
+                            </svg>
+                        </div>
+                        <h3 class="feature-name">Выпускной</h3>
+                        <p class="feature-desc">Финальное мероприятие курса с награждением и общением с комьюнити</p>
+                    </div>
+
+                    <div class="feature-card left feature-pool">
+                        <div class="learning-feature-icon">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <line x1="12" y1="6" x2="12" y2="12"/>
+                                <line x1="12" y1="16" x2="12.01" y2="16"/>
+                            </svg>
+                        </div>
+                        <h3 class="feature-name">Резервный пул</h3>
+                        <p class="feature-desc">Право участвовать в резервном пуле для защиты вложений участников через систему компенсации</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Крипто-декоративные элементы -->
+            <div class="crypto-decoration">
+                <div class="crypto-coin coin-1"></div>
+                <div class="crypto-coin coin-2"></div>
+                <div class="crypto-coin coin-3"></div>
+            </div>
+        </section>
+        
+        <section id="roadmap" class="roadmap-section">
+            <div class="roadmap-container">
+                <h2 class="roadmap-title">Крипто-карта</h2>
+                <p class="roadmap-subtitle">От новичка до мастера DeFi и трейдинга — 16 модулей, пошаговая карта обучения</p>
+
+                <!-- Сноска -->
+                <div class="roadmap-note-card">
+                    <strong>Важно:</strong> программа не отражает все уроки, практику и вебинары. Домашние задания и дополнительные темы обсуждаются по факту обучения с участниками потока.
+                </div>
+
+                <div class="roadmap">
+                    <!-- Линия -->
+                    <div class="roadmap-line"></div>
+
+                    <!-- Модули -->
+                    <!-- 1-4: зеленые -->
+                    <div class="roadmap-module roadmap-module-green">
+                        <div class="roadmap-marker roadmap-marker-green"></div>
+                        <div class="roadmap-module-icon"><i class="fa-solid fa-flag"></i></div>
+                        <div class="roadmap-module-header">Модуль 1: Начало твоего пути</div>
+                        <p class="roadmap-module-desc">В рамках этого модуля мы объясним, как устроен курс, кто его ведёт, что ты получишь, как всё работает и чего ожидать. Познакомим со спикерами, экосистемой и программой, дадим советы новичкам и разберём частые страхи перед стартом, а еще ответим на вопросы, которые интересны, но их страшно задавать</p>
+                        <button class="roadmap-toggle-lessons roadmap-toggle-green">Показать уроки</button>
+                        <ul class="roadmap-lessons">
+                            <li>Знакомство со спикерами и программой курса</li>
+                            <li>Знакомство с экосистемой</li>
+                            <li>FAQ</li>
+                        </ul>
+                    </div>
+
+                    <div class="roadmap-module roadmap-module-green">
+                        <div class="roadmap-marker roadmap-marker-green"></div>
+                        <div class="roadmap-module-icon"><i class="fa-solid fa-coins"></i></div>
+                        <div class="roadmap-module-header">Модуль 2: Введение в крипту</div>
+                        <p class="roadmap-module-desc">В рамках этого модуля мы научим понимать, что такое криптовалюта, зачем она нужна и как начать с нуля. Разберём базовые понятия, способы покупки и продажи, основы риск-менеджмента и построения инвестиционной стратегии, для тех, кто имеет в тарифе услуга по комплектованию портфеля, соберем индивидуально портфель</p>
+                        <button class="roadmap-toggle-lessons roadmap-toggle-green">Показать уроки</button>
+                        <ul class="roadmap-lessons">
+                            <li>Личные цели и маршрут</li>
+                            <li>Криптовалюта: основы основ</li>
+                            <li>Как покупать и продавать криптовалюту</li>
+                            <li>Как выбрать свой путь и стратегию, как собирать портфель</li>
+                            <li>Заводим свои первые кошельки</li>
+                            <li>Риск и мани-менеджмент</li>
+                            <li>Основы безопасности в криптовалюте</li>
+                            <li>Биржевые кошельки</li>
+                        </ul>
+                    </div>
+
+                    <div class="roadmap-module roadmap-module-green">
+                        <div class="roadmap-marker roadmap-marker-green"></div>
+                        <div class="roadmap-module-icon"><i class="fa-solid fa-shield-halved"></i></div>
+                        <div class="roadmap-module-header">Модуль 3: Безопасность операций с криптовалютой</div>
+                        <p class="roadmap-module-desc">Мы покажем, как защищать свои средства и личные данные, как распознавать и избегать мошеннические схемы. Также ты узнаешь о рисках разных видов кошельков, получишь рекомендации по тем, которыми мы сами пользуемся, и научишься работать с ними на практике. Кроме того, мы подробно разберём, какие опасности подстерегают в разных стратегиях и способах торговли, и покажем реальные схемы мошенничества, чтобы ты всегда оставался на шаг впереди</p>
+                        <button class="roadmap-toggle-lessons roadmap-toggle-green">Показать уроки</button>
+                        <ul class="roadmap-lessons">
+                            <li>Основы безопасности в криптовалюте</li>
+                            <li>Биржевые кошельки</li>
+                            <li>Горячие кошельки</li>
+                            <li>Холодные кошельки</li>
+                            <li>Безопасность при совершении P2P-транзакций</li>
+                            <li>Безопасность при совершении NFT-транзакций</li>
+                            <li>Безопасность при совершении спотовых и фьючерсных-транзакций</li>
+                            <li>Безопасность при стейкинге</li>
+                            <li>Безопасность AirDrop</li>
+                            <li>Безопасность при совершении сделок с мемкоинами</li>
+                            <li>Безопасность при совершении сделок с цифровыми активами Telegram</li>
+                            <li>Безопасность при совершении сделок от новостей и сигналов</li>
+                        </ul>
+                    </div>
+
+                    <div class="roadmap-module roadmap-module-green">
+                        <div class="roadmap-marker roadmap-marker-green"></div>
+                        <div class="roadmap-module-icon"><i class="fa-solid fa-building-columns"></i></div>
+                        <div class="roadmap-module-header">Модуль 4: Все по биржам</div>
+                        <p class="roadmap-module-desc">В рамках этого модуля мы объясним, как работают криптобиржи, сравним их, чем отличаются централизованные (CEX) и децентрализованные (DEX), как пользоваться ими на практике, где торгуются NFT, что такое DEX-мониторы и как ими пользоваться для нахождения перспективных активов (токенов)</p>
+                        <button class="roadmap-toggle-lessons roadmap-toggle-green">Показать уроки</button>
+                        <ul class="roadmap-lessons">
+                            <li>Основа основ</li>
+                            <li>CEX-биржа</li>
+                            <li>DEX-биржа</li>
+                            <li>DEX-мониторы</li>
+                            <li>Launchpads и IDO-платформы</li>
+                            <li>Биржи для NFT</li>
+                            <li>Блокчейн-сканеры</li>
+                            <li>Биржа внутри Telegram</li>
+                        </ul>
+                    </div>
+
+                    <!-- 5-6: зеленые -->
+                    <div class="roadmap-module roadmap-module-green">
+                        <div class="roadmap-marker roadmap-marker-green"></div>
+                        <div class="roadmap-module-icon"><i class="fa-solid fa-chart-line"></i></div>
+                        <div class="roadmap-module-header">Модуль 5: Фундаментальный анализ</div>
+                        <p class="roadmap-module-desc">В рамках этого модуля мы объясним, как разбираться в проектах до инвестирования: оценивать токеномику, команду, рынок и ключевые метрики. Научим видеть настоящую ценность монеты, а не следовать за хайпом</p>
+                        <button class="roadmap-toggle-lessons roadmap-toggle-green">Показать уроки</button>
+                        <ul class="roadmap-lessons">
+                            <li>Что такое ФА и почему это важно</li>
+                            <li>Ключевые метрики</li>
+                            <li>Токеномика и модель проекта</li>
+                            <li>Финансовые показатели криптопроекта</li>
+                            <li>Команда и инвесторы</li>
+                            <li>Рынок и конкуренты</li>
+                            <li>Сентимент и новости</li>
+                            <li>Анализ дорожной карты (Roadmap) и выполнение обещаний</li>
+                        </ul>
+                    </div>
+
+                    <div class="roadmap-module roadmap-module-green">
+                        <div class="roadmap-marker roadmap-marker-green"></div>
+                        <div class="roadmap-module-icon"><i class="fa-solid fa-chart-area"></i></div>
+                        <div class="roadmap-module-header">Модуль 6: Технический анализ</div>
+                        <p class="roadmap-module-desc">В рамках этого модуля мы научим читать графики, понимать тренды и паттерны, использовать индикаторы, выстраивать торговые стратегии и избегать типичных ошибок трейдеров</p>
+                        <button class="roadmap-toggle-lessons roadmap-toggle-green">Показать уроки</button>
+                        <ul class="roadmap-lessons">
+                            <li>Введение в технический анализ</li>
+                            <li>Тренды и линии поддержки/сопротивления</li>
+                            <li>Фигуры технического анализа</li>
+                            <li>Индикаторы и осцилляторы, инструменты</li>
+                            <li>Статистика позиций и психология трейдинга</li>
+                            <li>Торговля по графикам и сигналы</li>
+                            <li>Маржинальная торговля</li>
+                            <li>Объединение ТА и сентимент-анализа</li>
+                            <li>Математика прибыльности: win rate, expectancy, Kelly formula</li>
+                        </ul>
+                    </div>
+
+                    <div class="roadmap-module roadmap-module-yellow">
+                        <div class="roadmap-marker roadmap-marker-yellow"></div>
+                        <div class="roadmap-module-icon"><i class="fa-solid fa-basket-shopping"></i></div>
+                        <div class="roadmap-module-header">Модуль 7: Спот торговля и стейкинг проектов</div>
+                        <p class="roadmap-module-desc">В рамках этого модуля мы объясним, как работать на спотовом рынке и стейкать проекты — торговать без плеча, читать стакан ордеров, подбирать монеты, использовать инструменты анализа и зарабатывать на стейкинге</p>
+                        <button class="roadmap-toggle-lessons roadmap-toggle-yellow">Показать уроки</button>
+                        <ul class="roadmap-lessons">
+                            <li>Введение в спот-торговлю и стейкинг</li>
+                            <li>Биржевой интерфейс и типы ордеров, чтение стакана и объемов</li>
+                            <li>Стратегии спот торговли</li>
+                            <li>Анализ исторических данных и паттернов</li>
+                            <li>Связь спот-торговли и стейкинга с фундаментальным и техническим анализом</li>
+                        </ul>
+                    </div>
+
+                    <div class="roadmap-module roadmap-module-yellow">
+                        <div class="roadmap-marker roadmap-marker-yellow"></div>
+                        <div class="roadmap-module-icon"><i class="fa-solid fa-scale-balanced"></i></div>
+                        <div class="roadmap-module-header">Модуль 8: Фьючерсная торговля</div>
+                        <p class="roadmap-module-desc">В рамках этого модуля мы научим, как торговать с плечом, открывать и защищать позиции, управлять рисками ликвидации и выстраивать стратегии для разных рыночных сценариев.</p>
+                        <button class="roadmap-toggle-lessons roadmap-toggle-yellow">Показать уроки</button>
+                        <ul class="roadmap-lessons">
+                            <li>Основа и практически всё о фьючерсах</li>
+                            <li>Стратегии фьючерсной торговли</li>
+                        </ul>
+                    </div>
+
+                    <div class="roadmap-module roadmap-module-yellow">
+                        <div class="roadmap-marker roadmap-marker-yellow"></div>
+                        <div class="roadmap-module-icon"><i class="fa-solid fa-gift"></i></div>
+                        <div class="roadmap-module-header">Модуль 9: AIRDROP</div>
+                        <p class="roadmap-module-desc">В рамках этого модуля мы объясним, что такое аирдропы и как получать «бесплатные токены» безопасно и эффективно. Ты узнаешь, где искать проекты, как участвовать и какие есть риски</p>
+                        <button class="roadmap-toggle-lessons roadmap-toggle-yellow">Показать уроки</button>
+                        <ul class="roadmap-lessons">
+                            <li>Airdrop: начало твоего пути</li>
+                            <li>Где находить AirDrop</li>
+                            <li>Как участвовать в AirDrop</li>
+                        </ul>
+                    </div>
+
+                    <div class="roadmap-module roadmap-module-yellow">
+                        <div class="roadmap-marker roadmap-marker-yellow"></div>
+                        <div class="roadmap-module-icon"><i class="fa-solid fa-network-wired"></i></div>
+                        <div class="roadmap-module-header">Модуль 10: DeFi</div>
+                        <p class="roadmap-module-desc">В рамках этого модуля мы научим пользоваться инструментами децентрализованных финансов: ликвидными пулами, стейкингом, фармингом, займами и DeFi-платформами</p>
+                        <button class="roadmap-toggle-lessons roadmap-toggle-yellow">Показать уроки</button>
+                        <ul class="roadmap-lessons">
+                            <li>Введение в DeFi</li>
+                            <li>Лендинг и заимствование</li>
+                            <li>Стейкинг и Yield Farming</li>
+                            <li>Governance и управление</li>
+                        </ul>
+                    </div>
+
+                    <div class="roadmap-module roadmap-module-yellow">
+                        <div class="roadmap-marker roadmap-marker-yellow"></div>
+                        <div class="roadmap-module-icon"><i class="fa-solid fa-cube"></i></div>
+                        <div class="roadmap-module-header">Модуль 11: Токенизированные системы</div>
+                        <p class="roadmap-module-desc">В рамках этого модуля мы изучим различные токенизированные системы и их применение в разных сферах</p>
+                        <button class="roadmap-toggle-lessons roadmap-toggle-yellow">Показать уроки</button>
+                        <ul class="roadmap-lessons">
+                            <li>SocialFi</li>
+                            <li>GameFi</li>
+                            <li>ScienceFi</li>
+                        </ul>
+                    </div>
+
+                    <!-- 12-16: фиолетово-синие -->
+                    <div class="roadmap-module roadmap-module-purple">
+                        <div class="roadmap-marker roadmap-marker-purple"></div>
+                        <div class="roadmap-module-icon"><i class="fa-solid fa-server"></i></div>
+                        <div class="roadmap-module-header">Модуль 12: Ончейн-инфраструктура и реальные активы</div>
+                        <p class="roadmap-module-desc">В рамках этого модуля мы изучим децентрализованные физические сети и токенизацию реальных активов</p>
+                        <button class="roadmap-toggle-lessons roadmap-toggle-purple">Показать уроки</button>
+                        <ul class="roadmap-lessons">
+                            <li>DePIN — децентрализованные физические сети</li>
+                            <li>RWA — токенизация реальных активов</li>
+                        </ul>
+                    </div>
+
+                    <div class="roadmap-module roadmap-module-purple">
+                        <div class="roadmap-marker roadmap-marker-purple"></div>
+                        <div class="roadmap-module-icon"><i class="fa-solid fa-exchange-alt"></i></div>
+                        <div class="roadmap-module-header">Модуль 13: Арбитраж</div>
+                        <p class="roadmap-module-desc">В рамках этого модуля мы объясним, как зарабатывать на разнице цен между биржами, парами и платформами. Покажем реальные стратегии арбитража и управление комиссиями. Научим решать вопросы с банками по 115 и 161-ФЗ, расскажем про черные и белые треугольники и многое другое, что важно.</p>
+                        <button class="roadmap-toggle-lessons roadmap-toggle-purple">Показать уроки</button>
+                        <ul class="roadmap-lessons">
+                            <li>Всё про арбитраж (P2P)</li>
+                            <li>Стратегии заработка</li>
+                            <li>Риски, что делать и ошибки</li>
+                        </ul>
+                    </div>
+
+                    <div class="roadmap-module roadmap-module-purple">
+                        <div class="roadmap-marker roadmap-marker-purple"></div>
+                        <div class="roadmap-module-icon"><i class="fa-solid fa-image"></i></div>
+                        <div class="roadmap-module-header">Модуль 14: NFT</div>
+                        <p class="roadmap-module-desc">В рамках этого модуля мы научим понимать, создавать и торговать NFT. Ты узнаешь, как работает технология, где покупать токены, как анализировать коллекции и какие у NFT реальные перспективы.</p>
+                        <button class="roadmap-toggle-lessons roadmap-toggle-purple">Показать уроки</button>
+                        <ul class="roadmap-lessons">
+                            <li>Введение в NFT</li>
+                            <li>NFT-рынки и биржи</li>
+                            <li>Как выбирать NFT, покупать и продавать</li>
+                            <li>Как создавать NFT и продвигать его</li>
+                        </ul>
+                    </div>
+
+                    <div class="roadmap-module roadmap-module-purple">
+                        <div class="roadmap-marker roadmap-marker-purple"></div>
+                        <div class="roadmap-module-icon"><i class="fa-solid fa-face-smile-beam"></i></div>
+                        <div class="roadmap-module-header">Модуль 15: Мемкоины</div>
+                        <p class="roadmap-module-desc">В рамках этого модуля мы научим анализировать и торговать мемкоинами — самыми волатильными и хайповыми токенами рынка. Поймёшь, как искать перспективные монеты и строить стратегии торговли, а главное – как избегать мусора в этом секторе.</p>
+                        <button class="roadmap-toggle-lessons roadmap-toggle-purple">Показать уроки</button>
+                        <ul class="roadmap-lessons">
+                            <li>Важно знать</li>
+                            <li>Анализ токенов</li>
+                            <li>Нарративы, соцсети, инфополе, kolscan</li>
+                            <li>Глубокий ончейн-анализ и Cielo</li>
+                            <li>Стратегия – флип от уровней</li>
+                            <li>Стратегия – среднесрочная торговля и гемхантинг</li>
+                            <li>Стратегия – флип на ПФ + быстрый холд + фиба</li>
+                            <li>Стратегия – флип на секундном тайм-фрейме</li>
+                            <li>Стратегия «копитрейдинг»</li>
+                            <li>Инструменты для торговли</li>
+                        </ul>
+                    </div>
+
+                    <div class="roadmap-module roadmap-module-purple">
+                        <div class="roadmap-marker roadmap-marker-purple"></div>
+                        <div class="roadmap-module-icon"><i class="fa-solid fa-comment-dollar"></i></div>
+                        <div class="roadmap-module-header">Модуль 16: Цифровой капитал Telegram</div>
+                        <p class="roadmap-module-desc">В рамках этого модуля мы объясним, как монетизировать активы в Telegram — от редких подарков до уникальных никнеймов. Покажем, как находить ценные теги, торговать ими и строить коллекции.</p>
+                        <button class="roadmap-toggle-lessons roadmap-toggle-purple">Показать уроки</button>
+                        <ul class="roadmap-lessons">
+                            <li>Подарки</li>
+                            <li>Никнеймы</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Крипто-декоративные элементы -->
+            <div class="crypto-decoration">
+                <div class="crypto-coin coin-1"></div>
+                <div class="crypto-coin coin-2"></div>
+                <div class="crypto-coin coin-3"></div>
+            </div>
+        </section>
+        
+        <section id="pricing" class="pricing-section">
+            <div class="pricing-container-wrapper">
+                <h2 class="pricing-title">Тарифы обучения</h2>
+                <p class="pricing-subtitle">Выбирай формат участия — каждый тариф даёт доступ ко всем модулям и инструментам, но с разным уровнем возможностей, поддержки и привилегий</p>
+
+                <div class="pricing-cards-grid">
+                    <!-- Access (серебро) -->
+                    <div class="pricing-card pricing-card-silver">
+                        <h3 class="pricing-card-title">Access</h3>
+                        <ul class="pricing-features">
+                            <li><i class="fas fa-book"></i> Доступ ко всем модулям на 3 месяца</li>
+                            <li><i class="fas fa-chalkboard-teacher"></i> Доступ к чату с куратором</li>
+                            <li><i class="fas fa-newspaper"></i> Боты с новостями и сигналами— 3 месяца</li>
+                            <li><i class="fas fa-coins"></i> Резервный пул</li>
+                            <li><i class="fas fa-file-alt"></i> Анализ твоей сделки: 10/неделя во время обучения, 5/неделя после (3 месяца)</li>
+                            <li><i class="fas fa-money-bill-wave"></i> Максимальный стартовый депозит — 6 000 ₽</li>
+                            <li><i class="fas fa-link"></i> Максимальный реферальный процент — 7%</li>
+                            <li><i class="fas fa-graduation-cap"></i> Выпускной</li>
+            </ul>
+                        <div class="pricing-bottom">
+                            <p class="pricing-price">44 400 ₽</p>
+                            <a href="#" class="btn-pricing btn-pricing-silver">Выбрать Access</a>
+        </div>
+    </div>
+    
+                    <!-- Vault (зелёный) -->
+                    <div class="pricing-card pricing-card-green">
+                        <h3 class="pricing-card-title">Vault</h3>
+                        <ul class="pricing-features">
+                            <li><i class="fas fa-book"></i> Доступ ко всем модулям на 6 месяцев</li>
+                            <li><i class="fas fa-chalkboard-teacher"></i> Доступ к чату с куратором</li>
+                            <li><i class="fas fa-envelope"></i> Возможность задавать вопросы лично куратору</li>
+                            <li><i class="fas fa-newspaper"></i> Боты с новостям и сигналами — 6 месяцев</li>
+                            <li><i class="fas fa-coins"></i> Резервный пул</li>
+                            <li><i class="fas fa-file-alt"></i> Анализ твоей сделки: 20/неделя во время обучения, 10/неделя после (3 месяца)</li>
+                            <li><i class="fas fa-money-bill-wave"></i> Максимальный стартовый депозит — 12 000 ₽</li>
+                            <li><i class="fas fa-link"></i> Максимальный реферальный процент — 20%</li>
+                            <li><i class="fas fa-graduation-cap"></i> Выпускной</li>
+                            <li><i class="fas fa-microphone"></i> 5 AMA-сессий в месяц с основателями и топ-трейдерами</li>
+                            <li><i class="fas fa-handshake"></i> Личное наставничество — 2 созвона с командой и куратором</li>
+            </ul>
+                        <div class="pricing-bottom">
+                            <p class="pricing-price">64 400 ₽</p>
+                            <a href="#" class="btn-pricing btn-pricing-green">Выбрать Vault</a>
+        </div>
+    </div>
+    
+                    <!-- Apex (золотой) -->
+                    <div class="pricing-card pricing-card-gold">
+                        <h3 class="pricing-card-title">Apex</h3>
+                        <ul class="pricing-features">
+                            <li><i class="fas fa-book"></i> Доступ ко всем модулям на 12 месяцев</li>
+                            <li><i class="fas fa-chalkboard-teacher"></i> Доступ к чату с куратором</li>
+                            <li><i class="fas fa-envelope"></i> Возможность задавать вопросы лично куратору</li>
+                            <li><i class="fas fa-newspaper"></i> Боты с новостями и сигналами — 12 месяцев</li>
+                            <li><i class="fas fa-coins"></i> Резервный пул</li>
+                            <li><i class="fas fa-file-alt"></i> Анализ твоей сделки: 30/неделя во время обучения, 20/неделя после (3 месяца)</li>
+                            <li><i class="fas fa-money-bill-wave"></i> Максимальный стартовый депозит — 20 000 ₽</li>
+                            <li><i class="fas fa-link"></i> Максимальный реферальный процент — 40%</li>
+                            <li><i class="fas fa-graduation-cap"></i> Выпускной</li>
+                            <li><i class="fas fa-microphone"></i> 10 AMA-сессий с основателями и топ-трейдерами в месяц</li>
+                            <li><i class="fas fa-handshake"></i> Личное наставничество — 6 созвона с командой сообщества и куратором</li>
+                            <li><i class="fas fa-cogs"></i> Сборка портфеля</li>
+                            <li><i class="fas fa-list"></i> Список активов с хорошим % стейкинга и бесплатным AirDrop</li>
+                            <li><i class="fas fa-star"></i> Премиум сигналы от команды-основателей — 3 месяца</li>
+                            <li><i class="fas fa-rocket"></i> Приоритетный доступ к разработкам и новым стратегиям</li>
+                            <li><i class="fas fa-user-plus"></i> Приглашение друга к обучению: до 25% скидки +1 месяц к продуктам</li>
+                            <li><i class="fas fa-user-plus"></i> Приглашение друга к сервисам сообщества: до 25% скидки +1 месяц к продуктам</li>
+            </ul>
+                        <div class="pricing-bottom">
+                            <p class="pricing-price">84 400 ₽</p>
+                            <a href="#" class="btn-pricing btn-pricing-gold">Выбрать Apex</a>
+        </div>
+    </div>
+    
+                    <!-- Prestige (фиолетовый) -->
+                    <div class="pricing-card pricing-card-purple">
+                        <h3 class="pricing-card-title">Prestige</h3>
+                        <ul class="pricing-features">
+                            <li><i class="fas fa-book"></i> Доступ ко всем модулям на 24 месяца</li>
+                            <li><i class="fas fa-tools"></i> Доступ ко всем инструментам, включая PRO</li>
+                            <li><i class="fas fa-chalkboard-teacher"></i> Доступ к чату с куратором</li>
+                            <li><i class="fas fa-envelope"></i> Возможность задавать куратору вопросы лично</li>
+                            <li><i class="fas fa-users"></i> Возможность задавать вопросы основателям проекта — 3 месяцев</li>
+                            <li><i class="fas fa-building"></i> Доступ к чату с основателями и топ-трейдерами</li>
+                            <li><i class="fas fa-newspaper"></i> Бот с новостями и сигналами — 24 месяца</li>
+                            <li><i class="fas fa-coins"></i> Резервный пул</li>
+                            <li><i class="fas fa-file-alt"></i> Анализ сделок: без лимита во время обучения, после — 30/неделя</li>
+                            <li><i class="fas fa-wallet"></i> Максимальный стартовый депозит — 30 000 ₽</li>
+                            <li><i class="fas fa-link"></i> Максимальный реферальный процент — 60%</li>
+                            <li><i class="fas fa-graduation-cap"></i> Выпускной</li>
+                            <li><i class="fas fa-microphone"></i> Все AMA-сессии с основателями и топ-трейдерами</li>
+                            <li><i class="fas fa-handshake"></i> Личное наставничество — 10 созвонов с командой и куратором</li>
+                            <li><i class="fas fa-cogs"></i> Сборка портфеля</li>
+                            <li><i class="fas fa-coins"></i> Список активов с хорошим % стейкинга</li>
+                            <li><i class="fas fa-gift"></i> Список активов с бесплатным AirDrop</li>
+                            <li><i class="fas fa-star"></i> Премиум сигналы от команды-основателей — 6 месяцев</li>
+                            <li><i class="fas fa-rocket"></i> Наивысший доступ к продуктам и новым стратегиям</li>
+                            <li><i class="fas fa-user-plus"></i> Приглашение друга к обучению: до 50% скидки +1 месяц к продуктам</li>
+                            <li><i class="fas fa-user-plus"></i> Приглашение друга к сервисам сообщества: до 50% скидки +1 месяц к продуктам</li>
+            </ul>
+                        <div class="pricing-bottom">
+                            <p class="pricing-price">104 400 ₽</p>
+                            <a href="#" class="btn-pricing btn-pricing-purple">Выбрать Prestige</a>
+                        </div>
+                    </div>
+        </div>
+    </div>
+            
+            <!-- Крипто-декоративные элементы -->
+            <div class="crypto-decoration">
+                <div class="crypto-coin coin-1"></div>
+                <div class="crypto-coin coin-2"></div>
+                <div class="crypto-coin coin-3"></div>
+            </div>
+        </section>
+        
+        <section id="faq" class="faq-section">
+            <div class="faq-container">
+                <h2 class="faq-title">FAQ</h2>
+                <p class="faq-subtitle">Отвечаем на самые популярные вопросы о крипто-обучении и заработке</p>
+
+                <div class="faq-list">
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <i class="fa-solid fa-circle-question"></i>
+                            <span>Сколько нужно денег, чтобы начать? Можно ли стартовать с маленькой суммы?</span>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Абсолютно можно начинать с минимальной суммы. Криптовалютный рынок гибкий: вы можете инвестировать даже от 10$, чтобы понять механику рынка, потренироваться и протестировать стратегии. Учтите, что прибыль при этом будет небольшой, а комиссии съедят часть дохода. Главное — использовать только те средства, которые вы готовы временно потерять.</p>
+                            <p>Мы рекомендуем стартовать с 50–100$, а в идеале — от 300$, но всё зависит от выбранного пути в крипте. Например: арбитраж — не требует больших вложений, кроме суммы, которую вы будете обменивать. Спотовый или фьючерсный рынок, мемкоины, NFT — требуют более серьёзного капитала.</p>
+                            <p>Советуем тестировать одну стратегию, постепенно пополняя кошелёк, а не распыляться на всё сразу — это обычно приводит к потере денег и опыта. По любым вопросам или для помощи в выборе направления в крипте вы можете обратиться к куратору или к другим участникам сообщества.</p>
+                            <p>А ещё для каждого тарифа мы выделяем специальный кошелёк с определённой суммой, поэтому изначально вложения с вашей стороны не требуются. Есть и демо-торговля, которая позволит отработать навыки, не затрагивая сумму для обучения. Исключение — P2P и NFT и проекты со стейкингом/p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <i class="fa-solid fa-circle-question"></i>
+                            <span>Что делать, если я ничего не понимаю в финансах и инвестициях, а тем более в крипте?</span>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Не переживайте — наш курс разработан специально для новичков. Мы начинаем с самых основ: объясняем базовые финансовые концепции, рассказываем, как работает криптовалютный рынок, и показываем, какие инструменты используются для анализа и торговли</p>
+                            <p>Наш подход позволяет даже полностью неопытному пользователю быстро освоить ключевые навыки и чувствовать себя уверенно на рынке. Курс не просто обучает, а формирует фундамент для дальнейшего самостоятельного развития в криптовалютной сфере.</p>
+                            <p>Вместе с этим у нас есть кураторы и комьюнити, куда можно адресовать практически любой вопрос, а доступ к комьюните у Вас сохраняется и после обучения, что даёт поддержку и в будущем.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <i class="fa-solid fa-circle-question"></i>
+                            <span>Насколько реально потерять все деньги?</span>
+                        </div>
+                        <div class="faq-answer">
+                            Любой инвестиционный рынок связан с риском. Крипта не исключение. Но мы обучаем умной и безопасной торговле, управлению рисками (риск и мани менеджмент), диверсификации портфеля и стратегиям входа и выхода из сделок, чтобы минимизировать потери и защитить капитал, в отдельных случаях, предусмотренных резервным пулом, готовы возместить убытки.
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <i class="fa-solid fa-circle-question"></i>
+                            <span>Можно ли жить только на доход от крипты?</span>
+                        </div>
+                        <div class="faq-answer">
+                            Да, это возможно, но только после долгого обучения, практики и выстраивания стратегии. В начале лучше рассматривать крипту как дополнительный доход или инвестицию, постепенно увеличивая долю от заработка по мере опыта.
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <i class="fa-solid fa-circle-question"></i>
+                            <span>Это вообще законно? Налоги, банки, государство?</span>
+                        </div>
+                        <div class="faq-answer">
+                            Да, законно. Мы подробно объясняем юридическую сторону крипто-деятельности: как правильно декларировать доходы, какие налоги платить, взаимодействие с банками и государственными органами.
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <i class="fa-solid fa-circle-question"></i>
+                            <span>Что будет, если биржа закроется или крипта "обнулится"?</span>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Мы обучаем управлению рисками, хранению активов в безопасных кошельках, диверсификации и использованию нескольких платформ. Даже если одна биржа закрывается, ваши активы остаются под контролем, а убытки минимизируются.</p>
+                            <p>Полное обнуление криптовалют практически невозможно, особенно у крупных и проверенных проектов, таких как Bitcoin, Ethereum, Solana. Однако отдельные токены, особенно мемкоины или малоизвестные альткоины, могут терять почти всю стоимость из-за низкой ликвидности, плохого проекта или мошенничества.</p>
+                            <p>Благодаря методам и диверсификации даже в случае падения отдельных монет ваши ключевые вложения остаются под контролем, а убытки — минимальными.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <i class="fa-solid fa-circle-question"></i>
+                            <span>Сколько времени нужно уделять крипте ежедневно?</span>
+                        </div>
+                        <div class="faq-answer">
+                            Минимально — 60-120 минут на изучение рынка, проверку позиций и стратегий. Полный контроль и профессиональное трейдинг время требуют больше, но мы учим эффективной работе без переработок, автоматизации и использованию инструментов, экономящих время.
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <i class="fa-solid fa-circle-question"></i>
+                            <span>Какие гарантии, что я буду зарабатывать на крипте благодаря курсу?</span>
+                        </div>
+                        <div class="faq-answer">
+                            Никакие курсы не дают 100% гарантию дохода — рынок непредсказуем. Но мы даём проверенные знания, практику, стратегии и поддержку сообщества, чтобы максимально увеличить ваши шансы на успех и снизить риски. А ещё выпускаем бесплатные обновления для тех, кто уже с нами - вне зависимости от тарифа.
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <i class="fa-solid fa-circle-question"></i>
+                            <span>В чём отличие вашего курса от тысяч аналогичных?</span>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Мы обучаем не только теории, но и практическому применению. Разбираем реальные кейсы, стратегии, психология трейдера, управление рисками, DeFi, NFT, мемкоины и арбитраж. Наши спикеры — практикующие трейдеры и инвесторы, а не теоретики и ребята, посмотревшие пару видео на ютубе ;).</p>
+                            <p>А еще у нас есть комьюнити без дополнительной платы, что редкость и много иных преимуществ - от собственных инструментов, до открытой работы с сообществом: от торговли (наши кошельки доступны для проверки) до резевного пула</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <i class="fa-solid fa-circle-question"></i>
+                            <span>Есть ли рассрочка? А что делать, если банк не одобряет?</span>
+                        </div>
+                        <div class="faq-answer">
+                            Да, мы предлагаем гибкие варианты оплаты и рассрочку. Если банк не одобряет, есть альтернативные способы оплаты и персональная поддержка. Просто напишите нам и объясните ситуацию, мы подберем подходящий вариант.
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <i class="fa-solid fa-circle-question"></i>
+                            <span>Есть ли сигналы на покупку/продажу?</span>
+                        </div>
+                        <div class="faq-answer">
+                            Мы не даём "слепых сигналов". Но разработали по собственным стратегиям бот, который подсвечивает интересные активы и токены, но это дополнительный инструмент, облегчающий торговлю. Вместо "слепых" сигналов мы обучаем самостоятельному анализу, чтению графиков, трендов и выбору стратегий. Вы станете независимым трейдером и научитесь принимать свои решения с уверенностью. А к дополнению сможете следить за нашей торговлю на вебинарах и по кошелькам, повторяя сделки. Но учитывайте, что мы, как и все, можем ошибаться, следуйте риск-менеджменту.
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <i class="fa-solid fa-circle-question"></i>
+                            <span>А есть юридическая помощь, если она потребуется?</span>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Мы понимаем, что в криптовалютном мире важно чувствовать себя защищёнными. В случае возникновения спорных ситуаций с биржами, банками, ФНС или переводами мы предоставляем проверенные советы, делимся документами и шаблонами, которыми сами пользуемся при необходимости.</p>
+                            <p>Кроме того, при необходимости мы можем порекомендовать юристов, в которых уверены, чтобы вы получили квалифицированную поддержку.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <i class="fa-solid fa-circle-question"></i>
+                            <span>А что за колесо фортуны? Можно крутить его постоянно?</span>
+                        </div>
+                        <div class="faq-answer">
+                            Колесо фортуны - это геймифицированный способ получения скидки на наше обучение или продукты - например, боты. Времени от времени мы меняем вероятность выпадения призов и добавляем новые. Касаемо попыток - они ограничены 3 попытками в месяц.
+                        </div>
+                    </div>
+                   
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <i class="fa-solid fa-circle-question"></i>
+                            <span>Связан ли проект с GMGN? У них же тоже крокодильчик?</span>
+                        </div>
+                        <div class="faq-answer">
+                            Нет, мы не является проектом GMGN, никак не связаны с ними, в том числе и партнерством. Наши проекты самостоятельны и независимы друг от друга.
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <i class="fa-solid fa-circle-question"></i>
+                            <span>А что за базовая академия?</span>
+                        </div>
+                        <div class="faq-answer">
+                        <p>Базовая академия - это бесплатный доступ к базовой информации, позволяет понять суть криптовалюты, ее риски, преимущества, узнать определенные инструменты, сервисы и стратегии, познакомиться с ребятами, которые находятся на обучении или прошли его.</p>
+                        <p>Тем, кто закончил базовую Академию, мы предоставляем 15% скидку на любой из тарифов, а еще опредеделённые фичи - подробнее в уроках базовой академии, до встречи там!</p>
+                </div>
+            </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <i class="fa-solid fa-circle-question"></i>
+                            <span>Знаю, что Вы занимаетесь еще традиционными инвестициями, есть продукты в этой теме?</span>
+                        </div>
+                        <div class="faq-answer">
+                        Члены нашей команды и права занимаются и обычными инвестициями - преимущественно собирают активы, которые приносят дивиденды. Но обучения по этой сфере у нас нет, но при достаточных заявках со стороны сообщества - рассмотрим и такую возможность
+                </div>
+            </div>
+
+                        <div class="faq-item">
+                        <div class="faq-question">
+                            <i class="fa-solid fa-circle-question"></i>
+                            <span>У меня вопрос, куда можно обратиться? Пишите/звоните ли вы первые?</span>
+                        </div>
+                        <div class="faq-answer">
+                        <p>Вы всегда можете написать основателям проекта по интересующим Вас вопросам, в том числе о сотрудничестве и идеях - наши контакты указаны во всех официальных аккаунтах нашего сообщества, а еще, если вы на обучении - куратору.</p>
+                        <p>Также свой вопрос можете задать по кнопке "Напиши нам" на сайте, ведующую на наш официальный бот в TG, или сразу в боте - @apevault_ecosystem_bot, либо в чатах сообщества - они размещены в FAQ в официальном канале сообщества в TG - @apevault_of</p>
+                        <p>Мы можем написать первыми, если нужно что-то уточнить, но никогда не звоним - только с Вашего согласия, пишем всегда с одного аккаунта и только в TG - @apevault_of_support, а в сообщениях всегда присылаем специальный антифишинговый код - его можно найти в личном кабинете в базовой академии или написать самим в поддержку для его получения, если его нет - перейдите в чат через сайт или TG в бот поддержки, если диалог сохранился - это мы. 
+                        <p>А еще можем написать с официальной почты (туда, кстати, можно и вопросы задавать и писать предложения, жалобы на кураторов, членов сообщества и по техническим вопросам, на всё ответим) - apevault@cryptoAV.ru</p>
+                </div>
+            </div>
+            
+            <!-- Крипто-декоративные элементы -->
+            <div class="crypto-decoration">
+                <div class="crypto-coin coin-1"></div>
+                <div class="crypto-coin coin-2"></div>
+                <div class="crypto-coin coin-3"></div>
+            </div>
+        </section>
+    </main>
+    
+
+    <!-- START footer -->
+    <footer id="contact" class="site-footer">
+        <div class="footer-inner">
+            <!-- Left: logo/description/contact -->
+            <div class="footer-col footer-brand">
+                <div class="footer-logo-section">
+                    <div class="footer-logo">
+                        <svg width="44" height="44" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="25" cy="25" r="23" fill="#456F44" stroke="#FFFFFF" stroke-width="2"/>
+                            <path d="M25 10 L30 20 L20 20 Z" fill="#FFFFFF"/>
+                            <circle cx="25" cy="25" r="8" fill="#101010"/>
+                            <path d="M25 17 L25 33 M17 25 L33 25" stroke="#456F44" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="footer-brand-name">ApeVault</div>
+                        <div class="footer-brand-tagline">сообщество диких криптанов</div>
+                    </div>
+                </div>
+                <p class="footer-description">
+                    Поддержка пользователей, обучающие курсы и инструменты для безопасной работы с криптой.
+                </p>
+                <div class="footer-contacts">
+                    <div class="footer-contact-item">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                            <path d="M21 8V7l-3 2-2-1-7 7 1 2 2 1 3-3h5V8z"></path>
+                        </svg>
+                        <a href="mailto:hello@apevault.example">hello@apevault.example</a>
+                    </div>
+                    <div class="footer-contact-item">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                            <path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 01.94-.27 11.36 11.36 0 003.6.57 1 1 0 011 1v3.5a1 1 0 01-1 1A17 17 0 013 5a1 1 0 011-1h3.5a1 1 0 011 1 11.36 11.36 0 00.57 3.6 1 1 0 01-.27.94l-2.18 2.25z"></path>
+                        </svg>
+                        <a href="tel:+1234567890">+1 (234) 567‑890</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Middle: links / downloads -->
+            <div class="footer-col footer-links">
+                <div class="footer-links-wrapper">
+                    <div class="footer-links-group">
+                        <h4>Документы</h4>
+                        <ul>
+                            <li>
+                                <a class="download-link" href="files/policy.pdf" download aria-label="Скачать Политику обработки персональных данных">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                        <path d="M12 16l4-5h-3V4h-2v7H8l4 5z"/>
+                                        <path d="M5 20h14v2H5z"/>
+                                    </svg>
+                                    Политика обработки персональных данных
+                                </a>
+                            </li>
+                            <li>
+                                <a class="download-link" href="files/offer.pdf" download aria-label="Скачать публичную оферту">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                        <path d="M3 3h18v18H3V3zm2 2v14h14V5H5z"/>
+                                        <path d="M8 9h8v2H8V9z"/>
+                                    </svg>
+                                    Публичная оферта
+                                </a>
+                            </li>
+                            <li>
+                                <a class="download-link" href="files/services.pdf" download aria-label="Скачать информацию о сервисах">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                        <path d="M4 6h16v2H4zM4 10h16v2H4zM4 14h16v2H4z"/>
+                                    </svg>
+                                    Информация о сервисах
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="footer-links-group">
+                        <h4>Реквизиты</h4>
+                        <div class="footer-requisites">
+                            ИП Соболева Ксения Витальевна<br>
+                            ИНН: <span>644110963363</span><br>
+                            ОГРН: <span>322645700054948</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: social icons -->
+            <div class="footer-col footer-social">
+                <div class="footer-social-icons">
+                    <a href="https://vk.com/yourpage" target="_blank" rel="noopener" aria-label="ВКонтакте">
+                        <i class="fa-brands fa-vk"></i>
+                    </a>
+                    <a href="https://t.me/yourchannel" target="_blank" rel="noopener" aria-label="Telegram">
+                        <i class="fa-brands fa-telegram"></i>
+                    </a>
+                    <a href="https://youtube.com/yourchannel" target="_blank" rel="noopener" aria-label="YouTube">
+                        <i class="fa-brands fa-youtube"></i>
+                    </a>
+                    <a href="https://rutube.ru/yourchannel" target="_blank" rel="noopener" aria-label="RuTube">
+                        <i class="fa-solid fa-play"></i>
+                    </a>
+                    <a href="https://instagram.com/yourprofile" target="_blank" rel="noopener" aria-label="Instagram">
+                        <i class="fa-brands fa-instagram"></i>
+                    </a>
+                </div>
+                <span class="footer-instagram-warning">
+                    Instagram (Meta) признана экстремистской и запрещённой в РФ
+                </span>
+            </div>
+        </div>
+
+        <!-- Bottom legal row -->
+        <div class="footer-bottom">
+            <div class="footer-legal">
+                <strong>ИП:</strong> Соболева Ксения Витальевна &nbsp;•&nbsp; <strong>ИНН:</strong> 644110963363 &nbsp;•&nbsp; <strong>ОГРН:</strong> 322645700054948
+            </div>
+            <div class="footer-downloads">
+                <a href="files/policy.pdf" download>Политика обработки персональных данных</a>
+                <a href="files/offer.pdf" download>Публичная оферта</a>
+                <a href="files/services.pdf" download>Информация о сервисах</a>
+            </div>
+        </div>
+    </footer>
+    <!-- END footer -->
+
+    <script src="script.js"></script>
+    <script>
+        // footer small interactivity
+        const footerYear = document.getElementById('footer-year');
+        if (footerYear) {
+            footerYear.textContent = new Date().getFullYear();
+        }
+
+        // add small click hooks for downloads (analytics or confirmations)
+        document.querySelectorAll('.download-link, a[download]').forEach(a => {
+            a.addEventListener('click', (e) => {
+                console.log('Download clicked:', a.getAttribute('href'));
+            });
+        });
+
+        // simple hover scale for social icons
+        document.querySelectorAll('.footer-social-icons a i').forEach(icon => {
+            icon.parentElement.addEventListener('mouseenter', () => {
+                icon.style.transform = 'scale(1.1)';
+            });
+            icon.parentElement.addEventListener('mouseleave', () => {
+                icon.style.transform = '';
+            });
+        });
+    </script>
+</body>
 </html>
-
-
 
