@@ -7,7 +7,6 @@ import { addTask, updateTask } from '@/services/firestoreService'
 import { Task, TaskAssignee, TaskCategory, TEAM_MEMBERS, TASK_CATEGORIES } from '@/types'
 import { X, Calendar, Users, Tag, FileText, AlertCircle, Clock } from 'lucide-react'
 import { formatDate } from '@/utils/dateUtils'
-import { CATEGORY_ICONS } from './categoryIcons'
 
 interface TaskFormProps {
   onClose: () => void
