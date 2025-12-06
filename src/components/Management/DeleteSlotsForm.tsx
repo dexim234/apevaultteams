@@ -209,16 +209,19 @@ export const DeleteSlotsForm = ({ onClose, onSave }: DeleteSlotsFormProps) => {
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start sm:items-center justify-center z-50 p-4 sm:py-0 overflow-y-auto">
-      <div className={`w-full max-w-2xl rounded-lg shadow-xl ${theme === 'dark' ? 'bg-[#1a1a1a]' : 'bg-white'} max-h-[90vh] overflow-y-auto`}>
+    <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-md flex items-start sm:items-center justify-center z-50 p-4 sm:py-0 overflow-y-auto">
+      <div className={`w-full max-w-2xl rounded-2xl shadow-2xl border ${theme === 'dark' ? 'bg-gradient-to-br from-[#0f1625] via-[#0d1220] to-[#0b101c] border-white/10' : 'bg-gradient-to-br from-white via-slate-50 to-white border-slate-200'} max-h-[90vh] overflow-y-auto`}>
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
-            <h3 className={`text-xl font-bold ${headingColor}`}>
-              Удаление слотов
-            </h3>
+            <div className="space-y-1">
+              <p className="text-xs uppercase tracking-[0.18em] text-[#4E6E49] font-semibold">Очистка</p>
+              <h3 className={`text-xl font-bold ${headingColor}`}>
+                Удаление слотов
+              </h3>
+            </div>
             <button
               onClick={onClose}
-              className={`p-2 rounded-lg ${theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}
+              className={`p-2 rounded-full border ${theme === 'dark' ? 'border-white/10 text-gray-200 hover:bg-white/5' : 'border-slate-200 text-slate-600 hover:bg-slate-100'}`}
             >
               <X className="w-5 h-5" />
             </button>

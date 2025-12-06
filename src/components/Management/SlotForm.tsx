@@ -503,16 +503,19 @@ export const SlotForm = ({ slot, onClose, onSave }: SlotFormProps) => {
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start sm:items-center justify-center z-50 p-3 sm:p-4 overflow-y-auto touch-manipulation">
-      <div className={`w-full max-w-2xl rounded-lg sm:rounded-xl shadow-xl ${theme === 'dark' ? 'bg-[#1a1a1a]' : 'bg-white'} max-h-[90vh] overflow-y-auto my-4 sm:my-8`}>
+    <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-md flex items-start sm:items-center justify-center z-50 p-3 sm:p-4 overflow-y-auto touch-manipulation">
+      <div className={`w-full max-w-2xl rounded-2xl shadow-2xl border ${theme === 'dark' ? 'bg-gradient-to-br from-[#0f1625] via-[#0d1220] to-[#0b101c] border-white/10' : 'bg-gradient-to-br from-white via-slate-50 to-white border-slate-200'} max-h-[90vh] overflow-y-auto my-4 sm:my-8`}>
         <div className="p-4 sm:p-6">
-          <div className="flex items-center justify-between mb-4 sm:mb-6">
-            <h3 className={`text-lg sm:text-xl font-bold ${headingColor} pr-2`}>
-              {slot ? 'Редактировать слот' : 'Добавить слот'}
-            </h3>
+          <div className="flex items-center justify-between mb-5 sm:mb-6">
+            <div className="space-y-1">
+              <p className="text-xs uppercase tracking-[0.18em] text-[#4E6E49] font-semibold">Слот</p>
+              <h3 className={`text-xl sm:text-2xl font-bold ${headingColor} pr-2`}>
+                {slot ? 'Редактировать слот' : 'Добавить слот'}
+              </h3>
+            </div>
             <button
               onClick={onClose}
-              className={`p-1.5 sm:p-2 rounded-lg flex-shrink-0 ${theme === 'dark' ? 'hover:bg-gray-700 active:bg-gray-600' : 'hover:bg-gray-100 active:bg-gray-200'} transition-colors touch-manipulation`}
+              className={`p-2 rounded-full border ${theme === 'dark' ? 'border-white/10 text-gray-200 hover:bg-white/5' : 'border-slate-200 text-slate-600 hover:bg-slate-100'} transition-colors touch-manipulation`}
               aria-label="Закрыть"
             >
               <X className="w-4 h-4 sm:w-5 sm:h-5" />

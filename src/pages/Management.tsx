@@ -6,7 +6,7 @@ import { ManagementTable } from '@/components/Management/ManagementTable'
 import { ManagementWeekView } from '@/components/Management/ManagementWeekView'
 import { SlotForm } from '@/components/Management/SlotForm'
 import { DayStatusForm } from '@/components/Management/DayStatusForm'
-import { Calendar, Table2, Clock, CalendarCheck, PlusCircle, Trash2, Moon, HeartPulse, Plane, Sparkles } from 'lucide-react'
+import { Calendar, Table2, Clock, CalendarCheck, PlusCircle, Trash2, Moon, HeartPulse, Plane } from 'lucide-react'
 import { TEAM_MEMBERS } from '@/types'
 import { DeleteSlotsForm } from '@/components/Management/DeleteSlotsForm'
 import { getWorkSlots, getDayStatuses } from '@/services/firestoreService'
@@ -34,17 +34,11 @@ export const Management = () => {
     upcomingSlots: 0,
     completedSlots: 0
   })
-  const [weekBadge, setWeekBadge] = useState<{ label: string; tone: string; text: string }>({
-    label: 'Неделя активна',
-    tone: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-100 border border-emerald-200 dark:border-emerald-700',
-    text: 'Текущая неделя'
-  })
 
   const [isMobile, setIsMobile] = useState(false)
 
   useEffect(() => {
     loadStats()
-    updateWeekBadge()
   }, [])
 
   useEffect(() => {
@@ -206,38 +200,6 @@ export const Management = () => {
     setViewMode(mode)
   }
 
-  const updateWeekBadge = () => {
-    const weekDays = getWeekDays(new Date())
-    const start = new Date(weekDays[0])
-    const end = new Date(weekDays[6])
-    const today = new Date()
-    start.setHours(0, 0, 0, 0)
-    end.setHours(23, 59, 59, 999)
-    today.setHours(0, 0, 0, 0)
-
-    if (today < start) {
-      setWeekBadge({
-        label: 'Предстоящая неделя',
-        tone: 'bg-sky-100 text-sky-800 dark:bg-sky-900/40 dark:text-sky-100 border border-sky-200 dark:border-sky-700',
-        text: 'Старт скоро'
-      })
-      return
-    }
-    if (today > end) {
-      setWeekBadge({
-        label: 'Неделя завершена',
-        tone: 'bg-slate-200 text-slate-800 dark:bg-slate-800/60 dark:text-slate-100 border border-slate-300 dark:border-slate-700',
-        text: 'Архив'
-      })
-      return
-    }
-    setWeekBadge({
-      label: 'Неделя активна',
-      tone: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-100 border border-emerald-200 dark:border-emerald-700',
-      text: 'В процессе'
-    })
-  }
-
   const runAction = () => {
     switch (actionType) {
       case 'add-slot':
@@ -264,71 +226,100 @@ export const Management = () => {
     <Layout>
       <div className="space-y-5 sm:space-y-7">
         {/* Hero */}
-        <div className={`relative overflow-hidden rounded-2xl p-5 sm:p-6 md:p-7 border-2 shadow-xl ${
+        <div className={`relative overflow-hidden rounded-2xl p-5 sm:p-6 md:p-7 border-2 shadow-2xl ${
           theme === 'dark'
-            ? 'bg-gradient-to-br from-[#0b0f17] via-[#111827] to-[#0b0f17] border-[#4E6E49]/30'
+            ? 'bg-gradient-to-br from-[#0b0f17] via-[#0f1b2d] to-[#0b0f17] border-[#4E6E49]/30'
             : 'bg-gradient-to-br from-white via-green-50/60 to-white border-green-200'
         }`}>
           <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute -top-24 -left-16 w-72 h-72 bg-gradient-to-br from-[#4E6E49]/20 via-transparent to-transparent blur-3xl" />
-            <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-blue-500/15 via-purple-500/12 to-transparent blur-3xl" />
-            <div className="absolute bottom-[-120px] left-10 w-72 h-72 bg-gradient-to-tr from-amber-300/12 via-[#4E6E49]/12 to-transparent blur-3xl" />
+            <div className="absolute -top-32 -left-16 w-80 h-80 bg-gradient-to-br from-[#4E6E49]/24 via-transparent to-transparent blur-3xl" />
+            <div className="absolute top-0 right-0 w-[26rem] h-[26rem] bg-gradient-to-bl from-blue-500/18 via-purple-500/12 to-transparent blur-3xl" />
+            <div className="absolute bottom-[-140px] left-14 w-80 h-80 bg-gradient-to-tr from-amber-300/14 via-[#4E6E49]/12 to-transparent blur-3xl" />
           </div>
-          <div className="relative z-10 grid grid-cols-1 xl:grid-cols-5 gap-4 xl:gap-6 items-stretch">
-            <div className="col-span-1 xl:col-span-2 flex flex-col gap-4">
-              <div className="flex items-start gap-3">
+          <div className="relative z-10 grid grid-cols-1 gap-6 xl:grid-cols-5 items-start">
+            <div className="col-span-1 xl:col-span-2 flex flex-col gap-3">
+              <div className="flex items-center gap-3">
                 <div className="p-4 rounded-2xl bg-white/80 dark:bg-white/5 border border-white/40 dark:border-white/10 shadow-lg">
                   <CalendarCheck className="w-7 h-7 text-[#4E6E49]" />
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-1">
                   <h1 className={`text-3xl sm:text-4xl font-extrabold ${headingColor}`}>
                     Расписание команды
                   </h1>
-                  <p className={`${labelColor} text-sm sm:text-base leading-snug`}>
-                    Удобное управление слотами, сменами и статусами недели в едином месте.
+                  <p className={`${labelColor} text-sm sm:text-base leading-snug max-w-xl`}>
+                    Управление слотами, сменами и статусами без лишнего визуального шума.
                   </p>
-                  <div className="flex flex-wrap gap-2">
-                    <span className={`px-3 py-1.5 rounded-full text-xs font-semibold inline-flex items-center gap-2 ${weekBadge.tone}`}>
-                      <Sparkles className="w-4 h-4 opacity-80" />
-                      {weekBadge.label}
-                    </span>
-                    <span className={`${labelColor} text-xs sm:text-sm`}>
-                      {weekBadge.text}
-                    </span>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                {[
+                  { label: 'Слоты недели', value: stats.slotsThisWeek, tone: 'from-emerald-500 to-emerald-600', icon: Calendar },
+                  { label: 'Предстоящие', value: stats.upcomingSlots, tone: 'from-sky-500 to-blue-600', icon: Clock },
+                  { label: 'Завершено', value: stats.completedSlots, tone: 'from-slate-500 to-slate-700', icon: CalendarCheck },
+                  { label: 'Участники', value: stats.activeMembers, tone: 'from-violet-500 to-fuchsia-500', icon: Table2 },
+                ].map((item) => {
+                  const Icon = item.icon
+                  return (
+                    <div
+                      key={item.label}
+                      className={`relative overflow-hidden rounded-2xl p-3 sm:p-4 border ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-white'} shadow-lg backdrop-blur`}
+                    >
+                      <div className="absolute inset-0 opacity-[0.12]" style={{ backgroundImage: 'radial-gradient(circle at 25% 20%, rgba(78,110,73,0.35), transparent 35%), radial-gradient(circle at 80% 0%, rgba(99,102,241,0.2), transparent 30%)' }} />
+                      <div className="relative flex items-center gap-3">
+                        <span className={`p-2 rounded-xl text-white shadow-lg bg-gradient-to-br ${item.tone}`}>
+                          <Icon className="w-4 h-4" />
+                        </span>
+                        <div className="space-y-1">
+                          <p className="text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                            {item.label}
+                          </p>
+                          <p className="text-3xl font-black text-slate-900 dark:text-white drop-shadow-sm leading-tight">
+                            {item.value}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+            <div className="col-span-1 xl:col-span-3">
+              <div className={`rounded-2xl border ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-white'} shadow-lg p-4 sm:p-5 h-full`}>
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <p className={`text-xs uppercase tracking-[0.12em] font-semibold ${labelColor}`}>Сейчас</p>
+                    <ul className={`space-y-2 text-sm sm:text-base ${labelColor}`}>
+                      <li className="flex items-start gap-2">
+                        <span className="mt-1 h-2 w-2 rounded-full bg-emerald-400" />
+                        Сначала выберите действие справа и откройте модуль.
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="mt-1 h-2 w-2 rounded-full bg-blue-400" />
+                        Фильтры сверху переключают отображение слотов и статусов.
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="mt-1 h-2 w-2 rounded-full bg-purple-400" />
+                        Таблица доступна только на десктопе — на мобайл включен режим недели.
+                      </li>
+                    </ul>
+                  </div>
+                  <div className="space-y-3">
+                    <p className={`text-xs uppercase tracking-[0.12em] font-semibold ${labelColor}`}>Подсказки</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      {['Слоты', 'Удаление', 'Выходной', 'Больничный', 'Отпуск', 'Коммент'].map((chip) => (
+                        <span
+                          key={chip}
+                          className={`px-3 py-2 rounded-xl text-xs font-semibold text-center border ${
+                            theme === 'dark' ? 'border-white/10 bg-white/5 text-white' : 'border-gray-200 bg-gray-50 text-gray-800'
+                          }`}
+                        >
+                          {chip}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-            <div className="col-span-1 xl:col-span-3 grid grid-cols-2 sm:grid-cols-4 gap-3">
-              {[
-                { label: 'Слоты недели', value: stats.slotsThisWeek, tone: 'bg-gradient-to-br from-emerald-500 to-emerald-600', icon: Calendar },
-                { label: 'Предстоящие', value: stats.upcomingSlots, tone: 'bg-gradient-to-br from-sky-500 to-blue-600', icon: Clock },
-                { label: 'Завершено', value: stats.completedSlots, tone: 'bg-gradient-to-br from-slate-500 to-slate-700', icon: CalendarCheck },
-                { label: 'Участники', value: stats.activeMembers, tone: 'bg-gradient-to-br from-violet-500 to-fuchsia-500', icon: Table2 },
-              ].map((item) => {
-                const Icon = item.icon
-                return (
-                  <div
-                    key={item.label}
-                    className={`relative overflow-hidden rounded-2xl p-3 sm:p-4 border ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-white'} shadow-lg`}
-                  >
-                    <div className="absolute inset-0 opacity-[0.12]" style={{ backgroundImage: 'radial-gradient(circle at 20% 20%, rgba(78,110,73,0.45), transparent 35%), radial-gradient(circle at 80% 0%, rgba(99,102,241,0.28), transparent 30%)' }} />
-                    <div className="relative flex items-center justify-between">
-                      <div>
-                        <p className="text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                          {item.label}
-                        </p>
-                        <p className="text-3xl font-black text-slate-900 dark:text-white drop-shadow-sm leading-tight">
-                          {item.value}
-                        </p>
-                      </div>
-                      <span className={`p-2 rounded-xl text-white shadow-lg ${item.tone}`}>
-                        <Icon className="w-4 h-4" />
-                      </span>
-                    </div>
-                  </div>
-                )
-              })}
             </div>
           </div>
         </div>
