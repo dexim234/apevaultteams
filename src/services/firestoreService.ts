@@ -252,6 +252,8 @@ export const getEarnings = async (userId?: string, startDate?: string, endDate?:
       amount: data?.amount || 0,
       poolAmount: data?.poolAmount || 0,
       slotId: data?.slotId || '',
+      extraWalletsCount: data?.extraWalletsCount || 0,
+      extraWalletsAmount: data?.extraWalletsAmount || 0,
       category: data?.category || 'other',
       participants: data?.participants || [],
     } as Earnings

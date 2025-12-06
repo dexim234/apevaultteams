@@ -40,14 +40,14 @@ export interface DayStatus {
 // Earnings types
 export type EarningsCategory = 'memecoins' | 'futures' | 'nft' | 'spot' | 'polymarket' | 'staking' | 'other'
 
-export const EARNINGS_CATEGORY_META: Record<EarningsCategory, { label: string; emoji: string; accent: string }> = {
-  memecoins: { label: 'Мемкоины', emoji: '🚀', accent: 'emerald' },
-  futures: { label: 'Фьючерсы', emoji: '📉', accent: 'blue' },
-  nft: { label: 'NFT', emoji: '🖼️', accent: 'purple' },
-  spot: { label: 'Спот', emoji: '💱', accent: 'amber' },
-  polymarket: { label: 'PolyMarket', emoji: '📊', accent: 'pink' },
-  staking: { label: 'Стейкинг', emoji: '🔒', accent: 'indigo' },
-  other: { label: 'Другое', emoji: '✨', accent: 'gray' },
+export const EARNINGS_CATEGORY_META: Record<EarningsCategory, { label: string; accent: string; icon: 'rocket' | 'line' | 'image' | 'coins' | 'barchart' | 'shield' | 'sparkles' }> = {
+  memecoins: { label: 'Мемкоины', accent: 'emerald', icon: 'rocket' },
+  futures: { label: 'Фьючерсы', accent: 'blue', icon: 'line' },
+  nft: { label: 'NFT', accent: 'purple', icon: 'image' },
+  spot: { label: 'Спот', accent: 'amber', icon: 'coins' },
+  polymarket: { label: 'PolyMarket', accent: 'pink', icon: 'barchart' },
+  staking: { label: 'Стейкинг', accent: 'indigo', icon: 'shield' },
+  other: { label: 'Другое', accent: 'gray', icon: 'sparkles' },
 }
 
 export interface Earnings {
@@ -58,6 +58,9 @@ export interface Earnings {
   poolAmount: number
   slotId: string
   category: EarningsCategory
+  // Доп. кошельки
+  extraWalletsCount?: number
+  extraWalletsAmount?: number
   participants: string[] // for shared earnings
 }
 

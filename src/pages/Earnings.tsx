@@ -7,7 +7,7 @@ import { EarningsTable } from '@/components/Earnings/EarningsTable'
 import { EarningsList } from '@/components/Earnings/EarningsList'
 import { getEarnings } from '@/services/firestoreService'
 import { Earnings as EarningsType, EARNINGS_CATEGORY_META, EarningsCategory, TEAM_MEMBERS } from '@/types'
-import { Plus, DollarSign, TrendingUp, Sparkles, Wallet, PiggyBank, PieChart } from 'lucide-react'
+import { Plus, DollarSign, TrendingUp, Sparkles, Wallet, PiggyBank, PieChart, Rocket, LineChart, Image, Coins, BarChart3, ShieldCheck } from 'lucide-react'
 import { getWeekRange, formatDate } from '@/utils/dateUtils'
 
 export const Earnings = () => {
@@ -33,6 +33,24 @@ export const Earnings = () => {
   const getNetValue = (earning: EarningsType) => Math.max(earning.amount - getPoolValue(earning), 0)
   const getParticipants = (earning: EarningsType) => earning.participants?.length ? earning.participants : [earning.userId]
   const getUserName = (userId: string) => TEAM_MEMBERS.find((m) => m.id === userId)?.name || userId
+  const getCategoryIcon = (key: EarningsCategory, className = 'w-4 h-4') => {
+    switch (key) {
+      case 'memecoins':
+        return <Rocket className={className} />
+      case 'futures':
+        return <LineChart className={className} />
+      case 'nft':
+        return <Image className={className} />
+      case 'spot':
+        return <Coins className={className} />
+      case 'polymarket':
+        return <BarChart3 className={className} />
+      case 'staking':
+        return <ShieldCheck className={className} />
+      default:
+        return <Sparkles className={className} />
+    }
+  }
 
   const calculateStats = () => {
     const weekRange = getWeekRange()
@@ -308,7 +326,9 @@ export const Earnings = () => {
                     <div key={cat.key} className={`p-3 rounded-xl border ${theme === 'dark' ? 'border-gray-800 bg-gray-900/70' : 'border-gray-200 bg-white'} shadow-sm`}>
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex items-center gap-2">
-                          <span className="text-lg">{meta.emoji}</span>
+                          <span className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800/80 flex items-center justify-center">
+                            {getCategoryIcon(cat.key, 'w-4 h-4')}
+                          </span>
                           <div>
                             <p className="text-sm font-semibold">{meta.label}</p>
                             <p className="text-[11px] text-gray-500">{cat.count} записей</p>

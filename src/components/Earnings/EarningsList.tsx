@@ -6,7 +6,7 @@ import { useAdminStore } from '@/store/adminStore'
 import { deleteEarnings } from '@/services/firestoreService'
 import { Earnings, EARNINGS_CATEGORY_META, EarningsCategory, TEAM_MEMBERS } from '@/types'
 import { formatDate } from '@/utils/dateUtils'
-import { Edit2, Trash2 } from 'lucide-react'
+import { Edit2, Trash2, Rocket, LineChart, Image, Coins, BarChart3, ShieldCheck, Sparkles, Wallet2 } from 'lucide-react'
 
 interface EarningsListProps {
   earnings: Earnings[]
@@ -20,6 +20,25 @@ export const EarningsList = ({ earnings, onEdit, onDelete }: EarningsListProps) 
   const { isAdmin } = useAdminStore()
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const POOL_RATE = 0.45
+
+  const getCategoryIcon = (key: EarningsCategory, className = 'w-4 h-4') => {
+    switch (key) {
+      case 'memecoins':
+        return <Rocket className={className} />
+      case 'futures':
+        return <LineChart className={className} />
+      case 'nft':
+        return <Image className={className} />
+      case 'spot':
+        return <Coins className={className} />
+      case 'polymarket':
+        return <BarChart3 className={className} />
+      case 'staking':
+        return <ShieldCheck className={className} />
+      default:
+        return <Sparkles className={className} />
+    }
+  }
 
   const handleDelete = async (id: string) => {
     if (!confirm('Вы уверены, что хотите удалить эту запись о заработке?')) {
@@ -129,7 +148,7 @@ export const EarningsList = ({ earnings, onEdit, onDelete }: EarningsListProps) 
                       <span className={`inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-semibold ${
                         theme === 'dark' ? 'bg-gray-800 text-gray-100' : 'bg-gray-100 text-gray-900'
                       }`}>
-                        <span>{categoryMeta.emoji}</span>
+                        {getCategoryIcon(earning.category, 'w-4 h-4')}
                         {categoryMeta.label}
                       </span>
                     </td>
@@ -152,6 +171,12 @@ export const EarningsList = ({ earnings, onEdit, onDelete }: EarningsListProps) 
                     <td className={`px-4 py-3 text-right font-semibold ${theme === 'dark' ? 'text-[#4E6E49]' : 'text-[#4E6E49]'}`}>
                       <div>{netAmount.toFixed(2)} ₽</div>
                       <div className="text-xs text-gray-500">по {shareAmount.toFixed(2)} ₽</div>
+                      {earning.extraWalletsAmount ? (
+                        <div className="text-[11px] text-gray-500 flex items-center gap-1 mt-1">
+                          <Wallet2 className="w-3 h-3" />
+                          {earning.extraWalletsCount || 0} / {earning.extraWalletsAmount.toFixed(0)} ₽
+                        </div>
+                      ) : null}
                     </td>
                     <td className={`px-4 py-3 text-right font-semibold ${theme === 'dark' ? 'text-purple-400' : 'text-purple-600'}`}>
                       {calcPool(earning).toFixed(2)} ₽
