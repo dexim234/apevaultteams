@@ -174,7 +174,6 @@ export const EarningsForm = ({ onClose, onSave, editingEarning }: EarningsFormPr
     }
 
     const gross = baseAmount + extraAmount
-    const pool = parseFloat((gross * POOL_RATE).toFixed(2))
 
     return {
       id: crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`,
