@@ -166,10 +166,10 @@ export const Login = () => {
   return (
     <div className={`min-h-screen relative overflow-hidden ${theme === 'dark' ? 'bg-[#0b0f17]' : 'bg-gradient-to-br from-slate-50 via-white to-slate-100'}`}>
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute -top-28 -left-20 w-[540px] h-[540px] bg-gradient-to-br from-[#4E6E49]/36 via-emerald-400/22 to-transparent blur-[90px]" />
-        <div className="absolute bottom-[-180px] right-[-120px] w-[640px] h-[640px] bg-gradient-to-tr from-blue-500/24 via-purple-500/20 to-transparent blur-[120px]" />
-        <div className="absolute top-[50%] left-[-140px] w-[420px] h-[420px] bg-gradient-to-br from-amber-400/16 via-[#4E6E49]/16 to-transparent blur-[100px]" />
-        <div className="floating-grid opacity-70 dark:opacity-40" />
+        <div className="absolute -top-24 -left-24 w-[620px] h-[620px] bg-gradient-to-br from-[#4E6E49]/35 via-emerald-400/22 to-transparent blur-[110px]" />
+        <div className="absolute top-[-120px] right-[-180px] w-[780px] h-[780px] bg-gradient-to-bl from-blue-500/24 via-purple-500/22 to-transparent blur-[140px]" />
+        <div className="absolute bottom-[-200px] right-[-80px] w-[620px] h-[620px] bg-gradient-to-tr from-amber-400/18 via-[#4E6E49]/18 to-transparent blur-[120px]" />
+        <div className="floating-grid opacity-75 dark:opacity-45" />
       </div>
 
       <div className="relative z-10 max-w-6xl mx-auto px-4 lg:px-6 min-h-screen flex items-center justify-center py-10">

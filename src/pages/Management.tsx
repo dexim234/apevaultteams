@@ -13,7 +13,7 @@ import { getWorkSlots, getDayStatuses } from '@/services/firestoreService'
 import { getWeekDays, formatDate } from '@/utils/dateUtils'
 
 type ViewMode = 'table' | 'week'
-type SlotFilter = 'all' | 'upcoming' | 'completed'
+export type SlotFilter = 'all' | 'upcoming' | 'completed'
 
 export const Management = () => {
   const { theme } = useThemeStore()
@@ -201,366 +201,203 @@ export const Management = () => {
 
   return (
     <Layout>
-      <div className="space-y-4 sm:space-y-6">
-        {/* Header with welcome message and stats */}
-        <div className={`rounded-xl sm:rounded-2xl p-4 sm:p-5 md:p-6 ${cardBg} shadow-lg border-2 ${
-          theme === 'dark' ? 'border-blue-500/30 bg-gradient-to-br from-[#1a1a1a] to-[#1a1a1a]/90' : 'border-blue-200 bg-gradient-to-br from-white to-blue-50/30'
+      <div className="space-y-5 sm:space-y-7">
+        {/* Hero */}
+        <div className={`relative overflow-hidden rounded-2xl p-5 sm:p-6 md:p-7 border-2 shadow-xl ${
+          theme === 'dark'
+            ? 'bg-gradient-to-br from-[#0b0f17] via-[#111827] to-[#0b0f17] border-[#4E6E49]/30'
+            : 'bg-gradient-to-br from-white via-green-50/40 to-white border-green-200'
         }`}>
-          <div className="relative overflow-hidden">
-            {/* Decorative elements */}
-            <div className="absolute top-0 right-0 w-32 h-32 sm:w-64 sm:h-64 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-full blur-3xl -mr-16 sm:-mr-32 -mt-16 sm:-mt-32" />
-            <div className="absolute bottom-0 left-0 w-24 h-24 sm:w-48 sm:h-48 bg-gradient-to-tr from-[#4E6E49]/10 to-yellow-500/10 rounded-full blur-2xl -ml-12 sm:-ml-24 -mb-12 sm:-mb-24" />
-            
-            <div className="relative z-10">
-              <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4 mb-4 sm:mb-6">
-                <div className={`p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-lg flex-shrink-0 ${
-                  theme === 'dark' 
-                    ? 'bg-gradient-to-br from-blue-600 to-purple-600' 
-                    : 'bg-gradient-to-br from-blue-500 to-purple-500'
-                } text-white transform transition-transform active:scale-95 sm:hover:scale-110`}>
-                  <CalendarCheck className="w-6 h-6 sm:w-8 sm:h-8" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
-                    <h1 className={`text-2xl sm:text-3xl md:text-4xl font-extrabold bg-gradient-to-r ${
-                      theme === 'dark' 
-                        ? 'from-blue-400 via-purple-400 to-pink-400 text-transparent bg-clip-text' 
-                        : 'from-blue-600 via-purple-600 to-pink-600 text-transparent bg-clip-text'
-                    }`}>
-                      Управление командой
-                    </h1>
-                    <Sparkles className={`w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0 ${theme === 'dark' ? 'text-yellow-400' : 'text-yellow-500'} animate-pulse`} />
-                  </div>
-                  <p className={`${labelColor} text-sm sm:text-base font-medium hidden sm:flex flex-wrap items-center gap-2`}>
-                    <Heart className="w-4 h-4 sm:w-5 sm:h-5 text-red-500 flex-shrink-0" />
-                    <span>Забота о каждом участнике нашей команды ApeVault</span>
-                  </p>
-                </div>
-              </div>
-            </div>
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute -top-24 -left-16 w-72 h-72 bg-gradient-to-br from-[#4E6E49]/25 via-transparent to-transparent blur-3xl" />
+            <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-blue-500/20 via-purple-500/15 to-transparent blur-3xl" />
+            <div className="absolute bottom-[-120px] left-10 w-72 h-72 bg-gradient-to-tr from-amber-400/15 via-[#4E6E49]/15 to-transparent blur-3xl" />
           </div>
-
-          {/* Stats cards */}
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-4 mb-4 sm:mb-6">
-            <div className={`p-3 sm:p-4 rounded-lg sm:rounded-xl border-2 ${
-              theme === 'dark' 
-                ? 'bg-[#4E6E49]/10 border-[#4E6E49]/30' 
-                : 'bg-green-50 border-green-200'
-            }`}>
-              <div className="flex items-center gap-2 sm:gap-3">
-                <div className={`p-1.5 sm:p-2 rounded-lg flex-shrink-0 ${
-                  theme === 'dark' ? 'bg-[#4E6E49]/20' : 'bg-green-100'
-                }`}>
-                  <Clock className={`w-4 h-4 sm:w-5 sm:h-5 ${theme === 'dark' ? 'text-[#4E6E49]' : 'text-[#4E6E49]'}`} />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className={`text-xs sm:text-sm ${labelColor} truncate`}>Всего слотов</p>
-                  <p className={`text-xl sm:text-2xl font-bold ${theme === 'dark' ? 'text-[#4E6E49]' : 'text-[#4E6E49]'}`}>
-                    {stats.slotsThisWeek}
-                  </p>
+          <div className="relative z-10 flex flex-col lg:flex-row gap-4 lg:items-center lg:justify-between">
+            <div className="flex items-start gap-4">
+              <div className="p-4 rounded-2xl bg-white/80 dark:bg-white/5 border border-white/40 dark:border-white/10 shadow-lg">
+                <CalendarCheck className="w-7 h-7 text-[#4E6E49]" />
+              </div>
+              <div className="space-y-2">
+                <h1 className={`text-3xl sm:text-4xl font-extrabold ${headingColor}`}>
+                  Расписание команды
+                </h1>
+                <p className={`${labelColor} text-sm sm:text-base`}>
+                  Быстрый контроль слотов, статусов дней и участников в одном окне.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <span className="px-3 py-1 rounded-full text-xs font-semibold bg-[#4E6E49]/15 text-[#4E6E49] border border-[#4E6E49]/30">
+                    Неделя активна
+                  </span>
+                  <span className="px-3 py-1 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-600 dark:text-blue-300 border border-blue-500/20">
+                    Быстрые действия
+                  </span>
                 </div>
               </div>
             </div>
-            <div className={`p-3 sm:p-4 rounded-lg sm:rounded-xl border-2 ${
-              theme === 'dark' 
-                ? 'bg-blue-500/10 border-blue-500/30' 
-                : 'bg-blue-50 border-blue-200'
-            }`}>
-              <div className="flex items-center gap-2 sm:gap-3">
-                <div className={`p-1.5 sm:p-2 rounded-lg flex-shrink-0 ${
-                  theme === 'dark' ? 'bg-blue-500/20' : 'bg-blue-100'
-                }`}>
-                  <Calendar className={`w-4 h-4 sm:w-5 sm:h-5 ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`} />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className={`text-xs sm:text-sm ${labelColor} truncate`}>Предстоящих</p>
-                  <p className={`text-xl sm:text-2xl font-bold ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}>
-                    {stats.upcomingSlots}
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className={`p-3 sm:p-4 rounded-lg sm:rounded-xl border-2 ${
-              theme === 'dark' 
-                ? 'bg-gray-500/10 border-gray-500/30' 
-                : 'bg-gray-50 border-gray-200'
-            }`}>
-              <div className="flex items-center gap-2 sm:gap-3">
-                <div className={`p-1.5 sm:p-2 rounded-lg flex-shrink-0 ${
-                  theme === 'dark' ? 'bg-gray-500/20' : 'bg-gray-100'
-                }`}>
-                  <CalendarCheck className={`w-4 h-4 sm:w-5 sm:h-5 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`} />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className={`text-xs sm:text-sm ${labelColor} truncate`}>Завершенных</p>
-                  <p className={`text-xl sm:text-2xl font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                    {stats.completedSlots}
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className={`p-3 sm:p-4 rounded-lg sm:rounded-xl border-2 ${
-              theme === 'dark' 
-                ? 'bg-purple-500/10 border-purple-500/30' 
-                : 'bg-purple-50 border-purple-200'
-            }`}>
-              <div className="flex items-center gap-2 sm:gap-3">
-                <div className={`p-1.5 sm:p-2 rounded-lg flex-shrink-0 ${
-                  theme === 'dark' ? 'bg-purple-500/20' : 'bg-purple-100'
-                }`}>
-                  <Users className={`w-4 h-4 sm:w-5 sm:h-5 ${theme === 'dark' ? 'text-purple-400' : 'text-purple-600'}`} />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className={`text-xs sm:text-sm ${labelColor} truncate`}>Активных участников</p>
-                  <p className={`text-xl sm:text-2xl font-bold ${theme === 'dark' ? 'text-purple-400' : 'text-purple-600'}`}>
-                    {stats.activeMembers}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-4">
-            {/* Slot Filter Tabs */}
-            <div className="flex flex-col gap-3 sm:gap-4">
-              <h2 className={`text-base sm:text-lg font-bold ${headingColor} flex items-center gap-2`}>
-                <CalendarCheck className="w-4 h-4 sm:w-5 sm:h-5 text-[#4E6E49] flex-shrink-0" />
-                <span>Фильтр слотов:</span>
-              </h2>
-              <div className="flex justify-start">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full lg:w-auto">
+              {[
+                { label: 'Слотов', value: stats.slotsThisWeek, tone: 'from-[#4E6E49]/12 to-emerald-500/12 text-[#4E6E49]' },
+                { label: 'Предстоящие', value: stats.upcomingSlots, tone: 'from-blue-500/12 to-indigo-500/12 text-blue-600' },
+                { label: 'Завершено', value: stats.completedSlots, tone: 'from-gray-500/12 to-gray-700/12 text-gray-700' },
+                { label: 'Участники', value: stats.activeMembers, tone: 'from-purple-500/12 to-pink-500/12 text-purple-600' },
+              ].map((item) => (
                 <div
-                  className={`inline-flex flex-col sm:flex-row flex-wrap rounded-lg sm:rounded-xl p-1 sm:p-1.5 shadow-lg gap-1 ${
-                    theme === 'dark'
-                      ? 'bg-gray-700/50 border-2 border-gray-800'
-                      : 'bg-gray-200/50 border-2 border-gray-300'
-                  }`}
+                  key={item.label}
+                  className={`rounded-xl px-3 py-3 border ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-white'} shadow-sm`}
                 >
-                  <button
-                  onClick={() => setSlotFilter('all')}
-                    className={`px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 rounded-lg transition-all duration-300 text-xs sm:text-sm font-semibold flex items-center justify-center gap-1.5 sm:gap-2 relative touch-manipulation active:scale-95 ${
-                    slotFilter === 'all'
-                      ? 'bg-gradient-to-r from-[#4E6E49] to-[#4E6E49] text-white shadow-lg shadow-#4E6E49/50 scale-105'
-                      : theme === 'dark'
-                      ? 'text-gray-300 hover:bg-gray-600/50 hover:text-white hover:scale-105'
-                      : 'text-gray-700 hover:bg-gray-300 hover:text-gray-900 hover:scale-105'
-                  }`}
-                >
-                  <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
-                  <span className="whitespace-nowrap">Все</span>
-                  {slotFilter === 'all' && (
-                    <span className="absolute -top-0.5 -right-0.5 w-2 h-2 sm:w-2.5 sm:h-2.5 bg-[#4E6E49] rounded-full animate-pulse"></span>
-                  )}
-                  </button>
-                  <button
-                  onClick={() => setSlotFilter('upcoming')}
-                    className={`px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 rounded-lg transition-all duration-300 text-xs sm:text-sm font-semibold flex items-center justify-center gap-1.5 sm:gap-2 relative touch-manipulation active:scale-95 ${
-                    slotFilter === 'upcoming'
-                      ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/50 scale-105'
-                      : theme === 'dark'
-                      ? 'text-gray-300 hover:bg-gray-600/50 hover:text-white hover:scale-105'
-                      : 'text-gray-700 hover:bg-gray-300 hover:text-gray-900 hover:scale-105'
-                  }`}
-                >
-                  <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
-                  <span className="whitespace-nowrap">Предстоящие</span>
-                  {slotFilter === 'upcoming' && (
-                    <span className="absolute -top-0.5 -right-0.5 w-2 h-2 sm:w-2.5 sm:h-2.5 bg-blue-400 rounded-full animate-pulse"></span>
-                  )}
-                  </button>
-                  <button
-                  onClick={() => setSlotFilter('completed')}
-                    className={`px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 rounded-lg transition-all duration-300 text-xs sm:text-sm font-semibold flex items-center justify-center gap-1.5 sm:gap-2 relative touch-manipulation active:scale-95 ${
-                    slotFilter === 'completed'
-                      ? 'bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-lg shadow-gray-500/50 scale-105'
-                      : theme === 'dark'
-                      ? 'text-gray-300 hover:bg-gray-600/50 hover:text-white hover:scale-105'
-                      : 'text-gray-700 hover:bg-gray-300 hover:text-gray-900 hover:scale-105'
-                  }`}
-                >
-                  <CalendarCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
-                  <span className="whitespace-nowrap">Завершенные</span>
-                  {slotFilter === 'completed' && (
-                    <span className="absolute -top-0.5 -right-0.5 w-2 h-2 sm:w-2.5 sm:h-2.5 bg-gray-400 rounded-full animate-pulse"></span>
-                  )}
-                  </button>
+                  <p className="text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                    {item.label}
+                  </p>
+                  <p className={`text-2xl font-extrabold bg-gradient-to-r ${item.tone} text-transparent bg-clip-text`}>
+                    {item.value}
+                  </p>
                 </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Controls */}
+        <div className={`rounded-2xl border ${theme === 'dark' ? 'border-gray-800 bg-[#0f1623]' : 'border-gray-200 bg-white'} shadow-xl p-4 sm:p-5 space-y-4`}>
+          <div className="flex flex-col lg:flex-row gap-3 lg:items-center lg:justify-between">
+            <div className="flex flex-wrap gap-2">
+              <div className={`flex rounded-xl border ${theme === 'dark' ? 'border-gray-800 bg-gray-900/70' : 'border-gray-200 bg-gray-50'} overflow-hidden`}>
+                <button
+                  onClick={() => handleViewModeChange('table')}
+                  aria-disabled={isMobile}
+                  className={`px-3 sm:px-4 py-2 text-sm font-semibold flex items-center gap-2 transition-all ${
+                    viewMode === 'table' && !isMobile
+                      ? 'bg-[#4E6E49] text-white shadow-lg'
+                      : isMobile
+                      ? 'text-gray-400 cursor-not-allowed'
+                      : theme === 'dark' ? 'text-gray-300 hover:bg-gray-800' : 'text-gray-700 hover:bg-white'
+                  }`}
+                >
+                  <Table2 className="w-4 h-4" />
+                  Таблица
+                </button>
+                <button
+                  onClick={() => handleViewModeChange('week')}
+                  className={`px-3 sm:px-4 py-2 text-sm font-semibold flex items-center gap-2 transition-all ${
+                    viewMode === 'week'
+                      ? 'bg-[#4E6E49] text-white shadow-lg'
+                      : theme === 'dark' ? 'text-gray-300 hover:bg-gray-800' : 'text-gray-700 hover:bg-white'
+                  }`}
+                >
+                  <Calendar className="w-4 h-4" />
+                  Неделя
+                </button>
+              </div>
+
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { key: 'all', label: 'Все', icon: <Calendar className="w-4 h-4" /> },
+                  { key: 'upcoming', label: 'Предстоящие', icon: <Clock className="w-4 h-4" /> },
+                  { key: 'completed', label: 'Завершённые', icon: <CalendarCheck className="w-4 h-4" /> },
+                ].map((f) => (
+                  <button
+                    key={f.key}
+                    onClick={() => setSlotFilter(f.key as SlotFilter)}
+                    className={`px-3 py-2 rounded-xl text-sm font-semibold flex items-center gap-2 transition-all border ${
+                      slotFilter === f.key
+                        ? 'bg-gradient-to-r from-[#4E6E49] to-emerald-600 text-white border-transparent shadow-lg'
+                        : theme === 'dark'
+                        ? 'border-gray-800 bg-gray-900/70 text-gray-200 hover:border-[#4E6E49]/40'
+                        : 'border-gray-200 bg-gray-50 text-gray-700 hover:border-[#4E6E49]/40'
+                    }`}
+                  >
+                    {f.icon}
+                    {f.label}
+                  </button>
+                ))}
               </div>
             </div>
 
-            <div className="flex flex-col gap-3 sm:gap-4">
-              <h2 className={`text-base sm:text-lg md:text-xl font-semibold ${headingColor}`}>Инструменты управления</h2>
-
-              <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-2 sm:gap-3 w-full">
-                {/* View mode toggle */}
-                <div className={`flex rounded-lg sm:rounded-xl p-1 sm:p-1.5 w-full sm:w-auto shadow-inner ${
-                  theme === 'dark' ? 'bg-gray-700/50 border border-gray-800' : 'bg-gray-200/50 border border-gray-300'
-                }`}>
-                  <button
-                    onClick={() => handleViewModeChange('table')}
-                    aria-disabled={isMobile}
-                    className={`flex-1 px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm md:text-base rounded-lg transition-all duration-200 flex items-center justify-center gap-1.5 sm:gap-2 font-medium touch-manipulation ${
-                      viewMode === 'table' && !isMobile
-                        ? 'bg-gradient-to-r from-[#4E6E49] to-[#4E6E49] text-white shadow-lg shadow-#4E6E49/50 scale-105'
-                        : isMobile
-                        ? 'bg-gray-200/60 text-gray-400 cursor-not-allowed'
-                        : theme === 'dark'
-                        ? 'text-gray-300 hover:bg-gray-600/50 hover:text-white active:scale-95'
-                        : 'text-gray-700 hover:bg-gray-300 hover:text-gray-900 active:scale-95'
-                    }`}
-                  >
-                    <Table2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
-                    <span className="whitespace-nowrap">Таблица</span>
-                  </button>
-                  <button
-                    onClick={() => handleViewModeChange('week')}
-                    className={`flex-1 px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm md:text-base rounded-lg transition-all duration-200 flex items-center justify-center gap-1.5 sm:gap-2 font-medium touch-manipulation active:scale-95 ${
-                      viewMode === 'week'
-                        ? 'bg-gradient-to-r from-[#4E6E49] to-[#4E6E49] text-white shadow-lg shadow-#4E6E49/50 scale-105'
-                        : theme === 'dark'
-                        ? 'text-gray-300 hover:bg-gray-600/50 hover:text-white'
-                        : 'text-gray-700 hover:bg-gray-300 hover:text-gray-900'
-                    }`}
-                  >
-                    <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
-                    <span className="whitespace-nowrap">Неделя</span>
-                  </button>
-                </div>
-
-              {/* Add buttons */}
+            <div className="flex flex-wrap gap-2 w-full lg:w-auto">
               <button
                 onClick={handleAddSlot}
-                className="w-full sm:flex-1 sm:w-auto px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm md:text-base bg-gradient-to-r from-[#4E6E49] to-[#4E6E49] hover:from-[#4E6E49] hover:to-[#4E6E49] text-white rounded-lg sm:rounded-xl transition-all duration-200 flex items-center justify-center gap-1.5 sm:gap-2 font-medium shadow-lg shadow-#4E6E49/30 hover:shadow-#4E6E49/50 active:scale-95 sm:hover:scale-105 touch-manipulation"
+                className="flex-1 lg:flex-none px-4 py-2 rounded-xl bg-gradient-to-r from-[#4E6E49] to-[#4E6E49] text-white font-semibold shadow-lg hover:shadow-xl transition"
               >
-                <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
-                <span className="whitespace-nowrap">Добавить слот</span>
+                Добавить слот
               </button>
-
               <button
                 onClick={handleDeleteSlots}
-                className="w-full sm:flex-1 sm:w-auto px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm md:text-base bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-lg sm:rounded-xl transition-all duration-200 flex items-center justify-center gap-1.5 sm:gap-2 font-medium shadow-lg shadow-red-500/30 hover:shadow-red-500/50 active:scale-95 sm:hover:scale-105 touch-manipulation"
+                className="flex-1 lg:flex-none px-4 py-2 rounded-xl bg-gradient-to-r from-red-500 to-pink-500 text-white font-semibold shadow-lg hover:shadow-xl transition"
               >
-                <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
-                <span className="whitespace-nowrap">Удалить слоты</span>
+                Удалить слоты
               </button>
-
-              <div className="flex gap-2 w-full sm:w-auto sm:flex-1">
+              <div className="flex flex-1 lg:flex-none gap-2">
                 <button
                   onClick={() => handleAddStatus('dayoff')}
-                  className="flex-1 px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white rounded-lg sm:rounded-xl transition-all duration-200 font-medium shadow-lg shadow-yellow-500/30 hover:shadow-yellow-500/50 active:scale-95 sm:hover:scale-105 touch-manipulation whitespace-nowrap"
+                  className="flex-1 px-3 py-2 rounded-xl bg-gradient-to-r from-yellow-500 to-yellow-600 text-white font-semibold shadow hover:shadow-lg"
                 >
                   Выходной
                 </button>
                 <button
                   onClick={() => handleAddStatus('sick')}
-                  className="flex-1 px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white rounded-lg sm:rounded-xl transition-all duration-200 font-medium shadow-lg shadow-purple-500/30 hover:shadow-purple-500/50 active:scale-95 sm:hover:scale-105 touch-manipulation whitespace-nowrap"
+                  className="flex-1 px-3 py-2 rounded-xl bg-gradient-to-r from-purple-500 to-purple-600 text-white font-semibold shadow hover:shadow-lg"
                 >
                   Больничный
                 </button>
                 <button
                   onClick={() => handleAddStatus('vacation')}
-                  className="flex-1 px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-lg sm:rounded-xl transition-all duration-200 font-medium shadow-lg shadow-orange-500/30 hover:shadow-orange-500/50 active:scale-95 sm:hover:scale-105 touch-manipulation whitespace-nowrap"
+                  className="flex-1 px-3 py-2 rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold shadow hover:shadow-lg"
                 >
                   Отпуск
                 </button>
               </div>
-              </div>
             </div>
           </div>
 
-          {/* Participant filter */}
-          <div className={`mt-4 sm:mt-6 pt-4 sm:pt-6 border-t-2 ${theme === 'dark' ? 'border-gray-800/50' : 'border-gray-200/50'}`}>
-            <label className={`block text-sm sm:text-base font-bold mb-3 sm:mb-4 flex items-center gap-2 ${headingColor}`}>
-              <Users className="w-4 h-4 sm:w-5 sm:h-5 text-[#4E6E49] flex-shrink-0" />
-              <span>Фильтр по участникам</span>
-            </label>
-            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+          <div className="flex flex-col gap-2">
+            <p className={`text-sm font-semibold ${headingColor}`}>Участники</p>
+            <div className="flex gap-2 overflow-x-auto pb-1">
               <button
                 onClick={() => setSelectedUserId(null)}
-                className={`group relative px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 md:py-3 rounded-lg sm:rounded-xl transition-all duration-300 font-medium text-xs sm:text-sm shadow-lg touch-manipulation active:scale-95 sm:hover:scale-105 ${
+                className={`px-3 py-2 rounded-xl text-sm font-semibold whitespace-nowrap border transition ${
                   selectedUserId === null
-                    ? 'bg-gradient-to-r from-[#4E6E49] to-[#4E6E49] text-white shadow-#4E6E49/50 scale-105'
+                    ? 'bg-gradient-to-r from-[#4E6E49] to-[#4E6E49] text-white border-transparent shadow-lg'
                     : theme === 'dark'
-                    ? 'bg-gray-700/50 border-2 border-gray-800 text-gray-300 hover:bg-gray-600/70 hover:border-[#4E6E49]/50 hover:text-white'
-                    : 'bg-white border-2 border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-[#4E6E49]/50 hover:text-[#4E6E49]'
+                    ? 'bg-gray-900/70 border-gray-800 text-gray-200 hover:border-[#4E6E49]/40'
+                    : 'bg-gray-50 border-gray-200 text-gray-700 hover:border-[#4E6E49]/40'
                 }`}
               >
-                <span className="flex items-center gap-1.5 sm:gap-2">
-                  <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
-                  <span className="whitespace-nowrap">Все участники</span>
-                </span>
-                {selectedUserId === null && (
-                  <span className="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 w-2 h-2 sm:w-3 sm:h-3 bg-[#4E6E49] rounded-full border border-white sm:border-2 animate-pulse"></span>
-                )}
+                Все участники
               </button>
               {TEAM_MEMBERS.map((member) => (
                 <button
                   key={member.id}
                   onClick={() => setSelectedUserId(member.id)}
-                  className={`group relative px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 md:py-3 rounded-lg sm:rounded-xl transition-all duration-300 font-medium text-xs sm:text-sm shadow-lg flex items-center gap-2 sm:gap-3 touch-manipulation active:scale-95 sm:hover:scale-105 ${
+                  className={`px-3 py-2 rounded-xl text-sm font-semibold whitespace-nowrap border transition flex items-center gap-2 ${
                     selectedUserId === member.id
-                      ? 'bg-gradient-to-r from-[#4E6E49] to-[#4E6E49] text-white shadow-#4E6E49/50 scale-105 ring-2 ring-#4E6E49/50'
+                      ? 'bg-gradient-to-r from-[#4E6E49] to-[#4E6E49] text-white border-transparent shadow-lg'
                       : theme === 'dark'
-                      ? 'bg-gray-700/50 border-2 border-gray-800 text-gray-300 hover:bg-gray-600/70 hover:border-[#4E6E49]/50 hover:text-white'
-                      : 'bg-white border-2 border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-[#4E6E49]/50 hover:text-[#4E6E49]'
+                      ? 'bg-gray-900/70 border-gray-800 text-gray-200 hover:border-[#4E6E49]/40'
+                      : 'bg-gray-50 border-gray-200 text-gray-700 hover:border-[#4E6E49]/40'
                   }`}
                 >
-                  <div className="relative flex-shrink-0">
-                    {member.avatar ? (
-                      <img
-                        src={member.avatar}
-                        alt={member.name}
-                        className={`w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 rounded-full object-cover border-2 transition-all duration-300 ${
-                          selectedUserId === member.id
-                            ? 'border-white ring-2 ring-white/50 scale-110'
-                            : theme === 'dark'
-                            ? 'border-gray-500 group-hover:border-[#4E6E49]'
-                            : 'border-gray-300 group-hover:border-[#4E6E49]'
-                        }`}
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement
-                          target.style.display = 'none'
-                          const fallback = target.nextElementSibling as HTMLElement
-                          if (fallback) fallback.style.display = 'flex'
-                        }}
-                      />
-                    ) : null}
-                    <div
-                      className={`w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center font-bold text-xs transition-all duration-300 ${
-                        selectedUserId === member.id
-                          ? 'bg-white/20 text-white ring-2 ring-white/50 scale-110'
-                          : theme === 'dark'
-                          ? 'bg-gradient-to-br from-[#4E6E49]/30 to-blue-500/30 text-gray-300 group-hover:from-[#4E6E49]/50 group-hover:to-blue-500/50'
-                          : 'bg-gradient-to-br from-[#4E6E49]/30 to-blue-400/30 text-gray-600 group-hover:from-[#4E6E49]/50 group-hover:to-blue-400/50'
-                      } ${member.avatar ? 'absolute inset-0 hidden' : ''}`}
-                    >
-                      {member.name.charAt(0).toUpperCase()}
-                    </div>
-                  </div>
-                  <span className="whitespace-nowrap truncate max-w-[100px] sm:max-w-none">{member.name}</span>
-                  {selectedUserId === member.id && (
-                    <span className="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 w-2 h-2 sm:w-3 sm:h-3 bg-[#4E6E49] rounded-full border border-white sm:border-2 animate-pulse"></span>
-                  )}
+                  <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-gradient-to-br from-[#4E6E49]/30 to-blue-500/30 text-xs font-bold">
+                    {member.name.charAt(0)}
+                  </span>
+                  {member.name}
                 </button>
               ))}
             </div>
           </div>
         </div>
 
-
         {/* Content view */}
         <div className={contentCardClass}>
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 mb-4">
+          <div className="flex items-center justify-between mb-4">
             <div>
-              <p className={`text-sm sm:text-base font-semibold ${headingColor}`}>Расписание команды</p>
-              <p className={`text-xs sm:text-sm ${labelColor}`}>
-                Выберите удобный формат отображения и управляйте слотами в одном месте
-              </p>
+              <p className={`text-sm sm:text-base font-semibold ${headingColor}`}>Расписание</p>
+              <p className={`text-xs sm:text-sm ${labelColor}`}>Слоты и статусы за выбранную неделю</p>
             </div>
             {isMobile && (
-              <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold text-amber-700 bg-amber-100 dark:text-amber-300 dark:bg-amber-500/10">
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>Мобильный вид</span>
-              </div>
+              <span className="text-xs px-3 py-1 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-300">
+                Мобильный вид
+              </span>
             )}
           </div>
 
@@ -573,7 +410,7 @@ export const Management = () => {
                   <Table2 className={`w-8 h-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`} />
                   <p className="text-sm font-semibold">Табличный вид недоступен на мобильных устройствах</p>
                   <p className="text-xs">
-                    Пожалуйста, откройте ApeVault Panel на ПК или ноутбуке, чтобы использовать расширенную таблицу.
+                    Откройте ApeVault Panel на ПК, чтобы использовать таблицу.
                   </p>
                 </div>
               </div>

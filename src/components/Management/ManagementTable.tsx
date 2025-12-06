@@ -239,7 +239,7 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
     <div className={`rounded-lg ${theme === 'dark' ? 'bg-[#1a1a1a]' : 'bg-white'} shadow-md overflow-hidden`}>
       {/* Week navigation */}
       <div
-        className={`p-4 border-b ${theme === 'dark' ? 'border-gray-800' : 'border-gray-200'} flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between`}
+        className={`p-4 border-b ${theme === 'dark' ? 'border-gray-800' : 'border-gray-200'} flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between bg-gradient-to-r ${theme === 'dark' ? 'from-[#0f172a] via-[#0b1323] to-[#0f172a]' : 'from-green-50 via-white to-green-50'}`}
       >
         <button
           onClick={() => navigateWeek('prev')}
@@ -262,20 +262,20 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
       <div className="overflow-x-auto -mx-3 sm:-mx-4 md:-mx-6 lg:-mx-8 px-3 sm:px-4 md:px-6 lg:px-8">
         <div className="min-w-full inline-block align-middle">
           <table className="w-full min-w-[640px]">
-            <thead>
-              <tr className={`${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100'}`}>
-                <th className={`px-2 sm:px-3 md:px-4 py-2 sm:py-2.5 md:py-3 text-left text-xs sm:text-sm font-semibold ${headingColor} sticky left-0 z-20 ${
-                  theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100'
+            <thead className="sticky top-0 z-30">
+              <tr className={`${theme === 'dark' ? 'bg-[#0f172a]' : 'bg-gray-50'} shadow-sm`}>
+                <th className={`px-2 sm:px-3 md:px-4 py-3 text-left text-xs sm:text-sm font-semibold ${headingColor} sticky left-0 z-30 ${
+                  theme === 'dark' ? 'bg-[#0f172a]' : 'bg-gray-50'
                 }`}>Участник</th>
                 {weekDays.map((day) => (
-                  <th key={day.toISOString()} className={`px-1.5 sm:px-2 md:px-3 lg:px-4 py-2 sm:py-2.5 md:py-3 text-center text-xs sm:text-sm font-semibold ${headingColor} whitespace-nowrap`}>
-                    <div className="flex flex-col items-center gap-0.5">
-                      <span className="text-[10px] sm:text-xs opacity-70">{formatDate(day, 'EEE')}</span>
-                      <span>{formatDate(day, 'dd.MM')}</span>
+                  <th key={day.toISOString()} className="px-1.5 sm:px-2 md:px-3 lg:px-4 py-3">
+                    <div className={`mx-auto w-full max-w-[110px] rounded-xl border ${theme === 'dark' ? 'border-white/10 bg-white/5 text-white' : 'border-gray-200 bg-white text-gray-900'} shadow-sm text-center`}>
+                      <div className="text-[10px] sm:text-xs opacity-70">{formatDate(day, 'EEE')}</div>
+                      <div className="text-sm font-semibold">{formatDate(day, 'dd.MM')}</div>
                     </div>
                   </th>
                 ))}
-                <th className={`px-2 sm:px-3 md:px-4 py-2 sm:py-2.5 md:py-3 text-center text-xs sm:text-sm font-bold ${headingColor} whitespace-nowrap`}>Статистика</th>
+                <th className={`px-2 sm:px-3 md:px-4 py-3 text-center text-xs sm:text-sm font-bold ${headingColor} whitespace-nowrap`}>Итог</th>
               </tr>
             </thead>
             <tbody>
