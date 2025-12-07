@@ -417,8 +417,8 @@ export const Management = () => {
 
         {/* Content view */}
         <div className={contentCardClass}>
-          <div className={`flex items-center mb-4 ${isMobile ? 'justify-center text-center' : 'justify-between'}`}>
-            <div>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 text-left">
+            <div className="text-left">
               <p className={`text-sm sm:text-base font-semibold ${headingColor}`}>Расписание</p>
               <p className={`text-xs sm:text-sm ${labelColor}`}>Слоты и статусы за выбранную неделю</p>
             </div>
