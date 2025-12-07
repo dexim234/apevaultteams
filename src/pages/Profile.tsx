@@ -32,8 +32,10 @@ import {
   Copy,
   Check,
   Info,
+  DollarSign,
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import { TEAM_MEMBERS } from '@/types'
 
 export const Profile = () => {
   const { theme } = useThemeStore()
@@ -46,6 +48,12 @@ export const Profile = () => {
   const [tasks, setTasks] = useState<Task[]>([])
   const [rating, setRating] = useState<RatingData | null>(null)
   const [ratingBreakdown, setRatingBreakdown] = useState<ReturnType<typeof getRatingBreakdown> | null>(null)
+  const [earningsSummary, setEarningsSummary] = useState<{
+    total: number
+    pool: number
+    net: number
+    weekly: { gross: number; pool: number; net: number }
+  } | null>(null)
   const [loading, setLoading] = useState(true)
   const [loginCopied, setLoginCopied] = useState(false)
 
@@ -82,6 +90,10 @@ export const Profile = () => {
         const weeklyEarnings = weekEarnings.reduce((sum, e) => {
           const participantCount = e.participants && e.participants.length > 0 ? e.participants.length : 1
           return sum + (e.amount / participantCount)
+        }, 0)
+        const weeklyPool = weekEarnings.reduce((sum, e) => {
+          const participantCount = e.participants && e.participants.length > 0 ? e.participants.length : 1
+          return sum + (e.poolAmount / participantCount)
         }, 0)
 
         const monthEarnings = await getEarnings(userId, monthStart, monthEnd)
@@ -167,6 +179,17 @@ export const Profile = () => {
 
         setRating({ ...updatedData, rating: calculatedRating })
         setRatingBreakdown(breakdown)
+
+        setEarningsSummary({
+          total: totalEarnings,
+          pool: poolAmount,
+          net: Math.max(0, totalEarnings - poolAmount),
+          weekly: {
+            gross: weeklyEarnings,
+            pool: weeklyPool,
+            net: Math.max(0, weeklyEarnings - weeklyPool),
+          },
+        })
       }
     } catch (error) {
       console.error('Error loading profile data:', error)
@@ -200,6 +223,8 @@ export const Profile = () => {
   }
 
   const userData = user || (isAdmin ? { name: 'Администратор', login: 'admin', password: 'admin' } : null)
+  const profileAvatar = user?.id ? TEAM_MEMBERS.find((m) => m.id === user.id)?.avatar : undefined
+  const profileInitial = userData?.name ? userData.name.charAt(0).toUpperCase() : 'A'
   const pendingTasks = tasks.filter(t => t.status === 'pending').length
   const inProgressTasks = tasks.filter(t => t.status === 'in_progress').length
   const completedTasks = tasks.filter(t => t.status === 'completed').length
@@ -242,8 +267,20 @@ export const Profile = () => {
         <div className={`rounded-2xl p-6 border ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-white'} shadow-lg`}>
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className={`p-3 rounded-xl ${theme === 'dark' ? 'bg-[#4E6E49]/20 text-[#4E6E49]' : 'bg-green-50 text-[#4E6E49]'}`}>
-                <User className="w-6 h-6" />
+              <div className="relative w-12 h-12 rounded-xl overflow-hidden shadow-lg border border-white/50 dark:border-white/10 bg-gradient-to-br from-[#4E6E49]/15 to-emerald-200/40 flex items-center justify-center">
+                {profileAvatar ? (
+                  <img
+                    src={profileAvatar}
+                    alt={userData.name}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement
+                      target.style.display = 'none'
+                    }}
+                  />
+                ) : (
+                  <span className="text-lg font-extrabold text-[#4E6E49]">{profileInitial}</span>
+                )}
               </div>
               <div>
                 <p className={`text-xs uppercase tracking-[0.14em] ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>ApeVault Black Ops</p>
@@ -399,6 +436,73 @@ export const Profile = () => {
               </div>
 
               <div className="space-y-4 flex flex-col">
+                {earningsSummary && (
+                  <div className={`rounded-2xl p-5 border ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-white'} shadow flex-1`}>
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className={`p-2.5 rounded-xl ${theme === 'dark' ? 'bg-emerald-500/20 text-emerald-200' : 'bg-emerald-50 text-emerald-700'}`}>
+                          <DollarSign className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <h2 className={`text-lg font-bold ${headingColor}`}>Мой заработок</h2>
+                          <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Суммы с учётом долей</p>
+                        </div>
+                      </div>
+                      <div className={`px-3 py-1.5 rounded-full text-xs font-semibold border ${earningsSummary.weekly.net >= 10000 ? 'border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-500/30 dark:bg-emerald-500/15 dark:text-emerald-100' : 'border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/15 dark:text-amber-100'}`}>
+                        {earningsSummary.weekly.net >= 10000 ? 'Вывод доступен' : 'Минимум 10 000 для вывода'}
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+                      {[
+                        { label: 'Всего заработано', value: earningsSummary.total },
+                        { label: 'Отправлено в пул', value: earningsSummary.pool },
+                        { label: 'Чистыми', value: earningsSummary.net },
+                      ].map((item) => (
+                        <div
+                          key={item.label}
+                          className={`p-4 rounded-xl border shadow-sm ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-100 bg-gray-50'}`}
+                        >
+                          <p className="text-xs uppercase tracking-wide opacity-70">{item.label}</p>
+                          <p className={`text-2xl font-extrabold ${headingColor}`}>{Math.round(item.value).toLocaleString('ru-RU')} ₽</p>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className={`p-4 rounded-xl border ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-emerald-50 bg-emerald-50/70'} flex flex-col gap-2`}>
+                      <div className="flex items-center justify-between gap-2 flex-wrap">
+                        <div>
+                          <p className={`text-sm font-semibold ${headingColor}`}>Активная неделя</p>
+                          <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Понедельник, среда, пятница, суббота — дни вывода</p>
+                        </div>
+                        <span className={`text-xs px-3 py-1 rounded-full border ${earningsSummary.weekly.net >= 10000 ? 'border-emerald-200 bg-emerald-100 text-emerald-800 dark:border-emerald-500/40 dark:bg-emerald-500/15 dark:text-emerald-50' : 'border-amber-200 bg-amber-100 text-amber-800 dark:border-amber-500/40 dark:bg-amber-500/15 dark:text-amber-50'}`}>
+                          {earningsSummary.weekly.net >= 10000 ? 'Доступно к выводу' : 'Перенос на следующую неделю'}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        {[
+                          { label: 'Заработано за неделю', value: earningsSummary.weekly.gross },
+                          { label: 'В пул за неделю', value: earningsSummary.weekly.pool },
+                          { label: 'Чистыми за неделю', value: earningsSummary.weekly.net },
+                        ].map((item) => (
+                          <div
+                            key={item.label}
+                            className={`p-3 rounded-lg border ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-white/80 bg-white/80'} shadow-sm`}
+                          >
+                            <p className="text-[11px] uppercase tracking-wide opacity-70">{item.label}</p>
+                            <p className={`text-lg font-bold ${headingColor}`}>{Math.round(item.value).toLocaleString('ru-RU')} ₽</p>
+                          </div>
+                        ))}
+                      </div>
+                      {earningsSummary.weekly.net < 10000 && (
+                        <p className={`text-xs ${theme === 'dark' ? 'text-amber-200' : 'text-amber-700'}`}>
+                          Менее 10 000 ₽ чистыми за активную неделю — вывод недоступен, сумма переносится на следующую неделю.
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )}
+
                 {rating && ratingBreakdown && (
                   <div className={`rounded-2xl p-5 border ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-white'} shadow flex-1`}>
                     <div className="flex items-center justify-between mb-4">
