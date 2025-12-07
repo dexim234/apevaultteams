@@ -47,7 +47,6 @@ export const EarningsForm = ({ onClose, onSave, editingEarning }: EarningsFormPr
 
   // Lock background scroll while modal is open
   useEffect(() => {
-    const originalStyle = document.body.getAttribute('style')
     const originalPaddingRight = window.innerWidth - document.documentElement.clientWidth
     
     // Store scroll position and lock it

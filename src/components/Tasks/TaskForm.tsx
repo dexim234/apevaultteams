@@ -45,7 +45,6 @@ export const TaskForm = ({ onClose, onSave, editingTask }: TaskFormProps) => {
 
   // Lock background scroll while modal is open
   useEffect(() => {
-    const originalStyle = document.body.getAttribute('style')
     const originalPaddingRight = window.innerWidth - document.documentElement.clientWidth
     
     // Store scroll position and lock it
