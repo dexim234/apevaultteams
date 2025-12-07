@@ -644,6 +644,7 @@ export const DayStatusForm = ({ type, status, onClose, onSave }: DayStatusFormPr
               </button>
             </div>
           </div>
+          </div>
         </div>
       </div>
     </div>

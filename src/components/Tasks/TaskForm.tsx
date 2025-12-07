@@ -500,7 +500,6 @@ export const TaskForm = ({ onClose, onSave, editingTask }: TaskFormProps) => {
               </button>
             </div>
           </div>
-          </div>
         </div>
       </div>
     </div>

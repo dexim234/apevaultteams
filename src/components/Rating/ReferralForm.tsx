@@ -220,6 +220,7 @@ export const ReferralForm = ({ referral, onClose, onSave }: ReferralFormProps) =
               Отмена
             </button>
           </div>
+          </div>
         </div>
       </div>
     </div>
