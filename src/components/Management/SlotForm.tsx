@@ -40,6 +40,7 @@ export const SlotForm = ({ slot, onClose, onSave }: SlotFormProps) => {
   const [currentEndDate, setCurrentEndDate] = useState('')
   const [currentBreakStart, setCurrentBreakStart] = useState('')
   const [currentBreakEnd, setCurrentBreakEnd] = useState('')
+  const [editingTimeSlotIndex, setEditingTimeSlotIndex] = useState<number | null>(null)
   const [currentSlotIndex, setCurrentSlotIndex] = useState<number | null>(null)
   const [editBreakSlotIndex, setEditBreakSlotIndex] = useState<number | null>(null)
   const [editBreakIndex, setEditBreakIndex] = useState<number | null>(null)
@@ -97,7 +98,7 @@ export const SlotForm = ({ slot, onClose, onSave }: SlotFormProps) => {
     }
   }, [crossesMidnight, date, currentStart, currentEnd])
 
-  const addTimeSlot = () => {
+  const addOrUpdateTimeSlot = () => {
     if (!currentStart || !currentEnd) {
       setError('Заполните время начала и окончания')
       return
@@ -125,21 +126,59 @@ export const SlotForm = ({ slot, onClose, onSave }: SlotFormProps) => {
     }
 
     // Add slot without breaks initially (breaks can be added separately)
+    const baseBreaks = editingTimeSlotIndex !== null ? (slots[editingTimeSlotIndex]?.breaks || []) : []
     const newSlot: TimeSlot = {
       start: currentStart,
       end: currentEnd,
       ...(endDate && { endDate }),
-      breaks: []
+      breaks: baseBreaks
     }
 
-    setSlots([...slots, newSlot])
+    if (editingTimeSlotIndex !== null) {
+      const updated = [...slots]
+      updated[editingTimeSlotIndex] = newSlot
+      setSlots(updated)
+    } else {
+      setSlots([...slots, newSlot])
+    }
+
     setCurrentStart('')
     setCurrentEnd('')
     setCrossesMidnight(false)
     setCurrentEndDate('')
     setCurrentBreakStart('')
     setCurrentBreakEnd('')
+    setEditingTimeSlotIndex(null)
     setCurrentSlotIndex(null)
+    setError('')
+  }
+
+  const startEditTimeSlot = (index: number) => {
+    const slotToEdit = slots[index]
+    if (!slotToEdit) return
+
+    const slotCrossesMidnight = !!slotToEdit.endDate || parseTime(slotToEdit.end) <= parseTime(slotToEdit.start)
+
+    setCurrentStart(slotToEdit.start)
+    setCurrentEnd(slotToEdit.end)
+    setCrossesMidnight(slotCrossesMidnight)
+    setCurrentEndDate(slotToEdit.endDate || '')
+    setEditingTimeSlotIndex(index)
+    // Сброс редактирования перерывов, чтобы не конфликтовать с редактированием времени
+    setCurrentSlotIndex(null)
+    setEditBreakSlotIndex(null)
+    setEditBreakIndex(null)
+    setCurrentBreakStart('')
+    setCurrentBreakEnd('')
+    setError('')
+  }
+
+  const cancelEditTimeSlot = () => {
+    setEditingTimeSlotIndex(null)
+    setCurrentStart('')
+    setCurrentEnd('')
+    setCrossesMidnight(false)
+    setCurrentEndDate('')
     setError('')
   }
 
@@ -287,6 +326,9 @@ export const SlotForm = ({ slot, onClose, onSave }: SlotFormProps) => {
 
   const removeTimeSlot = (index: number) => {
     setSlots(slots.filter((_, i) => i !== index))
+    if (editingTimeSlotIndex === index) {
+      cancelEditTimeSlot()
+    }
   }
 
   const handleDayToggle = (dayIndex: number) => {
@@ -833,13 +875,32 @@ export const SlotForm = ({ slot, onClose, onSave }: SlotFormProps) => {
                     )}
                   </div>
                 )}
-                <button
-                  onClick={addTimeSlot}
-                  className="w-full px-4 py-2 bg-[#4E6E49] hover:bg-[#4E6E49] text-white rounded-lg transition-colors flex items-center justify-center gap-2"
-                >
-                  <Plus className="w-4 h-4" />
-                  Добавить слот
-                </button>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <button
+                    onClick={addOrUpdateTimeSlot}
+                    className="w-full px-4 py-2 bg-[#4E6E49] hover:bg-[#4E6E49] text-white rounded-lg transition-colors flex items-center justify-center gap-2"
+                  >
+                    {editingTimeSlotIndex !== null ? (
+                      <>
+                        <Edit className="w-4 h-4" />
+                        Сохранить слот
+                      </>
+                    ) : (
+                      <>
+                        <Plus className="w-4 h-4" />
+                        Добавить слот
+                      </>
+                    )}
+                  </button>
+                  {editingTimeSlotIndex !== null && (
+                    <button
+                      onClick={cancelEditTimeSlot}
+                      className={`w-full sm:w-auto px-4 py-2 rounded-lg border ${theme === 'dark' ? 'border-gray-700 text-gray-200 hover:bg-gray-700' : 'border-gray-300 text-gray-800 hover:bg-gray-100'}`}
+                    >
+                      Отмена
+                    </button>
+                  )}
+                </div>
               </div>
 
               {/* Added slots */}
@@ -866,13 +927,22 @@ export const SlotForm = ({ slot, onClose, onSave }: SlotFormProps) => {
                           </span>
                         )}
                       </div>
-                      <button
-                        onClick={() => removeTimeSlot(index)}
-                        className="p-1 text-red-500 hover:bg-red-500 hover:text-white rounded transition-colors flex-shrink-0"
-                        title="Удалить слот"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => startEditTimeSlot(index)}
+                          className="p-1 text-blue-500 hover:bg-blue-500 hover:text-white rounded transition-colors flex-shrink-0"
+                          title="Редактировать слот"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => removeTimeSlot(index)}
+                          className="p-1 text-red-500 hover:bg-red-500 hover:text-white rounded transition-colors flex-shrink-0"
+                          title="Удалить слот"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
 
                     {/* Breaks for this slot */}

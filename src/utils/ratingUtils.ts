@@ -42,10 +42,10 @@ export const calculateRating = (
     rating += 10
   }
 
-  // Часы работы в неделю: <20 = 0%, >=20 = 15%, >=30 = 25%
-  if (weeklyHours >= 30) {
+  // Часы работы в неделю: <15 = 0%, >=15 = 15%, >=20 = 25%
+  if (weeklyHours >= 20) {
     rating += 25
-  } else if (weeklyHours >= 20) {
+  } else if (weeklyHours >= 15) {
     rating += 15
   }
 
@@ -79,9 +79,9 @@ export const getRatingBreakdown = (
   const vacationDaysPoints = data.vacationDays <= 7 ? 10 : 0
   
   let weeklyHoursPoints = 0
-  if (weeklyHours >= 30) {
+  if (weeklyHours >= 20) {
     weeklyHoursPoints = 25
-  } else if (weeklyHours >= 20) {
+  } else if (weeklyHours >= 15) {
     weeklyHoursPoints = 15
   }
 

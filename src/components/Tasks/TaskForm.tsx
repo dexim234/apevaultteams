@@ -1,5 +1,5 @@
 // Form for adding/editing tasks
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useAuthStore } from '@/store/authStore'
 import { useAdminStore } from '@/store/adminStore'
 import { useThemeStore } from '@/store/themeStore'
@@ -42,6 +42,15 @@ export const TaskForm = ({ onClose, onSave, editingTask }: TaskFormProps) => {
   const [assignees, setAssignees] = useState<TaskAssignee[]>(initialAssignees)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+
+  // Lock background scroll while modal is open
+  useEffect(() => {
+    const originalOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = originalOverflow
+    }
+  }, [])
 
   const priorityOptions: { value: 'low' | 'medium' | 'high'; label: string; desc: string; tone: string }[] = [
     { value: 'high', label: 'Высокий', desc: 'Нужен приоритет и быстрый старт', tone: theme === 'dark' ? 'bg-red-500/15 border-red-500/40 text-red-100' : 'bg-red-50 border-red-200 text-red-700' },
@@ -187,7 +196,7 @@ export const TaskForm = ({ onClose, onSave, editingTask }: TaskFormProps) => {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto overscroll-contain">
       <div className={`${cardBg} rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto border-2 ${
         theme === 'dark' 
           ? 'border-[#4E6E49]/30 bg-gradient-to-br from-[#1a1a1a] via-[#1a1a1a] to-[#0A0A0A]' 

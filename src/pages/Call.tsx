@@ -23,6 +23,19 @@ export const CallPage = () => {
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'completed' | 'cancelled' | 'reviewed'>('all')
 
+  // Prevent background scrolling when any modal is open
+  useEffect(() => {
+    const originalOverflow = document.body.style.overflow
+    if (showForm || showDeleteModal) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => {
+      document.body.style.overflow = originalOverflow
+    }
+  }, [showForm, showDeleteModal])
+
   useEffect(() => {
     loadCalls()
   }, [])
@@ -428,7 +441,7 @@ export const CallPage = () => {
 
         {/* Form Modal */}
         {showForm && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200 overscroll-contain">
             <div className={`${bgColor} rounded-2xl p-8 shadow-2xl border ${borderColor} max-w-2xl w-full max-h-[90vh] overflow-y-auto animate-in slide-in-from-bottom-4 duration-300`}>
               <div className="flex items-center justify-between mb-6">
                 <h2 className={`text-3xl font-bold ${textColor}`}>
@@ -448,7 +461,7 @@ export const CallPage = () => {
 
         {/* Delete Confirmation Modal */}
         {showDeleteModal && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200 overscroll-contain">
             <div className={`${bgColor} rounded-2xl p-8 shadow-2xl border ${borderColor} max-w-md w-full animate-in slide-in-from-bottom-4 duration-300`}>
               <div className="flex items-center gap-4 mb-6">
                 <div className="p-3 rounded-full bg-red-500/10">

@@ -22,7 +22,7 @@ export const DeleteSlotsForm = ({ onClose, onSave }: DeleteSlotsFormProps) => {
   const [deleteByWeekDay, setDeleteByWeekDay] = useState(false)
   const [deleteByDates, setDeleteByDates] = useState(false)
   const [deleteByDateRange, setDeleteByDateRange] = useState(false)
-  const [selectedWeekDay, setSelectedWeekDay] = useState<number | null>(null)
+  const [selectedWeekDays, setSelectedWeekDays] = useState<number[]>([])
   const [selectedDates, setSelectedDates] = useState<string[]>([])
   const [currentDate, setCurrentDate] = useState('')
   const [dateRangeStart, setDateRangeStart] = useState('')
@@ -33,7 +33,7 @@ export const DeleteSlotsForm = ({ onClose, onSave }: DeleteSlotsFormProps) => {
   const weekDays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс']
   const activeMode = deleteByWeekDay ? 'По дню недели' : deleteByDates ? 'По датам' : deleteByDateRange ? 'Диапазон' : 'Не выбран'
   const selectionInfo = deleteByWeekDay
-    ? (selectedWeekDay !== null ? weekDays[selectedWeekDay] : 'День недели')
+    ? (selectedWeekDays.length > 0 ? selectedWeekDays.map((d) => weekDays[d]).join(', ') : 'Дни недели')
     : deleteByDates
     ? (selectedDates[0] ? `${formatDate(selectedDates[0], 'dd.MM')} +${Math.max(selectedDates.length - 1, 0)}` : 'Добавьте даты')
     : deleteByDateRange
@@ -51,7 +51,7 @@ export const DeleteSlotsForm = ({ onClose, onSave }: DeleteSlotsFormProps) => {
       setError('')
     } else {
       setDeleteByWeekDay(false)
-      setSelectedWeekDay(null)
+      setSelectedWeekDays([])
     }
   }
 
@@ -129,7 +129,7 @@ export const DeleteSlotsForm = ({ onClose, onSave }: DeleteSlotsFormProps) => {
       return
     }
 
-    if (deleteByWeekDay && selectedWeekDay === null) {
+    if (deleteByWeekDay && selectedWeekDays.length === 0) {
       setError('Выберите день недели')
       return
     }
@@ -167,7 +167,7 @@ export const DeleteSlotsForm = ({ onClose, onSave }: DeleteSlotsFormProps) => {
           .filter((slot) => {
             const dateObj = new Date(slot.date + 'T00:00:00')
             const dayOfWeek = dateObj.getDay() === 0 ? 6 : dateObj.getDay() - 1
-            return dayOfWeek === selectedWeekDay
+            return selectedWeekDays.includes(dayOfWeek)
           })
           .map((slot) => slot.id)
       } else if (deleteByDates) {
@@ -192,9 +192,10 @@ export const DeleteSlotsForm = ({ onClose, onSave }: DeleteSlotsFormProps) => {
       const usersText = targetUserIds.length > 1 
         ? `${targetUserIds.length} участников`
         : TEAM_MEMBERS.find(m => m.id === targetUserIds[0])?.name || 'участника'
-      
+
+      const weekDaysText = selectedWeekDays.map((d) => weekDays[d]).join(', ')
       const confirmMessage = deleteByWeekDay
-        ? `Удалить все слоты ${usersText} на ${weekDays[selectedWeekDay!]}? (${slotsToDelete.length} слотов)`
+        ? `Удалить все слоты ${usersText} на ${weekDaysText}? (${slotsToDelete.length} слотов)`
         : deleteByDateRange
         ? `Удалить все слоты ${usersText} с ${formatDate(dateRangeStart, 'dd.MM.yyyy')} по ${formatDate(dateRangeEnd, 'dd.MM.yyyy')}? (${slotsToDelete.length} слотов)`
         : `Удалить слоты ${usersText} на выбранные даты? (${slotsToDelete.length} слотов)`
@@ -325,24 +326,31 @@ export const DeleteSlotsForm = ({ onClose, onSave }: DeleteSlotsFormProps) => {
             {deleteByWeekDay && (
               <div className="ml-6">
                 <p className={`text-sm mb-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                  Выберите день недели:
+                  Выберите дни недели:
                 </p>
                 <div className="flex gap-2 flex-wrap">
-                  {weekDays.map((day, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setSelectedWeekDay(index)}
-                      className={`px-3 py-1 rounded-lg transition-colors ${
-                        selectedWeekDay === index
-                          ? 'bg-red-500 text-white'
-                          : theme === 'dark'
-                          ? 'bg-gray-700 text-gray-300'
-                          : 'bg-gray-200 text-gray-700'
-                      }`}
-                    >
-                      {day}
-                    </button>
-                  ))}
+                  {weekDays.map((day, index) => {
+                    const isSelected = selectedWeekDays.includes(index)
+                    return (
+                      <button
+                        key={index}
+                        onClick={() => {
+                          setSelectedWeekDays((prev) =>
+                            prev.includes(index) ? prev.filter((d) => d !== index) : [...prev, index]
+                          )
+                        }}
+                        className={`px-3 py-1 rounded-lg transition-colors ${
+                          isSelected
+                            ? 'bg-red-500 text-white'
+                            : theme === 'dark'
+                            ? 'bg-gray-700 text-gray-300'
+                            : 'bg-gray-200 text-gray-700'
+                        }`}
+                      >
+                        {day}
+                      </button>
+                    )
+                  })}
                 </div>
               </div>
             )}
