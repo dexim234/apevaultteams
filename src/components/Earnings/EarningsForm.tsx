@@ -45,6 +45,15 @@ export const EarningsForm = ({ onClose, onSave, editingEarning }: EarningsFormPr
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
+  // Lock background scroll while modal is open
+  useEffect(() => {
+    const originalOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = originalOverflow
+    }
+  }, [])
+
   const getCategoryIcon = (key: EarningsCategory, className = 'w-4 h-4') => {
     switch (key) {
       case 'memecoins':
@@ -301,7 +310,7 @@ export const EarningsForm = ({ onClose, onSave, editingEarning }: EarningsFormPr
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 sm:p-6 touch-manipulation overflow-y-auto overscroll-contain">
-      <div className={`w-full max-w-[540px] sm:max-w-3xl rounded-2xl sm:rounded-3xl shadow-xl ${theme === 'dark' ? 'bg-[#1a1a1a]' : 'bg-white'} max-h-[72vh] sm:max-h-[82vh] overflow-hidden`}>
+      <div className={`w-full max-w-[540px] sm:max-w-3xl rounded-2xl sm:rounded-3xl shadow-xl ${theme === 'dark' ? 'bg-[#1a1a1a]' : 'bg-white'} max-h-[calc(100dvh-72px)] overflow-y-auto`}>
         <div className="p-4 sm:p-6 flex flex-col h-full">
           <div className="flex items-center justify-between mb-4 sm:mb-6">
             <h3 className={`text-lg sm:text-xl font-bold ${headingColor} pr-2`}>{isEditing ? 'Редактировать заработок' : 'Добавить заработок'}</h3>
@@ -314,7 +323,7 @@ export const EarningsForm = ({ onClose, onSave, editingEarning }: EarningsFormPr
             </button>
           </div>
 
-          <div className="space-y-3 sm:space-y-4 overflow-y-auto pr-1">
+          <div className="space-y-3 sm:space-y-4 overflow-y-auto pr-1 pb-6">
             {/* Date */}
             <div>
               <label className={`flex flex-col sm:flex-row sm:items-center sm:justify-between text-xs sm:text-sm font-medium mb-2 gap-1 sm:gap-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
@@ -326,7 +335,7 @@ export const EarningsForm = ({ onClose, onSave, editingEarning }: EarningsFormPr
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
                 disabled={!isAdmin && !isEditing}
-                className={`w-full max-w-[240px] sm:max-w-xs px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base rounded-lg border touch-manipulation ${
+                className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base rounded-lg border touch-manipulation ${
                   theme === 'dark'
                     ? 'bg-gray-700 border-gray-800 text-white'
                     : 'bg-white border-gray-300 text-gray-900'
@@ -621,6 +630,17 @@ export const EarningsForm = ({ onClose, onSave, editingEarning }: EarningsFormPr
                 className="flex-1 px-4 py-2.5 sm:py-2 bg-[#4E6E49] hover:bg-[#4E6E49] disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg sm:rounded-xl transition-colors text-sm sm:text-base font-medium touch-manipulation active:scale-95 disabled:active:scale-100"
               >
                 {loading ? 'Сохранение...' : isEditing ? 'Сохранить' : 'Сохранить все'}
+              </button>
+              <button
+                type="button"
+                onClick={onClose}
+                className={`flex-1 px-4 py-2.5 sm:py-2 rounded-lg sm:rounded-xl border text-sm sm:text-base font-medium transition-colors touch-manipulation active:scale-95 ${
+                  theme === 'dark'
+                    ? 'border-gray-700 text-gray-200 hover:bg-gray-800'
+                    : 'border-gray-300 text-gray-800 hover:bg-gray-100'
+                }`}
+              >
+                Отмена
               </button>
             </div>
           </div>
