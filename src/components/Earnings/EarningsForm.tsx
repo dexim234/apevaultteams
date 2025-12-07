@@ -304,20 +304,21 @@ export const EarningsForm = ({ onClose, onSave, editingEarning }: EarningsFormPr
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start sm:items-center justify-center z-[70] p-4 sm:p-6 touch-manipulation overflow-y-auto overscroll-contain modal-scroll">
-      <div className={`w-full max-w-[540px] sm:max-w-3xl rounded-2xl sm:rounded-3xl shadow-xl ${theme === 'dark' ? 'bg-[#1a1a1a]' : 'bg-white'} max-h-[85dvh] sm:max-h-[calc(100dvh-96px)] overflow-hidden`}>
-        <div className="p-4 sm:p-6 flex flex-col h-full min-h-0 overflow-y-auto modal-scroll">
+      <div className={`w-full max-w-[540px] sm:max-w-3xl rounded-2xl sm:rounded-3xl shadow-xl ${theme === 'dark' ? 'bg-[#1a1a1a]' : 'bg-white'} max-h-[85dvh] sm:max-h-[calc(100dvh-96px)] flex flex-col`}>
+        <div className="flex-shrink-0 p-4 sm:p-6">
           <div className="flex items-center justify-between mb-4 sm:mb-6">
             <h3 className={`text-lg sm:text-xl font-bold ${headingColor} pr-2`}>{isEditing ? 'Редактировать заработок' : 'Добавить заработок'}</h3>
             <button
               onClick={onClose}
-              className={`p-1.5 sm:p-2 rounded-lg flex-shrink-0 ${theme === 'dark' ? 'hover:bg-gray-700 active:bg-gray-600' : 'hover:bg-gray-100 active:bg-gray-200'} transition-colors touch-manipulation`}
+              className={`p-1.5 sm:p-2 rounded-lg flex-shrink-0 ${theme === 'dark' ? 'hover:bg-gray-700 active:bg-gray-600 text-gray-200' : 'hover:bg-gray-100 active:bg-gray-200 text-gray-700'} transition-colors touch-manipulation`}
               aria-label="Закрыть"
             >
               <X className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
           </div>
-
-          <div className="space-y-3 sm:space-y-4 overflow-y-auto overscroll-contain pr-1 pb-8 flex-1 min-h-0">
+        </div>
+        <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain modal-scroll px-4 sm:px-6">
+          <div className="space-y-3 sm:space-y-4 pb-8">
             {/* Date */}
             <div>
               <label className={`flex flex-col sm:flex-row sm:items-center sm:justify-between text-xs sm:text-sm font-medium mb-2 gap-1 sm:gap-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>

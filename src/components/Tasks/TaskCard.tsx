@@ -18,6 +18,7 @@ import {
   Radio,
   Trash2,
   User,
+  X,
   Users,
   X,
   XCircle,
@@ -446,36 +447,50 @@ export const TaskCard = ({ task, onEdit, onDelete, onUpdate }: TaskCardProps) =>
       {/* Reject Dialog */}
       {showRejectDialog && (
         <div className="fixed inset-0 bg-black/50 flex items-start sm:items-center justify-center z-[70] p-4 overflow-y-auto overscroll-contain modal-scroll">
-          <div className={`${cardBg} rounded-xl p-6 max-w-md w-full border-2 ${borderColor}`}>
-            <h3 className={`text-lg font-bold mb-4 ${headingColor}`}>Отклонить задачу</h3>
-            <textarea
-              value={rejectionComment}
-              onChange={(e) => setRejectionComment(e.target.value)}
-              placeholder="Укажите причину отклонения"
-              rows={3}
-              className={`w-full px-4 py-2 rounded-lg border ${borderColor} ${
-                theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'
-              } ${headingColor} mb-4 focus:outline-none focus:ring-2 focus:ring-[#4E6E49]/50`}
-            />
-            <div className="flex gap-3">
-              <button
-                onClick={() => handleApprove('reject')}
-                disabled={loading || !rejectionComment.trim()}
-                className="flex-1 px-4 py-2 rounded-lg font-medium transition-colors bg-red-500 hover:bg-red-600 text-white disabled:opacity-50"
-              >
-                Отклонить
-              </button>
+          <div className={`${cardBg} rounded-xl p-6 max-w-md w-full border-2 ${borderColor} flex flex-col`}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className={`text-lg font-bold ${headingColor}`}>Отклонить задачу</h3>
               <button
                 onClick={() => {
                   setShowRejectDialog(false)
                   setRejectionComment('')
                 }}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                  theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'
-                }`}
+                className={`p-1.5 rounded-lg transition-colors flex-shrink-0 ${theme === 'dark' ? 'hover:bg-gray-700 text-gray-200' : 'hover:bg-gray-100 text-gray-700'}`}
+                aria-label="Закрыть"
               >
-                Отмена
+                <X className="w-5 h-5" />
               </button>
+            </div>
+            <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain modal-scroll">
+              <textarea
+                value={rejectionComment}
+                onChange={(e) => setRejectionComment(e.target.value)}
+                placeholder="Укажите причину отклонения"
+                rows={3}
+                className={`w-full px-4 py-2 rounded-lg border ${borderColor} ${
+                  theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'
+                } ${headingColor} mb-4 focus:outline-none focus:ring-2 focus:ring-[#4E6E49]/50`}
+              />
+              <div className="flex gap-3">
+                <button
+                  onClick={() => handleApprove('reject')}
+                  disabled={loading || !rejectionComment.trim()}
+                  className="flex-1 px-4 py-2 rounded-lg font-medium transition-colors bg-red-500 hover:bg-red-600 text-white disabled:opacity-50"
+                >
+                  Отклонить
+                </button>
+                <button
+                  onClick={() => {
+                    setShowRejectDialog(false)
+                    setRejectionComment('')
+                  }}
+                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                    theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'
+                  }`}
+                >
+                  Отмена
+                </button>
+              </div>
             </div>
           </div>
         </div>

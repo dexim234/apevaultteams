@@ -116,14 +116,17 @@ export const ReferralForm = ({ referral, onClose, onSave }: ReferralFormProps) =
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start sm:items-center justify-center z-[70] p-4 sm:py-0 overflow-y-auto overscroll-contain modal-scroll">
-      <div className={`w-full max-w-md rounded-lg shadow-xl ${theme === 'dark' ? 'bg-[#1a1a1a]' : 'bg-white'} max-h-[90vh] overflow-y-auto`}>
-        <div className="p-6 space-y-4">
+      <div className={`w-full max-w-md rounded-lg shadow-xl ${theme === 'dark' ? 'bg-[#1a1a1a]' : 'bg-white'} max-h-[90vh] flex flex-col`}>
+        <div className="flex-shrink-0 p-6 pb-4">
           <div className="flex items-center justify-between">
             <h3 className={`text-xl font-bold ${headingColor}`}>{title}</h3>
-            <button onClick={onClose} className={`p-2 rounded-lg ${buttonColor}`}>
+            <button onClick={onClose} className={`p-2 rounded-lg flex-shrink-0 ${buttonColor}`} aria-label="Закрыть">
               <X className="w-5 h-5" />
             </button>
           </div>
+        </div>
+        <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain modal-scroll px-6 pb-6">
+          <div className="space-y-4">
 
           <div>
             <label className={`block text-sm font-medium mb-2 ${labelColor}`}>Имя</label>

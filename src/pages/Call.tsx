@@ -432,22 +432,21 @@ export const CallPage = () => {
         {/* Form Modal */}
         {showForm && (
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[70] flex items-start sm:items-center justify-center p-4 overflow-y-auto overscroll-contain modal-scroll animate-in fade-in duration-200">
-            <div className={`${bgColor} rounded-2xl shadow-2xl border ${borderColor} max-w-2xl w-full max-h-[85dvh] sm:max-h-[calc(100dvh-96px)] overflow-hidden animate-in slide-in-from-bottom-4 duration-300`}>
-              <div className="flex flex-col h-full min-h-0">
-                <div className="p-8 flex items-center justify-between shrink-0">
-                  <h2 className={`text-3xl font-bold ${textColor}`}>
-                    {editingCall ? 'Редактировать сигнал' : 'Создать новый сигнал'}
-                  </h2>
-                  <button
-                    onClick={handleCancel}
-                    className={`p-2 rounded-xl transition-colors ${theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}
-                  >
-                    <X className={`w-6 h-6 ${subtleColor}`} />
-                  </button>
-                </div>
-                <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-8 pb-10">
-                  <CallForm callToEdit={editingCall} onSuccess={handleSuccess} onCancel={handleCancel} />
-                </div>
+            <div className={`${bgColor} rounded-2xl shadow-2xl border ${borderColor} max-w-2xl w-full max-h-[85dvh] sm:max-h-[calc(100dvh-96px)] flex flex-col animate-in slide-in-from-bottom-4 duration-300`}>
+              <div className="flex-shrink-0 p-8 flex items-center justify-between">
+                <h2 className={`text-3xl font-bold ${textColor}`}>
+                  {editingCall ? 'Редактировать сигнал' : 'Создать новый сигнал'}
+                </h2>
+                <button
+                  onClick={handleCancel}
+                  className={`p-2 rounded-xl transition-colors flex-shrink-0 ${theme === 'dark' ? 'hover:bg-gray-700 text-gray-200' : 'hover:bg-gray-100 text-gray-700'}`}
+                  aria-label="Закрыть"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+              <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain modal-scroll px-8 pb-10">
+                <CallForm callToEdit={editingCall} onSuccess={handleSuccess} onCancel={handleCancel} />
               </div>
             </div>
           </div>
@@ -456,8 +455,8 @@ export const CallPage = () => {
         {/* Delete Confirmation Modal */}
         {showDeleteModal && (
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[70] flex items-start sm:items-center justify-center p-4 overflow-y-auto overscroll-contain modal-scroll animate-in fade-in duration-200">
-            <div className={`${bgColor} rounded-2xl shadow-2xl border ${borderColor} max-w-md w-full max-h-[70dvh] sm:max-h-[calc(100dvh-96px)] overflow-hidden animate-in slide-in-from-bottom-4 duration-300`}>
-              <div className="flex flex-col h-full min-h-0 p-8 space-y-6 overflow-y-auto overscroll-contain">
+            <div className={`${bgColor} rounded-2xl shadow-2xl border ${borderColor} max-w-md w-full max-h-[70dvh] sm:max-h-[calc(100dvh-96px)] flex flex-col animate-in slide-in-from-bottom-4 duration-300`}>
+              <div className="flex-shrink-0 p-8 pb-4 flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <div className="p-3 rounded-full bg-red-500/10">
                     <AlertCircle className="w-8 h-8 text-red-500" />
@@ -467,7 +466,19 @@ export const CallPage = () => {
                     <p className={subtleColor}>Это действие нельзя отменить</p>
                   </div>
                 </div>
-                <div className="flex gap-4 pt-2">
+                <button
+                  onClick={() => {
+                    setShowDeleteModal(false)
+                    setDeleteCallId(null)
+                  }}
+                  className={`p-2 rounded-xl transition-colors flex-shrink-0 ${theme === 'dark' ? 'hover:bg-gray-700 text-gray-200' : 'hover:bg-gray-100 text-gray-700'}`}
+                  aria-label="Закрыть"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+              <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain modal-scroll px-8 pb-8">
+                <div className="flex gap-4">
                   <button
                     onClick={() => {
                       setShowDeleteModal(false)
