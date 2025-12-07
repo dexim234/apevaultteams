@@ -5,7 +5,7 @@ import { useAuthStore } from '@/store/authStore'
 import { useAdminStore } from '@/store/adminStore'
 import { updateTask } from '@/services/firestoreService'
 import { Task, TaskStatus, TASK_STATUSES, TEAM_MEMBERS } from '@/types'
-import { CalendarClock, Check, CheckSquare, Clock3, MoreVertical, RotateCcw, X } from 'lucide-react'
+import { AlarmClock, CalendarClock, Check, CheckSquare, Clock3, MoreVertical, RotateCcw, X } from 'lucide-react'
 import { formatDate } from '@/utils/dateUtils'
 import { TaskDeadlineBadge } from './TaskDeadlineBadge'
 import { CATEGORY_ICONS } from './categoryIcons'
@@ -505,6 +505,12 @@ export const TaskKanban = ({ tasks, onUpdate, onEdit, onDelete }: TaskKanbanProp
                           </div>
                           </div>
                           <div className={`flex items-center gap-2 flex-wrap ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                            {task.startTime && (
+                              <span className="inline-flex items-center gap-1">
+                                <AlarmClock className="w-3.5 h-3.5" />
+                                {task.startTime}
+                              </span>
+                            )}
                             <span className="inline-flex items-center gap-1">
                               <CalendarClock className="w-3.5 h-3.5" />
                               {formatDate(new Date(task.dueDate), 'dd.MM.yyyy')}

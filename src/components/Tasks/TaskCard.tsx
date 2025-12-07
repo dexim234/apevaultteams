@@ -7,6 +7,7 @@ import { updateTask } from '@/services/firestoreService'
 import { Task, TaskStatus, TEAM_MEMBERS, TASK_CATEGORIES, TASK_STATUSES } from '@/types'
 import {
   AlertCircle,
+  AlarmClock,
   Calendar,
   Check,
   CheckCircle2,
@@ -343,10 +344,18 @@ export const TaskCard = ({ task, onEdit, onDelete, onUpdate }: TaskCardProps) =>
           </div>
 
           {/* Due date and time */}
-          <div className="flex items-center gap-2 flex-wrap text-xs sm:text-sm">
-            <Calendar className={`w-4 h-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`} />
-            <span className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
-              Срок: {formatDate(new Date(task.dueDate), 'dd.MM.yyyy')} {task.dueTime}
+          <div className="flex items-center gap-3 flex-wrap text-xs sm:text-sm">
+            <span className="inline-flex items-center gap-1">
+              <AlarmClock className={`w-4 h-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`} />
+              <span className={theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}>
+                Старт: {task.startTime || '—'}
+              </span>
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <Calendar className={`w-4 h-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`} />
+              <span className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                Дедлайн: {formatDate(new Date(task.dueDate), 'dd.MM.yyyy')} {task.dueTime}
+              </span>
             </span>
             <TaskDeadlineBadge dueDate={task.dueDate} dueTime={task.dueTime} theme={theme} />
           </div>

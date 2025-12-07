@@ -155,6 +155,7 @@ export interface Task {
   priority?: 'low' | 'medium' | 'high'
   dueDate: string // YYYY-MM-DD format (обязательно)
   dueTime: string // HH:mm format (обязательно)
+  startTime?: string // HH:mm format (необязательно)
 }
 
 // Team members
@@ -176,7 +177,7 @@ export const TASK_CATEGORIES: Record<TaskCategory, { label: string; icon: string
 }
 
 export const TASK_STATUSES: Record<TaskStatus, { label: string; color: string }> = {
-  pending: { label: 'На согласовании', color: 'yellow' },
+  pending: { label: 'Рассмотрение', color: 'yellow' },
   in_progress: { label: 'В работе', color: 'blue' },
   completed: { label: 'Выполнена', color: 'green' },
   closed: { label: 'Закрыта', color: 'gray' },

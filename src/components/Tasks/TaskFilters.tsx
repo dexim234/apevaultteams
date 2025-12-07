@@ -154,7 +154,7 @@ export const TaskFilters = ({
                     ? 'bg-[#4E6E49]/20 border-[#4E6E49] text-[#4E6E49]'
                     : 'bg-green-50 border-[#4E6E49] text-[#4E6E49]'
                   : `${theme === 'dark' ? 'bg-gray-800 border-gray-800 text-gray-200 hover:bg-gray-700' : 'bg-white border-gray-200 text-gray-700 hover:border-[#4E6E49]/40'}`
-              } flex items-center gap-2 justify-center`}
+              } flex items-center gap-2 justify-start text-left w-full`}
             >
               <Gauge className="w-4 h-4" />
               Все задачи
@@ -174,7 +174,7 @@ export const TaskFilters = ({
                 <button
                   key={key}
                   onClick={() => onStatusChange(key as TaskStatus)}
-                  className={`px-3 py-2 rounded-lg text-sm font-semibold transition-all border-2 flex items-center justify-between gap-2 ${
+                  className={`px-3 py-2 rounded-lg text-sm font-semibold transition-all border-2 flex items-center justify-start gap-3 text-left ${
                     selectedStatus === key
                       ? palette
                       : theme === 'dark'
@@ -201,7 +201,7 @@ export const TaskFilters = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <button
               onClick={() => onCategoryChange('all')}
-              className={`px-3 py-2 rounded-lg text-sm font-semibold transition-all border-2 flex items-center gap-2 justify-center ${
+              className={`px-3 py-3 rounded-lg text-sm font-semibold transition-all border-2 flex items-center gap-2 justify-center text-center ${
                 selectedCategory === 'all'
                   ? theme === 'dark'
                     ? 'bg-[#4E6E49]/20 border-[#4E6E49] text-[#4E6E49]'
@@ -220,7 +220,7 @@ export const TaskFilters = ({
                 <button
                   key={key}
                   onClick={() => onCategoryChange(key as TaskCategory)}
-                  className={`px-3 py-2 rounded-lg text-sm font-semibold transition-all border-2 flex items-center gap-2 justify-between ${
+                  className={`px-3 py-3 rounded-lg text-sm font-semibold transition-all border-2 flex flex-col items-center gap-2 text-center leading-tight whitespace-normal ${
                     isActive
                       ? theme === 'dark'
                         ? 'bg-[#4E6E49]/20 border-[#4E6E49] text-[#4E6E49]'
@@ -228,11 +228,10 @@ export const TaskFilters = ({
                       : `${theme === 'dark' ? 'bg-gray-900 border-gray-800 text-gray-200 hover:border-[#4E6E49]/40' : 'bg-white border-gray-200 text-gray-700 hover:border-[#4E6E49]/40'}`
                   }`}
                 >
-                  <span className="flex items-center gap-2">
+                  <span className="flex items-center gap-2 justify-center">
                     <Icon className="w-4 h-4" />
-                    {label}
+                    <span className="break-words">{label}</span>
                   </span>
-                  <CircleDot className={`w-3 h-3 ${isActive ? 'text-[#4E6E49]' : 'text-gray-400'}`} />
                 </button>
               )
             })}

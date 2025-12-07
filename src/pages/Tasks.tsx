@@ -176,7 +176,7 @@ export const Tasks = () => {
                 </div>
                 <div className="space-y-3">
                   {[
-                    { label: 'На согласовании', value: stats.pending, rate: pendingRate, color: 'bg-amber-500', tint: 'bg-amber-500/15' },
+                    { label: 'Рассмотрение', value: stats.pending, rate: pendingRate, color: 'bg-amber-500', tint: 'bg-amber-500/15' },
                     { label: 'В работе', value: stats.inProgress, rate: workRate, color: 'bg-sky-500', tint: 'bg-sky-500/15' },
                     { label: 'Выполнена', value: stats.completed, rate: completionRate, color: 'bg-emerald-500', tint: 'bg-emerald-500/15' },
                   ].map((row) => (
@@ -203,7 +203,7 @@ export const Tasks = () => {
                 {[
                   { label: 'Всего задач', value: totalTasks, icon: <BarChart3 className="w-5 h-5" />, tone: 'emerald' },
                   { label: 'В работе', value: stats.inProgress, icon: <List className="w-5 h-5" />, tone: 'sky' },
-                  { label: 'На согласовании', value: stats.pending, icon: <Sparkles className="w-5 h-5" />, tone: 'amber' },
+                  { label: 'Рассмотрение', value: stats.pending, icon: <Sparkles className="w-5 h-5" />, tone: 'amber' },
                   { label: 'Закрыта', value: stats.closed, icon: <CheckSquare className="w-5 h-5" />, tone: 'slate' },
                 ].map((card) => {
                   const toneMap: Record<string, { bg: string; text: string; border: string }> = {

@@ -5,7 +5,8 @@ import { useAdminStore } from '@/store/adminStore'
 import { useThemeStore } from '@/store/themeStore'
 import { addTask, updateTask } from '@/services/firestoreService'
 import { Task, TaskAssignee, TaskCategory, TEAM_MEMBERS, TASK_CATEGORIES } from '@/types'
-import { X, Calendar, Users, Tag, FileText, AlertCircle, Clock } from 'lucide-react'
+import { X, Calendar, Users, Tag, FileText, AlertCircle, Clock, AlarmClock, Sparkles } from 'lucide-react'
+import { CATEGORY_ICONS } from './categoryIcons'
 import { formatDate } from '@/utils/dateUtils'
 
 interface TaskFormProps {
@@ -31,6 +32,7 @@ export const TaskForm = ({ onClose, onSave, editingTask }: TaskFormProps) => {
   const [priority, setPriority] = useState<'low' | 'medium' | 'high'>(editingTask?.priority || 'medium')
   const [dueDate, setDueDate] = useState(editingTask?.dueDate || formatDate(new Date(), 'yyyy-MM-dd'))
   const [dueTime, setDueTime] = useState(editingTask?.dueTime || '12:00')
+  const [startTime, setStartTime] = useState(editingTask?.startTime || '09:00')
   const initialAssignees: TaskAssignee[] =
     editingTask && editingTask.assignees && editingTask.assignees.length > 0
       ? editingTask.assignees
@@ -40,6 +42,12 @@ export const TaskForm = ({ onClose, onSave, editingTask }: TaskFormProps) => {
   const [assignees, setAssignees] = useState<TaskAssignee[]>(initialAssignees)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+
+  const priorityOptions: { value: 'low' | 'medium' | 'high'; label: string; desc: string; tone: string }[] = [
+    { value: 'high', label: 'Высокий', desc: 'Нужен приоритет и быстрый старт', tone: theme === 'dark' ? 'bg-red-500/15 border-red-500/40 text-red-100' : 'bg-red-50 border-red-200 text-red-700' },
+    { value: 'medium', label: 'Средний', desc: 'Стандартный приоритет, плановый слот', tone: theme === 'dark' ? 'bg-amber-500/15 border-amber-500/40 text-amber-100' : 'bg-amber-50 border-amber-200 text-amber-700' },
+    { value: 'low', label: 'Низкий', desc: 'Можно параллельно с другими задачами', tone: theme === 'dark' ? 'bg-gray-500/15 border-gray-500/40 text-gray-100' : 'bg-gray-50 border-gray-200 text-gray-700' },
+  ]
 
   const handleParticipantToggle = (userId: string) => {
     if (assignees.find((assignee) => assignee.userId === userId)) {
@@ -97,6 +105,12 @@ export const TaskForm = ({ onClose, onSave, editingTask }: TaskFormProps) => {
         return
       }
 
+      if (!startTime) {
+        setError('Укажите время начала')
+        setLoading(false)
+        return
+      }
+
       if (!dueTime) {
         setError('Укажите время дедлайна')
         setLoading(false)
@@ -131,6 +145,7 @@ export const TaskForm = ({ onClose, onSave, editingTask }: TaskFormProps) => {
           approvals: updatedApprovals,
           dueDate,
           dueTime,
+          startTime,
           updatedAt: now,
         }
 
@@ -157,6 +172,7 @@ export const TaskForm = ({ onClose, onSave, editingTask }: TaskFormProps) => {
           priority,
           dueDate,
           dueTime,
+          startTime,
         }
 
         await addTask(newTask)
@@ -274,49 +290,105 @@ export const TaskForm = ({ onClose, onSave, editingTask }: TaskFormProps) => {
           </div>
 
           {/* Category and Priority */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Category */}
-            <div>
-              <label className={`block text-sm font-medium mb-2 ${headingColor} flex items-center gap-2`}>
-                <Tag className="w-4 h-4" />
-                Категория
-              </label>
-              <select
-                value={category}
-                onChange={(e) => setCategory(e.target.value as TaskCategory)}
-                className={`w-full px-4 py-2.5 rounded-lg border ${borderColor} ${inputBg} ${headingColor} focus:outline-none focus:ring-2 focus:ring-[#4E6E49]/50 transition-all`}
-              >
+          <div className="grid grid-cols-1 gap-4 sm:gap-6">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <label className={`block text-sm font-medium ${headingColor} flex items-center gap-2`}>
+                  <Tag className="w-4 h-4" />
+                  Категория
+                </label>
+                <span className={`text-[11px] ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                  Центрируем текст и убрали лишние точки
+                </span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
                 {Object.entries(TASK_CATEGORIES).map(([key, { label }]) => {
+                  const Icon = CATEGORY_ICONS[key as TaskCategory]
+                  const isActive = category === key
+
                   return (
-                    <option key={key} value={key}>
-                      {label}
-                    </option>
+                    <button
+                      key={key}
+                      type="button"
+                      onClick={() => setCategory(key as TaskCategory)}
+                      className={`p-3 rounded-lg border-2 text-sm font-semibold transition-all text-center leading-tight whitespace-normal ${
+                        isActive
+                          ? theme === 'dark'
+                            ? 'border-[#4E6E49] bg-[#4E6E49]/15 text-[#4E6E49]'
+                            : 'border-[#4E6E49] bg-green-50 text-[#4E6E49]'
+                          : theme === 'dark'
+                            ? 'border-gray-800 bg-gray-900 text-gray-200 hover:border-[#4E6E49]/40'
+                            : 'border-gray-200 bg-white text-gray-800 hover:border-[#4E6E49]/40'
+                      } flex flex-col items-center gap-2`}
+                    >
+                      <span className="flex items-center gap-2 justify-center">
+                        <Icon className="w-4 h-4" />
+                        <span className="break-words">{label}</span>
+                      </span>
+                      <span className={`text-[11px] ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                        Подходит для этой задачи?
+                      </span>
+                    </button>
                   )
                 })}
-              </select>
+              </div>
             </div>
 
-            {/* Priority */}
-            <div>
-              <label className={`block text-sm font-medium mb-2 ${headingColor}`}>
-                Приоритет
-              </label>
-              <select
-                value={priority}
-                onChange={(e) => setPriority(e.target.value as 'low' | 'medium' | 'high')}
-                className={`w-full px-4 py-2.5 rounded-lg border ${borderColor} ${inputBg} ${headingColor} focus:outline-none focus:ring-2 focus:ring-[#4E6E49]/50 transition-all`}
-              >
-                <option value="low">Низкий</option>
-                <option value="medium">Средний</option>
-                <option value="high">Высокий</option>
-              </select>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <label className={`block text-sm font-medium ${headingColor} flex items-center gap-2`}>
+                  <Sparkles className="w-4 h-4" />
+                  Приоритет
+                </label>
+                <span className={`text-[11px] ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                  Влияет на порядок в списке и уведомления
+                </span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3">
+                {priorityOptions.map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => setPriority(option.value)}
+                    className={`p-3 rounded-lg border-2 text-left transition-all ${option.tone} ${
+                      priority === option.value
+                        ? 'ring-2 ring-offset-2 ring-[#4E6E49] dark:ring-offset-[#1a1a1a]'
+                        : ''
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-semibold text-sm">{option.label}</span>
+                      {priority === option.value && <span className="text-xs font-semibold">выбрано</span>}
+                    </div>
+                    <p className="text-xs mt-1 leading-snug opacity-80">{option.desc}</p>
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
-          {/* Due Date and Time */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className={`block text-sm font-medium mb-2 ${headingColor} flex items-center gap-2`}>
+          {/* Timing */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="p-3 rounded-lg border-2 flex flex-col gap-2 transition-all shadow-sm bg-white/60 dark:bg-[#1a1a1a]/60"
+              style={{ borderColor: theme === 'dark' ? '#2f2f2f' : '#e5e7eb' }}>
+              <label className={`text-sm font-medium ${headingColor} flex items-center gap-2`}>
+                <AlarmClock className="w-4 h-4" />
+                Время начала *
+              </label>
+              <input
+                type="time"
+                value={startTime}
+                onChange={(e) => setStartTime(e.target.value)}
+                required
+                className={`w-full px-4 py-2.5 rounded-lg border ${borderColor} ${inputBg} ${headingColor} focus:outline-none focus:ring-2 focus:ring-[#4E6E49]/50 transition-all`}
+              />
+              <p className={`text-[11px] leading-snug ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                Помогает планировать последовательность задач и уведомлений.
+              </p>
+            </div>
+            <div className="p-3 rounded-lg border-2 flex flex-col gap-2 transition-all shadow-sm bg-white/60 dark:bg-[#1a1a1a]/60"
+              style={{ borderColor: theme === 'dark' ? '#2f2f2f' : '#e5e7eb' }}>
+              <label className={`text-sm font-medium ${headingColor} flex items-center gap-2`}>
                 <Calendar className="w-4 h-4" />
                 Дата дедлайна *
               </label>
@@ -328,9 +400,13 @@ export const TaskForm = ({ onClose, onSave, editingTask }: TaskFormProps) => {
                 required
                 className={`w-full px-4 py-2.5 rounded-lg border ${borderColor} ${inputBg} ${headingColor} focus:outline-none focus:ring-2 focus:ring-[#4E6E49]/50 transition-all`}
               />
+              <p className={`text-[11px] leading-snug ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                Ограничение по датам учитывает сегодняшнюю дату автоматически.
+              </p>
             </div>
-            <div>
-              <label className={`block text-sm font-medium mb-2 ${headingColor} flex items-center gap-2`}>
+            <div className="p-3 rounded-lg border-2 flex flex-col gap-2 transition-all shadow-sm bg-white/60 dark:bg-[#1a1a1a]/60"
+              style={{ borderColor: theme === 'dark' ? '#2f2f2f' : '#e5e7eb' }}>
+              <label className={`text-sm font-medium ${headingColor} flex items-center gap-2`}>
                 <Clock className="w-4 h-4" />
                 Время дедлайна *
               </label>
@@ -341,6 +417,9 @@ export const TaskForm = ({ onClose, onSave, editingTask }: TaskFormProps) => {
                 required
                 className={`w-full px-4 py-2.5 rounded-lg border ${borderColor} ${inputBg} ${headingColor} focus:outline-none focus:ring-2 focus:ring-[#4E6E49]/50 transition-all`}
               />
+              <p className={`text-[11px] leading-snug ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                Добавьте время, чтобы вся команда понимала, когда итог должен быть готов.
+              </p>
             </div>
           </div>
 

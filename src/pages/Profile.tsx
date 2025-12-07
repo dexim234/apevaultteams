@@ -324,7 +324,7 @@ export const Profile = () => {
                     </div>
                   </div>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
-                    {[{label:'На согласовании',value:pendingTasks,classes:theme==='dark'?'bg-amber-500/15 border-amber-500/30 text-amber-100':'bg-amber-50 border-amber-200 text-amber-900'},
+                    {[{label:'Рассмотрение',value:pendingTasks,classes:theme==='dark'?'bg-amber-500/15 border-amber-500/30 text-amber-100':'bg-amber-50 border-amber-200 text-amber-900'},
                       {label:'В работе',value:inProgressTasks,classes:theme==='dark'?'bg-blue-500/15 border-blue-500/30 text-blue-100':'bg-blue-50 border-blue-200 text-blue-900'},
                       {label:'Выполнена',value:completedTasks,classes:theme==='dark'?'bg-emerald-500/15 border-emerald-500/30 text-emerald-50':'bg-emerald-50 border-emerald-200 text-emerald-900'},
                       {label:'Всего',value:tasks.length,classes:theme==='dark'?'bg-gray-600/20 border-gray-500/40 text-gray-100':'bg-gray-50 border-gray-200 text-gray-800'}].map(({label,value,classes})=>(

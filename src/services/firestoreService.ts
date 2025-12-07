@@ -640,6 +640,7 @@ export const getTasks = async (filters?: {
       priority: data.priority,
       dueDate: data.dueDate || new Date().toISOString().split('T')[0],
       dueTime: data.dueTime || '12:00',
+      startTime: data.startTime,
     } as Task
   })
 
