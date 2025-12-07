@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import { useAuthStore } from '@/store/authStore'
 import { useThemeStore } from '@/store/themeStore'
 import { useAdminStore } from '@/store/adminStore'
-import { addWorkSlot, updateWorkSlot, getWorkSlots } from '@/services/firestoreService'
+import { addWorkSlot, updateWorkSlot, getWorkSlots, cleanupOldData } from '@/services/firestoreService'
 import { calculateHours, timeOverlaps, formatDate, getDatesInRange, normalizeDatesList, parseTime } from '@/utils/dateUtils'
 import { X, Plus, Trash2, Edit } from 'lucide-react'
 import { WorkSlot, TimeSlot, TEAM_MEMBERS } from '@/types'
@@ -460,6 +460,11 @@ export const SlotForm = ({ slot, onClose, onSave }: SlotFormProps) => {
       return
     }
 
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const todayStr = formatDate(today, 'yyyy-MM-dd')
+    const isPastDate = (dateStr: string) => dateStr < todayStr
+
     const createSlotForUserDate = async (targetUserId: string, dateStr: string, participants: string[] = [targetUserId]) => {
       const validationError = await validateSlot(dateStr, slots)
       if (validationError) {
@@ -503,6 +508,7 @@ export const SlotForm = ({ slot, onClose, onSave }: SlotFormProps) => {
           const dayOfWeek = checkDate.getDay() === 0 ? 6 : checkDate.getDay() - 1
           if (repeatDays.includes(dayOfWeek)) {
             const dateStr = formatDate(checkDate, 'yyyy-MM-dd')
+            if (isPastDate(dateStr)) continue
             for (const targetUserId of targetUsers) {
               await createSlotForUserDate(targetUserId, dateStr)
             }
@@ -519,6 +525,7 @@ export const SlotForm = ({ slot, onClose, onSave }: SlotFormProps) => {
           const dayOfWeek = checkDate.getDay() === 0 ? 6 : checkDate.getDay() - 1
           if (selectedDays.includes(dayOfWeek)) {
             const dateStr = formatDate(checkDate, 'yyyy-MM-dd')
+            if (isPastDate(dateStr)) continue
             for (const targetUserId of targetUsers) {
               await createSlotForUserDate(targetUserId, dateStr)
             }
@@ -536,6 +543,12 @@ export const SlotForm = ({ slot, onClose, onSave }: SlotFormProps) => {
         }
       }
 
+      try {
+        await cleanupOldData()
+      } catch (cleanupError) {
+        console.error('Cleanup after slot save failed:', cleanupError)
+      }
+
       onSave()
     } catch (err: any) {
       console.error('Error saving slot:', err)
@@ -551,9 +564,9 @@ export const SlotForm = ({ slot, onClose, onSave }: SlotFormProps) => {
   const timeSummary = slots.map((s) => `${s.start}–${s.end}${s.endDate ? ' (+1)' : ''}`)
 
   return (
-    <div className="fixed inset-0 bg-slate-950/75 backdrop-blur-xl flex items-start sm:items-center justify-center z-[70] p-4 sm:p-6 touch-manipulation overflow-y-auto overflow-x-hidden overscroll-contain modal-scroll">
-      <div className={`w-full max-w-5xl rounded-3xl shadow-[0_24px_80px_rgba(0,0,0,0.45)] border ${theme === 'dark' ? 'bg-gradient-to-br from-[#0c1320] via-[#0b1220] to-[#08111b] border-white/10' : 'bg-gradient-to-br from-white via-slate-50 to-white border-slate-200'} max-h-[85dvh] sm:max-h-[calc(100dvh-96px)] flex flex-col overflow-hidden`}>
-        <div className="flex-shrink-0 p-4 sm:p-6 lg:p-7">
+    <div className="fixed inset-0 bg-slate-950/75 backdrop-blur-xl flex items-start sm:items-center justify-center z-[70] p-4 sm:p-6 touch-manipulation overflow-y-auto overscroll-contain modal-scroll">
+      <div className={`w-full max-w-5xl rounded-3xl shadow-[0_24px_80px_rgba(0,0,0,0.45)] border ${theme === 'dark' ? 'bg-gradient-to-br from-[#0c1320] via-[#0b1220] to-[#08111b] border-white/10' : 'bg-gradient-to-br from-white via-slate-50 to-white border-slate-200'} max-h-[85dvh] sm:max-h-[calc(100dvh-96px)] overflow-hidden`}>
+        <div className="p-4 sm:p-6 lg:p-7 flex flex-col h-full min-h-0 overflow-y-auto overscroll-contain modal-scroll">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="space-y-1">
               <div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-[#4E6E49] font-semibold">
@@ -577,18 +590,17 @@ export const SlotForm = ({ slot, onClose, onSave }: SlotFormProps) => {
               </div>
               <button
                 onClick={onClose}
-                className={`p-2.5 rounded-full border flex-shrink-0 ${theme === 'dark' ? 'border-white/10 text-gray-200 hover:bg-white/5' : 'border-slate-200 text-slate-600 hover:bg-slate-100'} transition-colors touch-manipulation`}
+                className={`p-2.5 rounded-full border ${theme === 'dark' ? 'border-white/10 text-gray-200 hover:bg-white/5' : 'border-slate-200 text-slate-600 hover:bg-slate-100'} transition-colors touch-manipulation`}
                 aria-label="Закрыть"
               >
                 <X className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
             </div>
           </div>
-        </div>
-        <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-contain modal-scroll px-4 sm:px-6 lg:px-7">
-          <div className="mt-5 grid lg:grid-cols-[0.9fr_1.6fr] gap-4 lg:gap-6 min-w-0">
+
+          <div className="mt-5 grid lg:grid-cols-[0.9fr_1.6fr] gap-4 lg:gap-6 flex-1 min-h-0">
             {/* Navigation / summary column */}
-            <aside className={`rounded-2xl border ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-slate-200 bg-white'} p-4 sm:p-5 space-y-4 self-start`}>
+            <aside className={`rounded-2xl border ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-slate-200 bg-white'} p-4 sm:p-5 space-y-4 sticky top-0 self-start max-h-full overflow-y-auto`}>
               <div className="flex items-center justify-between">
                 <p className="text-sm font-semibold">Навигация</p>
                 <span className="text-[11px] uppercase tracking-wide text-[#4E6E49] font-semibold">4 шага</span>
@@ -1196,10 +1208,10 @@ export const SlotForm = ({ slot, onClose, onSave }: SlotFormProps) => {
               </button>
             </div>
           </div>
-          </div>
         </div>
       </div>
     </div>
+  </div>
   )
 }
 
