@@ -115,8 +115,8 @@ export const ReferralForm = ({ referral, onClose, onSave }: ReferralFormProps) =
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start sm:items-center justify-center z-[70] p-4 sm:py-0 overflow-y-auto overscroll-contain modal-scroll">
-      <div className={`w-full max-w-md rounded-lg shadow-xl ${theme === 'dark' ? 'bg-[#1a1a1a]' : 'bg-white'} max-h-[90vh] flex flex-col`}>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start sm:items-center justify-center z-[70] p-4 sm:py-0 overflow-y-auto overflow-x-hidden overscroll-contain modal-scroll">
+      <div className={`w-full max-w-md rounded-lg shadow-xl ${theme === 'dark' ? 'bg-[#1a1a1a]' : 'bg-white'} max-h-[90vh] flex flex-col overflow-hidden`}>
         <div className="flex-shrink-0 p-6 pb-4">
           <div className="flex items-center justify-between">
             <h3 className={`text-xl font-bold ${headingColor}`}>{title}</h3>
@@ -125,8 +125,8 @@ export const ReferralForm = ({ referral, onClose, onSave }: ReferralFormProps) =
             </button>
           </div>
         </div>
-        <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain modal-scroll px-6 pb-6">
-          <div className="space-y-4">
+        <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-contain modal-scroll px-6 pb-6">
+          <div className="space-y-4 min-w-0">
 
           <div>
             <label className={`block text-sm font-medium mb-2 ${labelColor}`}>Имя</label>

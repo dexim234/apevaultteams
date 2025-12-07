@@ -81,8 +81,8 @@ export const RatingCard = ({ rating }: RatingCardProps) => {
       value: formatHours(rating.breakdown.weeklyHours),
       points: rating.breakdown.weeklyHoursPoints,
       maxPoints: 25,
-      explanation: '30+ часов в неделю = 25% к рейтингу. 20-29 часов = 15%. Менее 20 часов = 0%. Показывает объем работы за неделю.',
-      threshold: '≥30ч: 25% | ≥20ч: 15%',
+      explanation: '20+ часов в неделю = 25% к рейтингу. 15-19 часов = 15%. Менее 15 часов = 0%. Показывает объем работы за неделю.',
+      threshold: '≥20ч: 25% | ≥15ч: 15%',
       color: 'bg-blue-200 text-blue-900'
     },
     {

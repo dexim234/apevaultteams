@@ -190,14 +190,14 @@ export const TaskForm = ({ onClose, onSave, editingTask }: TaskFormProps) => {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-start sm:items-center justify-center z-[70] p-4 overflow-y-auto overscroll-contain modal-scroll">
-      <div className={`${cardBg} rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-2xl max-h-[calc(100dvh-96px)] sm:max-h-[calc(100dvh-96px)] flex flex-col border-2 ${
+    <div className="fixed inset-0 bg-black/50 flex items-start sm:items-center justify-center z-[70] p-4 overflow-y-auto overflow-x-hidden overscroll-contain modal-scroll">
+      <div className={`${cardBg} rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-2xl max-h-[calc(100dvh-96px)] sm:max-h-[calc(100dvh-96px)] flex flex-col border-2 overflow-hidden ${
         theme === 'dark' 
           ? 'border-[#4E6E49]/30 bg-gradient-to-br from-[#1a1a1a] via-[#1a1a1a] to-[#0A0A0A]' 
           : 'border-green-200 bg-gradient-to-br from-white via-green-50/30 to-white'
       } relative`}>
         {/* Header */}
-        <div className={`flex-shrink-0 ${cardBg} border-b ${borderColor} p-4 sm:p-6 flex items-center justify-between z-10`}>
+        <div className={`flex-shrink-0 ${cardBg} border-b ${borderColor} p-4 sm:p-6 flex items-center justify-between`}>
           <h2 className={`text-xl sm:text-2xl font-bold ${headingColor} flex items-center gap-2`}>
             <FileText className="w-5 h-5 sm:w-6 sm:h-6" />
             {isEditing ? 'Редактировать задачу' : 'Новая задача'}
@@ -214,8 +214,8 @@ export const TaskForm = ({ onClose, onSave, editingTask }: TaskFormProps) => {
         </div>
 
         {/* Form Content */}
-        <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain modal-scroll">
-          <div className="p-4 sm:p-6 space-y-4 sm:space-y-6 pb-10">
+        <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-contain modal-scroll">
+          <div className="p-4 sm:p-6 space-y-4 sm:space-y-6 pb-10 min-w-0">
           {error && (
             <div className={`p-3 rounded-lg bg-red-500/10 border border-red-500/30 flex items-center gap-2 text-red-500`}>
               <AlertCircle className="w-5 h-5 flex-shrink-0" />
@@ -367,29 +367,29 @@ export const TaskForm = ({ onClose, onSave, editingTask }: TaskFormProps) => {
           </div>
 
           {/* Timing */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="p-3 rounded-lg border-2 flex flex-col gap-2 transition-all shadow-sm bg-white/60 dark:bg-[#1a1a1a]/60"
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 min-w-0">
+            <div className="p-3 rounded-lg border-2 flex flex-col gap-2 transition-all shadow-sm bg-white/60 dark:bg-[#1a1a1a]/60 min-w-0 overflow-hidden"
               style={{ borderColor: theme === 'dark' ? '#2f2f2f' : '#e5e7eb' }}>
-              <label className={`text-sm font-medium ${headingColor} flex items-center gap-2`}>
-                <AlarmClock className="w-4 h-4" />
-                Время начала *
+              <label className={`text-sm font-medium ${headingColor} flex items-center gap-2 min-w-0`}>
+                <AlarmClock className="w-4 h-4 flex-shrink-0" />
+                <span className="truncate">Время начала *</span>
               </label>
               <input
                 type="time"
                 value={startTime}
                 onChange={(e) => setStartTime(e.target.value)}
                 required
-                className={`w-full px-4 py-2.5 rounded-lg border ${borderColor} ${inputBg} ${headingColor} focus:outline-none focus:ring-2 focus:ring-[#4E6E49]/50 transition-all`}
+                className={`w-full min-w-0 px-4 py-2.5 rounded-lg border ${borderColor} ${inputBg} ${headingColor} focus:outline-none focus:ring-2 focus:ring-[#4E6E49]/50 transition-all`}
               />
-              <p className={`text-[11px] leading-snug ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+              <p className={`text-[11px] leading-snug ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} break-words`}>
                 Помогает планировать последовательность задач и уведомлений.
               </p>
             </div>
-            <div className="p-3 rounded-lg border-2 flex flex-col gap-2 transition-all shadow-sm bg-white/60 dark:bg-[#1a1a1a]/60"
+            <div className="p-3 rounded-lg border-2 flex flex-col gap-2 transition-all shadow-sm bg-white/60 dark:bg-[#1a1a1a]/60 min-w-0 overflow-hidden"
               style={{ borderColor: theme === 'dark' ? '#2f2f2f' : '#e5e7eb' }}>
-              <label className={`text-sm font-medium ${headingColor} flex items-center gap-2`}>
-                <Calendar className="w-4 h-4" />
-                Дата дедлайна *
+              <label className={`text-sm font-medium ${headingColor} flex items-center gap-2 min-w-0`}>
+                <Calendar className="w-4 h-4 flex-shrink-0" />
+                <span className="truncate">Дата дедлайна *</span>
               </label>
               <input
                 type="date"
@@ -397,26 +397,26 @@ export const TaskForm = ({ onClose, onSave, editingTask }: TaskFormProps) => {
                 onChange={(e) => setDueDate(e.target.value)}
                 min={formatDate(new Date(), 'yyyy-MM-dd')}
                 required
-                className={`w-full px-4 py-2.5 rounded-lg border ${borderColor} ${inputBg} ${headingColor} focus:outline-none focus:ring-2 focus:ring-[#4E6E49]/50 transition-all`}
+                className={`w-full min-w-0 px-4 py-2.5 rounded-lg border ${borderColor} ${inputBg} ${headingColor} focus:outline-none focus:ring-2 focus:ring-[#4E6E49]/50 transition-all`}
               />
-              <p className={`text-[11px] leading-snug ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+              <p className={`text-[11px] leading-snug ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} break-words`}>
                 Ограничение по датам учитывает сегодняшнюю дату автоматически.
               </p>
             </div>
-            <div className="p-3 rounded-lg border-2 flex flex-col gap-2 transition-all shadow-sm bg-white/60 dark:bg-[#1a1a1a]/60"
+            <div className="p-3 rounded-lg border-2 flex flex-col gap-2 transition-all shadow-sm bg-white/60 dark:bg-[#1a1a1a]/60 min-w-0 overflow-hidden"
               style={{ borderColor: theme === 'dark' ? '#2f2f2f' : '#e5e7eb' }}>
-              <label className={`text-sm font-medium ${headingColor} flex items-center gap-2`}>
-                <Clock className="w-4 h-4" />
-                Время дедлайна *
+              <label className={`text-sm font-medium ${headingColor} flex items-center gap-2 min-w-0`}>
+                <Clock className="w-4 h-4 flex-shrink-0" />
+                <span className="truncate">Время дедлайна *</span>
               </label>
               <input
                 type="time"
                 value={dueTime}
                 onChange={(e) => setDueTime(e.target.value)}
                 required
-                className={`w-full px-4 py-2.5 rounded-lg border ${borderColor} ${inputBg} ${headingColor} focus:outline-none focus:ring-2 focus:ring-[#4E6E49]/50 transition-all`}
+                className={`w-full min-w-0 px-4 py-2.5 rounded-lg border ${borderColor} ${inputBg} ${headingColor} focus:outline-none focus:ring-2 focus:ring-[#4E6E49]/50 transition-all`}
               />
-              <p className={`text-[11px] leading-snug ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+              <p className={`text-[11px] leading-snug ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} break-words`}>
                 Добавьте время, чтобы вся команда понимала, когда итог должен быть готов.
               </p>
             </div>

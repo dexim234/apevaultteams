@@ -431,8 +431,8 @@ export const CallPage = () => {
 
         {/* Form Modal */}
         {showForm && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[70] flex items-start sm:items-center justify-center p-4 overflow-y-auto overscroll-contain modal-scroll animate-in fade-in duration-200">
-            <div className={`${bgColor} rounded-2xl shadow-2xl border ${borderColor} max-w-2xl w-full max-h-[85dvh] sm:max-h-[calc(100dvh-96px)] flex flex-col animate-in slide-in-from-bottom-4 duration-300`}>
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[70] flex items-start sm:items-center justify-center p-4 overflow-y-auto overflow-x-hidden overscroll-contain modal-scroll animate-in fade-in duration-200">
+            <div className={`${bgColor} rounded-2xl shadow-2xl border ${borderColor} max-w-2xl w-full max-h-[85dvh] sm:max-h-[calc(100dvh-96px)] flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 duration-300`}>
               <div className="flex-shrink-0 p-8 flex items-center justify-between">
                 <h2 className={`text-3xl font-bold ${textColor}`}>
                   {editingCall ? 'Редактировать сигнал' : 'Создать новый сигнал'}
@@ -445,7 +445,7 @@ export const CallPage = () => {
                   <X className="w-6 h-6" />
                 </button>
               </div>
-              <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain modal-scroll px-8 pb-10">
+              <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-contain modal-scroll px-8 pb-10 min-w-0">
                 <CallForm callToEdit={editingCall} onSuccess={handleSuccess} onCancel={handleCancel} />
               </div>
             </div>
@@ -454,8 +454,8 @@ export const CallPage = () => {
 
         {/* Delete Confirmation Modal */}
         {showDeleteModal && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[70] flex items-start sm:items-center justify-center p-4 overflow-y-auto overscroll-contain modal-scroll animate-in fade-in duration-200">
-            <div className={`${bgColor} rounded-2xl shadow-2xl border ${borderColor} max-w-md w-full max-h-[70dvh] sm:max-h-[calc(100dvh-96px)] flex flex-col animate-in slide-in-from-bottom-4 duration-300`}>
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[70] flex items-start sm:items-center justify-center p-4 overflow-y-auto overflow-x-hidden overscroll-contain modal-scroll animate-in fade-in duration-200">
+            <div className={`${bgColor} rounded-2xl shadow-2xl border ${borderColor} max-w-md w-full max-h-[70dvh] sm:max-h-[calc(100dvh-96px)] flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 duration-300`}>
               <div className="flex-shrink-0 p-8 pb-4 flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <div className="p-3 rounded-full bg-red-500/10">
@@ -477,7 +477,7 @@ export const CallPage = () => {
                   <X className="w-6 h-6" />
                 </button>
               </div>
-              <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain modal-scroll px-8 pb-8">
+              <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-contain modal-scroll px-8 pb-8 min-w-0">
                 <div className="flex gap-4">
                   <button
                     onClick={() => {

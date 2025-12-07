@@ -606,8 +606,8 @@ export const TaskKanban = ({ tasks, onUpdate, onEdit, onDelete }: TaskKanbanProp
 
       {/* Reject Dialog */}
       {rejectDialog && (
-        <div className="fixed inset-0 bg-black/50 flex items-start sm:items-center justify-center z-[70] p-4 overflow-y-auto overscroll-contain modal-scroll">
-          <div className={`${cardBg} rounded-xl p-6 max-w-md w-full border-2 ${borderColor} flex flex-col`}>
+        <div className="fixed inset-0 bg-black/50 flex items-start sm:items-center justify-center z-[70] p-4 overflow-y-auto overflow-x-hidden overscroll-contain modal-scroll">
+          <div className={`${cardBg} rounded-xl p-6 max-w-md w-full border-2 ${borderColor} flex flex-col overflow-hidden`}>
             <div className="flex items-center justify-between mb-4">
               <h3 className={`text-lg font-bold ${headingColor}`}>Отклонить задачу</h3>
               <button
@@ -621,7 +621,7 @@ export const TaskKanban = ({ tasks, onUpdate, onEdit, onDelete }: TaskKanbanProp
                 <X className="w-5 h-5" />
               </button>
             </div>
-            <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain modal-scroll">
+            <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-contain modal-scroll min-w-0">
               <textarea
                 value={rejectionComment}
                 onChange={(e) => setRejectionComment(e.target.value)}
