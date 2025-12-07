@@ -11,7 +11,7 @@ import type {
   CallSentiment,
   Network,
 } from '@/types'
-import { Sparkles, Wand2, Rocket, LineChart, Images, Coins, Shield, Target } from 'lucide-react'
+import { Sparkles, Wand2, Rocket, LineChart, Image, Coins, Shield, Target } from 'lucide-react'
 
 interface CallFormProps {
   onSuccess?: () => void
@@ -47,7 +47,7 @@ const networkOptions: { value: Network; label: string }[] = [
 const CATEGORY_META: Record<CallCategory, { label: string; gradient: string; icon: JSX.Element }> = {
   memecoins: { label: 'Мемкоины', gradient: 'from-emerald-500 to-emerald-700', icon: <Rocket className="w-5 h-5" /> },
   futures: { label: 'Фьючерсы', gradient: 'from-blue-500 to-indigo-600', icon: <LineChart className="w-5 h-5" /> },
-  nft: { label: 'NFT', gradient: 'from-purple-500 to-pink-600', icon: <Images className="w-5 h-5" /> },
+  nft: { label: 'NFT', gradient: 'from-purple-500 to-pink-600', icon: <Image className="w-5 h-5" /> },
   spot: { label: 'Спот', gradient: 'from-amber-500 to-orange-600', icon: <Coins className="w-5 h-5" /> },
   polymarket: { label: 'Polymarket', gradient: 'from-rose-500 to-red-600', icon: <Target className="w-5 h-5" /> },
   staking: { label: 'Стейкинг', gradient: 'from-cyan-500 to-blue-500', icon: <Shield className="w-5 h-5" /> },

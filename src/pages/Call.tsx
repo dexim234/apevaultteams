@@ -1,7 +1,6 @@
 // Call page redesigned for multi-domain signals
 import { useState, useEffect, useMemo, type JSX } from 'react'
 import { useThemeStore } from '@/store/themeStore'
-import { useAuthStore } from '@/store/authStore'
 import { Layout } from '@/components/Layout'
 import { CallForm } from '@/components/Call/CallForm'
 import { getCalls, deleteCall } from '@/services/firestoreService'
@@ -15,7 +14,6 @@ import {
   Copy,
   Check,
   Search,
-  BarChart3,
   Zap,
   Sparkles,
   Filter,
@@ -24,7 +22,7 @@ import {
   Activity,
   Rocket,
   LineChart,
-  Images,
+  Image,
   Coins,
   Target,
   AlertTriangle,
@@ -37,7 +35,7 @@ type RiskFilter = 'all' | CallRiskLevel
 const CATEGORY_META: Record<CallCategory, { label: string; gradient: string; chip: string; icon: JSX.Element }> = {
   memecoins: { label: 'Мемкоины', gradient: 'from-emerald-500 to-emerald-700', chip: 'bg-emerald-500/15 text-emerald-500', icon: <Rocket className="w-4 h-4" /> },
   futures: { label: 'Фьючерсы', gradient: 'from-blue-500 to-indigo-600', chip: 'bg-blue-500/15 text-blue-500', icon: <LineChart className="w-4 h-4" /> },
-  nft: { label: 'NFT', gradient: 'from-purple-500 to-pink-500', chip: 'bg-purple-500/15 text-purple-500', icon: <Images className="w-4 h-4" /> },
+  nft: { label: 'NFT', gradient: 'from-purple-500 to-pink-500', chip: 'bg-purple-500/15 text-purple-500', icon: <Image className="w-4 h-4" /> },
   spot: { label: 'Спот', gradient: 'from-amber-500 to-orange-500', chip: 'bg-amber-500/15 text-amber-600', icon: <Coins className="w-4 h-4" /> },
   polymarket: { label: 'Polymarket', gradient: 'from-rose-500 to-red-500', chip: 'bg-rose-500/15 text-rose-500', icon: <Target className="w-4 h-4" /> },
   staking: { label: 'Стейкинг', gradient: 'from-cyan-500 to-blue-500', chip: 'bg-cyan-500/15 text-cyan-500', icon: <Shield className="w-4 h-4" /> },
