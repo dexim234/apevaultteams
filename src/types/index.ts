@@ -93,7 +93,7 @@ export interface Referral {
 }
 
 // Call (Trading Signal) types
-export type Network = 'solana' | 'ethereum' | 'bsc' | 'ton' | 'base' | 'sui' | 'monad'
+export type Network = 'solana' | 'ethereum' | 'bsc' | 'ton' | 'base' | 'sui' | 'monad' | 'polygon'
 export type CallCategory = 'memecoins' | 'futures' | 'nft' | 'spot' | 'polymarket' | 'staking'
 export type CallStatus = 'active' | 'completed' | 'cancelled' | 'reviewed'
 export type CallRiskLevel = 'low' | 'medium' | 'high' | 'ultra'

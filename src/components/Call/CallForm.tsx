@@ -28,7 +28,6 @@ interface FieldConfig {
   placeholder?: string
   helper?: string
   type?: FieldType
-  required?: boolean
   options?: { value: string; label: string }[]
 }
 
@@ -42,6 +41,7 @@ const networkOptions: { value: Network; label: string }[] = [
   { value: 'base', label: 'Base' },
   { value: 'sui', label: 'SUI' },
   { value: 'monad', label: 'Monad' },
+  { value: 'polygon', label: 'Polygon' },
 ]
 
 const CATEGORY_META: Record<CallCategory, { label: string; gradient: string; icon: JSX.Element }> = {
@@ -55,64 +55,64 @@ const CATEGORY_META: Record<CallCategory, { label: string; gradient: string; ico
 
 const CATEGORY_FIELDS: Record<CallCategory, FieldConfig[]> = {
   memecoins: [
-    { key: 'coinName', label: 'Название монеты', placeholder: 'PEPE', required: true },
-    { key: 'ticker', label: 'Тикер', placeholder: 'PEPE', required: true },
-    { key: 'network', label: 'Сеть', type: 'select', options: networkOptions, required: true },
+    { key: 'coinName', label: 'Название монеты', placeholder: 'PEPE' },
+    { key: 'ticker', label: 'Тикер', placeholder: 'PEPE' },
+    { key: 'network', label: 'Сеть', type: 'select', options: networkOptions },
     { key: 'contract', label: 'Контракт', placeholder: '0x...' },
     { key: 'signalType', label: 'Тип сигнала', type: 'select', options: [
       { value: 'buy', label: 'Buy' },
       { value: 'sell', label: 'Sell' },
       { value: 'hold', label: 'Hold' },
       { value: 'alert', label: 'Alert' },
-    ], required: true },
-    { key: 'reason', label: 'Причина входа', placeholder: 'Хайп, крупные покупки...', required: true },
-    { key: 'entryCap', label: 'Зона входа в капитализации', placeholder: '10M-15M', required: true },
-    { key: 'targets', label: 'Цели (TP1/TP2/TP3)', placeholder: '20M / 30M / 50M', required: true },
+    ] },
+    { key: 'reason', label: 'Причина входа', placeholder: 'Хайп, крупные покупки...' },
+    { key: 'entryCap', label: 'Зона входа в капитализации', placeholder: '10M-15M' },
+    { key: 'targets', label: 'Цели (TP1/TP2/TP3)', placeholder: '20M / 30M / 50M' },
     { key: 'stopLoss', label: 'Стоп-лосс (если применим)', placeholder: '5M или 15%' },
     { key: 'riskLevel', label: 'Риск-уровень', type: 'select', options: [
       { value: 'low', label: 'Низкий' },
       { value: 'medium', label: 'Средний' },
       { value: 'high', label: 'Высокий' },
       { value: 'ultra', label: 'Ультра-высокий' },
-    ], required: true },
-    { key: 'risks', label: 'Риски', placeholder: 'Разворот тренда, низкая ликвидность', required: true, type: 'textarea' },
+    ] },
+    { key: 'risks', label: 'Риски', placeholder: 'Разворот тренда, низкая ликвидность', type: 'textarea' },
     { key: 'holdPlan', label: 'План удержания', type: 'select', options: [
       { value: 'flip', label: 'Флип' },
       { value: 'short', label: 'Краткосрок' },
       { value: 'medium', label: 'Среднесрок' },
       { value: 'long', label: 'Дальнесрок' },
-    ], required: true },
+    ] },
     { key: 'liquidityLocked', label: 'Залочена ли ликвидность', type: 'checkbox' },
     { key: 'traderComment', label: 'Комментарий трейдера', type: 'textarea', placeholder: 'Доп. наблюдения, планы' },
   ],
   futures: [
-    { key: 'pair', label: 'Пара', placeholder: 'BTC/USDT', required: true },
+    { key: 'pair', label: 'Пара', placeholder: 'BTC/USDT' },
     { key: 'direction', label: 'Направление', type: 'select', options: [
       { value: 'long', label: 'Long' },
       { value: 'short', label: 'Short' },
-    ], required: true },
-    { key: 'leverage', label: 'Рекомендованное плечо', placeholder: 'x3 - x10', required: true },
+    ] },
+    { key: 'leverage', label: 'Рекомендованное плечо', placeholder: 'x3 - x10' },
     { key: 'entryPrice', label: 'Цена входа', placeholder: '69500' },
-    { key: 'entryZone', label: 'Зоны входа (min-max)', placeholder: '69000 - 70000', required: true },
-    { key: 'targets', label: 'Цели (TP1/TP2/TP3)', placeholder: '71000 / 72500 / 74000', required: true },
-    { key: 'stopLoss', label: 'SL уровень', placeholder: '68000', required: true },
+    { key: 'entryZone', label: 'Зоны входа (min-max)', placeholder: '69000 - 70000' },
+    { key: 'targets', label: 'Цели (TP1/TP2/TP3)', placeholder: '71000 / 72500 / 74000' },
+    { key: 'stopLoss', label: 'SL уровень', placeholder: '68000' },
     { key: 'signalStyle', label: 'Тип сигнала', type: 'select', options: [
       { value: 'breakout', label: 'Breakout' },
       { value: 'retest', label: 'Retest' },
       { value: 'range', label: 'Range' },
       { value: 'scalping', label: 'Scalping' },
       { value: 'swing', label: 'Swing' },
-    ], required: true },
-    { key: 'positionSize', label: 'Размер позиции (% от депо)', placeholder: '2-5%', required: true },
-    { key: 'reason', label: 'Причина входа (анализ)', placeholder: 'Тренд, объемы, дивергенция...', required: true, type: 'textarea' },
+    ] },
+    { key: 'positionSize', label: 'Размер позиции (% от депо)', placeholder: '2-5%' },
+    { key: 'reason', label: 'Причина входа (анализ)', placeholder: 'Тренд, объемы, дивергенция...', type: 'textarea' },
     { key: 'timeframe', label: 'Таймфрейм анализа', type: 'select', options: [
       { value: '1m', label: '1m' },
       { value: '5m', label: '5m' },
       { value: '15m', label: '15m' },
       { value: '1h', label: '1h' },
       { value: '4h', label: '4h' },
-    ], required: true },
-    { key: 'risks', label: 'Риски', placeholder: 'Резкий вброс, низкая волатильность', required: true, type: 'textarea' },
+    ] },
+    { key: 'risks', label: 'Риски', placeholder: 'Резкий вброс, низкая волатильность', type: 'textarea' },
     { key: 'riskLevel', label: 'Риск-уровень', type: 'select', options: [
       { value: 'low', label: 'Низкий' },
       { value: 'medium', label: 'Средний' },
@@ -121,42 +121,42 @@ const CATEGORY_FIELDS: Record<CallCategory, FieldConfig[]> = {
     ] },
   ],
   nft: [
-    { key: 'collectionLink', label: 'Коллекция (ссылка)', placeholder: 'https://...' , required: true },
-    { key: 'nftLink', label: 'NFT (ссылка)', placeholder: 'https://.../item', required: true },
-    { key: 'marketplace', label: 'Маркетплейс', placeholder: 'OpenSea / Magic Eden', required: true },
-    { key: 'network', label: 'Сеть', type: 'select', options: networkOptions, required: true },
-    { key: 'entryPrice', label: 'Рекомендованная цена входа', placeholder: '1.2 ETH', required: true },
+    { key: 'collectionLink', label: 'Коллекция (ссылка)', placeholder: 'https://...' },
+    { key: 'nftLink', label: 'NFT (ссылка)', placeholder: 'https://.../item' },
+    { key: 'marketplace', label: 'Маркетплейс', placeholder: 'OpenSea / Magic Eden' },
+    { key: 'network', label: 'Сеть', type: 'select', options: networkOptions },
+    { key: 'entryPrice', label: 'Рекомендованная цена входа', placeholder: '1.2 ETH' },
     { key: 'rarity', label: 'Редкость / атрибуты', placeholder: 'Rank < 5% или редкий фон' },
     { key: 'signalType', label: 'Тип сигнала', type: 'select', options: [
       { value: 'buy', label: 'Buy' },
       { value: 'sell', label: 'Sell' },
       { value: 'mint', label: 'Mint' },
-    ], required: true },
-    { key: 'reason', label: 'Причина входа', placeholder: 'Новый минт, хайп, инсайд', required: true, type: 'textarea' },
+    ] },
+    { key: 'reason', label: 'Причина входа', placeholder: 'Новый минт, хайп, инсайд', type: 'textarea' },
     { key: 'holdingHorizon', label: 'Срок удержания', type: 'select', options: [
       { value: 'flip', label: 'Скоростной флип' },
       { value: 'short', label: 'Краткосрок' },
       { value: 'medium', label: 'Среднесрок' },
       { value: 'long', label: 'Долгосрок' },
-    ], required: true },
-    { key: 'minLiquidity', label: 'Минимальная ликвидность (floor + объём)', placeholder: 'Floor 2 ETH, объём 120 ETH', required: true },
-    { key: 'targetPrice', label: 'Цель продажи / Target price', placeholder: '3 ETH', required: true },
+    ] },
+    { key: 'minLiquidity', label: 'Минимальная ликвидность (floor + объём)', placeholder: 'Floor 2 ETH, объём 120 ETH' },
+    { key: 'targetPrice', label: 'Цель продажи / Target price', placeholder: '3 ETH' },
     { key: 'traderComment', label: 'Комментарий трейдера', type: 'textarea', placeholder: 'Что смотрим, когда фиксируем' },
     { key: 'risks', label: 'Риски', type: 'textarea', placeholder: 'Падение спроса, фальшивый объём' },
   ],
   spot: [
-    { key: 'coin', label: 'Монета', placeholder: 'BTC', required: true },
-    { key: 'entryCap', label: 'Капитализация входа', placeholder: '500M', required: true },
-    { key: 'targets', label: 'Цели (TP1/TP2/TP3)', placeholder: '550M / 650M / 750M', required: true },
+    { key: 'coin', label: 'Монета', placeholder: 'BTC' },
+    { key: 'entryCap', label: 'Капитализация входа', placeholder: '500M' },
+    { key: 'targets', label: 'Цели (TP1/TP2/TP3)', placeholder: '550M / 650M / 750M' },
     { key: 'stopLoss', label: 'SL', placeholder: '-10%' },
     { key: 'holdingHorizon', label: 'Горизонт удержания', type: 'select', options: [
       { value: 'short', label: 'Краткосрок' },
       { value: 'medium', label: 'Среднесрок' },
       { value: 'long', label: 'Долгосрок' },
-    ], required: true },
-    { key: 'reason', label: 'Причина входа', placeholder: 'Фундаментал, хайп, запуск', required: true, type: 'textarea' },
-    { key: 'positionSize', label: 'Размер позиции', placeholder: '5-10% портфеля', required: true },
-    { key: 'risks', label: 'Риски', placeholder: 'Регуляторика, конкуренты', required: true, type: 'textarea' },
+    ] },
+    { key: 'reason', label: 'Причина входа', placeholder: 'Фундаментал, хайп, запуск', type: 'textarea' },
+    { key: 'positionSize', label: 'Размер позиции', placeholder: '5-10% портфеля' },
+    { key: 'risks', label: 'Риски', placeholder: 'Регуляторика, конкуренты', type: 'textarea' },
     { key: 'traderComment', label: 'Комментарий', type: 'textarea', placeholder: 'Условия фиксации, обновления' },
     { key: 'riskLevel', label: 'Риск-уровень', type: 'select', options: [
       { value: 'low', label: 'Низкий' },
@@ -166,49 +166,49 @@ const CATEGORY_FIELDS: Record<CallCategory, FieldConfig[]> = {
     ] },
   ],
   polymarket: [
-    { key: 'event', label: 'Событие', placeholder: 'Trump wins 2025', required: true },
+    { key: 'event', label: 'Событие', placeholder: 'Trump wins 2025' },
     { key: 'positionType', label: 'Тип позиции', type: 'select', options: [
       { value: 'yes', label: 'Yes' },
       { value: 'no', label: 'No' },
-    ], required: true },
-    { key: 'entryPrice', label: 'Цена входа (%)', placeholder: '42%', required: true },
-    { key: 'expectedProbability', label: 'Ожидаемая вероятность (%)', placeholder: '65%', required: true },
-    { key: 'reason', label: 'Причина входа', placeholder: 'Аналитика, инсайд, тренд новостей', required: true, type: 'textarea' },
-    { key: 'eventDeadline', label: 'Срок исхода события', placeholder: '31.12.2025', required: true },
+    ] },
+    { key: 'entryPrice', label: 'Цена входа (%)', placeholder: '42%' },
+    { key: 'expectedProbability', label: 'Ожидаемая вероятность (%)', placeholder: '65%' },
+    { key: 'reason', label: 'Причина входа', placeholder: 'Аналитика, инсайд, тренд новостей', type: 'textarea' },
+    { key: 'eventDeadline', label: 'Срок исхода события', placeholder: '31.12.2025' },
     { key: 'riskLevel', label: 'Риск', type: 'select', options: [
       { value: 'low', label: 'Низкий' },
       { value: 'medium', label: 'Средний' },
       { value: 'high', label: 'Высокий' },
       { value: 'ultra', label: 'Ультра-высокий' },
-    ], required: true },
-    { key: 'maxStake', label: 'Максимальный объём ставки', placeholder: 'до $5k', required: true },
-    { key: 'risks', label: 'Риски', placeholder: 'Неопределённость новостей, низкая ликвидность', required: true, type: 'textarea' },
-    { key: 'targetPlan', label: 'Цель', placeholder: 'Продажа до события или удержание', required: true },
+    ] },
+    { key: 'maxStake', label: 'Максимальный объём ставки', placeholder: 'до $5k' },
+    { key: 'risks', label: 'Риски', placeholder: 'Неопределённость новостей, низкая ликвидность', type: 'textarea' },
+    { key: 'targetPlan', label: 'Цель', placeholder: 'Продажа до события или удержание' },
   ],
   staking: [
-    { key: 'coin', label: 'Монета', placeholder: 'SOL', required: true },
-    { key: 'platform', label: 'Платформа', placeholder: 'Jito, Lido...', required: true },
+    { key: 'coin', label: 'Монета', placeholder: 'SOL' },
+    { key: 'platform', label: 'Платформа', placeholder: 'Jito, Lido...' },
     { key: 'term', label: 'Срок стейкинга', type: 'select', options: [
       { value: 'flexible', label: 'Гибкий' },
       { value: '30d', label: '30 дней' },
       { value: '90d', label: '90 дней' },
       { value: 'fixed', label: 'Фиксированный' },
-    ], required: true },
-    { key: 'apy', label: 'APY', placeholder: '12-18%', required: true },
-    { key: 'minDeposit', label: 'Минимальный депозит', placeholder: '100 USDT', required: true },
+    ] },
+    { key: 'apy', label: 'APY', placeholder: '12-18%' },
+    { key: 'minDeposit', label: 'Минимальный депозит', placeholder: '100 USDT' },
     { key: 'protocolRisk', label: 'Риски протокола', type: 'select', options: [
       { value: 'low', label: 'Низкие' },
       { value: 'medium', label: 'Средние' },
       { value: 'high', label: 'Высокие' },
       { value: 'ultra', label: 'Ультра' },
-    ], required: true },
+    ] },
     { key: 'action', label: 'Тип сигнала', type: 'select', options: [
       { value: 'enter', label: 'Вход' },
       { value: 'exit', label: 'Выход' },
       { value: 'rebalance', label: 'Перераспределение' },
-    ], required: true },
-    { key: 'reason', label: 'Причина', placeholder: 'Рост доходности, снижение рисков...', required: true, type: 'textarea' },
-    { key: 'risks', label: 'Риски', placeholder: 'Смарт-контракт, ликвидность', required: true, type: 'textarea' },
+    ] },
+    { key: 'reason', label: 'Причина', placeholder: 'Рост доходности, снижение рисков...', type: 'textarea' },
+    { key: 'risks', label: 'Риски', placeholder: 'Смарт-контракт, ликвидность', type: 'textarea' },
     { key: 'traderComment', label: 'Комментарий трейдера', type: 'textarea', placeholder: 'Тактика выхода, дополнительные условия' },
   ],
 }
@@ -351,34 +351,9 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory }: C
     return undefined
   }
 
-  const validate = () => {
-    const activeFields = CATEGORY_FIELDS[category]
-    const activePayload = (details as any)[category]
-    for (const field of activeFields) {
-      if (field.required) {
-        const value = activePayload?.[field.key]
-        if (field.type === 'checkbox') continue
-        if (!value || String(value).trim() === '') {
-          return `Заполните поле "${field.label}"`
-        }
-      }
-    }
-    return ''
-  }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
-    const validationError = validate()
-    if (validationError) {
-      setError(validationError)
-      return
-    }
-
-    if (!user && !callToEdit) {
-      setError('Вы не авторизованы. Для создания сигнала необходимо войти.')
-      return
-    }
 
     setLoading(true)
     try {
