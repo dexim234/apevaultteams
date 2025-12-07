@@ -12,7 +12,7 @@ import {
   orderBy,
 } from 'firebase/firestore'
 import { db } from '@/firebase/config'
-import { WorkSlot, DayStatus, Earnings, RatingData, Referral, Call, Task, TaskStatus } from '@/types'
+import { WorkSlot, DayStatus, Earnings, RatingData, Referral, Call, Task, TaskStatus, Note } from '@/types'
 
 const DATA_RETENTION_DAYS = 30
 
@@ -693,5 +693,64 @@ export const updateTask = async (id: string, updates: Partial<Task>): Promise<vo
 export const deleteTask = async (id: string): Promise<void> => {
   const taskRef = doc(db, 'tasks', id)
   await deleteDoc(taskRef)
+}
+
+// Notes (user + admin visibility)
+export const getUserNotes = async (userId?: string, includeAllForAdmin: boolean = false): Promise<Note[]> => {
+  const notesRef = collection(db, 'notes')
+  let q: ReturnType<typeof query>
+
+  if (!includeAllForAdmin && userId) {
+    q = query(notesRef, where('userId', '==', userId))
+  } else {
+    q = query(notesRef)
+  }
+
+  const snapshot = await getDocs(q)
+  const notes = snapshot.docs.map((docSnap) => {
+    const data = docSnap.data() as any
+    return {
+      id: docSnap.id,
+      userId: data.userId || '',
+      title: data.title || '',
+      text: data.text || '',
+      priority: data.priority === 'low' || data.priority === 'high' ? data.priority : 'medium',
+      createdAt: data.createdAt || new Date().toISOString(),
+      updatedAt: data.updatedAt || new Date().toISOString(),
+    } as Note
+  })
+
+  notes.sort((a, b) => (b.updatedAt || '').localeCompare(a.updatedAt || ''))
+  if (userId && !includeAllForAdmin) {
+    return notes.filter((n) => n.userId === userId)
+  }
+  return notes
+}
+
+export const addNote = async (note: Omit<Note, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> => {
+  const notesRef = collection(db, 'notes')
+  const payload = {
+    ...note,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  }
+  const res = await addDoc(notesRef, payload)
+  return res.id
+}
+
+export const updateNote = async (id: string, updates: Partial<Omit<Note, 'id' | 'userId'>>): Promise<void> => {
+  const noteRef = doc(db, 'notes', id)
+  const cleanUpdates = Object.fromEntries(
+    Object.entries({
+      ...updates,
+      updatedAt: new Date().toISOString(),
+    }).filter(([_, value]) => value !== undefined)
+  )
+  await updateDoc(noteRef, cleanUpdates as any)
+}
+
+export const deleteNote = async (id: string): Promise<void> => {
+  const noteRef = doc(db, 'notes', id)
+  await deleteDoc(noteRef)
 }
 

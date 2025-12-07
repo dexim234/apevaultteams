@@ -158,6 +158,16 @@ export interface Task {
   startTime?: string // HH:mm format (необязательно)
 }
 
+export interface Note {
+  id: string
+  userId: string
+  title: string
+  text: string
+  priority: 'low' | 'medium' | 'high'
+  createdAt: string
+  updatedAt: string
+}
+
 // Team members
 export const TEAM_MEMBERS: User[] = [
   { id: '1', name: 'Артём', login: 'artyom03', password: '248artdex', avatar: '/avatars/artyom.jpg' },

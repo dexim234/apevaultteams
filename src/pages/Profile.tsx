@@ -10,7 +10,12 @@ import {
   getDayStatuses,
   getReferrals,
   getWorkSlots,
-  getWeeklyMessages
+  getWeeklyMessages,
+  getCalls,
+  getUserNotes,
+  addNote,
+  updateNote,
+  deleteNote,
 } from '@/services/firestoreService'
 import {
   getWeekRange,
@@ -33,9 +38,12 @@ import {
   Check,
   Info,
   DollarSign,
+  StickyNote,
+  Edit3,
+  Trash2,
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import { TEAM_MEMBERS } from '@/types'
+import { TEAM_MEMBERS, Note } from '@/types'
 
 export const Profile = () => {
   const { theme } = useThemeStore()
@@ -54,8 +62,23 @@ export const Profile = () => {
     net: number
     weekly: { gross: number; pool: number; net: number }
   } | null>(null)
+  const [callStats, setCallStats] = useState<{ total: number; active: number; completed: number }>({ total: 0, active: 0, completed: 0 })
+  const [notes, setNotes] = useState<Note[]>([])
+  const [noteDraft, setNoteDraft] = useState<Note>({
+    id: '',
+    userId: '',
+    title: '',
+    text: '',
+    priority: 'medium',
+    createdAt: '',
+    updatedAt: '',
+  })
   const [loading, setLoading] = useState(true)
   const [loginCopied, setLoginCopied] = useState(false)
+
+  const userData = user || (isAdmin ? { name: 'Администратор', login: 'admin', password: 'admin' } : null)
+  const profileAvatar = user?.id ? TEAM_MEMBERS.find((m) => m.id === user.id)?.avatar : undefined
+  const profileInitial = userData?.name ? userData.name.charAt(0).toUpperCase() : 'A'
 
   const headingColor = theme === 'dark' ? 'text-white' : 'text-gray-900'
 
@@ -148,6 +171,11 @@ export const Profile = () => {
         const currentReferrals = await getReferrals(undefined, monthIsoStart, monthIsoEnd)
         const userReferrals = currentReferrals.filter((referral) => referral.ownerId === userId).length
 
+        const userCalls = await getCalls({ userId })
+        const activeCalls = userCalls.filter((c) => c.status === 'active').length
+        const completedCalls = userCalls.filter((c) => c.status === 'completed' || c.status === 'reviewed').length
+        setCallStats({ total: userCalls.length, active: activeCalls, completed: completedCalls })
+
         const updatedData: Omit<RatingData, 'rating'> = {
           userId,
           earnings: totalEarnings,
@@ -190,11 +218,81 @@ export const Profile = () => {
             net: Math.max(0, weeklyEarnings - weeklyPool),
           },
         })
+
+        if (user) {
+          const userNotes = await getUserNotes(user.id, isAdmin)
+          setNotes(userNotes)
+        } else if (isAdmin) {
+          const allNotes = await getUserNotes(undefined, true)
+          setNotes(allNotes)
+        }
       }
     } catch (error) {
       console.error('Error loading profile data:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleSaveNote = async () => {
+    if (!user?.id) return
+    if (!noteDraft.title.trim() && !noteDraft.text.trim()) return
+
+    try {
+      if (noteDraft.id) {
+        await updateNote(noteDraft.id, {
+          title: noteDraft.title,
+          text: noteDraft.text,
+          priority: noteDraft.priority,
+        })
+        const next = notes.map((n) =>
+          n.id === noteDraft.id
+            ? { ...n, title: noteDraft.title, text: noteDraft.text, priority: noteDraft.priority, updatedAt: new Date().toISOString() }
+            : n
+        )
+        setNotes(next)
+      } else {
+        const newId = await addNote({
+          userId: user.id,
+          title: noteDraft.title,
+          text: noteDraft.text,
+          priority: noteDraft.priority,
+        })
+        const now = new Date().toISOString()
+        setNotes([
+          {
+            id: newId,
+            userId: user.id,
+            title: noteDraft.title,
+            text: noteDraft.text,
+            priority: noteDraft.priority,
+            createdAt: now,
+            updatedAt: now,
+          },
+          ...notes,
+        ])
+      }
+    } catch (err) {
+      console.error('Error saving note', err)
+    } finally {
+      setNoteDraft({ id: '', userId: '', title: '', text: '', priority: 'medium', createdAt: '', updatedAt: '' })
+    }
+  }
+
+  const handleEditNote = (id: string) => {
+    const found = notes.find((n) => n.id === id)
+    if (found) setNoteDraft(found)
+  }
+
+  const handleDeleteNote = async (id: string) => {
+    try {
+      await deleteNote(id)
+      setNotes(notes.filter((n) => n.id !== id))
+      if (noteDraft.id === id) {
+        setNoteDraft({ id: '', userId: '', title: '', text: '', priority: 'medium', createdAt: '', updatedAt: '' })
+      }
+    } catch (err) {
+      console.error('Error deleting note', err)
     }
   }
 
@@ -222,9 +320,6 @@ export const Profile = () => {
     }
   }
 
-  const userData = user || (isAdmin ? { name: 'Администратор', login: 'admin', password: 'admin' } : null)
-  const profileAvatar = user?.id ? TEAM_MEMBERS.find((m) => m.id === user.id)?.avatar : undefined
-  const profileInitial = userData?.name ? userData.name.charAt(0).toUpperCase() : 'A'
   const pendingTasks = tasks.filter(t => t.status === 'pending').length
   const inProgressTasks = tasks.filter(t => t.status === 'in_progress').length
   const completedTasks = tasks.filter(t => t.status === 'completed').length
@@ -370,6 +465,21 @@ export const Profile = () => {
                       </button>
                     </div>
                   </div>
+                  <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                    <div className={`p-4 rounded-xl border ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-white'} shadow-sm`}>
+                      <p className={`text-xs font-semibold uppercase tracking-wide ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Мои коллы</p>
+                      <p className={`mt-1 text-lg font-bold ${headingColor}`}>{callStats.total}</p>
+                      <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Активных: {callStats.active} · Завершённых: {callStats.completed}</p>
+                    </div>
+                    <div className={`p-4 rounded-xl border ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-white'} shadow-sm`}>
+                      <p className={`text-xs font-semibold uppercase tracking-wide ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Учебная панель (преподаватель)</p>
+                      <p className={`mt-1 text-sm font-semibold ${headingColor}`}>в разработке</p>
+                    </div>
+                    <div className={`p-4 rounded-xl border ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-white'} shadow-sm`}>
+                      <p className={`text-xs font-semibold uppercase tracking-wide ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Учебная панель (куратор)</p>
+                      <p className={`mt-1 text-sm font-semibold ${headingColor}`}>в разработке</p>
+                    </div>
+                  </div>
                 </div>
 
                 <div className={`rounded-2xl p-5 border ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-white'} shadow flex-1`}>
@@ -425,6 +535,126 @@ export const Profile = () => {
                       </div>
                     </div>
                   )}
+                  <div className="mt-4 space-y-3">
+                    <div className="flex items-center gap-2">
+                      <StickyNote className="w-4 h-4 text-[#4E6E49]" />
+                      <p className={`text-sm font-semibold ${headingColor}`}>Мои заметки</p>
+                      <span className="text-[11px] px-2 py-1 rounded-full border border-white/20 bg-white/10 dark:border-gray-200/40 dark:bg-gray-100/60 text-xs text-gray-700 dark:text-gray-900">
+                        Видит автор и админ
+                      </span>
+                    </div>
+                    <div className="grid gap-2 sm:grid-cols-2">
+                      <input
+                        type="text"
+                        value={noteDraft.title}
+                        onChange={(e) => setNoteDraft({ ...noteDraft, title: e.target.value })}
+                        placeholder="Заголовок"
+                        className={`px-3 py-2 rounded-lg border ${theme === 'dark' ? 'border-white/10 bg-white/5 text-white' : 'border-gray-200 bg-white text-gray-900'} text-sm`}
+                      />
+                      <div className="flex gap-2">
+                        {(['low', 'medium', 'high'] as const).map((p) => (
+                          <button
+                            key={p}
+                            onClick={() => setNoteDraft({ ...noteDraft, priority: p })}
+                            className={`px-3 py-2 rounded-lg border text-sm flex-1 ${
+                              noteDraft.priority === p
+                                ? 'border-[#4E6E49] bg-[#4E6E49]/10 text-[#4E6E49]'
+                                : theme === 'dark'
+                                ? 'border-white/10 bg-white/5 text-white'
+                                : 'border-gray-200 bg-white text-gray-800'
+                            }`}
+                          >
+                            {p === 'low' ? 'Низкий' : p === 'medium' ? 'Средний' : 'Высокий'}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <textarea
+                      value={noteDraft.text}
+                      onChange={(e) => setNoteDraft({ ...noteDraft, text: e.target.value })}
+                      rows={3}
+                      placeholder="Текст заметки"
+                      className={`w-full px-3 py-2 rounded-lg border ${theme === 'dark' ? 'border-white/10 bg-white/5 text-white' : 'border-gray-200 bg-white text-gray-900'} text-sm`}
+                    />
+                    <div className="flex gap-2">
+                      <button
+                        onClick={handleSaveNote}
+                        className={`px-4 py-2 rounded-lg font-semibold flex items-center gap-2 ${
+                          !user?.id
+                            ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
+                            : theme === 'dark'
+                            ? 'bg-[#4E6E49]/20 text-[#4E6E49] border border-[#4E6E49]/40'
+                            : 'bg-gradient-to-r from-[#4E6E49] to-emerald-500 text-white'
+                        }`}
+                        disabled={!user?.id}
+                      >
+                        <Edit3 className="w-4 h-4" />
+                        {noteDraft.id ? 'Сохранить' : 'Добавить'}
+                      </button>
+                      {noteDraft.id && (
+                        <button
+                          onClick={() =>
+                            setNoteDraft({
+                              id: '',
+                              userId: '',
+                              title: '',
+                              text: '',
+                              priority: 'medium',
+                              createdAt: '',
+                              updatedAt: '',
+                            })
+                          }
+                          className={`px-4 py-2 rounded-lg font-semibold border ${theme === 'dark' ? 'border-white/15 text-gray-200' : 'border-gray-200 text-gray-700'}`}
+                        >
+                          Отмена
+                        </button>
+                      )}
+                    </div>
+                    {notes.length > 0 && (
+                      <div className="space-y-2">
+                        {notes.map((n) => (
+                          <div
+                            key={n.id}
+                            className={`p-3 rounded-lg border ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-gray-50'} flex flex-col gap-1`}
+                          >
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="min-w-0">
+                                <p className={`text-sm font-semibold ${headingColor} truncate`}>{n.title || 'Без названия'}</p>
+                                <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} whitespace-pre-line`}>{n.text}</p>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <span
+                                  className={`text-[11px] px-2 py-1 rounded-full border ${
+                                    n.priority === 'high'
+                                      ? 'border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-500/40 dark:bg-rose-500/15 dark:text-rose-50'
+                                      : n.priority === 'medium'
+                                      ? 'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-500/40 dark:bg-amber-500/15 dark:text-amber-50'
+                                      : 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-500/40 dark:bg-emerald-500/15 dark:text-emerald-50'
+                                  }`}
+                                >
+                                  {n.priority === 'high' ? 'Высокий' : n.priority === 'medium' ? 'Средний' : 'Низкий'}
+                                </span>
+                                <button
+                                  onClick={() => handleEditNote(n.id)}
+                                  className={`p-1 rounded border ${theme === 'dark' ? 'border-white/10 text-gray-200' : 'border-gray-200 text-gray-700'}`}
+                                  title="Редактировать"
+                                >
+                                  <Edit3 className="w-4 h-4" />
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteNote(n.id)}
+                                  className={`p-1 rounded border ${theme === 'dark' ? 'border-white/10 text-red-200' : 'border-gray-200 text-red-600'}`}
+                                  title="Удалить"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                   <button
                     onClick={() => navigate('/tasks')}
                     className={`w-full px-4 py-3 rounded-lg font-semibold transition-all flex items-center justify-center gap-2 ${theme === 'dark' ? 'bg-gradient-to-r from-[#4E6E49]/20 to-emerald-700/20 text-[#4E6E49] border border-[#4E6E49]/40' : 'bg-gradient-to-r from-green-50 to-emerald-50 text-[#4E6E49] border border-green-200'}`}
