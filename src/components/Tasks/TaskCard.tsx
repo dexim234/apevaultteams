@@ -101,17 +101,14 @@ export const TaskCard = ({ task, onEdit, onDelete, onUpdate }: TaskCardProps) =>
       (currentStage.responsible === 'all' ? resolveParticipants() : (currentStage.responsible as string[])).includes(user.id)
     )
   const userApproval = stageApprovals.find((a) => a.userId === user?.id)
-  const allApproved =
-    stageApprovals.length > 0 && stageApprovals.every((a) => a.status === 'approved')
   const canApproveForAll = !!user && (user.id === task.mainExecutor || user.id === task.createdBy || isAdmin)
-  const stagesFullyApproved = allStagesApproved()
-
   const allStagesApproved = () => {
     if (!task.stages || task.stages.length === 0) {
       return stageApprovals.every((a) => a.status === 'approved')
     }
     return task.stages.every((s) => s.status === 'approved')
   }
+  const stagesFullyApproved = allStagesApproved()
 
   const handleStatusChange = async (newStatus: TaskStatus) => {
     if (!user && !isAdmin) return

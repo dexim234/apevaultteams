@@ -5,7 +5,7 @@ import { useAuthStore } from '@/store/authStore'
 import { useAdminStore } from '@/store/adminStore'
 import { updateTask } from '@/services/firestoreService'
 import { Task, TaskStatus, TASK_STATUSES, TEAM_MEMBERS } from '@/types'
-import { AlarmClock, CalendarClock, Check, CheckSquare, Clock3, MoreVertical, RotateCcw, X } from 'lucide-react'
+import { AlarmClock, CalendarClock, Check, CheckSquare, Clock3, MoreVertical, RotateCcw, X, AlertCircle } from 'lucide-react'
 import { formatDate } from '@/utils/dateUtils'
 import { TaskDeadlineBadge } from './TaskDeadlineBadge'
 import { CATEGORY_ICONS } from './categoryIcons'
@@ -35,6 +35,7 @@ export const TaskKanban = ({ tasks, onUpdate, onEdit, onDelete }: TaskKanbanProp
   const headingColor = theme === 'dark' ? 'text-white' : 'text-gray-900'
   const cardBg = theme === 'dark' ? 'bg-[#1a1a1a]' : 'bg-white'
   const borderColor = theme === 'dark' ? 'border-gray-800' : 'border-gray-300'
+  const inputBg = theme === 'dark' ? 'bg-gray-800' : 'bg-white'
 
   const statuses: TaskStatus[] = ['pending', 'in_progress', 'completed', 'closed', 'rejected']
 
@@ -68,6 +69,7 @@ export const TaskKanban = ({ tasks, onUpdate, onEdit, onDelete }: TaskKanbanProp
       responsible: 'all',
       approvals: task.approvals || [],
       status: task.status === 'rejected' ? 'rejected' : 'pending',
+      comments: [],
     }
   }
 
@@ -390,7 +392,7 @@ export const TaskKanban = ({ tasks, onUpdate, onEdit, onDelete }: TaskKanbanProp
           status: 'pending',
         }]
       }
-      const resetStages = staged.map((stage, idx) => {
+      const resetStages = staged.map((stage) => {
         const responsibleIds = stage.responsible === 'all' ? participants : stage.responsible
         return {
           ...stage,
