@@ -38,6 +38,20 @@ html.modal-open {
   overflow: hidden;
 }
 
+/* Prevent zoom on input focus on mobile devices */
+@media screen and (max-width: 768px) {
+  input[type="text"],
+  input[type="date"],
+  input[type="time"],
+  input[type="number"],
+  input[type="email"],
+  input[type="tel"],
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
+
 body::before {
   content: '';
   position: fixed;

@@ -380,6 +380,7 @@ export const TaskForm = ({ onClose, onSave, editingTask }: TaskFormProps) => {
                 onChange={(e) => setStartTime(e.target.value)}
                 required
                 className={`w-full min-w-0 px-4 py-2.5 rounded-lg border ${borderColor} ${inputBg} ${headingColor} focus:outline-none focus:ring-2 focus:ring-[#4E6E49]/50 transition-all`}
+                style={{ fontSize: '16px' }}
               />
               <p className={`text-[11px] leading-snug ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} break-words`}>
                 Помогает планировать последовательность задач и уведомлений.
@@ -398,6 +399,7 @@ export const TaskForm = ({ onClose, onSave, editingTask }: TaskFormProps) => {
                 min={formatDate(new Date(), 'yyyy-MM-dd')}
                 required
                 className={`w-full min-w-0 px-4 py-2.5 rounded-lg border ${borderColor} ${inputBg} ${headingColor} focus:outline-none focus:ring-2 focus:ring-[#4E6E49]/50 transition-all`}
+                style={{ fontSize: '16px' }}
               />
               <p className={`text-[11px] leading-snug ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} break-words`}>
                 Ограничение по датам учитывает сегодняшнюю дату автоматически.
@@ -415,6 +417,7 @@ export const TaskForm = ({ onClose, onSave, editingTask }: TaskFormProps) => {
                 onChange={(e) => setDueTime(e.target.value)}
                 required
                 className={`w-full min-w-0 px-4 py-2.5 rounded-lg border ${borderColor} ${inputBg} ${headingColor} focus:outline-none focus:ring-2 focus:ring-[#4E6E49]/50 transition-all`}
+                style={{ fontSize: '16px' }}
               />
               <p className={`text-[11px] leading-snug ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} break-words`}>
                 Добавьте время, чтобы вся команда понимала, когда итог должен быть готов.

@@ -36,6 +36,7 @@ export const Management = () => {
     recommendedToAdd: 0,
     topMembers: [] as string[],
   })
+  const [refreshKey, setRefreshKey] = useState(0)
 
   const [isMobile, setIsMobile] = useState(false)
 
@@ -195,10 +196,10 @@ export const Management = () => {
     setStatusType(null)
     setEditingSlot(null)
     setEditingStatus(null)
-    // Force reload after a short delay
-    setTimeout(() => {
-      window.location.reload()
-    }, 500)
+    // Reload data without page refresh
+    loadStats()
+    // Force component refresh
+    setRefreshKey(prev => prev + 1)
   }
 
   const headingColor = theme === 'dark' ? 'text-white' : 'text-gray-900'
@@ -444,6 +445,7 @@ export const Management = () => {
               </div>
             ) : (
               <ManagementTable
+                key={refreshKey}
                 selectedUserId={selectedUserId}
                 slotFilter={slotFilter}
                 onEditSlot={handleEditSlot}
@@ -452,6 +454,7 @@ export const Management = () => {
             )
           ) : (
             <ManagementWeekView
+              key={refreshKey}
               selectedUserId={selectedUserId}
               slotFilter={slotFilter}
               onEditSlot={handleEditSlot}
