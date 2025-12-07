@@ -441,10 +441,10 @@ export const CallPage = () => {
 
         {/* Form Modal */}
         {showForm && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[70] flex items-start sm:items-center justify-center p-4 overflow-y-auto overscroll-contain modal-scroll animate-in fade-in duration-200">
-            <div className={`${bgColor} rounded-2xl shadow-2xl border ${borderColor} max-w-2xl w-full max-h-[85dvh] sm:max-h-[calc(100dvh-96px)] overflow-hidden animate-in slide-in-from-bottom-4 duration-300`}>
-              <div className="flex flex-col h-full min-h-0">
-                <div className="p-8 flex items-center justify-between shrink-0">
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[70] flex items-start sm:items-center justify-center p-4 animate-in fade-in duration-200">
+            <div className={`${bgColor} rounded-2xl shadow-2xl border ${borderColor} max-w-2xl w-full max-h-[85dvh] sm:max-h-[calc(100dvh-96px)] animate-in slide-in-from-bottom-4 duration-300`}>
+              <div className="flex flex-col h-full">
+                <div className="p-8 pb-4 flex items-center justify-between shrink-0">
                   <h2 className={`text-3xl font-bold ${textColor}`}>
                     {editingCall ? 'Редактировать сигнал' : 'Создать новый сигнал'}
                   </h2>
@@ -455,7 +455,7 @@ export const CallPage = () => {
                     <X className={`w-6 h-6 ${subtleColor}`} />
                   </button>
                 </div>
-                <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-8 pb-10">
+                <div className="flex-1 overflow-y-auto overscroll-contain px-8 pb-8 min-h-0">
                   <CallForm callToEdit={editingCall} onSuccess={handleSuccess} onCancel={handleCancel} />
                 </div>
               </div>
@@ -465,10 +465,10 @@ export const CallPage = () => {
 
         {/* Delete Confirmation Modal */}
         {showDeleteModal && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[70] flex items-start sm:items-center justify-center p-4 overflow-y-auto overscroll-contain modal-scroll animate-in fade-in duration-200">
-            <div className={`${bgColor} rounded-2xl shadow-2xl border ${borderColor} max-w-md w-full max-h-[70dvh] sm:max-h-[calc(100dvh-96px)] overflow-hidden animate-in slide-in-from-bottom-4 duration-300`}>
-              <div className="flex flex-col h-full min-h-0 p-8 space-y-6 overflow-y-auto overscroll-contain">
-                <div className="flex items-center gap-4">
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[70] flex items-start sm:items-center justify-center p-4 animate-in fade-in duration-200">
+            <div className={`${bgColor} rounded-2xl shadow-2xl border ${borderColor} max-w-md w-full max-h-[70dvh] sm:max-h-[calc(100dvh-96px)] animate-in slide-in-from-bottom-4 duration-300`}>
+              <div className="flex flex-col h-full p-8">
+                <div className="flex items-center gap-4 mb-6">
                   <div className="p-3 rounded-full bg-red-500/10">
                     <AlertCircle className="w-8 h-8 text-red-500" />
                   </div>

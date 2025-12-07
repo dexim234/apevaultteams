@@ -445,7 +445,7 @@ export const TaskCard = ({ task, onEdit, onDelete, onUpdate }: TaskCardProps) =>
 
       {/* Reject Dialog */}
       {showRejectDialog && (
-        <div className="fixed inset-0 bg-black/50 flex items-start sm:items-center justify-center z-[70] p-4 overflow-y-auto overscroll-contain modal-scroll">
+        <div className="fixed inset-0 bg-black/50 flex items-start sm:items-center justify-center z-[70] p-4">
           <div className={`${cardBg} rounded-xl p-6 max-w-md w-full border-2 ${borderColor}`}>
             <h3 className={`text-lg font-bold mb-4 ${headingColor}`}>Отклонить задачу</h3>
             <textarea

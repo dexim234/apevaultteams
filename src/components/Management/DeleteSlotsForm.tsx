@@ -228,10 +228,10 @@ export const DeleteSlotsForm = ({ onClose, onSave }: DeleteSlotsFormProps) => {
   }
 
   return (
-    <div className="fixed inset-0 bg-slate-950/75 backdrop-blur-xl flex items-start sm:items-center justify-center z-[70] p-4 sm:p-6 overflow-y-auto overscroll-contain modal-scroll">
-      <div className={`w-full max-w-5xl rounded-3xl shadow-[0_24px_80px_rgba(0,0,0,0.45)] border ${theme === 'dark' ? 'bg-gradient-to-br from-[#0c1320] via-[#0b1220] to-[#08111b] border-white/10' : 'bg-gradient-to-br from-white via-slate-50 to-white border-slate-200'} max-h-[85dvh] sm:max-h-[calc(100dvh-96px)] overflow-hidden`}>
-        <div className="p-5 sm:p-6 lg:p-7 flex flex-col h-full min-h-0 overflow-y-auto modal-scroll">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="fixed inset-0 bg-slate-950/75 backdrop-blur-xl flex items-start sm:items-center justify-center z-[70] p-4 sm:p-6">
+      <div className={`w-full max-w-5xl rounded-3xl shadow-[0_24px_80px_rgba(0,0,0,0.45)] border ${theme === 'dark' ? 'bg-gradient-to-br from-[#0c1320] via-[#0b1220] to-[#08111b] border-white/10' : 'bg-gradient-to-br from-white via-slate-50 to-white border-slate-200'} max-h-[85dvh] sm:max-h-[calc(100dvh-96px)]`}>
+        <div className="p-5 sm:p-6 lg:p-7 flex flex-col h-full">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between shrink-0">
             <div className="space-y-1">
               <div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-[#4E6E49] font-semibold">
                 <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-[#4E6E49]/10 text-[#4E6E49] border border-[#4E6E49]/30">
@@ -289,7 +289,7 @@ export const DeleteSlotsForm = ({ onClose, onSave }: DeleteSlotsFormProps) => {
               </div>
             </aside>
 
-            <div className="space-y-4 overflow-y-auto overscroll-contain pr-1 pb-6 flex-1 min-h-0">
+            <div className="space-y-4 overflow-y-auto overscroll-contain pr-1 flex-1 min-h-0">
               {/* User selection for admin */}
             {isAdmin && (
               <div>

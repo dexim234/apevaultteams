@@ -196,7 +196,7 @@ export const TaskForm = ({ onClose, onSave, editingTask }: TaskFormProps) => {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-start sm:items-center justify-center z-[70] p-4 overflow-y-auto overscroll-contain modal-scroll">
+    <div className="fixed inset-0 bg-black/50 flex items-start sm:items-center justify-center z-[70] p-4">
       <div className={`${cardBg} rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-2xl max-h-[calc(100dvh-96px)] sm:max-h-[calc(100dvh-96px)] overflow-hidden border-2 ${
         theme === 'dark' 
           ? 'border-[#4E6E49]/30 bg-gradient-to-br from-[#1a1a1a] via-[#1a1a1a] to-[#0A0A0A]' 
@@ -220,7 +220,7 @@ export const TaskForm = ({ onClose, onSave, editingTask }: TaskFormProps) => {
           </div>
 
           {/* Form Content */}
-          <div className="p-4 sm:p-6 space-y-4 sm:space-y-6 flex-1 min-h-0 overflow-y-auto overscroll-contain modal-scroll pb-10">
+          <div className="p-4 sm:p-6 space-y-4 sm:space-y-6 flex-1 min-h-0 overflow-y-auto overscroll-contain">
           {error && (
             <div className={`p-3 rounded-lg bg-red-500/10 border border-red-500/30 flex items-center gap-2 text-red-500`}>
               <AlertCircle className="w-5 h-5 flex-shrink-0" />

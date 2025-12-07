@@ -219,11 +219,7 @@ body.dark .nav-chip[data-active='false'] {
   border-color: rgba(78, 110, 73, 0.4);
 }
 
-/* Smooth scrolling for modal overlays/content on mobile */
-.modal-scroll {
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
-}
+
 
 .nav-chip:focus-visible,
 .pill:focus-visible,
