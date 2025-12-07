@@ -70,7 +70,7 @@ export const CallPage = () => {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
   const [categoryFilter, setCategoryFilter] = useState<'all' | CallCategory>('all')
   const [riskFilter, setRiskFilter] = useState<RiskFilter>('all')
-  const [showAnalytics, setShowAnalytics] = useState(true)
+  const [traderFilter, setTraderFilter] = useState<'all' | string>('all')
 
   useScrollLock(showForm || showDeleteModal)
 
@@ -211,6 +211,7 @@ export const CallPage = () => {
       if (statusFilter !== 'all' && call.status !== statusFilter) return false
       if (categoryFilter !== 'all' && call.category !== categoryFilter) return false
       if (riskFilter !== 'all' && getRiskLevel(call) !== riskFilter) return false
+      if (traderFilter !== 'all' && call.userId !== traderFilter) return false
       if (searchQuery.trim()) {
         return composeSearchString(call).includes(searchQuery.toLowerCase())
       }
@@ -244,7 +245,7 @@ export const CallPage = () => {
   const pillActive = 'bg-gradient-to-r from-emerald-400 to-teal-500 text-white shadow-md shadow-emerald-300/30'
 
   const renderQuickStat = (label: string, value: string | number, accent: string) => (
-    <div className={`p-4 rounded-xl border ${borderColor} ${theme === 'dark' ? 'bg-gray-800/60' : 'bg-gray-50'}`}>
+    <div className={`p-4 rounded-xl border ${borderColor} ${theme === 'dark' ? 'bg-gray-800/70' : 'bg-gray-50'}`}>
       <p className={`text-xs uppercase tracking-wider ${subtleColor}`}>{label}</p>
       <p className={`text-2xl font-bold ${accent}`}>{value}</p>
     </div>
@@ -345,12 +346,11 @@ export const CallPage = () => {
     <Layout>
       <div className="space-y-6">
         {/* Hero */}
-        <div className={`rounded-2xl p-8 ${bgColor} shadow-xl border-2 ${theme === 'dark' ? 'border-emerald-900/20' : 'border-emerald-100'} relative overflow-hidden`}>
-          <div className="absolute inset-0 bg-gradient-to-r from-emerald-200/50 via-transparent to-teal-200/50 dark:from-emerald-700/20 dark:to-teal-700/20" />
+        <div className={`rounded-2xl p-8 ${theme === 'dark' ? 'bg-[#0f1218]' : 'bg-white'} shadow-xl border ${borderColor} relative overflow-hidden`}>
           <div className="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div className="space-y-3">
               <div className="flex items-center gap-3">
-                <div className="p-4 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-600 text-white shadow-md">
+                <div className="p-4 rounded-2xl bg-gradient-to-br from-sky-500 to-teal-500 text-white shadow-md">
                   <Zap className="w-7 h-7" />
                 </div>
                 <div>
@@ -362,7 +362,7 @@ export const CallPage = () => {
               <div className="flex flex-wrap gap-3">
                 <button
                   onClick={() => { setEditingCall(null); setFormCategory('memecoins'); setShowForm(true) }}
-                  className="inline-flex items-center gap-2 px-4 py-3 rounded-xl text-white bg-gradient-to-r from-emerald-400 to-teal-500 shadow-md hover:shadow-lg transition-all"
+                  className="inline-flex items-center gap-2 px-4 py-3 rounded-xl text-white bg-gradient-to-r from-sky-500 to-teal-500 shadow-md hover:shadow-lg transition-all"
                 >
                   <Plus className="w-5 h-5" />
                   Новый сигнал
@@ -442,14 +442,6 @@ export const CallPage = () => {
                 </button>
               ))}
             </div>
-            <div className="flex flex-wrap gap-2 ml-auto">
-              <button
-                onClick={() => setShowAnalytics((v) => !v)}
-                className={`px-3 py-2 rounded-lg text-sm font-semibold border ${borderColor} ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-50'}`}
-              >
-                {showAnalytics ? 'Скрыть аналитику' : 'Показать аналитику'}
-              </button>
-            </div>
           </div>
 
           <div className="flex flex-wrap gap-2">
@@ -484,14 +476,26 @@ export const CallPage = () => {
             ))}
           </div>
 
-          {showAnalytics && (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {renderQuickStat('Всего сигналов', totals.total, textColor)}
-              {renderQuickStat('Активных', totals.active, 'text-emerald-500')}
-              {renderQuickStat('Завершено', totals.completed, 'text-blue-500')}
-              {renderQuickStat('High risk', totals.highRisk, 'text-amber-500')}
-            </div>
-          )}
+          <div className="flex flex-wrap items-center gap-3">
+            <span className={`text-xs ${subtleColor} uppercase tracking-wider`}>Трейдер:</span>
+            <select
+              value={traderFilter}
+              onChange={(e) => setTraderFilter(e.target.value)}
+              className={`px-3 py-2 rounded-lg border ${borderColor} ${theme === 'dark' ? 'bg-gray-800 text-white' : 'bg-gray-50 text-gray-900'} text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50`}
+            >
+              <option value="all">Все трейдеры</option>
+              {TEAM_MEMBERS.map((t) => (
+                <option key={t.id} value={t.id}>{t.name}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {renderQuickStat('Всего сигналов', totals.total, textColor)}
+            {renderQuickStat('Активных', totals.active, 'text-emerald-500')}
+            {renderQuickStat('Завершено', totals.completed, 'text-blue-500')}
+            {renderQuickStat('High risk', totals.highRisk, 'text-amber-500')}
+          </div>
         </div>
 
         {/* Form Modal */}

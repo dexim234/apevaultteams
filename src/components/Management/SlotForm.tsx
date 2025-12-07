@@ -564,9 +564,9 @@ export const SlotForm = ({ slot, onClose, onSave }: SlotFormProps) => {
   const timeSummary = slots.map((s) => `${s.start}–${s.end}${s.endDate ? ' (+1)' : ''}`)
 
   return (
-    <div className="fixed inset-0 bg-slate-950/75 backdrop-blur-xl flex items-start sm:items-center justify-center z-[70] p-4 sm:p-6 touch-manipulation overflow-y-auto overscroll-contain modal-scroll">
-      <div className={`w-full max-w-5xl rounded-3xl shadow-[0_24px_80px_rgba(0,0,0,0.45)] border ${theme === 'dark' ? 'bg-gradient-to-br from-[#0c1320] via-[#0b1220] to-[#08111b] border-white/10' : 'bg-gradient-to-br from-white via-slate-50 to-white border-slate-200'} max-h-[85dvh] sm:max-h-[calc(100dvh-96px)] overflow-hidden`}>
-        <div className="p-4 sm:p-6 lg:p-7 flex flex-col h-full min-h-0 overflow-y-auto overscroll-contain modal-scroll">
+    <div className="fixed inset-0 bg-slate-950/75 backdrop-blur-xl flex items-start sm:items-center justify-center z-[70] p-4 sm:p-6 touch-manipulation overflow-y-auto">
+      <div className={`w-full max-w-5xl rounded-3xl shadow-[0_24px_80px_rgba(0,0,0,0.45)] border ${theme === 'dark' ? 'bg-gradient-to-br from-[#0c1320] via-[#0b1220] to-[#08111b] border-white/10' : 'bg-gradient-to-br from-white via-slate-50 to-white border-slate-200'} max-h-[90vh] overflow-y-auto`}>
+        <div className="p-4 sm:p-6 lg:p-7 flex flex-col h-full min-h-0 overflow-y-auto">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="space-y-1">
               <div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-[#4E6E49] font-semibold">
