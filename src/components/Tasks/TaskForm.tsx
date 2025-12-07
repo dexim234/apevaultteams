@@ -197,29 +197,30 @@ export const TaskForm = ({ onClose, onSave, editingTask }: TaskFormProps) => {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto overscroll-contain">
-      <div className={`${cardBg} rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-2xl max-h-[85dvh] sm:max-h-[calc(100dvh-72px)] overflow-hidden border-2 ${
+      <div className={`${cardBg} rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-2xl max-h-[calc(100dvh-96px)] sm:max-h-[calc(100dvh-96px)] overflow-hidden border-2 ${
         theme === 'dark' 
           ? 'border-[#4E6E49]/30 bg-gradient-to-br from-[#1a1a1a] via-[#1a1a1a] to-[#0A0A0A]' 
           : 'border-green-200 bg-gradient-to-br from-white via-green-50/30 to-white'
       } relative`}>
-        {/* Header */}
-        <div className={`sticky top-0 ${cardBg} border-b ${borderColor} p-4 sm:p-6 flex items-center justify-between z-10`}>
-          <h2 className={`text-xl sm:text-2xl font-bold ${headingColor} flex items-center gap-2`}>
-            <FileText className="w-5 h-5 sm:w-6 sm:h-6" />
-            {isEditing ? 'Редактировать задачу' : 'Новая задача'}
-          </h2>
-          <button
-            onClick={onClose}
-            className={`p-2 rounded-lg transition-colors ${
-              theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-100'
-            }`}
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
+        <div className="flex flex-col h-full min-h-0">
+          {/* Header */}
+          <div className={`sticky top-0 ${cardBg} border-b ${borderColor} p-4 sm:p-6 flex items-center justify-between z-10`}>
+            <h2 className={`text-xl sm:text-2xl font-bold ${headingColor} flex items-center gap-2`}>
+              <FileText className="w-5 h-5 sm:w-6 sm:h-6" />
+              {isEditing ? 'Редактировать задачу' : 'Новая задача'}
+            </h2>
+            <button
+              onClick={onClose}
+              className={`p-2 rounded-lg transition-colors ${
+                theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-100'
+              }`}
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
 
-        {/* Form Content */}
-        <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+          {/* Form Content */}
+          <div className="p-4 sm:p-6 space-y-4 sm:space-y-6 flex-1 min-h-0 overflow-y-auto overscroll-contain pb-10">
           {error && (
             <div className={`p-3 rounded-lg bg-red-500/10 border border-red-500/30 flex items-center gap-2 text-red-500`}>
               <AlertCircle className="w-5 h-5 flex-shrink-0" />
@@ -479,29 +480,30 @@ export const TaskForm = ({ onClose, onSave, editingTask }: TaskFormProps) => {
             </div>
           </div>
 
-          {/* Actions */}
-          <div className={`flex flex-col sm:flex-row gap-3 pt-4 border-t ${borderColor}`}>
-            <button
-              onClick={handleSave}
-              disabled={loading}
-              className={`flex-1 px-6 py-3 rounded-lg font-semibold transition-all ${
-                loading
-                  ? 'bg-gray-400 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-[#4E6E49] to-emerald-700 hover:from-[#4E6E49] hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:scale-[1.02]'
-              }`}
-            >
-              {loading ? 'Сохранение...' : isEditing ? 'Сохранить изменения' : 'Создать задачу'}
-            </button>
-            <button
-              onClick={onClose}
-              className={`px-6 py-3 rounded-lg font-semibold transition-colors ${
-                theme === 'dark'
-                  ? 'bg-gray-700 hover:bg-gray-600 text-gray-300'
-                  : 'bg-gray-200 hover:bg-gray-300 text-gray-700'
-              }`}
-            >
-              Отмена
-            </button>
+            {/* Actions */}
+            <div className={`flex flex-col sm:flex-row gap-3 pt-4 border-t ${borderColor}`}>
+              <button
+                onClick={handleSave}
+                disabled={loading}
+                className={`flex-1 px-6 py-3 rounded-lg font-semibold transition-all ${
+                  loading
+                    ? 'bg-gray-400 cursor-not-allowed'
+                    : 'bg-gradient-to-r from-[#4E6E49] to-emerald-700 hover:from-[#4E6E49] hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:scale-[1.02]'
+                }`}
+              >
+                {loading ? 'Сохранение...' : isEditing ? 'Сохранить изменения' : 'Создать задачу'}
+              </button>
+              <button
+                onClick={onClose}
+                className={`px-6 py-3 rounded-lg font-semibold transition-colors ${
+                  theme === 'dark'
+                    ? 'bg-gray-700 hover:bg-gray-600 text-gray-300'
+                    : 'bg-gray-200 hover:bg-gray-300 text-gray-700'
+                }`}
+              >
+                Отмена
+              </button>
+            </div>
           </div>
         </div>
       </div>
