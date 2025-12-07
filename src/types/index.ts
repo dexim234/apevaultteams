@@ -230,6 +230,7 @@ export interface TaskApproval {
   status: 'approved' | 'rejected' | 'pending'
   comment?: string
   updatedAt: string
+  forAll?: boolean // пометка, что согласование выполнено за других
 }
 
 export interface TaskAssignee {
@@ -247,7 +248,7 @@ export interface Task {
   createdBy: string // user ID
   assignedTo: string[] // user IDs (для быстрых фильтров)
   assignees?: TaskAssignee[]
-  approvals: TaskApproval[] // Для статуса "pending"
+  approvals: TaskApproval[] // Текущие согласования (этап по умолчанию)
   createdAt: string
   updatedAt: string
   completedAt?: string
@@ -257,6 +258,34 @@ export interface Task {
   dueDate: string // YYYY-MM-DD format (обязательно)
   dueTime: string // HH:mm format (обязательно)
   startTime?: string // HH:mm format (необязательно)
+  // Роли
+  mainExecutor?: string // главный исполнитель
+  deputies?: { userId: string; responsibility?: string }[]
+  executors?: string[]
+  curators?: string[]
+  leads?: string[]
+  // Этапы и комментарии
+  stages?: TaskStage[]
+  currentStageId?: string
+  comments?: TaskComment[]
+}
+
+export interface TaskStage {
+  id: string
+  name: string
+  description?: string
+  responsible: 'all' | string[] // 'all' = все исполнители/роли
+  approvals: TaskApproval[]
+  comments?: TaskComment[]
+  status: 'pending' | 'approved' | 'rejected'
+}
+
+export interface TaskComment {
+  id: string
+  userId: string
+  text: string
+  createdAt: string
+  stageId?: string // если комментарий к конкретному этапу
 }
 
 export interface Note {

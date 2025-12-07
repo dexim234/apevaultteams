@@ -4,7 +4,7 @@ import { useAuthStore } from '@/store/authStore'
 import { useAdminStore } from '@/store/adminStore'
 import { useThemeStore } from '@/store/themeStore'
 import { addTask, updateTask } from '@/services/firestoreService'
-import { Task, TaskAssignee, TaskCategory, TEAM_MEMBERS, TASK_CATEGORIES } from '@/types'
+import { Task, TaskAssignee, TaskCategory, TaskStage, TEAM_MEMBERS, TASK_CATEGORIES } from '@/types'
 import { X, Calendar, Users, Tag, FileText, AlertCircle, Clock, AlarmClock, Sparkles } from 'lucide-react'
 import { CATEGORY_ICONS } from './categoryIcons'
 import { formatDate } from '@/utils/dateUtils'
@@ -34,6 +34,20 @@ export const TaskForm = ({ onClose, onSave, editingTask }: TaskFormProps) => {
   const [dueDate, setDueDate] = useState(editingTask?.dueDate || formatDate(new Date(), 'yyyy-MM-dd'))
   const [dueTime, setDueTime] = useState(editingTask?.dueTime || '12:00')
   const [startTime, setStartTime] = useState(editingTask?.startTime || '09:00')
+  const [mainExecutor, setMainExecutor] = useState<string>(editingTask?.mainExecutor || '')
+  const [deputies, setDeputies] = useState<{ userId: string; responsibility?: string }[]>(editingTask?.deputies || [])
+  const [executors, setExecutors] = useState<string[]>(editingTask?.executors || [])
+  const [curators, setCurators] = useState<string[]>(editingTask?.curators || [])
+  const [leads, setLeads] = useState<string[]>(editingTask?.leads || [])
+  const fallbackStage: TaskStage = {
+    id: 'stage-1',
+    name: 'Этап 1',
+    responsible: 'all',
+    approvals: editingTask?.approvals || [],
+    status: 'pending',
+  }
+  const [stages, setStages] = useState<TaskStage[]>(editingTask?.stages && editingTask.stages.length > 0 ? editingTask.stages : [fallbackStage])
+  const [currentStageId, setCurrentStageId] = useState<string>(editingTask?.currentStageId || stages[0]?.id || 'stage-1')
   const initialAssignees: TaskAssignee[] =
     editingTask && editingTask.assignees && editingTask.assignees.length > 0
       ? editingTask.assignees
@@ -80,6 +94,61 @@ export const TaskForm = ({ onClose, onSave, editingTask }: TaskFormProps) => {
     )
   }
 
+  const toggleUserInList = (userId: string, list: string[], setter: (value: string[]) => void) => {
+    if (list.includes(userId)) {
+      setter(list.filter((id) => id !== userId))
+    } else {
+      setter([...list, userId])
+    }
+  }
+
+  const handleDeputyChange = (userId: string, responsibility: string) => {
+    setDeputies((prev) => prev.map((d) => (d.userId === userId ? { ...d, responsibility } : d)))
+  }
+
+  const handleStageChange = (stageId: string, updates: Partial<TaskStage>) => {
+    setStages((prev) =>
+      prev.map((stage) => (stage.id === stageId ? { ...stage, ...updates } : stage))
+    )
+  }
+
+  const handleStageResponsibleToggle = (stageId: string, userId: string) => {
+    setStages((prev) =>
+      prev.map((stage) => {
+        if (stage.id !== stageId) return stage
+        if (stage.responsible === 'all') {
+          return stage
+        }
+        const list = stage.responsible || []
+        const nextList = list.includes(userId) ? list.filter((id) => id !== userId) : [...list, userId]
+        return { ...stage, responsible: nextList }
+      })
+    )
+  }
+
+  const handleAddStage = () => {
+    const newStage: TaskStage = {
+      id: `stage-${Date.now()}`,
+      name: `Этап ${stages.length + 1}`,
+      responsible: 'all',
+      approvals: [],
+      status: 'pending',
+    }
+    setStages((prev) => [...prev, newStage])
+    if (!currentStageId) {
+      setCurrentStageId(newStage.id)
+    }
+  }
+
+  const handleRemoveStage = (stageId: string) => {
+    if (stages.length === 1) return
+    const updated = stages.filter((stage) => stage.id !== stageId)
+    setStages(updated)
+    if (currentStageId === stageId) {
+      setCurrentStageId(updated[0]?.id || '')
+    }
+  }
+
   const handleSave = async () => {
     if (!isAdmin && !user) {
       setError('Пользователь не найден')
@@ -96,7 +165,7 @@ export const TaskForm = ({ onClose, onSave, editingTask }: TaskFormProps) => {
         return
       }
 
-      if (assignees.length === 0) {
+      if (assignees.length === 0 && !mainExecutor) {
         setError('Выберите хотя бы одного участника')
         setLoading(false)
         return
@@ -120,15 +189,30 @@ export const TaskForm = ({ onClose, onSave, editingTask }: TaskFormProps) => {
         return
       }
 
+      if (!mainExecutor) {
+        setError('Выберите главного исполнителя')
+        setLoading(false)
+        return
+      }
+
       const now = new Date().toISOString()
       const currentUserId = user?.id || 'admin'
 
-      const participantIds = assignees.map((assignee) => assignee.userId)
+      const participantIds = Array.from(
+        new Set([
+          ...assignees.map((assignee) => assignee.userId),
+          ...(mainExecutor ? [mainExecutor] : []),
+          ...deputies.map((d) => d.userId),
+          ...executors,
+          ...curators,
+          ...leads,
+        ])
+      )
 
-      if (isEditing && editingTask) {
-        // Update existing task
-        const updatedApprovals = participantIds.map((userId) => {
-          const existing = editingTask.approvals.find((a) => a.userId === userId)
+      const buildStageApprovals = (stage: TaskStage): TaskStage => {
+        const responsibleIds = stage.responsible === 'all' ? participantIds : stage.responsible
+        const approvals = responsibleIds.map((userId) => {
+          const existing = stage.approvals?.find((a) => a.userId === userId)
           return (
             existing || {
               userId,
@@ -137,7 +221,15 @@ export const TaskForm = ({ onClose, onSave, editingTask }: TaskFormProps) => {
             }
           )
         })
+        return { ...stage, approvals, status: stage.status || 'pending' }
+      }
 
+      const normalizedStages = stages.map(buildStageApprovals)
+      const firstStage = normalizedStages[0]
+      const derivedCurrentStageId = currentStageId || firstStage?.id || 'stage-1'
+
+      if (isEditing && editingTask) {
+        // Update existing task
         const updates: Partial<Task> = {
           title: title.trim(),
           description: description.trim() || undefined,
@@ -145,7 +237,14 @@ export const TaskForm = ({ onClose, onSave, editingTask }: TaskFormProps) => {
           priority,
           assignedTo: participantIds,
           assignees,
-          approvals: updatedApprovals,
+          approvals: firstStage ? firstStage.approvals : [],
+          stages: normalizedStages,
+          currentStageId: derivedCurrentStageId,
+          mainExecutor: mainExecutor || undefined,
+          deputies,
+          executors,
+          curators,
+          leads,
           dueDate,
           dueTime,
           startTime,
@@ -165,11 +264,14 @@ export const TaskForm = ({ onClose, onSave, editingTask }: TaskFormProps) => {
           createdBy: currentUserId,
           assignedTo: participantIds,
           assignees,
-          approvals: participantIds.map((userId) => ({
-            userId,
-            status: 'pending' as const,
-            updatedAt: now,
-          })),
+          approvals: firstStage ? firstStage.approvals : [],
+          stages: normalizedStages,
+          currentStageId: derivedCurrentStageId,
+          mainExecutor: mainExecutor || undefined,
+          deputies,
+          executors,
+          curators,
+          leads,
           createdAt: now,
           updatedAt: now,
           priority,
@@ -190,32 +292,31 @@ export const TaskForm = ({ onClose, onSave, editingTask }: TaskFormProps) => {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-start sm:items-center justify-center z-[70] p-4 overflow-y-auto overflow-x-hidden overscroll-contain modal-scroll">
-      <div className={`${cardBg} rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-2xl max-h-[calc(100dvh-96px)] sm:max-h-[calc(100dvh-96px)] flex flex-col border-2 overflow-hidden ${
+    <div className="fixed inset-0 bg-black/50 flex items-start sm:items-center justify-center z-[70] p-4 overflow-y-auto overscroll-contain modal-scroll">
+      <div className={`${cardBg} rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-2xl max-h-[calc(100dvh-96px)] sm:max-h-[calc(100dvh-96px)] overflow-hidden border-2 ${
         theme === 'dark' 
           ? 'border-[#4E6E49]/30 bg-gradient-to-br from-[#1a1a1a] via-[#1a1a1a] to-[#0A0A0A]' 
           : 'border-green-200 bg-gradient-to-br from-white via-green-50/30 to-white'
       } relative`}>
-        {/* Header */}
-        <div className={`flex-shrink-0 ${cardBg} border-b ${borderColor} p-4 sm:p-6 flex items-center justify-between`}>
-          <h2 className={`text-xl sm:text-2xl font-bold ${headingColor} flex items-center gap-2`}>
-            <FileText className="w-5 h-5 sm:w-6 sm:h-6" />
-            {isEditing ? 'Редактировать задачу' : 'Новая задача'}
-          </h2>
-          <button
-            onClick={onClose}
-            className={`p-2 rounded-lg transition-colors flex-shrink-0 ${
-              theme === 'dark' ? 'hover:bg-gray-700 text-gray-200' : 'hover:bg-gray-100 text-gray-700'
-            }`}
-            aria-label="Закрыть"
-          >
-            <X className="w-5 h-5 sm:w-6 sm:h-6" />
-          </button>
-        </div>
+        <div className="flex flex-col h-full min-h-0">
+          {/* Header */}
+          <div className={`sticky top-0 ${cardBg} border-b ${borderColor} p-4 sm:p-6 flex items-center justify-between z-10`}>
+            <h2 className={`text-xl sm:text-2xl font-bold ${headingColor} flex items-center gap-2`}>
+              <FileText className="w-5 h-5 sm:w-6 sm:h-6" />
+              {isEditing ? 'Редактировать задачу' : 'Новая задача'}
+            </h2>
+            <button
+              onClick={onClose}
+              className={`p-2 rounded-lg transition-colors ${
+                theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-100'
+              }`}
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
 
-        {/* Form Content */}
-        <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-contain modal-scroll">
-          <div className="p-4 sm:p-6 space-y-4 sm:space-y-6 pb-10 min-w-0">
+          {/* Form Content */}
+          <div className="p-4 sm:p-6 space-y-4 sm:space-y-6 flex-1 min-h-0 overflow-y-auto overscroll-contain modal-scroll pb-10">
           {error && (
             <div className={`p-3 rounded-lg bg-red-500/10 border border-red-500/30 flex items-center gap-2 text-red-500`}>
               <AlertCircle className="w-5 h-5 flex-shrink-0" />
@@ -367,30 +468,29 @@ export const TaskForm = ({ onClose, onSave, editingTask }: TaskFormProps) => {
           </div>
 
           {/* Timing */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 min-w-0">
-            <div className="p-3 rounded-lg border-2 flex flex-col gap-2 transition-all shadow-sm bg-white/60 dark:bg-[#1a1a1a]/60 min-w-0 overflow-hidden"
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="p-3 rounded-lg border-2 flex flex-col gap-2 transition-all shadow-sm bg-white/60 dark:bg-[#1a1a1a]/60"
               style={{ borderColor: theme === 'dark' ? '#2f2f2f' : '#e5e7eb' }}>
-              <label className={`text-sm font-medium ${headingColor} flex items-center gap-2 min-w-0`}>
-                <AlarmClock className="w-4 h-4 flex-shrink-0" />
-                <span className="truncate">Время начала *</span>
+              <label className={`text-sm font-medium ${headingColor} flex items-center gap-2`}>
+                <AlarmClock className="w-4 h-4" />
+                Время начала *
               </label>
               <input
                 type="time"
                 value={startTime}
                 onChange={(e) => setStartTime(e.target.value)}
                 required
-                className={`w-full min-w-0 px-4 py-2.5 rounded-lg border ${borderColor} ${inputBg} ${headingColor} focus:outline-none focus:ring-2 focus:ring-[#4E6E49]/50 transition-all`}
-                style={{ fontSize: '16px' }}
+                className={`w-full px-4 py-2.5 rounded-lg border ${borderColor} ${inputBg} ${headingColor} focus:outline-none focus:ring-2 focus:ring-[#4E6E49]/50 transition-all`}
               />
-              <p className={`text-[11px] leading-snug ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} break-words`}>
+              <p className={`text-[11px] leading-snug ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                 Помогает планировать последовательность задач и уведомлений.
               </p>
             </div>
-            <div className="p-3 rounded-lg border-2 flex flex-col gap-2 transition-all shadow-sm bg-white/60 dark:bg-[#1a1a1a]/60 min-w-0 overflow-hidden"
+            <div className="p-3 rounded-lg border-2 flex flex-col gap-2 transition-all shadow-sm bg-white/60 dark:bg-[#1a1a1a]/60"
               style={{ borderColor: theme === 'dark' ? '#2f2f2f' : '#e5e7eb' }}>
-              <label className={`text-sm font-medium ${headingColor} flex items-center gap-2 min-w-0`}>
-                <Calendar className="w-4 h-4 flex-shrink-0" />
-                <span className="truncate">Дата дедлайна *</span>
+              <label className={`text-sm font-medium ${headingColor} flex items-center gap-2`}>
+                <Calendar className="w-4 h-4" />
+                Дата дедлайна *
               </label>
               <input
                 type="date"
@@ -398,34 +498,135 @@ export const TaskForm = ({ onClose, onSave, editingTask }: TaskFormProps) => {
                 onChange={(e) => setDueDate(e.target.value)}
                 min={formatDate(new Date(), 'yyyy-MM-dd')}
                 required
-                className={`w-full min-w-0 px-4 py-2.5 rounded-lg border ${borderColor} ${inputBg} ${headingColor} focus:outline-none focus:ring-2 focus:ring-[#4E6E49]/50 transition-all`}
-                style={{ fontSize: '16px' }}
+                className={`w-full px-4 py-2.5 rounded-lg border ${borderColor} ${inputBg} ${headingColor} focus:outline-none focus:ring-2 focus:ring-[#4E6E49]/50 transition-all`}
               />
-              <p className={`text-[11px] leading-snug ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} break-words`}>
+              <p className={`text-[11px] leading-snug ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                 Ограничение по датам учитывает сегодняшнюю дату автоматически.
               </p>
             </div>
-            <div className="p-3 rounded-lg border-2 flex flex-col gap-2 transition-all shadow-sm bg-white/60 dark:bg-[#1a1a1a]/60 min-w-0 overflow-hidden"
+            <div className="p-3 rounded-lg border-2 flex flex-col gap-2 transition-all shadow-sm bg-white/60 dark:bg-[#1a1a1a]/60"
               style={{ borderColor: theme === 'dark' ? '#2f2f2f' : '#e5e7eb' }}>
-              <label className={`text-sm font-medium ${headingColor} flex items-center gap-2 min-w-0`}>
-                <Clock className="w-4 h-4 flex-shrink-0" />
-                <span className="truncate">Время дедлайна *</span>
+              <label className={`text-sm font-medium ${headingColor} flex items-center gap-2`}>
+                <Clock className="w-4 h-4" />
+                Время дедлайна *
               </label>
               <input
                 type="time"
                 value={dueTime}
                 onChange={(e) => setDueTime(e.target.value)}
                 required
-                className={`w-full min-w-0 px-4 py-2.5 rounded-lg border ${borderColor} ${inputBg} ${headingColor} focus:outline-none focus:ring-2 focus:ring-[#4E6E49]/50 transition-all`}
-                style={{ fontSize: '16px' }}
+                className={`w-full px-4 py-2.5 rounded-lg border ${borderColor} ${inputBg} ${headingColor} focus:outline-none focus:ring-2 focus:ring-[#4E6E49]/50 transition-all`}
               />
-              <p className={`text-[11px] leading-snug ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} break-words`}>
+              <p className={`text-[11px] leading-snug ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                 Добавьте время, чтобы вся команда понимала, когда итог должен быть готов.
               </p>
             </div>
           </div>
 
-          {/* Participants */}
+          {/* Роли и участники */}
+          <div className="space-y-4">
+            <div>
+              <label className={`block text-sm font-medium mb-2 ${headingColor}`}>
+                Главный исполнитель *
+              </label>
+              <select
+                value={mainExecutor}
+                onChange={(e) => setMainExecutor(e.target.value)}
+                className={`w-full px-4 py-2.5 rounded-lg border ${borderColor} ${inputBg} ${headingColor} focus:outline-none focus:ring-2 focus:ring-[#4E6E49]/50`}
+              >
+                <option value="">Выберите главного</option>
+                {TEAM_MEMBERS.map((member) => (
+                  <option key={member.id} value={member.id}>
+                    {member.name} ({member.login})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Deputies */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <label className={`block text-sm font-medium ${headingColor}`}>Замы (несколько)</label>
+                <span className="text-xs text-gray-500">Добавьте зоны ответственности</span>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
+                {TEAM_MEMBERS.map((member) => {
+                  const isSelected = deputies.some((d) => d.userId === member.id)
+                  return (
+                    <button
+                      key={member.id}
+                      type="button"
+                      onClick={() => {
+                        if (isSelected) {
+                          setDeputies((prev) => prev.filter((d) => d.userId !== member.id))
+                        } else {
+                          setDeputies((prev) => [...prev, { userId: member.id, responsibility: '' }])
+                        }
+                      }}
+                      className={`p-3 rounded-lg border-2 transition-all text-left ${
+                        isSelected
+                          ? theme === 'dark'
+                            ? 'border-[#4E6E49] bg-[#4E6E49]/20'
+                            : 'border-[#4E6E49] bg-green-50'
+                          : `${borderColor} ${inputBg}`
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <div className={`w-2 h-2 rounded-full ${isSelected ? 'bg-[#4E6E49]' : 'bg-gray-400'}`} />
+                        <span className={`text-sm font-medium ${isSelected ? 'text-[#4E6E49]' : headingColor}`}>
+                          {member.name}
+                        </span>
+                      </div>
+                      {isSelected && (
+                        <input
+                          value={deputies.find((d) => d.userId === member.id)?.responsibility || ''}
+                          onChange={(e) => handleDeputyChange(member.id, e.target.value)}
+                          className={`mt-2 w-full px-2 py-1.5 rounded border ${borderColor} ${theme === 'dark' ? 'bg-[#1a1a1a] text-gray-100' : 'bg-white text-gray-700'}`}
+                          placeholder="Зона ответственности"
+                        />
+                      )}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* Other roles */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {[{ label: 'Исполнители', list: executors, setter: setExecutors },
+                { label: 'Кураторы', list: curators, setter: setCurators },
+                { label: 'Ведущие', list: leads, setter: setLeads }].map((role) => (
+                <div key={role.label} className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className={`text-sm font-medium ${headingColor}`}>{role.label}</label>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    {TEAM_MEMBERS.map((member) => {
+                      const isSelected = role.list.includes(member.id)
+                      return (
+                        <button
+                          key={member.id}
+                          type="button"
+                          onClick={() => toggleUserInList(member.id, role.list, role.setter)}
+                          className={`p-2 rounded-lg border text-left text-sm transition-all ${
+                            isSelected
+                              ? theme === 'dark'
+                                ? 'border-[#4E6E49] bg-[#4E6E49]/20'
+                                : 'border-[#4E6E49] bg-green-50'
+                              : `${borderColor} ${inputBg}`
+                          }`}
+                        >
+                          <span className={isSelected ? 'text-[#4E6E49]' : headingColor}>{member.name}</span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Participants (для приоритетов и совместимости) */}
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className={`block text-sm font-medium ${headingColor} flex items-center gap-2`}>
@@ -475,6 +676,89 @@ export const TaskForm = ({ onClose, onSave, editingTask }: TaskFormProps) => {
                   </button>
                 )
               })}
+            </div>
+          </div>
+
+          {/* Этапы согласования */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <label className={`block text-sm font-medium ${headingColor}`}>Этапы согласования</label>
+              <button
+                type="button"
+                onClick={handleAddStage}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold ${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600 text-gray-200' : 'bg-gray-200 hover:bg-gray-300 text-gray-800'}`}
+              >
+                Добавить этап
+              </button>
+            </div>
+            <div className="space-y-3">
+              {stages.map((stage, index) => (
+                <div key={stage.id} className={`p-3 rounded-lg border-2 ${borderColor} ${inputBg}`}>
+                  <div className="flex items-center justify-between gap-2">
+                    <input
+                      value={stage.name}
+                      onChange={(e) => handleStageChange(stage.id, { name: e.target.value })}
+                      className={`flex-1 px-3 py-2 rounded-lg border ${borderColor} ${theme === 'dark' ? 'bg-[#1a1a1a] text-gray-100' : 'bg-white text-gray-700'}`}
+                      placeholder={`Этап ${index + 1}`}
+                    />
+                    {stages.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveStage(stage.id)}
+                        className={`px-2 py-1 text-xs rounded-lg ${theme === 'dark' ? 'bg-red-500/20 text-red-300 hover:bg-red-500/30' : 'bg-red-100 text-red-700 hover:bg-red-200'}`}
+                      >
+                        Удалить
+                      </button>
+                    )}
+                  </div>
+                  <textarea
+                    value={stage.description || ''}
+                    onChange={(e) => handleStageChange(stage.id, { description: e.target.value })}
+                    rows={2}
+                    className={`mt-2 w-full px-3 py-2 rounded-lg border ${borderColor} ${theme === 'dark' ? 'bg-[#1a1a1a] text-gray-100' : 'bg-white text-gray-700'}`}
+                    placeholder="Описание этапа (опционально)"
+                  />
+                  <div className="mt-2 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <label className={`text-sm font-medium ${headingColor}`}>Ответственные:</label>
+                      <label className="inline-flex items-center gap-2 text-xs">
+                        <input
+                          type="checkbox"
+                          checked={stage.responsible === 'all'}
+                          onChange={(e) =>
+                            handleStageChange(stage.id, { responsible: e.target.checked ? 'all' : [] })
+                          }
+                        />
+                        Все участники
+                      </label>
+                    </div>
+                    {stage.responsible !== 'all' && (
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                        {TEAM_MEMBERS.map((member) => {
+                          const list = Array.isArray(stage.responsible) ? stage.responsible : []
+                          const isSelected = list.includes(member.id)
+                          return (
+                            <button
+                              key={member.id}
+                              type="button"
+                              onClick={() => handleStageResponsibleToggle(stage.id, member.id)}
+                              className={`p-2 rounded-lg border text-left text-sm transition-all ${
+                                isSelected
+                                  ? theme === 'dark'
+                                    ? 'border-[#4E6E49] bg-[#4E6E49]/20'
+                                    : 'border-[#4E6E49] bg-green-50'
+                                  : `${borderColor} ${inputBg}`
+                              }`}
+                            >
+                              <span className={isSelected ? 'text-[#4E6E49]' : headingColor}>{member.name}</span>
+                            </button>
+                          )
+                        })}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 

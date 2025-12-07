@@ -677,6 +677,14 @@ export const getTasks = async (filters?: {
       dueDate: data.dueDate || new Date().toISOString().split('T')[0],
       dueTime: data.dueTime || '12:00',
       startTime: data.startTime,
+      mainExecutor: data.mainExecutor,
+      deputies: data.deputies || [],
+      executors: data.executors || [],
+      curators: data.curators || [],
+      leads: data.leads || [],
+      stages: data.stages || [],
+      currentStageId: data.currentStageId,
+      comments: data.comments || [],
     } as Task
   })
 

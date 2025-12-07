@@ -41,6 +41,8 @@ export const TaskCard = ({ task, onEdit, onDelete, onUpdate }: TaskCardProps) =>
   const [loading, setLoading] = useState(false)
   const [showRejectDialog, setShowRejectDialog] = useState(false)
   const [rejectionComment, setRejectionComment] = useState('')
+  const [commentDraft, setCommentDraft] = useState('')
+  const [commentTarget, setCommentTarget] = useState<'stage' | 'task'>('stage')
 
   const headingColor = theme === 'dark' ? 'text-white' : 'text-gray-900'
   const cardBg = theme === 'dark' ? 'bg-[#1a1a1a]' : 'bg-white'
@@ -64,9 +66,52 @@ export const TaskCard = ({ task, onEdit, onDelete, onUpdate }: TaskCardProps) =>
     .filter(Boolean) as { member: (typeof TEAM_MEMBERS)[number]; priority: 'low' | 'medium' | 'high'; comment?: string }[]
   
   const canEdit = isAdmin || user?.id === task.createdBy
-  const canApprove = task.status === 'pending' && assigneeIds.includes(user?.id || '')
-  const userApproval = task.approvals.find((a) => a.userId === user?.id)
-  const allApproved = task.status === 'pending' && task.approvals.length > 0 && task.approvals.every((a) => a.status === 'approved')
+  const resolveParticipants = () => {
+    const extra = [
+      task.mainExecutor,
+      ...(task.deputies?.map((d) => d.userId) || []),
+      ...(task.executors || []),
+      ...(task.curators || []),
+      ...(task.leads || []),
+    ].filter(Boolean) as string[]
+    return Array.from(new Set([...(task.assignedTo || []), ...extra]))
+  }
+  const getCurrentStage = () => {
+    if (task.stages && task.stages.length > 0) {
+      const targetId = task.currentStageId || task.stages[0].id
+      return task.stages.find((s) => s.id === targetId) || task.stages[0]
+    }
+    return {
+      id: 'legacy-stage',
+      name: 'Этап',
+      responsible: 'all' as const,
+      approvals: task.approvals || [],
+      status: task.status === 'rejected' ? 'rejected' : 'pending',
+    }
+  }
+  const currentStage = getCurrentStage()
+  const stageApprovals = currentStage.approvals || []
+  const approvalsApproved = stageApprovals.filter((a) => a.status === 'approved').length
+  const approvalsTotal = stageApprovals.length
+  const canApprove =
+    task.status !== 'closed' &&
+    task.status !== 'completed' &&
+    !!user &&
+    (
+      (currentStage.responsible === 'all' ? resolveParticipants() : (currentStage.responsible as string[])).includes(user.id)
+    )
+  const userApproval = stageApprovals.find((a) => a.userId === user?.id)
+  const allApproved =
+    stageApprovals.length > 0 && stageApprovals.every((a) => a.status === 'approved')
+  const canApproveForAll = !!user && (user.id === task.mainExecutor || user.id === task.createdBy || isAdmin)
+  const stagesFullyApproved = allStagesApproved()
+
+  const allStagesApproved = () => {
+    if (!task.stages || task.stages.length === 0) {
+      return stageApprovals.every((a) => a.status === 'approved')
+    }
+    return task.stages.every((s) => s.status === 'approved')
+  }
 
   const handleStatusChange = async (newStatus: TaskStatus) => {
     if (!user && !isAdmin) return
@@ -84,9 +129,8 @@ export const TaskCard = ({ task, onEdit, onDelete, onUpdate }: TaskCardProps) =>
         updates.completedBy = user?.id || 'admin'
       } else if (newStatus === 'closed') {
         updates.closedAt = now
-      } else if (newStatus === 'in_progress' && task.status === 'pending') {
-        // Only move to in_progress if all approvals are done
-        if (!allApproved) {
+      } else if (newStatus === 'in_progress') {
+        if (!allStagesApproved()) {
           setLoading(false)
           return
         }
@@ -102,7 +146,7 @@ export const TaskCard = ({ task, onEdit, onDelete, onUpdate }: TaskCardProps) =>
     }
   }
 
-  const handleApprove = async (action: 'approve' | 'reject') => {
+  const handleApprove = async (action: 'approve' | 'reject', approveForAll?: boolean) => {
     if (!user) return
     
     setLoading(true)
@@ -110,26 +154,36 @@ export const TaskCard = ({ task, onEdit, onDelete, onUpdate }: TaskCardProps) =>
       const now = new Date().toISOString()
       const newStatus: 'approved' | 'rejected' = action === 'approve' ? 'approved' : 'rejected'
       const commentValue = action === 'reject' ? (rejectionComment || '').trim() : ''
+      const participants = resolveParticipants()
+      const responsible =
+        currentStage.responsible === 'all' ? participants : (currentStage.responsible as string[])
+      const targetApprovals = stageApprovals
 
-      const cleanApproval = (approval: Task['approvals'][number]) => {
-        const base = {
-          ...approval,
-          status: newStatus,
-          updatedAt: now,
-        }
-        if (commentValue) {
-          return { ...base, comment: commentValue }
-        }
-        const { comment, ...rest } = base
-        return rest
-      }
+      const updatedApprovals: Task['approvals'] =
+        approveForAll
+          ? responsible.map((uid) => {
+              const existing = targetApprovals.find((a) => a.userId === uid)
+              const base = existing || { userId: uid, status: 'pending' as const, updatedAt: now }
+              return {
+                ...base,
+                status: newStatus,
+                updatedAt: now,
+                forAll: true,
+                ...(commentValue ? { comment: commentValue } : {}),
+              }
+            })
+          : targetApprovals.map((a) =>
+              a.userId === user.id
+                ? {
+                    ...a,
+                    status: newStatus,
+                    updatedAt: now,
+                    ...(commentValue ? { comment: commentValue } : { comment: a.comment }),
+                  }
+                : a
+            )
 
-      const updatedApprovals: Task['approvals'] = task.approvals.map((a) =>
-        a.userId === user.id ? cleanApproval(a) : a
-      )
-
-      // If user hasn't approved yet, add their approval
-      if (!userApproval) {
+      if (!approveForAll && !targetApprovals.find((a) => a.userId === user.id)) {
         const baseApproval = {
           userId: user.id,
           status: newStatus,
@@ -140,16 +194,55 @@ export const TaskCard = ({ task, onEdit, onDelete, onUpdate }: TaskCardProps) =>
         )
       }
 
+      let updatedStages = task.stages || []
+      if (updatedStages.length > 0) {
+        updatedStages = updatedStages.map((stage) =>
+          stage.id === currentStage.id
+            ? {
+                ...stage,
+                approvals: updatedApprovals,
+                status: updatedApprovals.some((a) => a.status === 'rejected')
+                  ? 'rejected'
+                  : updatedApprovals.every((a) => a.status === 'approved')
+                  ? 'approved'
+                  : 'pending',
+              }
+            : stage
+        )
+      }
+
+      const stageApproved = updatedApprovals.every((a) => a.status === 'approved')
+      const stageRejected = updatedApprovals.some((a) => a.status === 'rejected')
+      let nextStageId = task.currentStageId
+      if (stageApproved && !stageRejected && updatedStages.length > 0) {
+        const currentIndex = updatedStages.findIndex((s) => s.id === currentStage.id)
+        const hasNext = currentIndex >= 0 && currentIndex < updatedStages.length - 1
+        if (hasNext) {
+          const nextStage = updatedStages[currentIndex + 1]
+          const responsibleIds = nextStage.responsible === 'all' ? participants : nextStage.responsible
+          updatedStages[currentIndex + 1] = {
+            ...nextStage,
+            approvals: responsibleIds.map((uid) => ({
+              userId: uid,
+              status: 'pending',
+              updatedAt: now,
+            })),
+            status: 'pending',
+          }
+          nextStageId = nextStage.id
+        }
+      }
+
       const updates: Partial<Task> = {
         approvals: updatedApprovals,
+        stages: updatedStages.length > 0 ? updatedStages : undefined,
+        currentStageId: nextStageId,
         updatedAt: now,
       }
 
-      // If rejected, change task status
-      if (action === 'reject') {
+      if (action === 'reject' || stageRejected) {
         updates.status = 'rejected'
-      } else if (action === 'approve') {
-        // When approving, immediately move to in_progress
+      } else if (action === 'approve' && allStagesApproved()) {
         updates.status = 'in_progress'
       }
 
@@ -162,6 +255,40 @@ export const TaskCard = ({ task, onEdit, onDelete, onUpdate }: TaskCardProps) =>
       onUpdate()
     } catch (error) {
       console.error('Error approving task:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleAddComment = async () => {
+    if (!user) return
+    if (!commentDraft.trim()) return
+    setLoading(true)
+    try {
+      const now = new Date().toISOString()
+      const newComment = {
+        id: `c-${Date.now()}`,
+        userId: user.id,
+        text: commentDraft.trim(),
+        createdAt: now,
+        stageId: commentTarget === 'stage' ? currentStage.id : undefined,
+      }
+      const updates: Partial<Task> = {
+        comments: [...(task.comments || []), newComment],
+        updatedAt: now,
+      }
+      if (newComment.stageId && task.stages && task.stages.length > 0) {
+        updates.stages = task.stages.map((stage) =>
+          stage.id === newComment.stageId
+            ? { ...stage, comments: [...(stage.comments || []), newComment] }
+            : stage
+        )
+      }
+      await updateTask(task.id, updates)
+      setCommentDraft('')
+      onUpdate()
+    } catch (error) {
+      console.error('Error adding comment:', error)
     } finally {
       setLoading(false)
     }
@@ -385,9 +512,73 @@ export const TaskCard = ({ task, onEdit, onDelete, onUpdate }: TaskCardProps) =>
           )}
         </div>
 
+        {/* Stage info & comments */}
+        <div className={`mt-4 p-3 rounded-lg border ${borderColor} ${theme === 'dark' ? 'bg-[#1a1a1a]/70' : 'bg-gray-50'}`}>
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm font-semibold">Этап: {currentStage.name}</span>
+            <span className="text-xs text-gray-500">
+              {approvalsApproved}/{approvalsTotal} согласований
+            </span>
+          </div>
+          {stageApprovals.length > 0 && (
+            <div className="space-y-1 text-xs">
+              {stageApprovals.map((a) => {
+                const member = TEAM_MEMBERS.find((m) => m.id === a.userId)
+                return (
+                  <div key={a.userId} className="flex items-center justify-between">
+                    <span className="flex items-center gap-1">
+                      <span className="font-medium">{member?.name || a.userId}</span>
+                      <span className="text-gray-500">({a.status === 'approved' ? 'ok' : a.status === 'rejected' ? 'отклонено' : 'ожидание'})</span>
+                    </span>
+                    {a.comment && <span className="text-gray-500 truncate max-w-[140px]">{a.comment}</span>}
+                  </div>
+                )
+              })}
+            </div>
+          )}
+          {user && (
+            <div className="mt-3 space-y-2">
+              <textarea
+                value={commentDraft}
+                onChange={(e) => setCommentDraft(e.target.value)}
+                rows={2}
+                className={`w-full px-3 py-2 rounded-lg border ${borderColor} ${theme === 'dark' ? 'bg-[#0f0f0f] text-gray-100' : 'bg-white text-gray-700'}`}
+                placeholder="Комментарий к задаче или этапу"
+              />
+              <div className="flex items-center justify-between gap-2 text-xs">
+                <div className="flex items-center gap-3">
+                  <label className="inline-flex items-center gap-1">
+                    <input
+                      type="radio"
+                      checked={commentTarget === 'stage'}
+                      onChange={() => setCommentTarget('stage')}
+                    />
+                    Этап
+                  </label>
+                  <label className="inline-flex items-center gap-1">
+                    <input
+                      type="radio"
+                      checked={commentTarget === 'task'}
+                      onChange={() => setCommentTarget('task')}
+                    />
+                    Задача
+                  </label>
+                </div>
+                <button
+                  onClick={handleAddComment}
+                  disabled={loading || !commentDraft.trim()}
+                  className={`px-3 py-1 rounded-lg font-semibold ${theme === 'dark' ? 'bg-[#4E6E49] text-white hover:bg-[#4E6E49]/80' : 'bg-[#4E6E49] text-white hover:bg-emerald-700'} disabled:opacity-50`}
+                >
+                  Добавить
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+
         {/* Actions */}
         <div className={`flex flex-wrap gap-2 pt-4 border-t ${borderColor}`}>
-          {canApprove && !userApproval && (
+          {canApprove && (!userApproval || userApproval.status === 'pending') && (
             <button
               onClick={() => handleApprove('approve')}
               className="flex-1 sm:flex-none px-4 py-2 bg-[#4E6E49] hover:bg-[#4E6E49] text-white rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
@@ -397,7 +588,7 @@ export const TaskCard = ({ task, onEdit, onDelete, onUpdate }: TaskCardProps) =>
             </button>
           )}
           
-          {canApprove && !userApproval && (
+          {canApprove && (!userApproval || userApproval.status === 'pending') && (
             <button
               onClick={() => setShowRejectDialog(true)}
               className="flex-1 sm:flex-none px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
@@ -406,9 +597,19 @@ export const TaskCard = ({ task, onEdit, onDelete, onUpdate }: TaskCardProps) =>
               Отклонить
             </button>
           )}
+          {canApproveForAll && (
+            <button
+              onClick={() => handleApprove('approve', true)}
+              disabled={loading}
+              className="flex-1 sm:flex-none px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+            >
+              <Check className="w-4 h-4" />
+              Согласовать за всех
+            </button>
+          )}
 
           {/* Status change buttons */}
-          {task.status === 'pending' && allApproved && (canEdit || canApprove) && (
+          {task.status === 'pending' && stagesFullyApproved && (canEdit || canApprove) && (
             <button
               onClick={() => handleStatusChange('in_progress')}
               disabled={loading}
@@ -445,51 +646,37 @@ export const TaskCard = ({ task, onEdit, onDelete, onUpdate }: TaskCardProps) =>
 
       {/* Reject Dialog */}
       {showRejectDialog && (
-        <div className="fixed inset-0 bg-black/50 flex items-start sm:items-center justify-center z-[70] p-4 overflow-y-auto overflow-x-hidden overscroll-contain modal-scroll">
-          <div className={`${cardBg} rounded-xl p-6 max-w-md w-full border-2 ${borderColor} flex flex-col overflow-hidden`}>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className={`text-lg font-bold ${headingColor}`}>Отклонить задачу</h3>
+        <div className="fixed inset-0 bg-black/50 flex items-start sm:items-center justify-center z-[70] p-4 overflow-y-auto overscroll-contain modal-scroll">
+          <div className={`${cardBg} rounded-xl p-6 max-w-md w-full border-2 ${borderColor}`}>
+            <h3 className={`text-lg font-bold mb-4 ${headingColor}`}>Отклонить задачу</h3>
+            <textarea
+              value={rejectionComment}
+              onChange={(e) => setRejectionComment(e.target.value)}
+              placeholder="Укажите причину отклонения"
+              rows={3}
+              className={`w-full px-4 py-2 rounded-lg border ${borderColor} ${
+                theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'
+              } ${headingColor} mb-4 focus:outline-none focus:ring-2 focus:ring-[#4E6E49]/50`}
+            />
+            <div className="flex gap-3">
+              <button
+                onClick={() => handleApprove('reject')}
+                disabled={loading || !rejectionComment.trim()}
+                className="flex-1 px-4 py-2 rounded-lg font-medium transition-colors bg-red-500 hover:bg-red-600 text-white disabled:opacity-50"
+              >
+                Отклонить
+              </button>
               <button
                 onClick={() => {
                   setShowRejectDialog(false)
                   setRejectionComment('')
                 }}
-                className={`p-1.5 rounded-lg transition-colors flex-shrink-0 ${theme === 'dark' ? 'hover:bg-gray-700 text-gray-200' : 'hover:bg-gray-100 text-gray-700'}`}
-                aria-label="Закрыть"
+                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                  theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'
+                }`}
               >
-                <X className="w-5 h-5" />
+                Отмена
               </button>
-            </div>
-            <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-contain modal-scroll min-w-0">
-              <textarea
-                value={rejectionComment}
-                onChange={(e) => setRejectionComment(e.target.value)}
-                placeholder="Укажите причину отклонения"
-                rows={3}
-                className={`w-full px-4 py-2 rounded-lg border ${borderColor} ${
-                  theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'
-                } ${headingColor} mb-4 focus:outline-none focus:ring-2 focus:ring-[#4E6E49]/50`}
-              />
-              <div className="flex gap-3">
-                <button
-                  onClick={() => handleApprove('reject')}
-                  disabled={loading || !rejectionComment.trim()}
-                  className="flex-1 px-4 py-2 rounded-lg font-medium transition-colors bg-red-500 hover:bg-red-600 text-white disabled:opacity-50"
-                >
-                  Отклонить
-                </button>
-                <button
-                  onClick={() => {
-                    setShowRejectDialog(false)
-                    setRejectionComment('')
-                  }}
-                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                    theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'
-                  }`}
-                >
-                  Отмена
-                </button>
-              </div>
             </div>
           </div>
         </div>

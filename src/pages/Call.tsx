@@ -346,50 +346,35 @@ export const CallPage = () => {
     <Layout>
       <div className="space-y-6">
         {/* Hero */}
-        <div className={`rounded-2xl p-8 ${theme === 'dark' ? 'bg-[#0f1218]' : 'bg-white'} shadow-xl border ${borderColor} relative overflow-hidden`}>
-          <div className="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-            <div className="space-y-3">
+        <div className={`rounded-2xl p-6 sm:p-7 ${theme === 'dark' ? 'bg-[#0f1218]' : 'bg-white'} shadow-xl border ${borderColor} relative overflow-hidden`}>
+          <div className="relative z-10 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div className="space-y-2">
               <div className="flex items-center gap-3">
-                <div className="p-4 rounded-2xl bg-gradient-to-br from-sky-500 to-teal-500 text-white shadow-md">
-                  <Zap className="w-7 h-7" />
+                <div className="p-3 rounded-2xl bg-gradient-to-br from-sky-500 to-teal-500 text-white shadow-md">
+                  <Zap className="w-6 h-6" />
                 </div>
                 <div>
-                  <p className="text-sm uppercase tracking-[0.25em] text-[#4E6E49]">Signals Hub</p>
-                  <h1 className={`text-4xl font-extrabold ${textColor}`}>Call: мульти-сигналы</h1>
+                  <p className="text-xs uppercase tracking-[0.2em] text-[#4E6E49]">Signals Hub</p>
+                  <h1 className={`text-2xl sm:text-3xl font-bold ${textColor}`}>Call: мульти-сигналы</h1>
                   <p className={`${subtleColor} text-sm`}>Мемы, фьючи, спот, NFT, Polymarket и стейкинг в одном окне.</p>
                 </div>
               </div>
-              <div className="flex flex-wrap gap-3">
-                <button
-                  onClick={() => { setEditingCall(null); setFormCategory('memecoins'); setShowForm(true) }}
-                  className="inline-flex items-center gap-2 px-4 py-3 rounded-xl text-white bg-gradient-to-r from-sky-500 to-teal-500 shadow-md hover:shadow-lg transition-all"
-                >
-                  <Plus className="w-5 h-5" />
-                  Новый сигнал
-                </button>
-                <div className="flex items-center gap-2 px-4 py-3 rounded-xl border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 bg-emerald-500/10">
-                  <Activity className="w-4 h-4" />
-                  <span className="text-sm font-semibold">Активных: {totals.active}</span>
-                </div>
-                <div className="flex items-center gap-2 px-4 py-3 rounded-xl border border-amber-500/30 text-amber-600 dark:text-amber-400 bg-amber-500/10">
-                  <Flame className="w-4 h-4" />
-                  <span className="text-sm font-semibold">High risk: {totals.highRisk}</span>
-                </div>
-              </div>
             </div>
-            <div className="w-full lg:w-96">
-              <div className={`rounded-2xl border ${borderColor} ${theme === 'dark' ? 'bg-gray-900/70' : 'bg-white'} p-3 shadow-inner`}>
-                <div className="flex items-center gap-2 mb-2">
-                  <Search className={`w-4 h-4 ${subtleColor}`} />
-                  <p className={`text-sm font-semibold ${textColor}`}>Поиск по всем сферам</p>
-                  <span className="ml-auto text-xs text-gray-500 dark:text-gray-400">{filteredCalls.length}/{calls.length}</span>
-                </div>
-                <input
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="тикер, событие, сеть, причина..."
-                  className={`w-full px-3 py-2 rounded-xl border ${borderColor} ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-50'} ${textColor} focus:outline-none focus:ring-2 focus:ring-[#4E6E49]/60`}
-                />
+            <div className="flex flex-wrap items-center gap-3">
+              <button
+                onClick={() => { setEditingCall(null); setFormCategory('memecoins'); setShowForm(true) }}
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-white bg-gradient-to-r from-sky-500 to-teal-500 shadow-md hover:shadow-lg transition-all"
+              >
+                <Plus className="w-5 h-5" />
+                Новый сигнал
+              </button>
+              <div className="flex items-center gap-2 px-3 py-2 rounded-xl border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 bg-emerald-500/10">
+                <Activity className="w-4 h-4" />
+                <span className="text-sm font-semibold">Активных: {totals.active}</span>
+              </div>
+              <div className="flex items-center gap-2 px-3 py-2 rounded-xl border border-amber-500/30 text-amber-600 dark:text-amber-400 bg-amber-500/10">
+                <Flame className="w-4 h-4" />
+                <span className="text-sm font-semibold">High risk: {totals.highRisk}</span>
               </div>
             </div>
           </div>
@@ -424,77 +409,92 @@ export const CallPage = () => {
 
         {/* Filters + analytics */}
         <div className={`rounded-2xl border ${borderColor} ${theme === 'dark' ? 'bg-gray-900/70' : 'bg-white'} p-5 space-y-4`}>
+          <div className="flex flex-col gap-3">
           <div className="flex flex-wrap items-center gap-3">
-            <div className="flex items-center gap-2 text-sm font-semibold">
-              <Filter className={`w-4 h-4 ${subtleColor}`} />
-              <span className={textColor}>Фильтры</span>
+              <div className="flex items-center gap-2 text-sm font-semibold">
+                <Filter className={`w-4 h-4 ${subtleColor}`} />
+                <span className={textColor}>Фильтры</span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {(Object.keys(statusLabels) as StatusFilter[]).map((status) => (
+                  <button
+                    key={status}
+                    onClick={() => setStatusFilter(status)}
+                    className={`px-3 py-1.5 rounded-xl text-sm font-semibold transition-all ${
+                      statusFilter === status ? pillActive : pillInactive
+                    }`}
+                  >
+                    {statusLabels[status].label}
+                  </button>
+                ))}
+              </div>
             </div>
-            <div className="flex flex-wrap gap-2">
-              {(Object.keys(statusLabels) as StatusFilter[]).map((status) => (
+
+            <div className="flex flex-col gap-2">
+              <label className={`text-xs uppercase tracking-wider ${subtleColor} flex items-center gap-2`}>
+                <Search className="w-4 h-4" />
+                Поиск по всем сферам <span className="text-[11px] text-gray-500 dark:text-gray-400">{filteredCalls.length}/{calls.length}</span>
+              </label>
+              <input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="тикер, событие, сеть, причина..."
+                className={`w-full px-3 py-2 rounded-xl border ${borderColor} ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-50'} ${textColor} focus:outline-none focus:ring-2 focus:ring-[#4E6E49]/60`}
+              />
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              <span className={`text-xs ${subtleColor} uppercase tracking-wider`}>Сфера:</span>
+              <button
+                onClick={() => setCategoryFilter('all')}
+                className={`px-3 py-1.5 rounded-full text-sm font-semibold border ${categoryFilter === 'all' ? pillActive : pillInactive}`}
+              >
+                Все
+              </button>
+              {(Object.keys(CATEGORY_META) as CallCategory[]).map((cat) => (
                 <button
-                  key={status}
-                  onClick={() => setStatusFilter(status)}
-                  className={`px-3 py-1.5 rounded-xl text-sm font-semibold transition-all ${
-                    statusFilter === status ? pillActive : pillInactive
-                  }`}
+                  key={cat}
+                  onClick={() => setCategoryFilter(categoryFilter === cat ? 'all' : cat)}
+                  className={`px-3 py-1.5 rounded-full text-sm font-semibold border ${categoryFilter === cat ? pillActive : pillInactive}`}
                 >
-                  {statusLabels[status].label}
+                  {CATEGORY_META[cat].label}
                 </button>
               ))}
             </div>
-          </div>
 
-          <div className="flex flex-wrap gap-2">
-            <span className={`text-xs ${subtleColor} uppercase tracking-wider`}>Сфера:</span>
-            <button
-              onClick={() => setCategoryFilter('all')}
-              className={`px-3 py-1.5 rounded-full text-sm font-semibold border ${categoryFilter === 'all' ? pillActive : pillInactive}`}
-            >
-              Все
-            </button>
-            {(Object.keys(CATEGORY_META) as CallCategory[]).map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setCategoryFilter(categoryFilter === cat ? 'all' : cat)}
-                className={`px-3 py-1.5 rounded-full text-sm font-semibold border ${categoryFilter === cat ? pillActive : pillInactive}`}
-              >
-                {CATEGORY_META[cat].label}
-              </button>
-            ))}
-          </div>
-
-          <div className="flex flex-wrap gap-2">
-            <span className={`text-xs ${subtleColor} uppercase tracking-wider`}>Риск:</span>
-            {(['all', 'low', 'medium', 'high', 'ultra'] as RiskFilter[]).map((risk) => (
-              <button
-                key={risk}
-                onClick={() => setRiskFilter(risk)}
-                className={`px-3 py-1.5 rounded-full text-sm font-semibold border ${riskFilter === risk ? pillActive : pillInactive}`}
-              >
-                {risk === 'all' ? 'Все' : risk}
-              </button>
-            ))}
-          </div>
-
-          <div className="flex flex-wrap items-center gap-3">
-            <span className={`text-xs ${subtleColor} uppercase tracking-wider`}>Трейдер:</span>
-            <select
-              value={traderFilter}
-              onChange={(e) => setTraderFilter(e.target.value)}
-              className={`px-3 py-2 rounded-lg border ${borderColor} ${theme === 'dark' ? 'bg-gray-800 text-white' : 'bg-gray-50 text-gray-900'} text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50`}
-            >
-              <option value="all">Все трейдеры</option>
-              {TEAM_MEMBERS.map((t) => (
-                <option key={t.id} value={t.id}>{t.name}</option>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className={`text-xs ${subtleColor} uppercase tracking-wider`}>Риск:</span>
+              {(['all', 'low', 'medium', 'high', 'ultra'] as RiskFilter[]).map((risk) => (
+                <button
+                  key={risk}
+                  onClick={() => setRiskFilter(risk)}
+                  className={`px-3 py-1.5 rounded-full text-sm font-semibold border ${riskFilter === risk ? pillActive : pillInactive}`}
+                >
+                  {risk === 'all' ? 'Все' : risk}
+                </button>
               ))}
-            </select>
-          </div>
+            </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {renderQuickStat('Всего сигналов', totals.total, textColor)}
-            {renderQuickStat('Активных', totals.active, 'text-emerald-500')}
-            {renderQuickStat('Завершено', totals.completed, 'text-blue-500')}
-            {renderQuickStat('High risk', totals.highRisk, 'text-amber-500')}
+            <div className="flex flex-wrap items-center gap-3">
+              <span className={`text-xs ${subtleColor} uppercase tracking-wider`}>Трейдер:</span>
+              <select
+                value={traderFilter}
+                onChange={(e) => setTraderFilter(e.target.value)}
+                className={`px-3 py-2 rounded-lg border ${borderColor} ${theme === 'dark' ? 'bg-gray-800 text-white' : 'bg-gray-50 text-gray-900'} text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50`}
+              >
+                <option value="all">Все трейдеры</option>
+                {TEAM_MEMBERS.map((t) => (
+                  <option key={t.id} value={t.id}>{t.name}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {renderQuickStat('Всего сигналов', totals.total, textColor)}
+              {renderQuickStat('Активных', totals.active, 'text-emerald-500')}
+              {renderQuickStat('Завершено', totals.completed, 'text-blue-500')}
+              {renderQuickStat('High risk', totals.highRisk, 'text-amber-500')}
+            </div>
           </div>
         </div>
 
