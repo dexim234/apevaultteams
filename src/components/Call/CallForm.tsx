@@ -45,12 +45,12 @@ const networkOptions: { value: Network; label: string }[] = [
 ]
 
 const CATEGORY_META: Record<CallCategory, { label: string; gradient: string; icon: JSX.Element }> = {
-  memecoins: { label: 'Мемкоины', gradient: 'from-emerald-500 to-emerald-700', icon: <Rocket className="w-5 h-5" /> },
-  futures: { label: 'Фьючерсы', gradient: 'from-blue-500 to-indigo-600', icon: <LineChart className="w-5 h-5" /> },
-  nft: { label: 'NFT', gradient: 'from-purple-500 to-pink-600', icon: <Image className="w-5 h-5" /> },
-  spot: { label: 'Спот', gradient: 'from-amber-500 to-orange-600', icon: <Coins className="w-5 h-5" /> },
-  polymarket: { label: 'Polymarket', gradient: 'from-rose-500 to-red-600', icon: <Target className="w-5 h-5" /> },
-  staking: { label: 'Стейкинг', gradient: 'from-cyan-500 to-blue-500', icon: <Shield className="w-5 h-5" /> },
+  memecoins: { label: 'Мемкоины', gradient: 'from-emerald-400 to-teal-500', icon: <Rocket className="w-5 h-5" /> },
+  futures: { label: 'Фьючерсы', gradient: 'from-blue-400 to-indigo-500', icon: <LineChart className="w-5 h-5" /> },
+  nft: { label: 'NFT', gradient: 'from-purple-400 to-pink-500', icon: <Image className="w-5 h-5" /> },
+  spot: { label: 'Спот', gradient: 'from-amber-400 to-orange-500', icon: <Coins className="w-5 h-5" /> },
+  polymarket: { label: 'Polymarket', gradient: 'from-rose-400 to-red-500', icon: <Target className="w-5 h-5" /> },
+  staking: { label: 'Стейкинг', gradient: 'from-cyan-400 to-blue-500', icon: <Shield className="w-5 h-5" /> },
 }
 
 const CATEGORY_FIELDS: Record<CallCategory, FieldConfig[]> = {
@@ -503,7 +503,7 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory }: C
           </div>
           <div>
             <p className={`text-lg font-bold ${textColor}`}>{CATEGORY_META[category].label}</p>
-            <p className={`text-xs ${subtle}`}>Заполните обязательные поля для этого типа сигнала</p>
+            <p className={`text-xs ${subtle}`}>Добавьте любые детали по этому типу сигнала</p>
           </div>
         </div>
 
@@ -512,7 +512,7 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory }: C
             <div key={field.key} className="space-y-2">
               {field.type !== 'checkbox' && (
                 <div className="flex items-center justify-between gap-2">
-                  <label className={`text-sm font-semibold ${textColor}`}>{field.label}{field.required && <span className="text-red-500">*</span>}</label>
+                  <label className={`text-sm font-semibold ${textColor}`}>{field.label}</label>
                   {field.helper && <span className={`text-[11px] ${subtle}`}>{field.helper}</span>}
                 </div>
               )}

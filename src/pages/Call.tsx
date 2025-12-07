@@ -33,12 +33,12 @@ type StatusFilter = 'all' | 'active' | 'completed' | 'cancelled' | 'reviewed'
 type RiskFilter = 'all' | CallRiskLevel
 
 const CATEGORY_META: Record<CallCategory, { label: string; gradient: string; chip: string; icon: JSX.Element }> = {
-  memecoins: { label: 'Мемкоины', gradient: 'from-emerald-500 to-emerald-700', chip: 'bg-emerald-500/15 text-emerald-500', icon: <Rocket className="w-4 h-4" /> },
-  futures: { label: 'Фьючерсы', gradient: 'from-blue-500 to-indigo-600', chip: 'bg-blue-500/15 text-blue-500', icon: <LineChart className="w-4 h-4" /> },
-  nft: { label: 'NFT', gradient: 'from-purple-500 to-pink-500', chip: 'bg-purple-500/15 text-purple-500', icon: <Image className="w-4 h-4" /> },
-  spot: { label: 'Спот', gradient: 'from-amber-500 to-orange-500', chip: 'bg-amber-500/15 text-amber-600', icon: <Coins className="w-4 h-4" /> },
-  polymarket: { label: 'Polymarket', gradient: 'from-rose-500 to-red-500', chip: 'bg-rose-500/15 text-rose-500', icon: <Target className="w-4 h-4" /> },
-  staking: { label: 'Стейкинг', gradient: 'from-cyan-500 to-blue-500', chip: 'bg-cyan-500/15 text-cyan-500', icon: <Shield className="w-4 h-4" /> },
+  memecoins: { label: 'Мемкоины', gradient: 'from-emerald-400 to-teal-500', chip: 'bg-emerald-500/10 text-emerald-600', icon: <Rocket className="w-4 h-4" /> },
+  futures: { label: 'Фьючерсы', gradient: 'from-blue-400 to-indigo-500', chip: 'bg-blue-500/10 text-blue-600', icon: <LineChart className="w-4 h-4" /> },
+  nft: { label: 'NFT', gradient: 'from-purple-400 to-pink-500', chip: 'bg-purple-500/10 text-purple-600', icon: <Image className="w-4 h-4" /> },
+  spot: { label: 'Спот', gradient: 'from-amber-400 to-orange-500', chip: 'bg-amber-500/10 text-amber-600', icon: <Coins className="w-4 h-4" /> },
+  polymarket: { label: 'Polymarket', gradient: 'from-rose-400 to-red-500', chip: 'bg-rose-500/10 text-rose-600', icon: <Target className="w-4 h-4" /> },
+  staking: { label: 'Стейкинг', gradient: 'from-cyan-400 to-blue-500', chip: 'bg-cyan-500/10 text-cyan-600', icon: <Shield className="w-4 h-4" /> },
 }
 
 const statusLabels: Record<StatusFilter, { label: string; className: string }> = {
@@ -241,7 +241,7 @@ export const CallPage = () => {
   }), [calls])
 
   const pillInactive = theme === 'dark' ? 'bg-gray-800 text-gray-200 border border-gray-700' : 'bg-white text-gray-700 border border-gray-200'
-  const pillActive = 'bg-gradient-to-r from-[#4E6E49] to-emerald-600 text-white shadow-lg shadow-emerald-500/30'
+  const pillActive = 'bg-gradient-to-r from-emerald-400 to-teal-500 text-white shadow-md shadow-emerald-300/30'
 
   const renderQuickStat = (label: string, value: string | number, accent: string) => (
     <div className={`p-4 rounded-xl border ${borderColor} ${theme === 'dark' ? 'bg-gray-800/60' : 'bg-gray-50'}`}>
@@ -345,12 +345,12 @@ export const CallPage = () => {
     <Layout>
       <div className="space-y-6">
         {/* Hero */}
-        <div className={`rounded-2xl p-8 ${bgColor} shadow-xl border-2 ${theme === 'dark' ? 'border-[#4E6E49]/20' : 'border-green-100'} relative overflow-hidden`}>
-          <div className="absolute inset-0 bg-gradient-to-r from-[#4E6E49]/5 via-transparent to-emerald-600/10" />
+        <div className={`rounded-2xl p-8 ${bgColor} shadow-xl border-2 ${theme === 'dark' ? 'border-emerald-900/20' : 'border-emerald-100'} relative overflow-hidden`}>
+          <div className="absolute inset-0 bg-gradient-to-r from-emerald-200/50 via-transparent to-teal-200/50 dark:from-emerald-700/20 dark:to-teal-700/20" />
           <div className="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div className="space-y-3">
               <div className="flex items-center gap-3">
-                <div className="p-4 rounded-2xl bg-gradient-to-br from-[#4E6E49] to-emerald-700 text-white shadow-lg">
+                <div className="p-4 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-600 text-white shadow-md">
                   <Zap className="w-7 h-7" />
                 </div>
                 <div>
@@ -362,7 +362,7 @@ export const CallPage = () => {
               <div className="flex flex-wrap gap-3">
                 <button
                   onClick={() => { setEditingCall(null); setFormCategory('memecoins'); setShowForm(true) }}
-                  className="inline-flex items-center gap-2 px-4 py-3 rounded-xl text-white bg-gradient-to-r from-[#4E6E49] to-emerald-600 shadow-lg hover:shadow-xl transition-all"
+                  className="inline-flex items-center gap-2 px-4 py-3 rounded-xl text-white bg-gradient-to-r from-emerald-400 to-teal-500 shadow-md hover:shadow-lg transition-all"
                 >
                   <Plus className="w-5 h-5" />
                   Новый сигнал
@@ -404,9 +404,9 @@ export const CallPage = () => {
               <button
                 key={cat}
                 onClick={() => { setFormCategory(cat); setEditingCall(null); setShowForm(true) }}
-                className={`relative overflow-hidden rounded-2xl border ${borderColor} ${theme === 'dark' ? 'bg-gray-900/70' : 'bg-white'} p-4 text-left shadow-md hover:shadow-xl transition-all`}
+                className={`relative overflow-hidden rounded-2xl border ${borderColor} ${theme === 'dark' ? 'bg-gray-900/70' : 'bg-white'} p-4 text-left shadow-md hover:shadow-lg transition-all`}
               >
-                <div className={`absolute inset-0 opacity-70 bg-gradient-to-r ${meta.gradient}`} />
+                <div className={`absolute inset-0 opacity-55 bg-gradient-to-r ${meta.gradient}`} />
                 <div className="relative z-10 flex items-start justify-between">
                   <div className="space-y-1">
                     <div className="flex items-center gap-2 text-white">
