@@ -1,5 +1,5 @@
 // Form for bulk deleting work slots
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useAuthStore } from '@/store/authStore'
 import { useThemeStore } from '@/store/themeStore'
 import { useAdminStore } from '@/store/adminStore'
@@ -29,6 +29,15 @@ export const DeleteSlotsForm = ({ onClose, onSave }: DeleteSlotsFormProps) => {
   const [dateRangeEnd, setDateRangeEnd] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+
+  // Lock background scroll while modal is open
+  useEffect(() => {
+    const originalOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = originalOverflow
+    }
+  }, [])
 
   const weekDays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс']
   const activeMode = deleteByWeekDay ? 'По дню недели' : deleteByDates ? 'По датам' : deleteByDateRange ? 'Диапазон' : 'Не выбран'
@@ -220,7 +229,7 @@ export const DeleteSlotsForm = ({ onClose, onSave }: DeleteSlotsFormProps) => {
 
   return (
     <div className="fixed inset-0 bg-slate-950/75 backdrop-blur-xl flex items-center justify-center z-50 p-4 sm:p-6 overflow-y-auto overscroll-contain">
-      <div className={`w-full max-w-5xl rounded-3xl shadow-[0_24px_80px_rgba(0,0,0,0.45)] border ${theme === 'dark' ? 'bg-gradient-to-br from-[#0c1320] via-[#0b1220] to-[#08111b] border-white/10' : 'bg-gradient-to-br from-white via-slate-50 to-white border-slate-200'} max-h-[72vh] sm:max-h-[82vh] overflow-hidden`}>
+      <div className={`w-full max-w-5xl rounded-3xl shadow-[0_24px_80px_rgba(0,0,0,0.45)] border ${theme === 'dark' ? 'bg-gradient-to-br from-[#0c1320] via-[#0b1220] to-[#08111b] border-white/10' : 'bg-gradient-to-br from-white via-slate-50 to-white border-slate-200'} max-h-[90vh] overflow-y-auto`}>
         <div className="p-5 sm:p-6 lg:p-7 flex flex-col h-full">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="space-y-1">
@@ -280,7 +289,7 @@ export const DeleteSlotsForm = ({ onClose, onSave }: DeleteSlotsFormProps) => {
               </div>
             </aside>
 
-            <div className="space-y-4 overflow-y-auto pr-1">
+            <div className="space-y-4 overflow-y-auto pr-1 pb-4">
               {/* User selection for admin */}
             {isAdmin && (
               <div>
