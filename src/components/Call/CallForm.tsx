@@ -11,7 +11,7 @@ import type {
   CallSentiment,
   Network,
 } from '@/types'
-import { Sparkles, Wand2, Rocket, LineChart, Image, Coins, Shield, Target } from 'lucide-react'
+import { Sparkles, Rocket, LineChart, Image, Coins, Shield, Target } from 'lucide-react'
 
 interface CallFormProps {
   onSuccess?: () => void

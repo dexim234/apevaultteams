@@ -27,7 +27,6 @@ export const Earnings = () => {
   const POOL_RATE = 0.45
   const categoryKeys = Object.keys(EARNINGS_CATEGORY_META) as EarningsCategory[]
 
-  const headingColor = theme === 'dark' ? 'text-white' : 'text-gray-900'
   const cardBg = theme === 'dark' ? 'bg-[#1a1a1a]' : 'bg-white'
   const getPoolValue = (earning: EarningsType) => earning.poolAmount || earning.amount * POOL_RATE
   const getNetValue = (earning: EarningsType) => Math.max(earning.amount - getPoolValue(earning), 0)
