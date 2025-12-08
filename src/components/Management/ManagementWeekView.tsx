@@ -224,9 +224,9 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
   const headingColor = theme === 'dark' ? 'text-white' : 'text-gray-900'
   const subtleColor = theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
   const statusTone = {
-    dayoff: 'bg-teal-100 text-teal-900 border border-teal-200 dark:bg-teal-900/30 dark:text-teal-100 dark:border-teal-800',
-    sick: 'bg-amber-100 text-amber-900 border border-amber-200 dark:bg-amber-900/30 dark:text-amber-100 dark:border-amber-700',
-    vacation: 'bg-sky-100 text-sky-900 border border-sky-200 dark:bg-sky-900/30 dark:text-sky-100 dark:border-sky-800',
+    dayoff: 'bg-amber-50 text-amber-900 border border-amber-200 shadow-inner dark:bg-amber-900/25 dark:text-amber-50 dark:border-amber-700',
+    sick: 'bg-orange-50 text-orange-900 border border-orange-200 shadow-inner dark:bg-orange-900/25 dark:text-orange-50 dark:border-orange-700',
+    vacation: 'bg-sky-50 text-sky-900 border border-sky-200 shadow-inner dark:bg-sky-900/25 dark:text-sky-50 dark:border-sky-700',
   } as const
 
   return (
@@ -287,19 +287,19 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
                   return (
                     <div
                       key={status.id}
-                      className={`group relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 rounded-xl shadow-xl border-2 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl backdrop-blur text-center sm:text-left ${
+                      className={`relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 rounded-2xl border-2 transition-all duration-300 hover:shadow-xl backdrop-blur text-center sm:text-left ring-1 ring-inset ring-black/5 dark:ring-white/5 ${
                         statusTone[status.type]
                       }`}
                     >
                       <div className="flex flex-col sm:flex-row sm:items-center gap-2 justify-center sm:justify-start w-full">
-                        <span className="font-semibold">{displayName}</span>
-                        <span className="text-sm">
+                        <span className="font-semibold text-base sm:text-lg">{displayName}</span>
+                        <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/70 dark:bg-white/10 text-xs sm:text-sm font-semibold">
                           {status.type === 'dayoff' ? 'Выходной' : status.type === 'sick' ? 'Больничный' : 'Отпуск'}
                         </span>
                         {status.comment && (
-                          <div className="relative group self-center sm:self-auto">
+                          <div className="relative group/status-comment self-center sm:self-auto">
                             <Info className="w-4 h-4 text-current cursor-help" />
-                            <div className="absolute bottom-full left-1/2 sm:left-0 -translate-x-1/2 sm:translate-x-0 mb-2 p-2 bg-[#0A0A0A] text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity z-10 whitespace-nowrap">
+                            <div className="pointer-events-none absolute bottom-full left-1/2 sm:left-0 -translate-x-1/2 sm:translate-x-0 mb-2 p-2 bg-[#0A0A0A] text-white text-xs rounded-lg opacity-0 group-hover/status-comment:opacity-100 transition-opacity z-10 whitespace-nowrap">
                               {status.comment}
                             </div>
                           </div>
@@ -485,9 +485,9 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
                           </div>
                         ))}
                         {slot.comment && (
-                          <div className="relative group flex items-center gap-2 pt-2">
+                          <div className="relative group/slot-comment flex items-center gap-2 pt-2">
                             <Info className="w-4 h-4 text-white cursor-help" />
-                            <div className="absolute bottom-full left-0 mb-2 p-2 bg-[#0A0A0A] text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity z-10 whitespace-nowrap">
+                            <div className="pointer-events-none absolute bottom-full left-0 mb-2 p-2 bg-[#0A0A0A] text-white text-xs rounded-lg opacity-0 group-hover/slot-comment:opacity-100 transition-opacity z-10 whitespace-nowrap">
                               {slot.comment}
                             </div>
                           </div>

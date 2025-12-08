@@ -416,8 +416,10 @@ export const Management = () => {
                 <CalendarCheck className="w-7 h-7 text-[#4E6E49]" />
               </div>
               <div className="space-y-2">
-                <h1 className="text-xl sm:text-3xl font-extrabold bg-gradient-to-r from-[#4E6E49] via-emerald-500 to-blue-500 bg-clip-text text-transparent">
-                  Расписание команды
+                <h1 className="text-xl sm:text-3xl font-extrabold">
+                  <span className="bg-gradient-to-r from-[#4E6E49] via-emerald-700 to-yellow-600 text-transparent bg-clip-text">
+                    Расписание команды
+                  </span>
                 </h1>
                 <p className={`${labelColor} text-sm sm:text-base leading-snug max-w-2xl`}>
                   Здесь можно управлять слотами, сменами и статусами.

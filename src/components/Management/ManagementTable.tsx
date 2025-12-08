@@ -235,9 +235,9 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
   const headingColor = theme === 'dark' ? 'text-white' : 'text-gray-900'
   const subtleColor = theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
   const statusTone = {
-    dayoff: 'bg-teal-100 text-teal-900 border border-teal-200 dark:bg-teal-900/40 dark:text-teal-100 dark:border-teal-800',
-    sick: 'bg-amber-100 text-amber-900 border border-amber-200 dark:bg-amber-900/40 dark:text-amber-100 dark:border-amber-700',
-    vacation: 'bg-sky-100 text-sky-900 border border-sky-200 dark:bg-sky-900/40 dark:text-sky-100 dark:border-sky-800',
+    dayoff: 'bg-amber-50 text-amber-900 border border-amber-200 shadow-inner dark:bg-amber-900/30 dark:text-amber-50 dark:border-amber-700',
+    sick: 'bg-orange-50 text-orange-900 border border-orange-200 shadow-inner dark:bg-orange-900/30 dark:text-orange-50 dark:border-orange-700',
+    vacation: 'bg-sky-50 text-sky-900 border border-sky-200 shadow-inner dark:bg-sky-900/30 dark:text-sky-50 dark:border-sky-700',
   } as const
 
   return (
@@ -400,9 +400,9 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
                               ))
                             })()}
                             {slot.comment && (
-                              <div className="flex items-center justify-center group relative">
+                              <div className="flex items-center justify-center group/slot-comment relative">
                                 <Info className="w-4 h-4 text-gray-400 cursor-help" />
-                                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-[#0A0A0A] text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
+                                <div className="pointer-events-none absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-[#0A0A0A] text-white text-xs rounded opacity-0 group-hover/slot-comment:opacity-100 transition-opacity whitespace-nowrap z-10">
                                   {slot.comment}
                                 </div>
                               </div>
@@ -446,14 +446,14 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
                         ) : status ? (
                           <div className="space-y-1">
                             <div
-                              className={`rounded px-2 py-1 text-xs font-semibold ${statusTone[status.type]}`}
+                              className={`rounded-lg px-3 py-2 text-xs font-semibold ring-1 ring-inset ring-black/5 dark:ring-white/10 ${statusTone[status.type]}`}
                             >
                               {status.type === 'dayoff' ? 'Выходной' : status.type === 'sick' ? 'Больничный' : 'Отпуск'}
                             </div>
                             {status.comment && (
-                              <div className="flex items-center justify-center group relative">
+                              <div className="flex items-center justify-center group/status-comment relative">
                                 <Info className="w-4 h-4 text-gray-400 cursor-help" />
-                                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-[#0A0A0A] text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
+                                <div className="pointer-events-none absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-[#0A0A0A] text-white text-xs rounded opacity-0 group-hover/status-comment:opacity-100 transition-opacity whitespace-nowrap z-10">
                                   {status.comment}
                                 </div>
                               </div>
