@@ -28,14 +28,7 @@ export const Earnings = () => {
   const categoryKeys = Object.keys(EARNINGS_CATEGORY_META) as EarningsCategory[]
 
   const headingColor = theme === 'dark' ? 'text-white' : 'text-gray-900'
-  const labelColor = theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
-  const cardBg = theme === 'dark'
-    ? 'border-[#4E6E49]/30 bg-gradient-to-br from-[#1a1a1a] via-[#1a1a1a] to-[#0A0A0A]'
-    : 'border-green-200 bg-gradient-to-br from-white via-green-50/30 to-white'
-  const sectionCardClass = `rounded-2xl p-4 sm:p-6 md:p-8 border-2 ${cardBg}`
-  const surfaceCardClass = `rounded-2xl border ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-white'}`
-  const softTextColor = theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-  const contentCardClass = `rounded-2xl p-4 sm:p-5 border-2 ${cardBg}`
+  const cardBg = theme === 'dark' ? 'bg-[#1a1a1a]' : 'bg-white'
   const getPoolValue = (earning: EarningsType) => earning.poolAmount || earning.amount * POOL_RATE
   const getNetValue = (earning: EarningsType) => Math.max(earning.amount - getPoolValue(earning), 0)
   const getParticipants = (earning: EarningsType) => earning.participants?.length ? earning.participants : [earning.userId]
