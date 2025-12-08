@@ -1,27 +1,18 @@
 // FAQ page
 import { Layout } from '@/components/Layout'
 import { useThemeStore } from '@/store/themeStore'
-import { 
-  HelpCircle, 
-  LogIn, 
-  Calendar, 
-  FileText, 
-  TrendingUp, 
-  DollarSign, 
-  Shield, 
-  MessageSquare, 
-  Users, 
-  Edit,
+import {
+  LogIn,
+  Calendar,
+  FileText,
+  TrendingUp,
+  Shield,
+  MessageSquare,
   Sparkles,
   Zap,
   Eye,
   CheckSquare,
-  CheckCircle2,
-  XCircle,
   BookOpen,
-  Clock3,
-  SunMedium,
-  Stethoscope
 } from 'lucide-react'
 import { useState } from 'react'
 
@@ -44,25 +35,24 @@ interface StageCard {
 type FAQCategory = {
   id: string
   name: string
-  icon: React.ReactNode
   color: string
   darkColor: string
 }
 
 const categories: FAQCategory[] = [
-  { id: 'all', name: 'Все вопросы', icon: <HelpCircle className="w-5 h-5" />, color: 'text-blue-600', darkColor: 'text-blue-400' },
-  { id: 'auth', name: 'Авторизация', icon: <LogIn className="w-5 h-5" />, color: 'text-purple-600', darkColor: 'text-purple-400' },
-  { id: 'slots', name: 'Рабочие слоты', icon: <Calendar className="w-5 h-5" />, color: 'text-[#4E6E49]', darkColor: 'text-[#4E6E49]' },
-  { id: 'status', name: 'Статусы', icon: <FileText className="w-5 h-5" />, color: 'text-orange-600', darkColor: 'text-orange-400' },
-  { id: 'rating', name: 'Рейтинг', icon: <TrendingUp className="w-5 h-5" />, color: 'text-red-600', darkColor: 'text-red-400' },
-  { id: 'earnings', name: 'Заработок', icon: <DollarSign className="w-5 h-5" />, color: 'text-yellow-600', darkColor: 'text-yellow-400' },
-  { id: 'calls', name: 'Торговые сигналы', icon: <Zap className="w-5 h-5" />, color: 'text-emerald-700', darkColor: 'text-emerald-500' },
-  { id: 'tasks', name: 'Задачи', icon: <CheckSquare className="w-5 h-5" />, color: 'text-lime-600', darkColor: 'text-lime-400' },
-  { id: 'admin', name: 'Администратор', icon: <Shield className="w-5 h-5" />, color: 'text-indigo-600', darkColor: 'text-indigo-400' },
-  { id: 'messages', name: 'Сообщения', icon: <MessageSquare className="w-5 h-5" />, color: 'text-cyan-600', darkColor: 'text-cyan-400' },
-  { id: 'referrals', name: 'Рефералы', icon: <Users className="w-5 h-5" />, color: 'text-pink-600', darkColor: 'text-pink-400' },
-  { id: 'edit', name: 'Редактирование', icon: <Edit className="w-5 h-5" />, color: 'text-teal-600', darkColor: 'text-teal-400' },
-  { id: 'interface', name: 'Интерфейс сайта', icon: <Eye className="w-5 h-5" />, color: 'text-violet-600', darkColor: 'text-violet-400' },
+  { id: 'all', name: 'Все вопросы', color: 'text-blue-600', darkColor: 'text-blue-400' },
+  { id: 'auth', name: 'Авторизация', color: 'text-purple-600', darkColor: 'text-purple-400' },
+  { id: 'slots', name: 'Рабочие слоты', color: 'text-[#4E6E49]', darkColor: 'text-[#4E6E49]' },
+  { id: 'status', name: 'Статусы', color: 'text-orange-600', darkColor: 'text-orange-400' },
+  { id: 'rating', name: 'Рейтинг', color: 'text-red-600', darkColor: 'text-red-400' },
+  { id: 'earnings', name: 'Заработок', color: 'text-yellow-600', darkColor: 'text-yellow-400' },
+  { id: 'calls', name: 'Торговые сигналы', color: 'text-emerald-700', darkColor: 'text-emerald-500' },
+  { id: 'tasks', name: 'Задачи', color: 'text-lime-600', darkColor: 'text-lime-400' },
+  { id: 'admin', name: 'Администратор', color: 'text-indigo-600', darkColor: 'text-indigo-400' },
+  { id: 'messages', name: 'Сообщения', color: 'text-cyan-600', darkColor: 'text-cyan-400' },
+  { id: 'referrals', name: 'Рефералы', color: 'text-pink-600', darkColor: 'text-pink-400' },
+  { id: 'edit', name: 'Редактирование', color: 'text-teal-600', darkColor: 'text-teal-400' },
+  { id: 'interface', name: 'Интерфейс сайта', color: 'text-violet-600', darkColor: 'text-violet-400' },
 ]
 
 const stageCards: StageCard[] = [
@@ -323,7 +313,6 @@ export const FAQ = () => {
   const textColor = theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
   const cardBg = theme === 'dark' ? 'bg-[#1a1a1a]' : 'bg-white'
   const borderColor = theme === 'dark' ? 'border-gray-800' : 'border-gray-200'
-  const hoverBg = theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'
 
   const filteredFAQs = selectedCategory === 'all' 
     ? faqData 
@@ -331,15 +320,8 @@ export const FAQ = () => {
 
   const selectedCategoryInfo = categories.find(c => c.id === selectedCategory)
 
-  const emojiHeaderIcons: Record<string, React.ReactNode> = {
-    '📅': <Calendar className="w-4 h-4" />,
-    '🏥': <Stethoscope className="w-4 h-4" />,
-    '🏖️': <SunMedium className="w-4 h-4" />,
-    '⏰': <Clock3 className="w-4 h-4" />,
-    '💰': <DollarSign className="w-4 h-4" />,
-    '📊': <TrendingUp className="w-4 h-4" />,
-    '📖': <BookOpen className="w-4 h-4" />
-  }
+  const sanitizeText = (text: string) =>
+    text.replace(/[📅🏥🏖️⏰💰📊📖✅❌🌙☀️📈📚⚙️📺🔬📋🎯🟢🟡🟣🟠🟤🔔🧲]/g, '').trim()
 
   const formatAnswer = (answer: string) => {
     const lines = answer.split('\n')
@@ -412,10 +394,10 @@ export const FAQ = () => {
     // 1) Если нашли явные шаги с номерами — строим карточки из них
     if (numbered.length >= 2) {
       const steps = numbered.map((item, idx) => {
-        const stepText = item.trimmed.replace(/^\d+\.\s*/, '')
+        const stepText = sanitizeText(item.trimmed.replace(/^\d+\.\s*/, ''))
         const [rawTitle, ...rest] = stepText.split(/[:\-—]/)
-        const title = (rawTitle || '').trim() || `Шаг ${idx + 1}`
-        const description = (rest.join(':').trim() || stepText).trim()
+        const title = sanitizeText((rawTitle || '').trim()) || `Шаг ${idx + 1}`
+        const description = sanitizeText((rest.join(':').trim() || stepText).trim())
         return { title, description }
       })
 
@@ -448,10 +430,11 @@ export const FAQ = () => {
     const fallbackSteps = cleanedSegments.length > 0 ? cleanedSegments : [answer.trim()]
 
     const steps = fallbackSteps.map((text, idx) => {
-      const [rawTitle, ...rest] = text.split(/[:\-—]/)
+      const sanitized = sanitizeText(text)
+      const [rawTitle, ...rest] = sanitized.split(/[:\-—]/)
       const titleFromText = (rawTitle || '').trim()
       const title = titleFromText ? titleFromText.slice(0, 60) : `Шаг ${idx + 1}`
-      const description = (rest.join(':').trim() || text).trim()
+      const description = sanitizeText((rest.join(':').trim() || sanitized).trim())
       return { title, description }
     })
 
@@ -583,12 +566,6 @@ export const FAQ = () => {
                     : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:border-gray-400'
                 }`}
               >
-                <span className={selectedCategory === category.id 
-                  ? 'text-white' 
-                  : (theme === 'dark' ? category.darkColor : category.color)
-                }>
-                  {category.icon}
-                </span>
                 <span>{category.name}</span>
               </button>
             ))}
@@ -602,18 +579,13 @@ export const FAQ = () => {
               ? 'border-blue-500/30 bg-blue-500/5' 
               : 'border-blue-200 bg-blue-50'
           } mb-6`}>
-            <div className={`flex items-center gap-3 ${
-              theme === 'dark' ? selectedCategoryInfo.darkColor : selectedCategoryInfo.color
-            }`}>
-              {selectedCategoryInfo.icon}
-              <div>
-                <h3 className="font-bold text-lg">
-                  {selectedCategoryInfo.name}
-                </h3>
-                <p className={`text-sm ${textColor}`}>
-                  {filteredFAQs.length} {filteredFAQs.length === 1 ? 'вопрос' : filteredFAQs.length < 5 ? 'вопроса' : 'вопросов'}
-                </p>
-              </div>
+            <div>
+              <h3 className={`font-bold text-lg ${theme === 'dark' ? selectedCategoryInfo.darkColor : selectedCategoryInfo.color}`}>
+                {selectedCategoryInfo.name}
+              </h3>
+              <p className={`text-sm ${textColor}`}>
+                {filteredFAQs.length} {filteredFAQs.length === 1 ? 'вопрос' : filteredFAQs.length < 5 ? 'вопроса' : 'вопросов'}
+              </p>
             </div>
           </div>
         )}
@@ -670,7 +642,6 @@ export const FAQ = () => {
                               theme === 'dark' ? 'bg-[#1a1a1a]/80 border-gray-800' : 'bg-gray-100 border-gray-200'
                             } ${badgeColor}`}
                           >
-                            {categoryInfo?.icon}
                             <span className="uppercase tracking-wide">
                               {categoryInfo ? categoryInfo.name : 'Общее'}
                             </span>

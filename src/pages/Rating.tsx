@@ -202,7 +202,7 @@ export const Rating = () => {
                   <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
                   Рейтинг команды
                 </div>
-                <h1 className="text-2xl sm:text-4xl font-extrabold bg-gradient-to-r from-[#4E6E49] via-emerald-500 to-blue-500 bg-clip-text text-transparent">
+                <h1 className="text-2xl sm:text-3xl font-extrabold bg-gradient-to-r from-[#4E6E49] via-emerald-500 to-blue-500 bg-clip-text text-transparent">
                   Обзор эффективности команды ApeVault Black OPS
                 </h1>
                 <p className={`text-sm sm:text-base leading-relaxed ${subTextColor}`}>

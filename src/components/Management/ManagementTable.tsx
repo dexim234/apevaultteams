@@ -266,7 +266,7 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
       {/* Table */}
       <div className="overflow-x-auto -mx-3 sm:-mx-4 md:-mx-6 lg:-mx-8 px-3 sm:px-4 md:px-6 lg:px-8">
         <div className="min-w-full inline-block align-middle">
-          <table className="w-full min-w-[640px]">
+          <table className="w-full">
             <thead className="sticky top-0 z-30">
               <tr className={`${theme === 'dark' ? 'bg-[#0f172a]' : 'bg-gray-50'} shadow-sm`}>
                 <th className={`px-2 sm:px-3 md:px-4 py-3 text-left text-xs sm:text-sm font-semibold ${headingColor} sticky left-0 z-30 ${

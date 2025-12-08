@@ -57,7 +57,6 @@ export const Management = () => {
     todaySlots: 0,
   })
 
-  const [isMobile, setIsMobile] = useState(false)
   const [timeAnchors, setTimeAnchors] = useState<{ nextStart: Date | null; activeEnd: Date | null }>({
     nextStart: null,
     activeEnd: null,
@@ -69,21 +68,6 @@ export const Management = () => {
 
   useEffect(() => {
     loadStats()
-  }, [])
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(max-width: 1023px)')
-    const handleChange = (event: MediaQueryListEvent | MediaQueryList) => {
-      setIsMobile(event.matches)
-    }
-
-    // Initial check
-    handleChange(mediaQuery)
-
-    const listener = (event: MediaQueryListEvent) => handleChange(event)
-    mediaQuery.addEventListener('change', listener)
-
-    return () => mediaQuery.removeEventListener('change', listener)
   }, [])
 
   useEffect(() => {
@@ -310,6 +294,65 @@ export const Management = () => {
     setViewMode(mode)
   }
 
+  const statCards = [
+    {
+      label: 'Сколько ещё добавить слотов',
+      value: `${Math.max(stats.recommendedDay, 0)} в день`,
+      note: `Неделя: ${Math.max(stats.recommendedWeek, 0)} до цели 15`,
+      icon: <ArrowUpRight className="w-4 h-4" />,
+      tone: 'from-emerald-500 to-blue-500',
+    },
+    {
+      label: 'Активные участники',
+      value: stats.activeMembers,
+      note: 'за неделю',
+      icon: <Users className="w-4 h-4" />,
+      tone: 'from-purple-500 to-pink-500',
+    },
+    {
+      label: 'Самый активный участник недели',
+      value: stats.mostActive || 'Нет данных',
+      note: 'по слотам',
+      icon: <Activity className="w-4 h-4" />,
+      tone: 'from-amber-500 to-orange-500',
+    },
+    {
+      label: 'Самые неактивные участники недели',
+      value: stats.leastActive.length ? stats.leastActive.join(', ') : 'Нет данных',
+      note: 'минимум слотов',
+      icon: <ArrowDownRight className="w-4 h-4" />,
+      tone: 'from-slate-500 to-gray-700',
+    },
+    {
+      label: 'Осталось слотов на неделе',
+      value: stats.remainingSlots,
+      note: 'предстоящие',
+      icon: <Hourglass className="w-4 h-4" />,
+      tone: 'from-sky-500 to-blue-600',
+    },
+    {
+      label: 'Завершено слотов на неделе',
+      value: stats.completedSlots,
+      note: 'факт',
+      icon: <CalendarCheck className="w-4 h-4" />,
+      tone: 'from-emerald-600 to-teal-500',
+    },
+    {
+      label: 'Таймер ближайшего слота',
+      value: timerLabels.nextStart,
+      note: 'до старта',
+      icon: <Timer className="w-4 h-4" />,
+      tone: 'from-indigo-500 to-blue-500',
+    },
+    {
+      label: 'До окончания активного слота',
+      value: timerLabels.activeRemaining,
+      note: 'если слот идёт',
+      icon: <Clock className="w-4 h-4" />,
+      tone: 'from-rose-500 to-red-500',
+    },
+  ]
+
 
   return (
     <Layout>
@@ -325,96 +368,40 @@ export const Management = () => {
             <div className="absolute top-0 right-0 w-[26rem] h-[26rem] bg-gradient-to-bl from-blue-500/18 via-purple-500/12 to-transparent blur-3xl" />
             <div className="absolute bottom-[-140px] left-14 w-80 h-80 bg-gradient-to-tr from-amber-300/14 via-[#4E6E49]/12 to-transparent blur-3xl" />
           </div>
-          <div className="relative z-10 grid grid-cols-1 gap-6 lg:grid-cols-[1.4fr_1fr] items-start">
-            <div className="flex flex-col gap-4">
-              <div className="flex items-start gap-3">
-                <div className="p-4 rounded-2xl bg-white/80 dark:bg-white/5 border border-white/40 dark:border-white/10 shadow-lg">
-                  <CalendarCheck className="w-7 h-7 text-[#4E6E49]" />
-                </div>
-                <div className="space-y-2">
-                  <h1 className="text-2xl sm:text-3xl font-extrabold bg-gradient-to-r from-[#4E6E49] via-emerald-500 to-blue-500 bg-clip-text text-transparent">
-                    Расписание команды
-                  </h1>
-                  <p className={`${labelColor} text-sm sm:text-base leading-snug max-w-2xl`}>
-                    Здесь можно управлять слотами, сменами и статусами.
-                  </p>
-                </div>
+          <div className="relative z-10 grid grid-cols-1 gap-5">
+            <div className="flex items-start gap-3">
+              <div className="p-4 rounded-2xl bg-white/80 dark:bg-white/5 border border-white/40 dark:border-white/10 shadow-lg">
+                <CalendarCheck className="w-7 h-7 text-[#4E6E49]" />
               </div>
-              <div className={`rounded-2xl border p-4 sm:p-5 backdrop-blur ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-green-100 bg-white/80'}`}>
-                <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                  {[
-                    {
-                      label: 'Рекомендуется добавить',
-                      value: `${Math.max(stats.recommendedDay, 0)} сл. в день`,
-                      note: `Неделя: ${Math.max(stats.recommendedWeek, 0)} слотов`,
-                      icon: <ArrowUpRight className="w-4 h-4" />,
-                      tone: 'from-emerald-500 to-blue-500',
-                    },
-                    {
-                      label: 'Активные участники',
-                      value: stats.activeMembers,
-                      note: 'за неделю',
-                      icon: <Users className="w-4 h-4" />,
-                      tone: 'from-purple-500 to-pink-500',
-                    },
-                    {
-                      label: 'Самый активный',
-                      value: stats.mostActive || 'Нет данных',
-                      note: 'неделя',
-                      icon: <Activity className="w-4 h-4" />,
-                      tone: 'from-amber-500 to-orange-500',
-                    },
-                    {
-                      label: 'Самые неактивные',
-                      value: stats.leastActive.length ? stats.leastActive.join(', ') : 'Нет данных',
-                      note: 'неделя',
-                      icon: <ArrowDownRight className="w-4 h-4" />,
-                      tone: 'from-slate-500 to-gray-700',
-                    },
-                    {
-                      label: 'Осталось слотов',
-                      value: stats.remainingSlots,
-                      note: 'на неделе',
-                      icon: <Hourglass className="w-4 h-4" />,
-                      tone: 'from-sky-500 to-blue-600',
-                    },
-                    {
-                      label: 'Завершено слотов',
-                      value: stats.completedSlots,
-                      note: 'на неделе',
-                      icon: <CalendarCheck className="w-4 h-4" />,
-                      tone: 'from-emerald-600 to-teal-500',
-                    },
-                    {
-                      label: 'Ближайший слот',
-                      value: timerLabels.nextStart,
-                      note: 'таймер',
-                      icon: <Timer className="w-4 h-4" />,
-                      tone: 'from-indigo-500 to-blue-500',
-                    },
-                    {
-                      label: 'До конца активного',
-                      value: timerLabels.activeRemaining,
-                      note: 'если есть',
-                      icon: <Clock className="w-4 h-4" />,
-                      tone: 'from-rose-500 to-red-500',
-                    },
-                  ].map((item) => (
-                    <div
-                      key={item.label}
-                      className={`rounded-xl border ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-white/70 bg-white'} p-3 flex flex-col gap-1 shadow-sm`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <p className="text-xs font-semibold text-[#4E6E49]">{item.label}</p>
-                        <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-semibold text-white bg-gradient-to-r ${item.tone}`}>
-                          {item.icon}
-                        </span>
-                      </div>
-                      <p className={`text-lg sm:text-xl font-bold ${headingColor}`}>{item.value}</p>
-                      <p className={`text-xs ${labelColor}`}>{item.note}</p>
+              <div className="space-y-2">
+                <h1 className="text-xl sm:text-3xl font-extrabold bg-gradient-to-r from-[#4E6E49] via-emerald-500 to-blue-500 bg-clip-text text-transparent">
+                  Расписание команды
+                </h1>
+                <p className={`${labelColor} text-sm sm:text-base leading-snug max-w-2xl`}>
+                  Здесь можно управлять слотами, сменами и статусами.
+                </p>
+              </div>
+            </div>
+
+            <div className={`rounded-2xl border p-4 sm:p-5 backdrop-blur ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-green-100 bg-white/80'}`}>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                {statCards.map((item) => (
+                  <div
+                    key={item.label}
+                    className={`rounded-xl border ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-white/70 bg-white'} p-3 flex flex-col gap-1.5 shadow-sm`}
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="text-[11px] sm:text-xs font-semibold text-[#4E6E49] leading-tight">{item.label}</p>
+                      <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-semibold text-white bg-gradient-to-r ${item.tone}`}>
+                        {item.icon}
+                      </span>
                     </div>
-                  ))}
-                </div>
+                    <p className={`text-lg sm:text-xl font-bold bg-gradient-to-r ${item.tone} bg-clip-text text-transparent`}>
+                      {item.value}
+                    </p>
+                    <p className={`text-xs ${labelColor}`}>{item.note}</p>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -558,11 +545,6 @@ export const Management = () => {
               <p className={`text-sm sm:text-base font-semibold ${headingColor}`}>Расписание</p>
               <p className={`text-xs sm:text-sm ${labelColor}`}>Слоты и статусы за выбранную неделю</p>
             </div>
-            {isMobile && (
-              <span className="text-xs px-3 py-1 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-300">
-                Мобильный вид
-              </span>
-            )}
           </div>
 
           {viewMode === 'table' ? (
