@@ -284,16 +284,13 @@ export const Management = () => {
 
   const headingColor = theme === 'dark' ? 'text-white' : 'text-gray-900'
   const labelColor = theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
-  const sectionCardClass = `rounded-2xl border-2 ${
-    theme === 'dark'
-      ? 'border-[#4E6E49]/25 bg-[#0f1623] shadow-[0_24px_80px_rgba(0,0,0,0.55)]'
-      : 'border-green-100 bg-white shadow-[0_20px_60px_rgba(15,23,42,0.08)]'
-  }`
-  const surfaceCardClass = `rounded-2xl border ${
-    theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-gray-50'
-  }`
+  const cardBg = theme === 'dark'
+    ? 'border-[#4E6E49]/30 bg-gradient-to-br from-[#1a1a1a] via-[#1a1a1a] to-[#0A0A0A]'
+    : 'border-green-200 bg-gradient-to-br from-white via-green-50/30 to-white'
+  const sectionCardClass = `rounded-2xl p-4 sm:p-6 md:p-8 border-2 ${cardBg}`
+  const surfaceCardClass = `rounded-2xl border ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-white'}`
   const softTextColor = theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-  const contentCardClass = `${sectionCardClass} p-4 sm:p-5`
+  const contentCardClass = `rounded-2xl p-4 sm:p-5 border-2 ${cardBg}`
   const statToneMap: Record<string, { bg: string; text: string; border: string }> = {
     emerald: {
       bg: theme === 'dark' ? 'bg-emerald-500/10' : 'bg-emerald-50',
