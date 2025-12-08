@@ -54,6 +54,7 @@ export const TaskFilters = ({
   const statusIcons: Record<TaskStatus, JSX.Element> = {
     pending: <CircleDot className="w-4 h-4" />,
     in_progress: <Clock3 className="w-4 h-4" />,
+    approval: <Gauge className="w-4 h-4" />,
     completed: <CheckCircle2 className="w-4 h-4" />,
     closed: <Archive className="w-4 h-4" />,
     rejected: <XCircle className="w-4 h-4" />,

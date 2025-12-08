@@ -147,20 +147,6 @@ export const TaskForm = ({ onClose, onSave, editingTask }: TaskFormProps) => {
     )
   }
 
-  const handleStageResponsibleToggle = (stageId: string, userId: string) => {
-    setStages((prev) =>
-      prev.map((stage) => {
-        if (stage.id !== stageId) return stage
-        if (stage.responsible === 'all') {
-          return stage
-        }
-        const list = stage.responsible || []
-        const nextList = list.includes(userId) ? list.filter((id) => id !== userId) : [...list, userId]
-        return { ...stage, responsible: nextList }
-      })
-    )
-  }
-
   const handleStageAssigneeToggle = (stageId: string, userId: string) => {
     setStages((prev) =>
       prev.map((stage) => {

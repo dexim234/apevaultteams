@@ -4,7 +4,7 @@ import { useThemeStore } from '@/store/themeStore'
 import { useAuthStore } from '@/store/authStore'
 import { useAdminStore } from '@/store/adminStore'
 import { updateTask } from '@/services/firestoreService'
-import { Task, TaskPriority, TaskStatus, TASK_STATUSES, TEAM_MEMBERS } from '@/types'
+import { Task, TaskPriority, TaskStatus, TaskStage, TASK_STATUSES, TEAM_MEMBERS } from '@/types'
 import { AlarmClock, CalendarClock, Check, CheckSquare, Clock3, MoreVertical, RotateCcw, X, AlertCircle } from 'lucide-react'
 import { formatDate } from '@/utils/dateUtils'
 import { TaskDeadlineBadge } from './TaskDeadlineBadge'
@@ -440,9 +440,15 @@ export const TaskKanban = ({ tasks, onUpdate, onEdit, onDelete }: TaskKanbanProp
       if (stages.length > 0) {
         const currentIndex = stages.findIndex((s) => s.id === currentStage.id)
         const participants = resolveParticipants(task)
-        const normalizedStages = stages.map((stage) =>
-          stage.id === currentStage.id ? { ...stage, status: 'approved' } : stage
-        )
+        const normalizedStages: TaskStage[] = stages.map((stage) => {
+          const status: TaskStage['status'] =
+            stage.id === currentStage.id
+              ? 'approved'
+              : stage.status === 'approved' || stage.status === 'rejected'
+                ? stage.status
+                : 'pending'
+          return { ...stage, status }
+        })
         const hasNext = currentIndex >= 0 && currentIndex < normalizedStages.length - 1
 
         if (hasNext) {
@@ -459,7 +465,7 @@ export const TaskKanban = ({ tasks, onUpdate, onEdit, onDelete }: TaskKanbanProp
               nextStage.requiresApproval === false
                 ? responsibleIds.map((uid) => ({ userId: uid, status: 'approved' as const, updatedAt: now }))
                 : responsibleIds.map((uid) => ({ userId: uid, status: 'pending' as const, updatedAt: now })),
-            status: nextStage.requiresApproval === false ? 'approved' : 'pending',
+            status: (nextStage.requiresApproval === false ? 'approved' : 'pending') as TaskStage['status'],
           }
 
           updates = {

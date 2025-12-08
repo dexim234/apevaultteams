@@ -8,7 +8,7 @@ import { TaskCard } from '@/components/Tasks/TaskCard'
 import { TaskFilters } from '@/components/Tasks/TaskFilters'
 import { TaskKanban } from '@/components/Tasks/TaskKanban'
 import { getTasks, deleteTask } from '@/services/firestoreService'
-import { Task, TaskCategory, TaskStatus, TEAM_MEMBERS } from '@/types'
+import { Task, TaskCategory, TaskStatus, TEAM_MEMBERS, TASK_STATUSES } from '@/types'
 import { CheckSquare, LayoutGrid, List, Plus, Sparkles } from 'lucide-react'
 import { formatDate } from '@/utils/dateUtils'
 

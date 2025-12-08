@@ -380,6 +380,10 @@ export const Profile = () => {
       label: 'В работе',
       classes: theme === 'dark' ? 'bg-blue-500/15 text-blue-100 border-blue-500/30' : 'bg-blue-50 text-blue-900 border-blue-200',
     },
+    approval: {
+      label: 'Согласование',
+      classes: theme === 'dark' ? 'bg-purple-500/15 text-purple-100 border-purple-500/30' : 'bg-purple-50 text-purple-900 border-purple-200',
+    },
     completed: {
       label: 'Выполнена',
       classes: theme === 'dark' ? 'bg-emerald-500/15 text-emerald-50 border-emerald-500/30' : 'bg-emerald-50 text-emerald-900 border-emerald-200',
