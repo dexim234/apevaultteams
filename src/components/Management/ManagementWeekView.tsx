@@ -1,33 +1,16 @@
 // Week view for management
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 import { parseISO } from 'date-fns'
 import { useThemeStore } from '@/store/themeStore'
 import { useAuthStore } from '@/store/authStore'
 import { useAdminStore } from '@/store/adminStore'
-import { getWorkSlots, getDayStatuses, deleteWorkSlot, deleteDayStatus } from '@/services/firestoreService'
+import { getWorkSlots, getDayStatuses, deleteWorkSlot, deleteDayStatus, updateDayStatus, addDayStatus } from '@/services/firestoreService'
 import { formatDate, getWeekDays } from '@/utils/dateUtils'
 import { WorkSlot, DayStatus } from '@/types'
 import { TEAM_MEMBERS } from '@/types'
 import { Edit, Trash2, Info, CheckCircle2, Calendar as CalendarIcon } from 'lucide-react'
 
 type SlotFilter = 'all' | 'upcoming' | 'completed'
-type StatusRange = {
-  id: string
-  userId: string
-  type: DayStatus['type']
-  start: string
-  end: string
-  comment?: string
-  originalIds: string[]
-  primary: DayStatus
-}
-
-const isAdjacentOrOverlap = (prevEnd: string, nextStart: string) => {
-  const prevEndDate = parseISO(prevEnd)
-  const nextStartDate = parseISO(nextStart)
-  const diffDays = Math.round((nextStartDate.getTime() - prevEndDate.getTime()) / (1000 * 60 * 60 * 24))
-  return diffDays <= 1
-}
 
 interface ManagementWeekViewProps {
   selectedUserId: string | null
@@ -46,66 +29,6 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
   const [loading, setLoading] = useState(true)
 
   const weekDays = getWeekDays(selectedWeek)
-  const statusRanges = useMemo<StatusRange[]>(() => {
-    const sorted = [...statuses].sort((a, b) => {
-      if (a.userId !== b.userId) return a.userId.localeCompare(b.userId)
-      if (a.type !== b.type) return a.type.localeCompare(b.type)
-      return a.date.localeCompare(b.date)
-    })
-
-    const ranges: StatusRange[] = []
-    for (const s of sorted) {
-      const start = s.date
-      const end = s.endDate || s.date
-      const last = ranges[ranges.length - 1]
-      const commentsEqual = (last?.comment || '') === (s.comment || '')
-
-      // Проверяем, можно ли объединить с предыдущим диапазоном
-      const canMerge = last &&
-        last.userId === s.userId &&
-        last.type === s.type &&
-        commentsEqual &&
-        isAdjacentOrOverlap(last.end, start)
-
-      if (canMerge) {
-        // Расширяем диапазон до конца текущего статуса
-        if (end > last.end) {
-          last.end = end
-        }
-        last.originalIds.push(s.id)
-        // Обновляем primary, если текущий статус раньше
-        if (start < last.start) {
-          last.start = start
-          last.primary = s
-        }
-      } else {
-        // Создаем новый диапазон
-        ranges.push({
-          id: `${s.id}-range`,
-          userId: s.userId,
-          type: s.type,
-          start,
-          end,
-          comment: s.comment,
-          originalIds: [s.id],
-          primary: s,
-        })
-      }
-    }
-    
-    // Отладочная информация
-    if (ranges.some(r => r.originalIds.length > 1)) {
-      console.log('Объединенные диапазоны:', ranges.filter(r => r.originalIds.length > 1).map(r => ({
-        type: r.type,
-        start: r.start,
-        end: r.end,
-        count: r.originalIds.length,
-        ids: r.originalIds
-      })))
-    }
-    
-    return ranges
-  }, [statuses])
 
   useEffect(() => {
     loadData()
@@ -186,14 +109,84 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
     }
   }
 
-  const handleDeleteStatus = async (id: string) => {
-    if (!isAdmin && user?.id !== statuses.find((s) => s.id === id)?.userId) {
+  const handleDeleteStatus = async (status: DayStatus, dateStr?: string) => {
+    if (!isAdmin && user?.id !== status.userId) {
       alert('Только администратор может удалять чужие статусы')
       return
     }
 
+    // Если статус имеет endDate и удаляется не весь диапазон, нужно обновить диапазон
+    if (status.endDate && dateStr) {
+      const statusStart = status.date
+      const statusEnd = status.endDate
+      
+      // Если удаляется первый день диапазона, обновляем дату начала
+      if (dateStr === statusStart) {
+        if (confirm('Удалить первый день диапазона? Остальные дни останутся.')) {
+          const newStart = new Date(parseISO(statusStart))
+          newStart.setDate(newStart.getDate() + 1)
+          const newStartStr = formatDate(newStart, 'yyyy-MM-dd')
+          
+          await updateDayStatus(status.id, {
+            ...status,
+            date: newStartStr
+          })
+          loadData()
+        }
+        return
+      }
+      
+      // Если удаляется последний день диапазона, обновляем дату окончания
+      if (dateStr === statusEnd) {
+        if (confirm('Удалить последний день диапазона? Остальные дни останутся.')) {
+          const newEnd = new Date(parseISO(statusEnd))
+          newEnd.setDate(newEnd.getDate() - 1)
+          const newEndStr = formatDate(newEnd, 'yyyy-MM-dd')
+          
+          await updateDayStatus(status.id, {
+            ...status,
+            endDate: newEndStr
+          })
+          loadData()
+        }
+        return
+      }
+      
+      // Если удаляется день из середины диапазона, разбиваем на два статуса
+      if (dateStr > statusStart && dateStr < statusEnd) {
+        if (confirm('Удалить этот день из диапазона? Диапазон будет разбит на две части.')) {
+          // Создаем первый статус (до удаляемого дня)
+          const firstEnd = new Date(parseISO(dateStr))
+          firstEnd.setDate(firstEnd.getDate() - 1)
+          const firstEndStr = formatDate(firstEnd, 'yyyy-MM-dd')
+          
+          await updateDayStatus(status.id, {
+            ...status,
+            endDate: firstEndStr
+          })
+          
+          // Создаем второй статус (после удаляемого дня)
+          const secondStart = new Date(parseISO(dateStr))
+          secondStart.setDate(secondStart.getDate() + 1)
+          const secondStartStr = formatDate(secondStart, 'yyyy-MM-dd')
+          
+          await addDayStatus({
+            userId: status.userId,
+            date: secondStartStr,
+            endDate: statusEnd,
+            type: status.type,
+            comment: status.comment
+          })
+          
+          loadData()
+        }
+        return
+      }
+    }
+
+    // Если статус без endDate или удаляется весь диапазон, удаляем полностью
     if (confirm('Удалить статус?')) {
-      await deleteDayStatus(id)
+      await deleteDayStatus(status.id)
       loadData()
     }
   }
@@ -270,6 +263,17 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
     return daySlots
   }
 
+  const getStatusesForDay = (date: string): DayStatus[] => {
+    return statuses.filter((s) => {
+      // If status has endDate, check if date falls within the range
+      if (s.endDate) {
+        return s.date <= date && s.endDate >= date
+      }
+      // Otherwise, check exact match
+      return s.date === date
+    })
+  }
+
   const navigateWeek = (direction: 'prev' | 'next') => {
     const newDate = new Date(selectedWeek)
     if (direction === 'prev') {
@@ -324,8 +328,7 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
         {weekDays.map((day) => {
           const dateStr = formatDate(day, 'yyyy-MM-dd')
           const daySlots = getSlotsForDay(dateStr)
-          const weekStartStr = formatDate(weekDays[0], 'yyyy-MM-dd')
-          const dayStatusRanges = statusRanges.filter((range) => range.start <= dateStr && range.end >= dateStr)
+          const dayStatuses = getStatusesForDay(dateStr)
 
           return (
             <div
@@ -338,108 +341,79 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
 
               <div className="space-y-3 sm:space-y-4">
                 {/* Statuses */}
-                {dayStatusRanges
-                  .map((range) => {
-                    const statusUser = TEAM_MEMBERS.find((u) => u.id === range.userId)
-                    // Fallback: try to find by old ID format if not found
-                    const statusUserFallback = statusUser || TEAM_MEMBERS.find((u) => {
-                      const oldIdMap: Record<string, string> = {
-                        'artyom': '1',
-                        'adel': '2',
-                        'kseniya': '3',
-                        'olga': '4',
-                        'anastasia': '5'
-                      }
-                      return oldIdMap[range.userId] === u.id
-                    })
-                    const displayName = statusUserFallback?.name || range.userId
-                    const weekStartDate = parseISO(weekStartStr)
-                    const rangeStartDate = parseISO(range.start)
-                    
-                    // Определяем первый видимый день диапазона в рамках недели
-                    const firstVisibleDate = rangeStartDate < weekStartDate ? weekStartDate : rangeStartDate
-                    const firstVisibleDateStr = formatDate(firstVisibleDate, 'yyyy-MM-dd')
-
-                    // Показываем карточку диапазонного статуса только один раз — в первый видимый день диапазона
-                    const isMultiDay = range.start !== range.end
-                    const isMerged = range.originalIds.length > 1
-                    
-                    // Если это объединенный диапазон (несколько статусов объединены), показываем только в первый день
-                    if (isMerged) {
-                      if (dateStr !== firstVisibleDateStr) {
-                        return null
-                      }
+                {dayStatuses.map((status) => {
+                  const statusUser = TEAM_MEMBERS.find((u) => u.id === status.userId)
+                  // Fallback: try to find by old ID format if not found
+                  const statusUserFallback = statusUser || TEAM_MEMBERS.find((u) => {
+                    const oldIdMap: Record<string, string> = {
+                      'artyom': '1',
+                      'adel': '2',
+                      'kseniya': '3',
+                      'olga': '4',
+                      'anastasia': '5'
                     }
-                    
-                    // Если это диапазон из нескольких дней, показываем только в первый день
-                    if (isMultiDay && dateStr !== firstVisibleDateStr) {
-                      return null
-                    }
-
-                    const dateRangeLabel =
-                      range.start !== range.end
-                        ? `${formatDate(parseISO(range.start), 'dd.MM')}–${formatDate(parseISO(range.end), 'dd.MM')}`
-                        : formatDate(parseISO(range.start), 'dd.MM')
-                    return (
-                      <div
-                        key={range.id}
-                        className={`relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 rounded-2xl border-2 transition-all duration-300 hover:shadow-xl backdrop-blur text-center sm:text-left ring-1 ring-inset ring-black/5 dark:ring-white/5 ${
-                          statusTone[range.type]
-                        }`}
-                      >
-                        <div className="flex flex-col sm:flex-row sm:items-center gap-2 justify-center text-center w-full">
-                          <span className="font-semibold text-base sm:text-lg">{displayName}</span>
-                          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/70 dark:bg-white/10 text-xs sm:text-sm font-semibold">
-                            {range.type === 'dayoff' ? 'Выходной' : range.type === 'sick' ? 'Больничный' : 'Отпуск'}
-                          </span>
-                          <span className="text-xs sm:text-sm font-semibold text-current">{dateRangeLabel}</span>
-                          {range.comment && (
-                            <div className="relative group/status-comment self-center sm:self-auto">
-                              <Info className="w-4 h-4 text-current cursor-help" />
-                              <div className="pointer-events-none absolute bottom-full left-1/2 sm:left-0 -translate-x-1/2 sm:translate-x-0 mb-2 p-2 bg-[#0A0A0A] text-white text-xs rounded-lg opacity-0 group-hover/status-comment:opacity-100 transition-opacity z-10 whitespace-nowrap">
-                                {range.comment}
-                              </div>
+                    return oldIdMap[status.userId] === u.id
+                  })
+                  const displayName = statusUserFallback?.name || status.userId
+                  return (
+                    <div
+                      key={status.id}
+                      className={`relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 rounded-2xl border-2 transition-all duration-300 hover:shadow-xl backdrop-blur text-center sm:text-left ring-1 ring-inset ring-black/5 dark:ring-white/5 ${
+                        statusTone[status.type]
+                      }`}
+                    >
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-2 justify-center sm:justify-start w-full">
+                        <span className="font-semibold text-base sm:text-lg">{displayName}</span>
+                        <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/70 dark:bg-white/10 text-xs sm:text-sm font-semibold">
+                          {status.type === 'dayoff' ? 'Выходной' : status.type === 'sick' ? 'Больничный' : 'Отпуск'}
+                        </span>
+                        {status.comment && (
+                          <div className="relative group/status-comment self-center sm:self-auto">
+                            <Info className="w-4 h-4 text-current cursor-help" />
+                            <div className="pointer-events-none absolute bottom-full left-1/2 sm:left-0 -translate-x-1/2 sm:translate-x-0 mb-2 p-2 bg-[#0A0A0A] text-white text-xs rounded-lg opacity-0 group-hover/status-comment:opacity-100 transition-opacity z-10 whitespace-nowrap">
+                              {status.comment}
                             </div>
-                          )}
-                        </div>
-                        <div className="flex gap-2 justify-center sm:justify-end w-full">
-                          {(isAdmin || user?.id === range.userId) ? (
-                            <>
-                              <button
-                                onClick={() => onEditStatus(range.primary)}
-                                className={`p-1 rounded transition-colors ${theme === 'dark' ? 'bg-white/10 hover:bg-white/20 text-white' : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-100'}`}
-                              >
-                                <Edit className="w-4 h-4 text-current" />
-                              </button>
-                              <button
-                                onClick={() => handleDeleteStatus(range.primary.id)}
-                                className={`p-1 rounded transition-colors ${theme === 'dark' ? 'bg-white/10 hover:bg-white/20 text-white' : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-100'}`}
-                              >
-                                <Trash2 className="w-4 h-4 text-current" />
-                              </button>
-                            </>
-                          ) : (
-                            <>
-                              <button
-                                disabled
-                                className={`p-1 cursor-not-allowed rounded ${theme === 'dark' ? 'bg-white/5 text-white/60' : 'bg-gray-100 text-gray-400 border border-gray-200'}`}
-                                title="Вы можете редактировать только свои статусы"
-                              >
-                                <Edit className="w-4 h-4 text-current opacity-60" />
-                              </button>
-                              <button
-                                disabled
-                                className={`p-1 cursor-not-allowed rounded ${theme === 'dark' ? 'bg-white/5 text-white/60' : 'bg-gray-100 text-gray-400 border border-gray-200'}`}
-                                title="Вы можете удалять только свои статусы"
-                              >
-                                <Trash2 className="w-4 h-4 text-current opacity-60" />
-                              </button>
-                            </>
-                          )}
-                        </div>
+                          </div>
+                        )}
                       </div>
-                    )
-                  })}
+                      <div className="flex gap-2 justify-center sm:justify-end w-full">
+                        {(isAdmin || user?.id === status.userId) ? (
+                          <>
+                            <button
+                              onClick={() => onEditStatus(status)}
+                              className={`p-1 rounded transition-colors ${theme === 'dark' ? 'bg-white/10 hover:bg-white/20 text-white' : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-100'}`}
+                            >
+                              <Edit className="w-4 h-4 text-current" />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteStatus(status, dateStr)}
+                              className={`p-1 rounded transition-colors ${theme === 'dark' ? 'bg-white/10 hover:bg-white/20 text-white' : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-100'}`}
+                            >
+                              <Trash2 className="w-4 h-4 text-current" />
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            <button
+                              disabled
+                              className={`p-1 cursor-not-allowed rounded ${theme === 'dark' ? 'bg-white/5 text-white/60' : 'bg-gray-100 text-gray-400 border border-gray-200'}`}
+                              title="Вы можете редактировать только свои статусы"
+                            >
+                              <Edit className="w-4 h-4 text-current opacity-60" />
+                            </button>
+                            <button
+                              disabled
+                              className={`p-1 cursor-not-allowed rounded ${theme === 'dark' ? 'bg-white/5 text-white/60' : 'bg-gray-100 text-gray-400 border border-gray-200'}`}
+                              title="Вы можете удалять только свои статусы"
+                            >
+                              <Trash2 className="w-4 h-4 text-current opacity-60" />
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  )
+                })}
 
                 {/* Slots */}
                 {daySlots.map((slot) => {
