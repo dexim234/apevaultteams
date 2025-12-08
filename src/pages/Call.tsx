@@ -408,15 +408,6 @@ export const CallPage = () => {
           </div>
         </div>
 
-        <div className="flex justify-end">
-          <button
-            onClick={() => { setEditingCall(null); setFormCategory('memecoins'); setShowForm(true) }}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-white bg-gradient-to-r from-[#4E6E49] via-emerald-600 to-sky-600 shadow-lg hover:shadow-xl transition-all text-sm font-semibold"
-          >
-            Добавить сигнал
-          </button>
-        </div>
-
         {/* Category mini-cards (aligned with Tasks style) */}
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
           {(Object.keys(CATEGORY_META) as CallCategory[]).map((cat) => {

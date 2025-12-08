@@ -371,17 +371,24 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory }: C
         details: payloadDetails,
         createdAt: callToEdit?.createdAt || new Date().toISOString(),
         status: callToEdit?.status || 'active',
-        comment: comment?.trim() ? comment.trim() : undefined,
-        sentiment: deriveSentiment(activePayload),
-        riskLevel: deriveRiskLevel(activePayload),
         tags: callToEdit?.tags || [],
-        maxProfit: callToEdit?.maxProfit,
-        currentPnL: callToEdit?.currentPnL,
-        currentMarketCap: callToEdit?.currentMarketCap,
-        signalMarketCap: callToEdit?.signalMarketCap,
-        currentPrice: callToEdit?.currentPrice,
-        entryPrice: callToEdit?.entryPrice,
       }
+
+      const trimmedComment = comment?.trim()
+      if (trimmedComment) baseData.comment = trimmedComment
+
+      const sentiment = deriveSentiment(activePayload)
+      if (sentiment) baseData.sentiment = sentiment
+
+      const riskLevel = deriveRiskLevel(activePayload)
+      if (riskLevel) baseData.riskLevel = riskLevel
+
+      if (callToEdit?.maxProfit !== undefined) baseData.maxProfit = callToEdit.maxProfit
+      if (callToEdit?.currentPnL !== undefined) baseData.currentPnL = callToEdit.currentPnL
+      if (callToEdit?.currentMarketCap !== undefined) baseData.currentMarketCap = callToEdit.currentMarketCap
+      if (callToEdit?.signalMarketCap !== undefined) baseData.signalMarketCap = callToEdit.signalMarketCap
+      if (callToEdit?.currentPrice !== undefined) baseData.currentPrice = callToEdit.currentPrice
+      if (callToEdit?.entryPrice !== undefined) baseData.entryPrice = callToEdit.entryPrice
 
       if (callToEdit) {
         await updateCall(callToEdit.id, baseData)
