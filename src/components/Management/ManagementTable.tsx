@@ -265,22 +265,32 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
     <div className={`rounded-lg ${theme === 'dark' ? 'bg-[#1a1a1a]' : 'bg-white'} shadow-md overflow-hidden`}>
       {/* Week navigation */}
       <div
-        className={`p-4 border-b ${theme === 'dark' ? 'border-gray-800' : 'border-gray-200'} flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between bg-gradient-to-r ${theme === 'dark' ? 'from-[#0f172a] via-[#0b1323] to-[#0f172a]' : 'from-green-50 via-white to-green-50'}`}
+        className={`p-4 border-b ${theme === 'dark' ? 'border-gray-800' : 'border-gray-200'} flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between`}
       >
         <button
           onClick={() => navigateWeek('prev')}
-          className="w-full sm:w-auto px-3 py-2 text-sm sm:text-base bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-lg transition-colors"
+          className={`w-full sm:w-auto px-3 py-2 text-sm sm:text-base rounded-lg transition-colors flex items-center justify-center gap-2 whitespace-nowrap ${
+            theme === 'dark'
+              ? 'border border-gray-700 bg-gray-900/60 hover:border-[#4E6E49]/50 hover:bg-gray-900'
+              : 'border border-gray-200 bg-white hover:border-[#4E6E49]/40 hover:bg-gray-50'
+          }`}
         >
-          ← Предыдущая неделя
+          <span>←</span>
+          <span>Предыдущая неделя</span>
         </button>
-        <span className={`${headingColor} font-semibold text-center text-sm sm:text-base`}>
+        <span className={`${headingColor} font-semibold text-center text-sm sm:text-base whitespace-nowrap`}>
           {formatDate(weekDays[0], 'dd.MM.yyyy')} - {formatDate(weekDays[6], 'dd.MM.yyyy')}
         </span>
         <button
           onClick={() => navigateWeek('next')}
-          className="w-full sm:w-auto px-3 py-2 text-sm sm:text-base bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-lg transition-colors"
+          className={`w-full sm:w-auto px-3 py-2 text-sm sm:text-base rounded-lg transition-colors flex items-center justify-center gap-2 whitespace-nowrap ${
+            theme === 'dark'
+              ? 'border border-gray-700 bg-gray-900/60 hover:border-[#4E6E49]/50 hover:bg-gray-900'
+              : 'border border-gray-200 bg-white hover:border-[#4E6E49]/40 hover:bg-gray-50'
+          }`}
         >
-          Следующая неделя →
+          <span>Следующая неделя</span>
+          <span>→</span>
         </button>
       </div>
 
@@ -292,7 +302,7 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
               <tr className={`${theme === 'dark' ? 'bg-[#0f172a]' : 'bg-gray-50'} shadow-sm`}>
                 <th className={`px-2 sm:px-3 md:px-4 py-3 text-left text-xs sm:text-sm font-semibold ${headingColor} sticky left-0 z-30 ${
                   theme === 'dark' ? 'bg-[#0f172a]' : 'bg-gray-50'
-                }`}>Член</th>
+                }`}>Members</th>
                 {weekDays.map((day) => (
                   <th key={day.toISOString()} className="px-1.5 sm:px-2 md:px-3 lg:px-4 py-3">
                     <div className={`mx-auto w-full max-w-[110px] rounded-xl border ${theme === 'dark' ? 'border-white/10 bg-white/5 text-white' : 'border-gray-200 bg-white text-gray-900'} shadow-sm text-center`}>
@@ -521,7 +531,7 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
                       </td>
                     )
                   })}
-                  <td className={`px-4 py-3 text-sm ${headingColor}`}>
+                  <td className={`px-4 py-3 text-sm ${headingColor} text-center`}>
                     <div className="space-y-1">
                       <div>Часов: {stats.totalHours.toFixed(1)}</div>
                       <div>Выходных: {stats.daysOff}</div>

@@ -332,18 +332,28 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
       >
         <button
           onClick={() => navigateWeek('prev')}
-          className="w-full sm:w-auto px-3 sm:px-4 py-2 text-xs sm:text-sm md:text-base bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-lg transition-colors touch-manipulation active:scale-95"
+          className={`w-full sm:w-auto px-3 sm:px-4 py-2 text-xs sm:text-sm md:text-base rounded-lg transition-colors touch-manipulation active:scale-95 flex items-center justify-center gap-2 whitespace-nowrap ${
+            theme === 'dark'
+              ? 'border border-gray-700 bg-gray-900/60 hover:border-[#4E6E49]/50 hover:bg-gray-900'
+              : 'border border-gray-200 bg-white hover:border-[#4E6E49]/40 hover:bg-gray-50'
+          }`}
         >
-          ← Предыдущая неделя
+          <span>←</span>
+          <span>Предыдущая неделя</span>
         </button>
         <span className={`${headingColor} font-semibold text-center text-xs sm:text-sm md:text-base whitespace-nowrap`}>
           {formatDate(weekDays[0], 'dd.MM.yyyy')} - {formatDate(weekDays[6], 'dd.MM.yyyy')}
         </span>
         <button
           onClick={() => navigateWeek('next')}
-          className="w-full sm:w-auto px-3 sm:px-4 py-2 text-xs sm:text-sm md:text-base bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-lg transition-colors touch-manipulation active:scale-95"
+          className={`w-full sm:w-auto px-3 sm:px-4 py-2 text-xs sm:text-sm md:text-base rounded-lg transition-colors touch-manipulation active:scale-95 flex items-center justify-center gap-2 whitespace-nowrap ${
+            theme === 'dark'
+              ? 'border border-gray-700 bg-gray-900/60 hover:border-[#4E6E49]/50 hover:bg-gray-900'
+              : 'border border-gray-200 bg-white hover:border-[#4E6E49]/40 hover:bg-gray-50'
+          }`}
         >
-          Следующая неделя →
+          <span>Следующая неделя</span>
+          <span>→</span>
         </button>
       </div>
 

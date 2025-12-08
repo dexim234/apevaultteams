@@ -579,7 +579,7 @@ export const Management = () => {
           </div>
 
           <div className={`${surfaceCardClass} p-3 sm:p-4 space-y-2`}>
-            <p className={`text-sm font-semibold ${headingColor}`}>Члены</p>
+            <p className={`text-sm font-semibold ${headingColor}`}>Members</p>
             <div className="flex gap-2 overflow-x-auto pb-1">
               <button
                 onClick={() => setSelectedUserId(null)}
@@ -591,7 +591,7 @@ export const Management = () => {
                     : 'bg-gray-50 border-gray-200 text-gray-700 hover:border-[#4E6E49]/40'
                 }`}
               >
-                Все члены
+                Все Members
               </button>
               {TEAM_MEMBERS.map((member) => (
                 <button

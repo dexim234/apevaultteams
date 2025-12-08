@@ -348,7 +348,7 @@ export const DayStatusForm = ({ type, status, onClose, onSave }: DayStatusFormPr
   const selectedNames = selectedUserIds.map((id) => getMemberName(id)).join(', ')
 
   const steps = [
-    { label: 'Члены', detail: selectedNames || 'Не выбрано', done: selectedUserIds.length > 0 || !!status, anchor: '#members' },
+    { label: 'Members', detail: selectedNames || 'Не выбрано', done: selectedUserIds.length > 0 || !!status, anchor: '#members' },
     { label: 'Даты', detail: previewDates.slice(0, 2).join(' · '), done: previewDates.length > 0, anchor: '#dates' },
     { label: 'Комментарий', detail: comment ? 'Заполнен' : 'Необязателен', done: !!comment, anchor: '#notes' },
   ]
@@ -445,7 +445,7 @@ export const DayStatusForm = ({ type, status, onClose, onSave }: DayStatusFormPr
                   👥
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Члены</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Members</p>
                   <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 line-clamp-2">{selectedNames || 'Не выбрано'}</p>
                 </div>
               </div>
@@ -514,7 +514,7 @@ export const DayStatusForm = ({ type, status, onClose, onSave }: DayStatusFormPr
             {adminBulkMode && (
               <div id="members" className="scroll-mt-20">
                 <label className={`block text-xs sm:text-sm font-medium mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                  Члены
+                  Members
                 </label>
                 <div className="space-y-3 rounded-2xl border border-dashed border-[#4E6E49]/30 p-3 sm:p-4 bg-[#4E6E49]/5 dark:bg-[#4E6E49]/10">
                   <div className="flex flex-wrap gap-2">
