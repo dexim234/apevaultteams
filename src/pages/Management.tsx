@@ -421,19 +421,16 @@ export const Management = () => {
           <div className="relative z-10 grid grid-cols-1 gap-5">
             <div className={`${surfaceCardClass} backdrop-blur p-4 sm:p-5 space-y-4`}>
               <div className="flex flex-col gap-4 sm:gap-5 lg:flex-row lg:items-center lg:justify-between">
-                <div className="flex items-start gap-3">
-                  <div className="p-4 rounded-2xl bg-white/80 dark:bg-white/5 border border-white/40 dark:border-white/10 shadow-lg">
-                    <CalendarCheck className="w-7 h-7 text-[#4E6E49]" />
+                <div className="flex items-center gap-3">
+                  <div className="p-3 rounded-2xl bg-white/80 dark:bg-white/5 border border-white/40 dark:border-white/10 shadow-lg">
+                    <CalendarCheck className="w-6 h-6 text-[#4E6E49]" />
                   </div>
-                  <div className="space-y-2">
-                    <h1 className="text-xl sm:text-3xl font-extrabold">
+                  <div className="flex items-center">
+                    <h1 className="text-xl sm:text-3xl font-extrabold leading-tight">
                       <span className="bg-gradient-to-r from-[#4E6E49] via-emerald-600 to-sky-500 text-transparent bg-clip-text">
                         Расписание команды
                       </span>
                     </h1>
-                    <p className={`${labelColor} text-sm sm:text-base leading-snug max-w-2xl`}>
-                      Здесь можно управлять слотами, сменами и статусами.
-                    </p>
                   </div>
                 </div>
               </div>
