@@ -363,8 +363,10 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory }: C
         [category]: activePayload,
       }
 
+      const userId = callToEdit?.userId || user?.id || 'unknown'
+
       const baseData: Omit<Call, 'id'> = {
-        userId: callToEdit?.userId || user?.id || '',
+        userId,
         category,
         details: payloadDetails,
         createdAt: callToEdit?.createdAt || new Date().toISOString(),
@@ -389,7 +391,8 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory }: C
       onSuccess?.()
     } catch (err) {
       console.error('Error creating call:', err)
-      setError('Ошибка при сохранении сигнала. Попробуйте ещё раз.')
+      const message = (err as any)?.message || (err as any)?.code || 'Ошибка при сохранении сигнала'
+      setError(message)
     } finally {
       setLoading(false)
     }

@@ -399,13 +399,22 @@ export const CallPage = () => {
                 </div>
                 <div className="flex flex-col justify-center">
                   <h1 className="text-2xl sm:text-3xl font-extrabold text-white drop-shadow-lg leading-tight">
-                    HUB
+                    Signals HUB
                   </h1>
                 </div>
               </div>
             </div>
             <div className="flex flex-wrap items-center gap-3" />
           </div>
+        </div>
+
+        <div className="flex justify-end">
+          <button
+            onClick={() => { setEditingCall(null); setFormCategory('memecoins'); setShowForm(true) }}
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-white bg-gradient-to-r from-[#4E6E49] via-emerald-600 to-sky-600 shadow-lg hover:shadow-xl transition-all text-sm font-semibold"
+          >
+            Добавить сигнал
+          </button>
         </div>
 
         {/* Category mini-cards (aligned with Tasks style) */}

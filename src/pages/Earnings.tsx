@@ -184,8 +184,7 @@ export const Earnings = () => {
                     <h1
                       className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white flex items-center gap-2 sm:gap-3 drop-shadow-lg"
                     >
-                      <span className="sm:hidden">Заработок</span>
-                      <span className="hidden sm:inline">Заработок команды</span>
+                      <span>Заработок команды</span>
                       <Sparkles
                         className={`w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0 ${
                           theme === 'dark' ? 'text-yellow-300' : 'text-yellow-500'
