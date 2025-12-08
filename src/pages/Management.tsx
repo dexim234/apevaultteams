@@ -419,56 +419,44 @@ export const Management = () => {
             <div className="absolute bottom-[-140px] left-14 w-80 h-80 bg-gradient-to-tr from-amber-300/12 via-[#4E6E49]/12 to-transparent blur-3xl" />
           </div>
           <div className="relative z-10 grid grid-cols-1 gap-5">
-            <div className="flex flex-col gap-4 sm:gap-6 lg:flex-row lg:items-start lg:justify-between">
-              <div className="flex items-start gap-3">
-                <div className="p-4 rounded-2xl bg-white/80 dark:bg-white/5 border border-white/40 dark:border-white/10 shadow-lg">
-                  <CalendarCheck className="w-7 h-7 text-[#4E6E49]" />
-                </div>
-                <div className="space-y-2">
-                  <h1 className="text-xl sm:text-3xl font-extrabold">
-                    <span className="bg-gradient-to-r from-[#4E6E49] via-emerald-700 to-yellow-600 text-transparent bg-clip-text">
-                      Расписание команды
-                    </span>
-                  </h1>
-                  <p className={`${labelColor} text-sm sm:text-base leading-snug max-w-2xl`}>
-                    Здесь можно управлять слотами, сменами и статусами.
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {[
-                      { href: '#schedule-overview', label: 'Обзор' },
-                      { href: '#schedule-actions', label: 'Действия' },
-                      { href: '#schedule-view', label: 'Расписание' },
-                    ].map((item) => (
-                      <a
-                        key={item.href}
-                        href={item.href}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition ${
-                          theme === 'dark'
-                            ? 'border-white/10 bg-white/5 text-white hover:border-[#4E6E49]/50'
-                            : 'border-gray-200 bg-white text-gray-800 hover:border-[#4E6E49]/50 hover:text-[#4E6E49]'
-                        }`}
-                      >
-                        {item.label}
-                      </a>
-                    ))}
+            <div className={`${surfaceCardClass} backdrop-blur p-4 sm:p-5 space-y-4`}>
+              <div className="flex flex-col gap-4 sm:gap-5 lg:flex-row lg:items-center lg:justify-between">
+                <div className="flex items-start gap-3">
+                  <div className="p-4 rounded-2xl bg-white/80 dark:bg-white/5 border border-white/40 dark:border-white/10 shadow-lg">
+                    <CalendarCheck className="w-7 h-7 text-[#4E6E49]" />
+                  </div>
+                  <div className="space-y-2">
+                    <h1 className="text-xl sm:text-3xl font-extrabold">
+                      <span className="bg-gradient-to-r from-[#4E6E49] via-emerald-700 to-yellow-600 text-transparent bg-clip-text">
+                        Расписание команды
+                      </span>
+                    </h1>
+                    <p className={`${labelColor} text-sm sm:text-base leading-snug max-w-2xl`}>
+                      Здесь можно управлять слотами, сменами и статусами.
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {[
+                        { href: '#schedule-overview', label: 'Обзор' },
+                        { href: '#schedule-actions', label: 'Действия' },
+                        { href: '#schedule-view', label: 'Расписание' },
+                      ].map((item) => (
+                        <a
+                          key={item.href}
+                          href={item.href}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition ${
+                            theme === 'dark'
+                              ? 'border-white/10 bg-white/5 text-white hover:border-[#4E6E49]/50'
+                              : 'border-gray-200 bg-white text-gray-800 hover:border-[#4E6E49]/50 hover:text-[#4E6E49]'
+                          }`}
+                        >
+                          {item.label}
+                        </a>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
-                <button
-                  onClick={() => {
-                    setActionType('add-slot')
-                    handleAddSlot()
-                  }}
-                  className="w-full sm:w-auto px-4 sm:px-6 py-3 sm:py-4 bg-gradient-to-r from-[#4E6E49] to-[#4E6E49] hover:from-[#4E6E49] hover:to-[#4E6E49] text-white rounded-lg sm:rounded-xl transition-all duration-200 flex items-center justify-center gap-2 text-sm sm:text-base font-semibold shadow-lg hover:shadow-xl active:scale-95 sm:hover:scale-105 transform touch-manipulation"
-                >
-                  <PlusCircle className="w-5 h-5 flex-shrink-0" />
-                  <span className="whitespace-nowrap">Добавить слот</span>
-                </button>
-              </div>
-            </div>
 
-            <div className={`${surfaceCardClass} backdrop-blur p-4 sm:p-5`}>
               <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
                 {statCards.map((item) => {
                   const tone = statToneMap[item.tone]
