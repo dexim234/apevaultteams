@@ -60,18 +60,26 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
       const last = ranges[ranges.length - 1]
       const commentsEqual = (last?.comment || '') === (s.comment || '')
 
-      if (
-        last &&
+      // Проверяем, можно ли объединить с предыдущим диапазоном
+      const canMerge = last &&
         last.userId === s.userId &&
         last.type === s.type &&
         commentsEqual &&
-        isAdjacentOrOverlap(last.end, start) // соседние или пересекающиеся даты
-      ) {
+        isAdjacentOrOverlap(last.end, start)
+
+      if (canMerge) {
+        // Расширяем диапазон до конца текущего статуса
         if (end > last.end) {
           last.end = end
         }
         last.originalIds.push(s.id)
+        // Обновляем primary, если текущий статус раньше
+        if (start < last.start) {
+          last.start = start
+          last.primary = s
+        }
       } else {
+        // Создаем новый диапазон
         ranges.push({
           id: `${s.id}-range`,
           userId: s.userId,
@@ -84,6 +92,7 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
         })
       }
     }
+    
     return ranges
   }, [statuses])
 
@@ -333,17 +342,26 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
                       return oldIdMap[range.userId] === u.id
                     })
                     const displayName = statusUserFallback?.name || range.userId
-                    const firstVisibleDate = range.start < weekStartStr ? weekStartStr : range.start
+                    const weekStartDate = parseISO(weekStartStr)
+                    const rangeStartDate = parseISO(range.start)
+                    
+                    // Определяем первый видимый день диапазона в рамках недели
+                    const firstVisibleDate = rangeStartDate < weekStartDate ? weekStartDate : rangeStartDate
+                    const firstVisibleDateStr = formatDate(firstVisibleDate, 'yyyy-MM-dd')
 
-                    // Показываем карточку диапазонного статуса один раз — в первый видимый день диапазона
-                    if (range.start !== range.end && dateStr !== firstVisibleDate) {
+                    // Показываем карточку диапазонного статуса только один раз — в первый видимый день диапазона
+                    // Если диапазон объединен (несколько статусов) или состоит из нескольких дней, показываем только в первый день
+                    const isMultiDay = range.start !== range.end
+                    const isMerged = range.originalIds.length > 1
+                    
+                    if ((isMultiDay || isMerged) && dateStr !== firstVisibleDateStr) {
                       return null
                     }
 
                     const dateRangeLabel =
                       range.start !== range.end
-                        ? `${formatDate(new Date(range.start), 'dd.MM')}–${formatDate(new Date(range.end), 'dd.MM')}`
-                        : formatDate(new Date(range.start), 'dd.MM')
+                        ? `${formatDate(parseISO(range.start), 'dd.MM')}–${formatDate(parseISO(range.end), 'dd.MM')}`
+                        : formatDate(parseISO(range.start), 'dd.MM')
                     return (
                       <div
                         key={range.id}
