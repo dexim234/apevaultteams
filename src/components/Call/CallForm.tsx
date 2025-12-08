@@ -44,13 +44,13 @@ const networkOptions: { value: Network; label: string }[] = [
   { value: 'polygon', label: 'Polygon' },
 ]
 
-const CATEGORY_META: Record<CallCategory, { label: string; gradient: string; icon: JSX.Element }> = {
-  memecoins: { label: 'Мемкоины', gradient: 'from-emerald-400 to-teal-500', icon: <Rocket className="w-5 h-5" /> },
-  futures: { label: 'Фьючерсы', gradient: 'from-blue-400 to-indigo-500', icon: <LineChart className="w-5 h-5" /> },
-  nft: { label: 'NFT', gradient: 'from-purple-400 to-pink-500', icon: <Image className="w-5 h-5" /> },
-  spot: { label: 'Спот', gradient: 'from-amber-400 to-orange-500', icon: <Coins className="w-5 h-5" /> },
-  polymarket: { label: 'Polymarket', gradient: 'from-rose-400 to-red-500', icon: <Target className="w-5 h-5" /> },
-  staking: { label: 'Стейкинг', gradient: 'from-cyan-400 to-blue-500', icon: <Shield className="w-5 h-5" /> },
+const CATEGORY_META: Record<CallCategory, { label: string; gradient: string; icon: JSX.Element; pastelBg: string; pastelBorder: string; pastelText: string }> = {
+  memecoins: { label: 'Мемкоины', gradient: 'from-emerald-300 to-teal-400', icon: <Rocket className="w-5 h-5" />, pastelBg: 'bg-emerald-50', pastelBorder: 'border-emerald-100', pastelText: 'text-emerald-800' },
+  futures: { label: 'Фьючерсы', gradient: 'from-sky-300 to-indigo-400', icon: <LineChart className="w-5 h-5" />, pastelBg: 'bg-sky-50', pastelBorder: 'border-sky-100', pastelText: 'text-sky-800' },
+  nft: { label: 'NFT', gradient: 'from-purple-300 to-pink-300', icon: <Image className="w-5 h-5" />, pastelBg: 'bg-purple-50', pastelBorder: 'border-purple-100', pastelText: 'text-purple-800' },
+  spot: { label: 'Спот', gradient: 'from-amber-300 to-orange-300', icon: <Coins className="w-5 h-5" />, pastelBg: 'bg-amber-50', pastelBorder: 'border-amber-100', pastelText: 'text-amber-800' },
+  polymarket: { label: 'Polymarket', gradient: 'from-rose-300 to-red-300', icon: <Target className="w-5 h-5" />, pastelBg: 'bg-rose-50', pastelBorder: 'border-rose-100', pastelText: 'text-rose-800' },
+  staking: { label: 'Стейкинг', gradient: 'from-cyan-300 to-blue-300', icon: <Shield className="w-5 h-5" />, pastelBg: 'bg-cyan-50', pastelBorder: 'border-cyan-100', pastelText: 'text-cyan-800' },
 }
 
 const CATEGORY_FIELDS: Record<CallCategory, FieldConfig[]> = {
@@ -476,15 +476,21 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory }: C
                 key={key}
                 type="button"
                 onClick={() => setCategory(key)}
-                className={`relative overflow-hidden rounded-xl px-3 py-3 border ${active ? 'border-transparent shadow-lg shadow-emerald-500/30' : borderColor} transition-all ${theme === 'dark' ? 'bg-gray-800/70' : 'bg-white'}`}
+                className={`relative overflow-hidden rounded-xl px-3 py-2.5 border text-left transition-all ${
+                  active
+                    ? 'border-transparent shadow-lg shadow-emerald-500/30 scale-[1.01]'
+                    : theme === 'dark'
+                    ? 'border-gray-700 bg-gray-800/70'
+                    : `${meta.pastelBorder} ${meta.pastelBg}`
+                }`}
               >
                 <div className={`absolute inset-0 opacity-90 ${active ? `bg-gradient-to-r ${meta.gradient}` : 'bg-gray-900/5 dark:bg-white/5'}`} />
-                <div className="relative flex items-center gap-3 text-left">
-                  <span className={`p-2 rounded-lg ${active ? 'bg-white/20 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200'}`}>
+                <div className="relative flex items-center gap-3">
+                  <span className={`p-2 rounded-lg ${active ? 'bg-white/20 text-white' : 'bg-white/80 dark:bg-gray-700 text-gray-700 dark:text-gray-200'}`}>
                     {meta.icon}
                   </span>
                   <div>
-                    <p className={`font-semibold ${active ? 'text-white' : textColor}`}>{meta.label}</p>
+                    <p className={`font-semibold text-sm ${active ? 'text-white' : meta.pastelText}`}>{meta.label}</p>
                   </div>
                   {active && <Wand2 className="w-4 h-4 text-white ml-auto" />}
                 </div>

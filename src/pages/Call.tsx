@@ -1,4 +1,4 @@
-// Call page redesigned for multi-domain signals
+// Signals HUB page redesigned for multi-domain signals
 import { useState, useEffect, useMemo, type JSX } from 'react'
 import { useThemeStore } from '@/store/themeStore'
 import { Layout } from '@/components/Layout'
@@ -7,7 +7,6 @@ import { getCalls, deleteCall } from '@/services/firestoreService'
 import type { Call, CallCategory, CallRiskLevel } from '@/types'
 import { TEAM_MEMBERS } from '@/types'
 import {
-  Plus,
   X,
   Edit,
   Trash2,
@@ -18,8 +17,6 @@ import {
   Sparkles,
   Filter,
   Shield,
-  Flame,
-  Activity,
   Rocket,
   LineChart,
   Image,
@@ -400,32 +397,15 @@ export const CallPage = () => {
                 <div className="p-3 rounded-2xl bg-gradient-to-br from-[#4E6E49] via-emerald-500 to-sky-500 text-white shadow-lg shadow-emerald-500/30">
                   <Zap className="w-6 h-6" />
                 </div>
-                <div>
+                <div className="flex flex-col justify-center">
                   <p className="text-[11px] uppercase tracking-[0.2em] text-[#4E6E49]">Signals Hub</p>
-                  <h1 className="text-2xl sm:text-3xl font-extrabold bg-gradient-to-r from-[#4E6E49] via-emerald-500 to-sky-500 bg-clip-text text-transparent">
-                    Call: мульти-сигналы
+                  <h1 className="text-2xl sm:text-3xl font-extrabold bg-gradient-to-r from-[#4E6E49] via-emerald-500 to-sky-500 bg-clip-text text-transparent leading-tight">
+                    Signals HUB
                   </h1>
-                  <p className={`${subtleColor} text-sm`}>Мемы, фьючи, спот, NFT, Polymarket и стейкинг в одном окне.</p>
                 </div>
               </div>
             </div>
-            <div className="flex flex-wrap items-center gap-3">
-              <button
-                onClick={() => { setEditingCall(null); setFormCategory('memecoins'); setShowForm(true) }}
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-white bg-gradient-to-r from-[#4E6E49] via-emerald-600 to-sky-600 shadow-lg hover:shadow-xl transition-all"
-              >
-                <Plus className="w-5 h-5" />
-                Новый сигнал
-              </button>
-              <div className="flex items-center gap-2 px-3 py-2 rounded-xl border border-emerald-500/30 text-emerald-600 dark:text-emerald-300 bg-emerald-500/10">
-                <Activity className="w-4 h-4" />
-                <span className="text-sm font-semibold">Активных: {totals.active}</span>
-              </div>
-              <div className="flex items-center gap-2 px-3 py-2 rounded-xl border border-amber-500/30 text-amber-600 dark:text-amber-200 bg-amber-500/10">
-                <Flame className="w-4 h-4" />
-                <span className="text-sm font-semibold">High risk: {totals.highRisk}</span>
-              </div>
-            </div>
+            <div className="flex flex-wrap items-center gap-3" />
           </div>
         </div>
 
@@ -564,7 +544,7 @@ export const CallPage = () => {
                     <X className={`w-5 h-5 ${subtleColor}`} />
                   </button>
                 </div>
-                <div className="px-6 pb-6 pt-2 overflow-y-auto flex-1">
+                <div className="px-6 pb-6 pt-2 overflow-y-auto flex-1 max-h-[75vh]">
                   <CallForm
                     callToEdit={editingCall}
                     onSuccess={handleSuccess}

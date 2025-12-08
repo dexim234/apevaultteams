@@ -83,7 +83,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                 className="nav-chip"
               >
                 <Zap className="w-4 h-4" />
-                <span>Call</span>
+                <span>HUB</span>
                 <ArrowUpRight className="w-4 h-4 opacity-70" />
               </Link>
 
@@ -234,7 +234,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
               >
                 <Zap className="w-5 h-5" />
                 <div className="flex items-center gap-1">
-                  <span className="text-[11px] font-semibold">Call</span>
+                  <span className="text-[11px] font-semibold">HUB</span>
                   <ArrowUpRight className="w-3 h-3 opacity-70" />
                 </div>
               </Link>
