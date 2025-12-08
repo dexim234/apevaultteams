@@ -568,7 +568,7 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
                   )
                 })}
 
-                {daySlots.length === 0 && dayStatusRanges.length === 0 && (
+                {daySlots.length === 0 && dayStatuses.length === 0 && (
                   <p className={`text-sm ${subtleColor}`}>
                     Нет данных
                   </p>
