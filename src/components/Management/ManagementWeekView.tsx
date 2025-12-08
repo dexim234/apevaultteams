@@ -93,6 +93,17 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
       }
     }
     
+    // Отладочная информация
+    if (ranges.some(r => r.originalIds.length > 1)) {
+      console.log('Объединенные диапазоны:', ranges.filter(r => r.originalIds.length > 1).map(r => ({
+        type: r.type,
+        start: r.start,
+        end: r.end,
+        count: r.originalIds.length,
+        ids: r.originalIds
+      })))
+    }
+    
     return ranges
   }, [statuses])
 
@@ -350,11 +361,18 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
                     const firstVisibleDateStr = formatDate(firstVisibleDate, 'yyyy-MM-dd')
 
                     // Показываем карточку диапазонного статуса только один раз — в первый видимый день диапазона
-                    // Если диапазон объединен (несколько статусов) или состоит из нескольких дней, показываем только в первый день
                     const isMultiDay = range.start !== range.end
                     const isMerged = range.originalIds.length > 1
                     
-                    if ((isMultiDay || isMerged) && dateStr !== firstVisibleDateStr) {
+                    // Если это объединенный диапазон (несколько статусов объединены), показываем только в первый день
+                    if (isMerged) {
+                      if (dateStr !== firstVisibleDateStr) {
+                        return null
+                      }
+                    }
+                    
+                    // Если это диапазон из нескольких дней, показываем только в первый день
+                    if (isMultiDay && dateStr !== firstVisibleDateStr) {
                       return null
                     }
 
