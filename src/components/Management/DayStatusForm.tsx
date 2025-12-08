@@ -367,32 +367,16 @@ export const DayStatusForm = ({ type, status, onClose, onSave }: DayStatusFormPr
   }
 
   const headingTitle = `${status ? 'Редактировать' : 'Добавить'} ${nounByType[type]}`
-  const badgeLabel = typeLabels[type]
 
   return (
     <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-xl flex items-start sm:items-center justify-center z-[70] p-4 sm:p-6 touch-manipulation overflow-y-auto overscroll-contain modal-scroll">
       <div className={`w-full max-w-[52rem] rounded-3xl shadow-[0_28px_80px_rgba(0,0,0,0.55)] border ${theme === 'dark' ? 'bg-[#0b1222] border-white/10' : 'bg-white border-slate-200'} max-h-[85dvh] sm:max-h-[calc(100dvh-96px)] overflow-y-auto relative`}>
         <div className="relative p-4 sm:p-6 lg:p-7 flex flex-col h-full min-h-0 overflow-y-auto modal-scroll">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-            <div className="space-y-3">
-              <div className="flex items-center gap-2 text-[11px] font-semibold tracking-wide">
-                <span className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-black/10 backdrop-blur text-[#4E6E49] border border-[#4E6E49]/30 uppercase">
-                  {badgeLabel}
-                </span>
-                <span className={`${theme === 'dark' ? 'text-white' : 'text-gray-900'} sm:inline hidden`}>расписание команды</span>
-                <span className={`${theme === 'dark' ? 'text-white' : 'text-gray-900'} sm:hidden inline`}>Расписание</span>
-              </div>
-              <div className="flex items-center gap-3 flex-wrap">
-                <h3 className={`text-2xl sm:text-3xl font-bold ${headingColor}`}>
-                  {headingTitle}
-                </h3>
-                <span className="text-xs px-3 py-1 rounded-full bg-white/20 dark:bg-white/10 border border-white/20 text-gray-800 dark:text-gray-100">
-                  Быстрые шаги и визуальный контроль
-                </span>
-              </div>
-              <p className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} text-sm leading-relaxed max-w-2xl`}>
-                Управляй расписанием команды через компактные шаги, визуальные подсказки и мгновенный превью выбранных дат. Всё адаптируется под экран и режим.
-              </p>
+            <div className="space-y-2">
+              <h3 className={`text-2xl sm:text-3xl font-bold ${headingColor}`}>
+                {headingTitle}
+              </h3>
               <div className="flex flex-wrap gap-2">
                 {steps.map((step, idx) => (
                   <a

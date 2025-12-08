@@ -44,6 +44,7 @@ export const Management = () => {
   const [editingSlot, setEditingSlot] = useState<any>(null)
   const [editingStatus, setEditingStatus] = useState<any>(null)
   const [actionType, setActionType] = useState<ActionType>('add-slot')
+  const [refreshKey, setRefreshKey] = useState(0)
   const [stats, setStats] = useState({
     slotsThisWeek: 0,
     activeMembers: 0,
@@ -294,10 +295,8 @@ export const Management = () => {
     setStatusType(null)
     setEditingSlot(null)
     setEditingStatus(null)
-    // Force reload after a short delay
-    setTimeout(() => {
-      window.location.reload()
-    }, 500)
+    loadStats()
+    setRefreshKey((key) => key + 1)
   }
 
   const headingColor = theme === 'dark' ? 'text-white' : 'text-gray-900'
@@ -629,6 +628,7 @@ export const Management = () => {
               <ManagementWeekView
                 selectedUserId={selectedUserId}
                 slotFilter={slotFilter}
+                refreshKey={refreshKey}
                 onEditSlot={handleEditSlot}
                 onEditStatus={handleEditStatus}
               />
@@ -636,6 +636,7 @@ export const Management = () => {
               <ManagementTable
                 selectedUserId={selectedUserId}
                 slotFilter={slotFilter}
+                refreshKey={refreshKey}
                 onEditSlot={handleEditSlot}
                 onEditStatus={handleEditStatus}
               />

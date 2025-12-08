@@ -17,9 +17,10 @@ interface ManagementWeekViewProps {
   slotFilter: SlotFilter
   onEditSlot: (slot: WorkSlot) => void
   onEditStatus: (status: DayStatus) => void
+  refreshKey: number
 }
 
-export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onEditStatus }: ManagementWeekViewProps) => {
+export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onEditStatus, refreshKey }: ManagementWeekViewProps) => {
   const { theme } = useThemeStore()
   const { user } = useAuthStore()
   const { isAdmin } = useAdminStore()
@@ -56,7 +57,7 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
 
   useEffect(() => {
     loadData()
-  }, [selectedUserId, selectedWeek])
+  }, [selectedUserId, selectedWeek, refreshKey])
 
   // Reload when window gets focus (user returns to tab)
   useEffect(() => {

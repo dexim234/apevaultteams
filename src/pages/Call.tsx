@@ -553,9 +553,9 @@ export const CallPage = () => {
         {/* Form Modal */}
         {showForm && (
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[70] flex items-start sm:items-center justify-center p-4 overflow-y-auto">
-            <div className={`${bgColor} rounded-2xl shadow-2xl border ${borderColor} max-w-3xl w-full max-h-[90vh] overflow-y-auto`}>
+            <div className={`${bgColor} rounded-2xl shadow-2xl border ${borderColor} max-w-3xl w-full max-h-[90vh] overflow-hidden`}>
               <div className="flex flex-col h-full">
-                <div className="p-6 flex items-center justify-between border-b border-gray-800/50 sticky top-0 z-10" style={{ background: 'inherit' }}>
+                <div className={`p-6 flex items-center justify-between sticky top-0 z-20 ${bgColor} border-b ${borderColor} shadow-sm`}>
                   <h2 className={`text-2xl font-bold ${textColor}`}>{editingCall ? 'Редактировать сигнал' : 'Создать сигнал'}</h2>
                   <button
                     onClick={handleCancel}
@@ -564,7 +564,7 @@ export const CallPage = () => {
                     <X className={`w-5 h-5 ${subtleColor}`} />
                   </button>
                 </div>
-                <div className="px-6 pb-6 pt-2 overflow-y-auto">
+                <div className="px-6 pb-6 pt-2 overflow-y-auto flex-1">
                   <CallForm
                     callToEdit={editingCall}
                     onSuccess={handleSuccess}

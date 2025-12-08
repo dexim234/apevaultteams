@@ -16,9 +16,10 @@ interface ManagementTableProps {
   slotFilter: SlotFilter
   onEditSlot: (slot: WorkSlot) => void
   onEditStatus: (status: DayStatus) => void
+  refreshKey: number
 }
 
-export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEditStatus }: ManagementTableProps) => {
+export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEditStatus, refreshKey }: ManagementTableProps) => {
   const { theme } = useThemeStore()
   const { user } = useAuthStore()
   const { isAdmin } = useAdminStore()
@@ -53,7 +54,7 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
 
   useEffect(() => {
     loadData()
-  }, [selectedUserId, selectedWeek])
+  }, [selectedUserId, selectedWeek, refreshKey])
 
   // Reload when window gets focus (user returns to tab)
   useEffect(() => {

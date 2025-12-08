@@ -485,7 +485,6 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory }: C
                   </span>
                   <div>
                     <p className={`font-semibold ${active ? 'text-white' : textColor}`}>{meta.label}</p>
-                    <p className={`text-xs ${active ? 'text-white/80' : subtle}`}>Кликните для шаблона полей</p>
                   </div>
                   {active && <Wand2 className="w-4 h-4 text-white ml-auto" />}
                 </div>
@@ -507,7 +506,7 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory }: C
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4">
           {CATEGORY_FIELDS[category].map((field) => (
             <div key={field.key} className="space-y-2">
               {field.type !== 'checkbox' && (
