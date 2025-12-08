@@ -409,14 +409,14 @@ export const Management = () => {
           id="schedule-overview"
           className={`relative overflow-hidden ${sectionCardClass} p-5 sm:p-6 md:p-8 ${
             theme === 'dark'
-              ? 'bg-gradient-to-br from-[#1b2435] via-[#121a27] to-[#0c131e]'
-              : 'bg-gradient-to-br from-white via-green-50/30 to-white'
+              ? 'bg-gradient-to-br from-[#0e1b2c] via-[#0c1827] to-[#0a1420]'
+              : 'bg-gradient-to-br from-white via-emerald-50/40 to-sky-50'
           }`}
         >
           <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute -top-32 -left-16 w-80 h-80 bg-gradient-to-br from-[#4E6E49]/18 via-transparent to-transparent blur-3xl" />
-            <div className="absolute top-0 right-0 w-[26rem] h-[26rem] bg-gradient-to-bl from-blue-400/16 via-emerald-400/12 to-transparent blur-3xl" />
-            <div className="absolute bottom-[-140px] left-14 w-80 h-80 bg-gradient-to-tr from-amber-300/12 via-[#4E6E49]/12 to-transparent blur-3xl" />
+            <div className="absolute -top-32 -left-16 w-80 h-80 bg-gradient-to-br from-[#4E6E49]/18 via-sky-500/8 to-transparent blur-3xl" />
+            <div className="absolute top-0 right-0 w-[26rem] h-[26rem] bg-gradient-to-bl from-sky-400/14 via-emerald-400/12 to-transparent blur-3xl" />
+            <div className="absolute bottom-[-140px] left-14 w-80 h-80 bg-gradient-to-tr from-sky-300/12 via-[#4E6E49]/12 to-transparent blur-3xl" />
           </div>
           <div className="relative z-10 grid grid-cols-1 gap-5">
             <div className={`${surfaceCardClass} backdrop-blur p-4 sm:p-5 space-y-4`}>
@@ -427,32 +427,13 @@ export const Management = () => {
                   </div>
                   <div className="space-y-2">
                     <h1 className="text-xl sm:text-3xl font-extrabold">
-                      <span className="bg-gradient-to-r from-[#4E6E49] via-emerald-700 to-yellow-600 text-transparent bg-clip-text">
+                      <span className="bg-gradient-to-r from-[#4E6E49] via-emerald-600 to-sky-500 text-transparent bg-clip-text">
                         Расписание команды
                       </span>
                     </h1>
                     <p className={`${labelColor} text-sm sm:text-base leading-snug max-w-2xl`}>
                       Здесь можно управлять слотами, сменами и статусами.
                     </p>
-                    <div className="flex flex-wrap gap-2">
-                      {[
-                        { href: '#schedule-overview', label: 'Обзор' },
-                        { href: '#schedule-actions', label: 'Действия' },
-                        { href: '#schedule-view', label: 'Расписание' },
-                      ].map((item) => (
-                        <a
-                          key={item.href}
-                          href={item.href}
-                          className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition ${
-                            theme === 'dark'
-                              ? 'border-white/10 bg-white/5 text-white hover:border-[#4E6E49]/50'
-                              : 'border-gray-200 bg-white text-gray-800 hover:border-[#4E6E49]/50 hover:text-[#4E6E49]'
-                          }`}
-                        >
-                          {item.label}
-                        </a>
-                      ))}
-                    </div>
                   </div>
                 </div>
               </div>
@@ -546,7 +527,7 @@ export const Management = () => {
             </div>
           </div>
 
-          {/* Actions block moved under filters */}
+          {/* Actions block */}
           <div className={`${surfaceCardClass} p-3 sm:p-4 space-y-3`}>
             <div className="flex items-center justify-between">
               <p className={`text-sm font-semibold ${headingColor}`}>Действие</p>
