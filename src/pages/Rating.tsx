@@ -144,7 +144,6 @@ export const Rating = () => {
   const headingColor = theme === 'dark' ? 'text-white' : 'text-gray-900'
   const cardBg = theme === 'dark' ? 'bg-[#151c2a]' : 'bg-white'
   const calmBorder = theme === 'dark' ? 'border-white/10' : 'border-gray-200'
-  const softSurface = theme === 'dark' ? 'bg-white/5' : 'bg-gray-50'
   const heroLabelColor = theme === 'dark' ? 'text-white/70' : 'text-slate-600'
   const heroValueColor = theme === 'dark' ? 'text-white' : 'text-slate-900'
 
