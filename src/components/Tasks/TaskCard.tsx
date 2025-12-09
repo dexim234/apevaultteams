@@ -101,7 +101,6 @@ export const TaskCard = ({ task, onEdit, onDelete, onUpdate }: TaskCardProps) =>
     return { approvals, approved, total: assigneeIds.length }
   }
 
-  const currentStage = getCurrentStage()
   const { approvals, approved, total } = getApprovalStats()
   const userApproval = approvals.find((a) => a.userId === user?.id)
   const canExecutorConfirm = isExecutor() && task.status === 'in_progress' && (!userApproval || userApproval.status !== 'approved')

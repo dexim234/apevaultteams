@@ -34,7 +34,6 @@ export const TaskKanban = ({ tasks, onUpdate, onEdit, onDelete }: TaskKanbanProp
   const headingColor = theme === 'dark' ? 'text-white' : 'text-gray-900'
   const cardBg = theme === 'dark' ? 'bg-[#1a1a1a]' : 'bg-white'
   const borderColor = theme === 'dark' ? 'border-gray-800' : 'border-gray-300'
-  const inputBg = theme === 'dark' ? 'bg-gray-800' : 'bg-white'
 
   const statuses: TaskStatus[] = ['in_progress', 'completed', 'closed']
 
