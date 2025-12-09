@@ -144,10 +144,6 @@ export const Rating = () => {
   const headingColor = theme === 'dark' ? 'text-white' : 'text-gray-900'
   const cardBg = theme === 'dark' ? 'bg-[#151c2a]' : 'bg-white'
   const calmBorder = theme === 'dark' ? 'border-white/10' : 'border-gray-200'
-  const heroBg =
-    theme === 'dark'
-      ? 'bg-gradient-to-br from-[#0c1424] via-[#0e1a2f] to-[#0a1220]'
-      : 'bg-gradient-to-br from-white via-emerald-50/60 to-white'
   const softSurface = theme === 'dark' ? 'bg-white/5' : 'bg-gray-50'
 
   const sectionLinks = [
@@ -200,14 +196,8 @@ export const Rating = () => {
       <div className="space-y-6">
         {/* Header */}
         <div
-          className={`rounded-3xl p-6 sm:p-8 shadow-2xl border ${calmBorder} relative overflow-hidden ${heroBg}`}
+          className={`rounded-2xl p-6 sm:p-7 ${cardBg} shadow-lg border ${calmBorder} relative overflow-hidden`}
         >
-          <div className="absolute inset-0 pointer-events-none opacity-70">
-            <div className="absolute -top-24 -left-20 w-72 h-72 bg-gradient-to-br from-[#4E6E49]/18 via-sky-400/12 to-transparent blur-3xl" />
-            <div className="absolute bottom-[-140px] right-10 w-72 h-72 bg-gradient-to-tr from-amber-300/14 via-emerald-400/12 to-transparent blur-3xl" />
-            <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/5 to-white/0 dark:via-white/5" />
-          </div>
-
           <div className="relative z-10 space-y-6">
             <div className="flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
               <div className="flex items-start gap-4">
