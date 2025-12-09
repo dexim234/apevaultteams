@@ -39,6 +39,9 @@ import {
   Percent,
   Building2,
   ScrollText,
+  Gauge,
+  Timer,
+  MessageSquare,
 } from 'lucide-react'
 import { useScrollLock } from '@/hooks/useScrollLock'
 
@@ -399,51 +402,85 @@ export const CallPage = () => {
 
     const addMetric = (label: string, value: string | undefined, icon: JSX.Element, copyValue?: string) => {
       if (!value) return
-      metrics.push({ label, value, icon, copyValue })
+      metrics.push({ label, value, icon, copyValue: copyValue ?? value })
     }
 
     switch (call.category) {
       case 'memecoins':
+        addMetric('Монета', d.coinName, <Coins className="w-4 h-4" />)
         addMetric('Тикер', d.ticker, <Hash className="w-4 h-4" />, d.ticker)
         addMetric('Сеть', d.network ? String(d.network).toUpperCase() : '', <Globe2 className="w-4 h-4" />)
         addMetric('Контракт', shortenValue(d.contract), <FileCode className="w-4 h-4" />, d.contract)
+        addMetric('Тип сигнала', d.signalType ? d.signalType.toUpperCase() : '', <Wand2 className="w-4 h-4" />)
         addMetric('Зона входа', d.entryCap, <MapPin className="w-4 h-4" />)
+        addMetric('Цели', d.targets, <Target className="w-4 h-4" />)
+        addMetric('SL', d.stopLoss, <Octagon className="w-4 h-4" />)
+        addMetric('План', horizonLabels[d.holdPlan] || d.holdPlan, <Clock3 className="w-4 h-4" />)
+        addMetric('Ликвидность', d.liquidityLocked ? 'Залочена' : '', <Shield className="w-4 h-4" />)
         addMetric('Риск', riskLabels[risk] || risk, <ShieldAlert className="w-4 h-4" />)
+        addMetric('Риски', d.risks, <AlertTriangle className="w-4 h-4" />)
+        addMetric('Комментарий', d.traderComment, <MessageSquare className="w-4 h-4" />)
         break
       case 'futures':
         addMetric('Пара', d.pair, <Activity className="w-4 h-4" />, d.pair)
         addMetric('Направление', d.direction ? d.direction.toUpperCase() : '', <TrendingUp className="w-4 h-4" />)
+        addMetric('Плечо', d.leverage, <Gauge className="w-4 h-4" />)
         addMetric('Зона входа', d.entryZone || d.entryPrice, <MapPin className="w-4 h-4" />)
         addMetric('Цели', d.targets, <Target className="w-4 h-4" />)
         addMetric('SL', d.stopLoss, <Octagon className="w-4 h-4" />)
+        addMetric('Стиль', d.signalStyle, <Wand2 className="w-4 h-4" />)
+        addMetric('Размер позиции', d.positionSize, <Percent className="w-4 h-4" />)
+        addMetric('Таймфрейм', d.timeframe, <Timer className="w-4 h-4" />)
         addMetric('Риск', riskLabels[risk] || risk, <ShieldAlert className="w-4 h-4" />)
+        addMetric('Риски', d.risks, <AlertTriangle className="w-4 h-4" />)
         break
       case 'nft':
+        addMetric('Коллекция', shortenValue((d as any).collectionLink), <Link2 className="w-4 h-4" />, (d as any).collectionLink)
         addMetric('NFT', shortenValue(d.nftLink), <Link2 className="w-4 h-4" />, d.nftLink)
+        addMetric('Маркетплейс', d.marketplace, <Building2 className="w-4 h-4" />)
         addMetric('Сеть', d.network ? String(d.network).toUpperCase() : '', <Network className="w-4 h-4" />)
+        addMetric('Вход', d.entryPrice, <MapPin className="w-4 h-4" />)
         addMetric('Редкость', d.rarity, <Sparkles className="w-4 h-4" />)
         addMetric('Тип сигнала', d.signalType ? d.signalType.toUpperCase() : '', <Wand2 className="w-4 h-4" />)
         addMetric('Срок удержания', horizonLabels[d.holdingHorizon] || d.holdingHorizon, <Clock3 className="w-4 h-4" />)
+        addMetric('Мин. ликвидность', d.minLiquidity, <Gauge className="w-4 h-4" />)
+        addMetric('Target', d.targetPrice, <Target className="w-4 h-4" />)
+        addMetric('Риски', d.risks, <AlertTriangle className="w-4 h-4" />)
+        addMetric('Комментарий', d.traderComment, <MessageSquare className="w-4 h-4" />)
         break
       case 'spot':
         addMetric('Монета', d.coin, <Coins className="w-4 h-4" />)
         addMetric('Зона входа', d.entryCap, <MapPin className="w-4 h-4" />)
         addMetric('Цели', d.targets, <Target className="w-4 h-4" />)
+        addMetric('SL', d.stopLoss, <Octagon className="w-4 h-4" />)
         addMetric('Горизонт', horizonLabels[d.holdingHorizon] || d.holdingHorizon, <Clock3 className="w-4 h-4" />)
+        addMetric('Размер', d.positionSize, <Percent className="w-4 h-4" />)
+        addMetric('Риск', d.riskLevel ? riskLabels[d.riskLevel as CallRiskLevel] : undefined, <ShieldAlert className="w-4 h-4" />)
+        addMetric('Риски', d.risks, <AlertTriangle className="w-4 h-4" />)
+        addMetric('Комментарий', d.traderComment, <MessageSquare className="w-4 h-4" />)
         break
       case 'polymarket':
         const positionType = d.positionType as 'yes' | 'no' | undefined
         addMetric('Событие', d.event, <ScrollText className="w-4 h-4" />)
         addMetric('Тип', positionType ? positionLabels[positionType] : '', <Shield className="w-4 h-4" />)
+        addMetric('Вход %', formatPercent(d.entryPrice), <Percent className="w-4 h-4" />)
+        addMetric('Ожидание %', formatPercent(d.expectedProbability), <Gauge className="w-4 h-4" />)
+        addMetric('Цель', d.targetPlan, <Target className="w-4 h-4" />)
+        addMetric('Макс ставка', d.maxStake, <Coins className="w-4 h-4" />)
         addMetric('Срок исхода', formatDeadlineLabel(d.eventDeadline), <CalendarClock className="w-4 h-4" />)
         addMetric('Риск', riskLabels[risk] || risk, <ShieldAlert className="w-4 h-4" />)
+        addMetric('Риски', d.risks, <AlertTriangle className="w-4 h-4" />)
         break
       case 'staking':
         addMetric('Монета', d.coin, <Coins className="w-4 h-4" />)
         addMetric('Платформа', d.platform, <Building2 className="w-4 h-4" />)
         addMetric('Срок', termLabels[d.term] || d.term, <CalendarClock className="w-4 h-4" />)
         addMetric('APY', formatPercent(d.apy), <Percent className="w-4 h-4" />)
+        addMetric('Мин. депозит', d.minDeposit, <Coins className="w-4 h-4" />)
         addMetric('Тип сигнала', actionLabels[d.action] || d.action, <Shield className="w-4 h-4" />)
+        addMetric('Риск протокола', d.protocolRisk ? riskLabels[d.protocolRisk as CallRiskLevel] : undefined, <ShieldAlert className="w-4 h-4" />)
+        addMetric('Риски', d.risks, <AlertTriangle className="w-4 h-4" />)
+        addMetric('Комментарий', d.traderComment, <MessageSquare className="w-4 h-4" />)
         break
     }
 
@@ -482,6 +519,27 @@ export const CallPage = () => {
               )}
             </div>
           ))}
+        </div>
+      </div>
+    )
+  }
+
+  const renderNarrative = (title: string, value?: string) => {
+    if (!value) return null
+    return (
+      <div className={`p-4 rounded-xl border ${borderColor} ${theme === 'dark' ? 'bg-gray-800/60' : 'bg-gray-50'} flex flex-col gap-2`}>
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className={`text-xs uppercase tracking-wider ${subtleColor} mb-1`}>{title}</p>
+            <p className={`${textColor} leading-relaxed text-sm whitespace-pre-line`}>{value}</p>
+          </div>
+          <button
+            onClick={() => copyValue(value)}
+            className={`px-3 py-2 rounded-lg border ${borderColor} ${theme === 'dark' ? 'hover:bg-gray-800 bg-white/5' : 'hover:bg-gray-100 bg-white'} text-xs font-semibold flex items-center gap-2 shrink-0`}
+          >
+            {copiedValue === value ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
+            {copiedValue === value ? 'Скопировано' : 'Копировать'}
+          </button>
         </div>
       </div>
     )
@@ -833,6 +891,24 @@ export const CallPage = () => {
                         </div>
 
                         {renderCategoryMetrics(call)}
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          {renderNarrative('Причина входа', details.reason)}
+                          {renderNarrative('Комментарий трейдера', details.traderComment || call.comment)}
+                          {renderNarrative('Риски', details.risks)}
+                          {call.currentPnL !== undefined && (
+                            <div className={`p-4 rounded-xl border ${borderColor} ${theme === 'dark' ? 'bg-gray-800/60' : 'bg-gray-50'}`}>
+                              <p className={`text-xs uppercase tracking-wider ${subtleColor} mb-1`}>Текущий PNL</p>
+                              <p className={`text-xl font-bold ${call.currentPnL >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>{call.currentPnL >= 0 ? '+' : ''}{call.currentPnL.toFixed(2)}%</p>
+                            </div>
+                          )}
+                          {call.maxProfit !== undefined && (
+                            <div className={`p-4 rounded-xl border ${borderColor} ${theme === 'dark' ? 'bg-gray-800/60' : 'bg-gray-50'}`}>
+                              <p className={`text-xs uppercase tracking-wider ${subtleColor} mb-1`}>MAX прибыль</p>
+                              <p className="text-xl font-bold text-emerald-500">+{call.maxProfit.toFixed(2)}%</p>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   )
