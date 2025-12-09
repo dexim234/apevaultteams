@@ -147,6 +147,13 @@ export const Rating = () => {
   const heroLabelColor = theme === 'dark' ? 'text-white/70' : 'text-slate-600'
   const heroValueColor = theme === 'dark' ? 'text-white' : 'text-slate-900'
 
+  const ratingBands = [
+    { label: '80-100%', title: 'Эталон', desc: 'Стабильный вклад, примеры для команды', tone: 'text-emerald-700 dark:text-emerald-100', bg: 'bg-emerald-50 dark:bg-emerald-900/40 border-emerald-200/60 dark:border-emerald-700/60' },
+    { label: '60-79%', title: 'Уверенно', desc: 'Держат темп, есть потенциал роста', tone: 'text-blue-700 dark:text-blue-100', bg: 'bg-blue-50 dark:bg-blue-900/40 border-blue-200/60 dark:border-blue-700/60' },
+    { label: '40-59%', title: 'В пути', desc: 'Нужна точечная поддержка и фокус', tone: 'text-amber-700 dark:text-amber-100', bg: 'bg-amber-50 dark:bg-amber-900/40 border-amber-200/60 dark:border-amber-700/60' },
+    { label: '0-39%', title: 'Зона роста', desc: 'Запускаем план восстановления', tone: 'text-rose-700 dark:text-rose-100', bg: 'bg-rose-50 dark:bg-rose-900/40 border-rose-200/60 dark:border-rose-700/60' },
+  ]
+
   const sortedRatings = useMemo(() => {
     return [...ratings].sort((a, b) => b.rating - a.rating)
   }, [ratings])
@@ -238,16 +245,17 @@ export const Rating = () => {
           <div className="relative p-6 sm:p-8 space-y-6">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
               <div className="space-y-3 max-w-3xl">
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/15 text-white text-xs font-semibold uppercase tracking-[0.14em]">
-                  <span className="text-lg">✔️</span>
-                  <span>Рейтинг</span>
-                </div>
                 <div className="flex items-start gap-3">
                   <div className="p-3 rounded-2xl bg-white/10 border border-white/20 text-white shadow-inner">
-                    <span className="text-2xl">📊</span>
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" className="text-emerald-300">
+                      <path d="M4 13.5V20h4v-6.5H4Z" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M10 10v10h4V10h-4Z" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M16 4v16h4V4h-4Z" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M4 16.5 9.5 11l3 3 7-7" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
                   </div>
                   <div className="space-y-2">
-                    <h1 className="text-3xl sm:text-4xl font-black text-white leading-tight">Командный рейтинг и эффективность</h1>
+                    <h1 className="text-3xl sm:text-4xl font-black text-white leading-tight">Рейтинг команды</h1>
                     <p className="text-sm text-white/70">
                       Данные за текущую неделю + последние 30 дней. В фокусе KPI команды, динамика и реферальная активность — как на дашборде задач.
                     </p>
@@ -270,9 +278,8 @@ export const Rating = () => {
               </div>
 
               <div className="flex flex-col items-start lg:items-end gap-2 text-white">
-                <span className="text-xs uppercase tracking-[0.12em] text-white/70">КПД команды (неделя)</span>
-                <div className="text-5xl font-black leading-none drop-shadow-md">{teamKPD.toFixed(1)}%</div>
-                <span className="text-xs text-white/60">Обновлено {todayLabel}</span>
+                <span className="text-xs uppercase tracking-[0.12em] text-white/70">Обновлено</span>
+                <div className="text-xl font-semibold text-white/90">{todayLabel}</div>
               </div>
             </div>
 
@@ -293,39 +300,27 @@ export const Rating = () => {
           </div>
         </div>
 
-        {/* Team KPD */}
-        <div
-          id="rating-team"
-          className={`rounded-2xl p-6 sm:p-7 ${cardBg} shadow-lg border ${calmBorder}`}
-        >
-          <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-            <div className="space-y-2">
-              <p className={`text-xs uppercase tracking-[0.12em] ${subTextColor}`}>Команда</p>
-              <h3 className={`text-2xl font-bold ${headingColor}`}>Средний КПД за неделю</h3>
-              <p className={`text-sm ${subTextColor}`}>
-                Плавный прогресс-бар показывает динамику всей команды.
-              </p>
-            </div>
-            <div className="text-right">
-              <div className="text-5xl font-extrabold text-emerald-600 dark:text-emerald-300">{teamKPD.toFixed(1)}%</div>
-              <p className={`text-xs ${subTextColor}`}>из 100%</p>
-            </div>
+        {/* Как строим эффективность */}
+        <div className={`rounded-2xl p-6 sm:p-7 ${cardBg} shadow-lg border ${calmBorder}`}>
+          <div className="flex flex-col gap-2 mb-4">
+            <p className={`text-xs uppercase tracking-[0.12em] ${subTextColor}`}>Методика</p>
+            <h3 className={`text-2xl font-bold ${headingColor}`}>Как мы строим эффективность команды?</h3>
+            <p className={`text-sm ${subTextColor}`}>Четыре зоны, которые показывают, где сейчас участник и что делать дальше.</p>
           </div>
-          <div className="mt-6">
-            <div className="w-full bg-gray-200 dark:bg-gray-800 rounded-full h-10 overflow-hidden border border-gray-200 dark:border-gray-700 shadow-inner">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+            {ratingBands.map((band) => (
               <div
-                className={`h-full transition-all duration-500 flex items-center px-3 text-sm font-semibold text-white ${
-                  teamKPD >= 80
-                    ? 'bg-emerald-600'
-                    : teamKPD >= 50
-                    ? 'bg-amber-500'
-                    : 'bg-blue-500'
-                }`}
-                style={{ width: `${Math.min(teamKPD, 100)}%` }}
+                key={band.label}
+                className={`rounded-xl border ${band.bg} p-3 transition`}
               >
-                {teamKPD >= 5 && <span>{teamKPD.toFixed(1)}%</span>}
+                <div className="flex items-center justify-between">
+                  <span className={`text-xs font-semibold ${subTextColor}`}>{band.label}</span>
+                  <span className="text-lg">•</span>
+                </div>
+                <p className={`text-base font-semibold ${band.tone}`}>{band.title}</p>
+                <p className={`text-sm ${subTextColor}`}>{band.desc}</p>
               </div>
-            </div>
+            ))}
           </div>
         </div>
 
@@ -342,7 +337,7 @@ export const Rating = () => {
             </div>
             <button
               onClick={handleAddReferral}
-              className="px-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl transition-all duration-200 flex items-center justify-center gap-2 font-semibold shadow-md w-full sm:w-auto"
+              className="px-4 py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 font-semibold shadow-md w-full sm:w-auto border border-indigo-200/70 bg-indigo-50 text-indigo-900 hover:bg-indigo-100 dark:bg-indigo-500/15 dark:border-indigo-400/30 dark:text-indigo-50"
             >
               <span className="text-xl">➕</span>
               <span>Добавить реферала</span>
