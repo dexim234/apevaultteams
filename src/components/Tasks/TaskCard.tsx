@@ -39,8 +39,6 @@ export const TaskCard = ({ task, onEdit, onDelete, onUpdate }: TaskCardProps) =>
   const [loading, setLoading] = useState(false)
   const [showReturnDialog, setShowReturnDialog] = useState(false)
   const [returnComment, setReturnComment] = useState('')
-  const [commentDraft, setCommentDraft] = useState('')
-  const [commentTarget, setCommentTarget] = useState<'stage' | 'task'>('stage')
 
   const headingColor = theme === 'dark' ? 'text-white' : 'text-gray-900'
   const cardBg = theme === 'dark' ? 'bg-[#1a1a1a]' : 'bg-white'
@@ -192,40 +190,6 @@ export const TaskCard = ({ task, onEdit, onDelete, onUpdate }: TaskCardProps) =>
       onUpdate()
     } catch (error) {
       console.error('Error returning task:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleAddComment = async () => {
-    if (!user) return
-    if (!commentDraft.trim()) return
-    setLoading(true)
-    try {
-      const now = new Date().toISOString()
-      const newComment = {
-        id: `c-${Date.now()}`,
-        userId: user.id,
-        text: commentDraft.trim(),
-        createdAt: now,
-        stageId: commentTarget === 'stage' ? currentStage.id : undefined,
-      }
-      const updates: Partial<Task> = {
-        comments: [...(task.comments || []), newComment],
-        updatedAt: now,
-      }
-      if (newComment.stageId && task.stages && task.stages.length > 0) {
-        updates.stages = task.stages.map((stage) =>
-          stage.id === newComment.stageId
-            ? { ...stage, comments: [...(stage.comments || []), newComment] }
-            : stage
-        )
-      }
-      await updateTask(task.id, updates)
-      setCommentDraft('')
-      onUpdate()
-    } catch (error) {
-      console.error('Error adding comment:', error)
     } finally {
       setLoading(false)
     }
@@ -494,44 +458,6 @@ export const TaskCard = ({ task, onEdit, onDelete, onUpdate }: TaskCardProps) =>
                   </div>
                 )
               })}
-            </div>
-          )}
-          {user && (
-            <div className="mt-3 space-y-2">
-              <textarea
-                value={commentDraft}
-                onChange={(e) => setCommentDraft(e.target.value)}
-                rows={2}
-                className={`w-full px-3 py-2 rounded-lg border ${borderColor} ${theme === 'dark' ? 'bg-[#0f0f0f] text-gray-100' : 'bg-white text-gray-700'}`}
-                placeholder="Комментарий к задаче или этапу"
-              />
-              <div className="flex items-center justify-between gap-2 text-xs">
-                <div className="flex items-center gap-3">
-                  <label className="inline-flex items-center gap-1">
-                    <input
-                      type="radio"
-                      checked={commentTarget === 'stage'}
-                      onChange={() => setCommentTarget('stage')}
-                    />
-                    Этап
-                  </label>
-                  <label className="inline-flex items-center gap-1">
-                    <input
-                      type="radio"
-                      checked={commentTarget === 'task'}
-                      onChange={() => setCommentTarget('task')}
-                    />
-                    Задача
-                  </label>
-                </div>
-                <button
-                  onClick={handleAddComment}
-                  disabled={loading || !commentDraft.trim()}
-                  className={`px-3 py-1 rounded-lg font-semibold ${theme === 'dark' ? 'bg-[#4E6E49] text-white hover:bg-[#4E6E49]/80' : 'bg-[#4E6E49] text-white hover:bg-emerald-700'} disabled:opacity-50`}
-                >
-                  Добавить
-                </button>
-              </div>
             </div>
           )}
         </div>

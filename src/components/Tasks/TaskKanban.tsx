@@ -4,7 +4,7 @@ import { useThemeStore } from '@/store/themeStore'
 import { useAuthStore } from '@/store/authStore'
 import { useAdminStore } from '@/store/adminStore'
 import { updateTask } from '@/services/firestoreService'
-import { Task, TaskPriority, TaskStatus, TASK_STATUSES, TEAM_MEMBERS, TaskApproval } from '@/types'
+import { Task, TaskPriority, TaskStatus, TASK_STATUSES, TEAM_MEMBERS, TaskApproval, TASK_CATEGORIES } from '@/types'
 import { AlarmClock, CalendarClock, Check, CheckSquare, Clock3, MoreVertical, X, AlertCircle } from 'lucide-react'
 import { formatDate } from '@/utils/dateUtils'
 import { TaskDeadlineBadge } from './TaskDeadlineBadge'
@@ -29,8 +29,6 @@ export const TaskKanban = ({ tasks, onUpdate, onEdit, onDelete }: TaskKanbanProp
   const [loading, setLoading] = useState<string | null>(null)
   const [touchStart, setTouchStart] = useState<{ x: number; y: number; task: Task } | null>(null)
   const [touchTarget, setTouchTarget] = useState<string | null>(null)
-  const [commentDrafts, setCommentDrafts] = useState<Record<string, string>>({})
-  const [commentTarget, setCommentTarget] = useState<Record<string, 'stage' | 'task'>>({})
   const [detailsTask, setDetailsTask] = useState<Task | null>(null)
 
   const headingColor = theme === 'dark' ? 'text-white' : 'text-gray-900'
@@ -365,41 +363,6 @@ export const TaskKanban = ({ tasks, onUpdate, onEdit, onDelete }: TaskKanbanProp
     }
   }
 
-  const handleAddComment = async (task: Task) => {
-    if (!user) return
-    const draft = commentDrafts[task.id] || ''
-    if (!draft.trim()) return
-    setLoading(task.id)
-    try {
-      const now = new Date().toISOString()
-      const newComment = {
-        id: `c-${Date.now()}`,
-        userId: user.id,
-        text: draft.trim(),
-        createdAt: now,
-        stageId: (commentTarget[task.id] || 'stage') === 'stage' ? getCurrentStage(task).id : undefined,
-      }
-      const updates: Partial<Task> = {
-        comments: [...(task.comments || []), newComment],
-        updatedAt: now,
-      }
-      if (newComment.stageId && task.stages && task.stages.length > 0) {
-        updates.stages = task.stages.map((stage) =>
-          stage.id === newComment.stageId
-            ? { ...stage, comments: [...(stage.comments || []), newComment] }
-            : stage
-        )
-      }
-      await updateTask(task.id, updates)
-      setCommentDrafts((prev) => ({ ...prev, [task.id]: '' }))
-      onUpdate()
-    } catch (error) {
-      console.error('Error adding comment:', error)
-    } finally {
-      setLoading(null)
-    }
-  }
-
   const getStatusColor = (status: TaskStatus) => {
     const colorMap: Record<TaskStatus, string> = {
       in_progress: theme === 'dark' ? 'bg-blue-500/20 border-blue-500/50' : 'bg-blue-50 border-blue-200',
@@ -677,6 +640,7 @@ export const TaskKanban = ({ tasks, onUpdate, onEdit, onDelete }: TaskKanbanProp
                               })}
                             </div>
                           )}
+                          {/* Комментарии можно просматривать, но не добавлять */}
                           {(task.comments?.length || currentStage.comments?.length) && (
                             <div className="mt-2 space-y-1">
                               {[
@@ -691,46 +655,6 @@ export const TaskKanban = ({ tasks, onUpdate, onEdit, onDelete }: TaskKanbanProp
                                   </div>
                                 )
                               })}
-                            </div>
-                          )}
-                          {user && (
-                            <div className={`mt-2 p-2 rounded-lg border ${borderColor} ${inputBg}`}>
-                              <textarea
-                                value={commentDrafts[task.id] || ''}
-                                onChange={(e) => setCommentDrafts((prev) => ({ ...prev, [task.id]: e.target.value }))}
-                                rows={2}
-                                className={`w-full px-2 py-1 rounded border ${borderColor} ${theme === 'dark' ? 'bg-[#1a1a1a] text-gray-100' : 'bg-white text-gray-700'}`}
-                                placeholder="Комментарий к задаче или этапу"
-                              />
-                              <div className="flex items-center justify-between mt-2 gap-2">
-                                <div className="flex items-center gap-2 text-[11px]">
-                                  <label className="inline-flex items-center gap-1">
-                                    <input
-                                      type="radio"
-                                      name={`comment-target-${task.id}`}
-                                      checked={(commentTarget[task.id] || 'stage') === 'stage'}
-                                      onChange={() => setCommentTarget((prev) => ({ ...prev, [task.id]: 'stage' }))}
-                                    />
-                                    Этап
-                                  </label>
-                                  <label className="inline-flex items-center gap-1">
-                                    <input
-                                      type="radio"
-                                      name={`comment-target-${task.id}`}
-                                      checked={commentTarget[task.id] === 'task'}
-                                      onChange={() => setCommentTarget((prev) => ({ ...prev, [task.id]: 'task' }))}
-                                    />
-                                    Задача
-                                  </label>
-                                </div>
-                                <button
-                                  onClick={() => handleAddComment(task)}
-                                  disabled={loading === task.id || !(commentDrafts[task.id] || '').trim()}
-                                  className={`px-3 py-1 text-xs rounded-lg font-medium ${theme === 'dark' ? 'bg-[#4E6E49] text-white hover:bg-[#4E6E49]/80' : 'bg-[#4E6E49] text-white hover:bg-emerald-700'} disabled:opacity-50`}
-                                >
-                                  Добавить
-                                </button>
-                              </div>
                             </div>
                           )}
                           <div className="flex items-center gap-2 flex-wrap">
@@ -860,68 +784,82 @@ export const TaskKanban = ({ tasks, onUpdate, onEdit, onDelete }: TaskKanbanProp
                 <X className="w-4 h-4" />
               </button>
             </div>
-            <div className="space-y-3 text-sm">
+            <div className="space-y-4 text-sm">
               <div>
                 <p className="text-xs text-gray-500">Название</p>
                 <p className={`font-semibold ${headingColor}`}>{detailsTask.title}</p>
               </div>
+
               {detailsTask.description && (
                 <div>
                   <p className="text-xs text-gray-500">Описание</p>
                   <p className={theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}>{detailsTask.description}</p>
                 </div>
               )}
+
               {detailsTask.expectedResult && (
                 <div>
                   <p className="text-xs text-gray-500">Ожидаемый результат</p>
                   <p className={theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}>{detailsTask.expectedResult}</p>
                 </div>
               )}
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <p className="text-xs text-gray-500">Автор</p>
                   <p className={headingColor}>{TEAM_MEMBERS.find((m) => m.id === detailsTask.createdBy)?.name || detailsTask.createdBy}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500">Главный исполнитель</p>
-                  <p className={headingColor}>{TEAM_MEMBERS.find((m) => m.id === detailsTask.mainExecutor)?.name || '—'}</p>
+                  <p className="text-xs text-gray-500">Категория</p>
+                  <p className={headingColor}>{TASK_CATEGORIES[detailsTask.category]?.label || detailsTask.category}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500">Ведущий исполнитель</p>
-                  <p className={headingColor}>{TEAM_MEMBERS.find((m) => m.id === detailsTask.leadExecutor)?.name || '—'}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500">Соисполнители</p>
+                  <p className="text-xs text-gray-500">Приоритет</p>
                   <p className={headingColor}>
-                    {(detailsTask.coExecutors || []).map((id) => TEAM_MEMBERS.find((m) => m.id === id)?.name || id).join(', ') || '—'}
+                    {detailsTask.priority === 'urgent'
+                      ? 'Экстренный'
+                      : detailsTask.priority === 'high'
+                        ? 'Высокий'
+                        : detailsTask.priority === 'medium'
+                          ? 'Средний'
+                          : 'Низкий'}
                   </p>
                 </div>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <p className="text-xs text-gray-500">Дедлайн</p>
-                  <p className={headingColor}>
-                    {formatDate(new Date(detailsTask.dueDate), 'dd.MM.yyyy')} · {detailsTask.dueTime}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500">Старт</p>
-                  <p className={headingColor}>{detailsTask.startTime || '—'}</p>
+                  <p className={headingColor}>{formatDate(new Date(detailsTask.dueDate), 'dd.MM.yyyy')} · {detailsTask.dueTime}</p>
                 </div>
               </div>
+
               <div>
                 <p className="text-xs text-gray-500">Статус</p>
                 <p className={`${headingColor} font-semibold`}>{TASK_STATUSES[detailsTask.status].label}</p>
               </div>
+
               {detailsTask.stages && detailsTask.stages.length > 0 && (
-                <div className="space-y-1">
+                <div className="space-y-2">
                   <p className="text-xs text-gray-500">Этапы</p>
                   {detailsTask.stages.map((stage) => (
-                    <div key={stage.id} className={`p-2 rounded border ${borderColor}`}>
-                      <p className={`font-semibold ${headingColor}`}>{stage.name}</p>
-                      <p className="text-xs text-gray-500">
-                        {stage.approvals?.filter((a) => a.status === 'approved').length || 0}/{stage.approvals?.length || 0} согласовано
-                      </p>
+                    <div key={stage.id} className={`p-3 rounded border ${borderColor} space-y-2`}>
+                      <div className="flex items-center justify-between">
+                        <p className={`font-semibold ${headingColor}`}>{stage.name}</p>
+                        <p className="text-xs text-gray-500">
+                          {stage.approvals?.filter((a) => a.status === 'approved').length || 0}/{stage.approvals?.length || 0} подтверждений
+                        </p>
+                      </div>
+                      {stage.assignees && stage.assignees.length > 0 && (
+                        <div className="space-y-1 text-xs">
+                          {stage.assignees.map((a) => {
+                            const member = TEAM_MEMBERS.find((m) => m.id === a.userId)
+                            return (
+                              <div key={a.userId} className="flex items-start justify-between gap-2">
+                                <span className="font-medium">{member?.name || a.userId}</span>
+                                {a.comment && <span className="text-gray-500 truncate">{a.comment}</span>}
+                              </div>
+                            )
+                          })}
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
