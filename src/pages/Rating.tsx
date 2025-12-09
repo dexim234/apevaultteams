@@ -144,11 +144,24 @@ export const Rating = () => {
   const headingColor = theme === 'dark' ? 'text-white' : 'text-gray-900'
   const cardBg = theme === 'dark' ? 'bg-[#151c2a]' : 'bg-white'
   const calmBorder = theme === 'dark' ? 'border-white/10' : 'border-gray-200'
+  const heroBg =
+    theme === 'dark'
+      ? 'bg-gradient-to-br from-[#0c1424] via-[#0e1a2f] to-[#0a1220]'
+      : 'bg-gradient-to-br from-white via-emerald-50/60 to-white'
+  const softSurface = theme === 'dark' ? 'bg-white/5' : 'bg-gray-50'
+  const pillSurface = theme === 'dark' ? 'bg-white/10 text-white' : 'bg-gray-100 text-gray-800'
 
   const sectionLinks = [
     { href: '#rating-team', label: 'Команда', icon: '🌿' },
     { href: '#rating-ref', label: 'Рефералы', icon: '🧲' },
     { href: '#rating-method', label: 'Карточки', icon: '📇' },
+  ]
+
+  const highlightStats = [
+    { label: 'Топ-1', value: `${ratingOverview.top.toFixed(1)}%`, note: 'лидер недели', tone: 'emerald' },
+    { label: 'Медиана', value: `${ratingOverview.median.toFixed(1)}%`, note: 'ровный темп', tone: 'sky' },
+    { label: '80%+', value: ratingOverview.high, note: 'устойчивые лидеры', tone: 'amber' },
+    { label: 'Участников', value: ratings.length, note: 'в рейтинге', tone: 'slate' },
   ]
 
   const ratingBands = [
@@ -188,59 +201,71 @@ export const Rating = () => {
       <div className="space-y-6">
         {/* Header */}
         <div
-          className={`rounded-2xl p-6 sm:p-8 ${cardBg} shadow-xl border ${calmBorder} relative overflow-hidden`}
+          className={`rounded-3xl p-6 sm:p-8 shadow-2xl border ${calmBorder} relative overflow-hidden ${heroBg}`}
         >
           <div className="absolute inset-0 pointer-events-none opacity-70">
             <div className="absolute -top-24 -left-20 w-72 h-72 bg-gradient-to-br from-[#4E6E49]/18 via-sky-400/12 to-transparent blur-3xl" />
             <div className="absolute bottom-[-140px] right-10 w-72 h-72 bg-gradient-to-tr from-amber-300/14 via-emerald-400/12 to-transparent blur-3xl" />
+            <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/5 to-white/0 dark:via-white/5" />
           </div>
 
           <div className="relative z-10 space-y-6">
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-              <div className="flex items-center gap-3">
+            <div className="flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
+              <div className="flex items-start gap-4">
                 <div className="p-3 rounded-2xl bg-gradient-to-br from-[#4E6E49] via-emerald-500 to-sky-500 text-white shadow-lg shadow-emerald-500/30">
-                  <span className="text-xl">⭐</span>
+                  <span className="text-xl">📈</span>
                 </div>
                 <div className="flex flex-col justify-center">
                   <h1 className={`text-2xl sm:text-3xl font-extrabold ${headingColor} drop-shadow-lg leading-tight`}>
                     Рейтинг команды
                   </h1>
+                  <p className={`mt-1 text-sm ${subTextColor}`}>
+                    Еженедельный срез эффективности + данные за 30 дней
+                  </p>
+                  <div className="flex flex-wrap gap-2 mt-3">
+                    {['Недельный КПД', 'Доход + пул', 'Рефералы', 'Сообщения'].map((chip) => (
+                      <span
+                        key={chip}
+                        className={`px-3 py-1 rounded-full text-xs font-semibold border ${calmBorder} ${softSurface}`}
+                      >
+                        {chip}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 w-full lg:w-auto">
-                {[
-                  { label: 'Топ-1', value: `${ratingOverview.top.toFixed(1)}%`, note: 'лидер недели' },
-                  { label: 'Медиана', value: `${ratingOverview.median.toFixed(1)}%`, note: 'ровный темп' },
-                  { label: '80%+', value: ratingOverview.high, note: 'устойчивые лидеры' },
-                ].map((item) => (
-                  <div
-                    key={item.label}
-                    className={`rounded-xl border ${calmBorder} ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-50'} p-3 flex flex-col gap-1`}
-                  >
-                    <span className={`text-[11px] uppercase tracking-wide ${subTextColor}`}>{item.label}</span>
-                    <span className="text-2xl font-extrabold text-white">{item.value}</span>
-                    <span className={`text-xs ${subTextColor}`}>{item.note}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full xl:w-auto">
+                {highlightStats.map((item) => {
+                  const tone =
+                    item.tone === 'emerald'
+                      ? theme === 'dark'
+                        ? 'bg-emerald-500/10 border-emerald-400/30 text-emerald-100'
+                        : 'bg-emerald-50 border-emerald-200 text-emerald-900'
+                      : item.tone === 'sky'
+                      ? theme === 'dark'
+                        ? 'bg-sky-500/10 border-sky-400/30 text-sky-100'
+                        : 'bg-sky-50 border-sky-200 text-sky-900'
+                      : item.tone === 'amber'
+                      ? theme === 'dark'
+                        ? 'bg-amber-500/10 border-amber-400/30 text-amber-100'
+                        : 'bg-amber-50 border-amber-200 text-amber-900'
+                      : theme === 'dark'
+                      ? 'bg-white/5 border-white/10 text-white'
+                      : 'bg-gray-50 border-gray-200 text-gray-900'
 
-            <div className="flex flex-wrap gap-2">
-              {sectionLinks.map((item) => (
-                <a
-                  key={item.href}
-                  href={item.href}
-                  className={`px-3 py-2 rounded-full text-sm font-semibold border ${calmBorder} transition flex items-center gap-2 ${
-                    theme === 'dark'
-                      ? 'bg-white/5 hover:bg-white/10 text-white'
-                      : 'bg-white hover:bg-gray-50 text-gray-800'
-                  }`}
-                >
-                  <span>{item.icon}</span>
-                  {item.label}
-                </a>
-              ))}
+                  return (
+                  <div
+                      key={item.label}
+                      className={`rounded-2xl border p-4 flex flex-col gap-1 shadow-sm ${tone}`}
+                    >
+                      <span className={`text-[11px] uppercase tracking-wide ${subTextColor}`}>{item.label}</span>
+                      <span className={`text-2xl font-extrabold ${headingColor}`}>{item.value}</span>
+                      <span className={`text-xs ${subTextColor}`}>{item.note}</span>
+                    </div>
+                  )
+                })}
+              </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
@@ -259,24 +284,43 @@ export const Rating = () => {
               ))}
             </div>
 
-            <div className="flex flex-col md:flex-row gap-3 md:items-center md:justify-between">
-              <div className={`flex flex-wrap gap-2 text-xs ${subTextColor}`}>
-                {['Выходные','Больничные','Отпуск','Часы','Заработок','Рефералы','Сообщения'].map((item) => (
-                  <span
-                    key={item}
-                    className={`px-3 py-1 rounded-full border ${calmBorder} ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-50'}`}
+            <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+              <div className="flex flex-wrap gap-2">
+                {sectionLinks.map((item) => (
+                  <a
+                    key={item.href}
+                    href={item.href}
+                    className={`px-3 py-2 rounded-full text-sm font-semibold border ${calmBorder} transition flex items-center gap-2 ${
+                      theme === 'dark'
+                        ? 'bg-white/5 hover:bg-white/10 text-white'
+                        : 'bg-white hover:bg-gray-50 text-gray-800'
+                    }`}
                   >
-                    {item}
-                  </span>
+                    <span>{item.icon}</span>
+                    {item.label}
+                  </a>
                 ))}
               </div>
-              <button
-                onClick={handleAddReferral}
-                className="px-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl transition-all duration-200 flex items-center justify-center gap-2 font-semibold shadow-md w-full md:w-auto"
-              >
-                <span className="text-xl">➕</span>
-                <span>Добавить реферала</span>
-              </button>
+
+              <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-3">
+                <div className={`flex flex-wrap gap-2 text-xs ${subTextColor}`}>
+                  {['Выходные','Больничные','Отпуск','Часы','Заработок','Рефералы','Сообщения'].map((item) => (
+                    <span
+                      key={item}
+                      className={`px-3 py-1 rounded-full border ${calmBorder} ${softSurface}`}
+                    >
+                      {item}
+                    </span>
+                  ))}
+                </div>
+                <button
+                  onClick={handleAddReferral}
+                  className="px-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl transition-all duration-200 flex items-center justify-center gap-2 font-semibold shadow-md w-full md:w-auto"
+                >
+                  <span className="text-xl">➕</span>
+                  <span>Добавить реферала</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -435,27 +479,46 @@ export const Rating = () => {
                 ))}
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-5">
-                {sortedRatings.map((rating, index) => (
-                  <div key={rating.userId} className="relative">
-                    {index <= 2 && (
-                      <div className="absolute -top-3 -right-3">
-                        <span
-                          className={`px-3 py-1 rounded-full text-xs font-bold border ${calmBorder} ${
-                            index === 0
-                              ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-100'
-                              : index === 1
-                              ? 'bg-blue-100 text-blue-800 dark:bg-blue-500/20 dark:text-blue-100'
-                              : 'bg-amber-100 text-amber-800 dark:bg-amber-500/20 dark:text-amber-100'
-                          }`}
-                        >
-                          {index === 0 ? '1 место' : index === 1 ? '2 место' : '3 место'}
-                        </span>
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-5">
+                {sortedRatings.map((rating, index) => {
+                  const placeBadge =
+                    index === 0
+                      ? { text: '1 место', tone: 'emerald', emoji: '🥇' }
+                      : index === 1
+                      ? { text: '2 место', tone: 'blue', emoji: '🥈' }
+                      : index === 2
+                      ? { text: '3 место', tone: 'amber', emoji: '🥉' }
+                      : { text: `${index + 1} место`, tone: 'slate', emoji: '🎯' }
+
+                  const placeTone =
+                    placeBadge.tone === 'emerald'
+                      ? theme === 'dark'
+                        ? 'bg-emerald-500/20 text-emerald-50 border-emerald-400/40'
+                        : 'bg-emerald-50 text-emerald-900 border-emerald-200'
+                      : placeBadge.tone === 'blue'
+                      ? theme === 'dark'
+                        ? 'bg-blue-500/20 text-blue-50 border-blue-400/40'
+                        : 'bg-blue-50 text-blue-900 border-blue-200'
+                      : placeBadge.tone === 'amber'
+                      ? theme === 'dark'
+                        ? 'bg-amber-500/20 text-amber-50 border-amber-400/40'
+                        : 'bg-amber-50 text-amber-900 border-amber-200'
+                      : theme === 'dark'
+                      ? 'bg-white/5 text-white border-white/10'
+                      : 'bg-gray-50 text-gray-800 border-gray-200'
+
+                  return (
+                    <div key={rating.userId} className="relative pt-3">
+                      <div
+                        className={`absolute -top-2 left-2 px-3 py-1 rounded-full text-xs font-semibold border shadow-sm flex items-center gap-1 ${placeTone}`}
+                      >
+                        <span>{placeBadge.emoji}</span>
+                        <span>{placeBadge.text}</span>
                       </div>
-                    )}
-                    <RatingCard rating={rating} />
-                  </div>
-                ))}
+                      <RatingCard rating={rating} />
+                    </div>
+                  )
+                })}
               </div>
             </>
           )}
