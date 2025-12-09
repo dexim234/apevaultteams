@@ -63,19 +63,6 @@ export const TaskCard = ({ task, onEdit, onDelete, onUpdate }: TaskCardProps) =>
   
   const canEdit = isAdmin || user?.id === task.createdBy || task.mainExecutor === user?.id
 
-  const getCurrentStage = () => {
-    if (task.stages && task.stages.length > 0) {
-      const targetId = task.currentStageId || task.stages[0].id
-      return task.stages.find((s) => s.id === targetId) || task.stages[0]
-    }
-    return {
-      id: 'legacy-stage',
-      name: 'Этап',
-      responsible: 'all' as const,
-      approvals: task.approvals || [],
-      status: 'pending' as const,
-    }
-  }
   const resolveExecutorApprovals = (): TaskApproval[] => {
     const now = new Date().toISOString()
     const current = (task.approvals || []).filter((a) => assigneeIds.includes(a.userId))
