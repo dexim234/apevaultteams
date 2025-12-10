@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { CheckCircle2, Clock, ThumbsDown } from 'lucide-react'
 import { getApprovalRequests, approveApprovalRequest, rejectApprovalRequest } from '@/services/firestoreService'
-import { ApprovalRequest, DayStatus, TEAM_MEMBERS, WorkSlot, Earnings, Referral } from '@/types'
+import { ApprovalRequest, DayStatus, TEAM_MEMBERS, WorkSlot } from '@/types'
 import { formatDate } from '@/utils/dateUtils'
 import { useAuthStore } from '@/store/authStore'
 
