@@ -7,7 +7,6 @@ import { updateTask } from '@/services/firestoreService'
 import { Task, TaskPriority, TaskStatus, TEAM_MEMBERS, TASK_CATEGORIES, TASK_STATUSES, TaskApproval } from '@/types'
 import {
   AlertCircle,
-  AlarmClock,
   Calendar,
   Check,
   CheckCircle2,
