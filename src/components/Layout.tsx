@@ -16,7 +16,6 @@ import {
   User,
   ChevronDown,
   Info,
-  BookOpen,
   ArrowUpRight,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
@@ -140,16 +139,6 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
               )}
 
               <Link
-                to="/rules"
-                data-active={location.pathname === '/rules'}
-                className="nav-chip"
-              >
-                <BookOpen className="w-4 h-4" />
-                <span>Правила</span>
-                <ArrowUpRight className="w-4 h-4 opacity-70" />
-              </Link>
-
-              <Link
                 to="/profile"
                 data-active={location.pathname === '/profile'}
                 className="nav-chip"
@@ -214,7 +203,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
       <nav className="lg:hidden fixed bottom-4 left-0 right-0 px-3 z-50">
         <div className="max-w-5xl mx-auto">
           <div className="glass-panel rounded-2xl shadow-2xl border border-white/60 dark:border-white/10">
-            <div className="grid grid-cols-5 divide-x divide-white/40 dark:divide-white/5">
+            <div className="grid grid-cols-4 divide-x divide-white/40 dark:divide-white/5">
               {!isAdmin && (
                 <Link
                   to="/call"
@@ -251,16 +240,6 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                   </div>
                 </Link>
               )}
-              <Link
-                to="/rules"
-                className={`flex flex-col items-center justify-center gap-1 py-3 ${location.pathname === '/rules' ? 'text-[#4E6E49]' : theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}
-              >
-                <BookOpen className="w-5 h-5" />
-                <div className="flex items-center gap-1">
-                  <span className="text-[11px] font-semibold">Правила</span>
-                  <ArrowUpRight className="w-3 h-3 opacity-70" />
-                </div>
-              </Link>
               <Link
                 to="/profile"
                 className={`flex flex-col items-center justify-center gap-1 py-3 ${location.pathname === '/profile' ? 'text-[#4E6E49]' : theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}
