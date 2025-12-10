@@ -4,9 +4,9 @@ import { parseISO } from 'date-fns'
 import { useThemeStore } from '@/store/themeStore'
 import { useAuthStore } from '@/store/authStore'
 import { useAdminStore } from '@/store/adminStore'
-import { getWorkSlots, getDayStatuses, deleteWorkSlot, deleteDayStatus, updateDayStatus, addDayStatus } from '@/services/firestoreService'
-import { formatDate, getWeekDays } from '@/utils/dateUtils'
-import { WorkSlot, DayStatus } from '@/types'
+import { getWorkSlots, getDayStatuses, addApprovalRequest, getApprovalRequests } from '@/services/firestoreService'
+import { formatDate, getWeekDays, isSameDate } from '@/utils/dateUtils'
+import { WorkSlot, DayStatus, ApprovalRequest } from '@/types'
 import { TEAM_MEMBERS } from '@/types'
 import { Edit, Trash2, Info, CheckCircle2, Calendar as CalendarIcon } from 'lucide-react'
 
@@ -26,6 +26,7 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
   const { isAdmin } = useAdminStore()
   const [slots, setSlots] = useState<WorkSlot[]>([])
   const [statuses, setStatuses] = useState<DayStatus[]>([])
+  const [approvals, setApprovals] = useState<ApprovalRequest[]>([])
   const [selectedWeek, setSelectedWeek] = useState(new Date())
   const [loading, setLoading] = useState(true)
 
@@ -54,6 +55,7 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
   }
 
   const weekDays = getWeekDays(selectedWeek)
+  const today = new Date()
 
   useEffect(() => {
     loadData()
@@ -80,10 +82,11 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
       const weekStart = formatDate(weekStartDate, 'yyyy-MM-dd')
       const weekEnd = formatDate(weekEndDate, 'yyyy-MM-dd')
 
-      // Load all slots and statuses for the week, not filtered by user
-      const [allSlots, allStatuses] = await Promise.all([
+      // Load all slots, statuses and approval requests for the week, not filtered by user
+      const [allSlots, allStatuses, allApprovals] = await Promise.all([
         getWorkSlots(),
-        getDayStatuses()
+        getDayStatuses(),
+        getApprovalRequests()
       ])
 
       // Filter by week range
@@ -104,6 +107,25 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
         ? weekStatuses.filter((s) => s.userId === selectedUserId)
         : weekStatuses
 
+      const weekApprovals = allApprovals.filter((a) => {
+        const afterDate = (a.after as any)?.date || (a.after as any)?.endDate
+        const beforeDate = (a.before as any)?.date || (a.before as any)?.endDate
+        const dateToCheck = afterDate || beforeDate
+        if (!dateToCheck) return false
+        return dateToCheck >= weekStart && dateToCheck <= weekEnd
+      })
+
+      const scopedApprovals = weekApprovals.filter((a) => {
+        if (a.status === 'approved') return false
+        if (selectedUserId) {
+          return a.targetUserId === selectedUserId || a.authorId === selectedUserId
+        }
+        if (isAdmin) return true
+        const currentUserId = user?.id
+        if (!currentUserId) return false
+        return a.authorId === currentUserId || a.targetUserId === currentUserId
+      })
+
       console.log('Loaded slots (week view):', {
         weekStart,
         weekEnd,
@@ -115,6 +137,7 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
 
       setSlots(filteredSlots)
       setStatuses(filteredStatuses)
+      setApprovals(scopedApprovals)
     } catch (error) {
       console.error('Error loading data:', error)
     } finally {
@@ -122,14 +145,22 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
     }
   }
 
-  const handleDeleteSlot = async (id: string) => {
-    if (!isAdmin && user?.id !== slots.find((s) => s.id === id)?.userId) {
+  const handleDeleteSlot = async (slot: WorkSlot) => {
+    if (!isAdmin && user?.id !== slot.userId) {
       alert('Только администратор может удалять чужие слоты')
       return
     }
 
-    if (confirm('Удалить слот?')) {
-      await deleteWorkSlot(id)
+    if (confirm('Отправить на согласование удаление слота?')) {
+      await addApprovalRequest({
+        entity: 'slot',
+        action: 'delete',
+        authorId: user?.id || slot.userId,
+        targetUserId: slot.userId,
+        before: slot,
+        after: null,
+        comment: slot.comment,
+      })
       loadData()
     }
   }
@@ -147,14 +178,22 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
       
       // Если удаляется первый день диапазона, обновляем дату начала
       if (dateStr === statusStart) {
-        if (confirm('Удалить первый день диапазона? Остальные дни останутся.')) {
+          if (confirm('Отправить на согласование удаление первого дня диапазона?')) {
           const newStart = new Date(parseISO(statusStart))
           newStart.setDate(newStart.getDate() + 1)
           const newStartStr = formatDate(newStart, 'yyyy-MM-dd')
           
-          await updateDayStatus(status.id, {
-            ...status,
-            date: newStartStr
+            await addApprovalRequest({
+              entity: 'status',
+              action: 'update',
+              authorId: user?.id || status.userId,
+              targetUserId: status.userId,
+              before: status,
+              after: {
+                ...status,
+                date: newStartStr
+              },
+              comment: status.comment,
           })
           loadData()
         }
@@ -163,14 +202,22 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
       
       // Если удаляется последний день диапазона, обновляем дату окончания
       if (dateStr === statusEnd) {
-        if (confirm('Удалить последний день диапазона? Остальные дни останутся.')) {
+          if (confirm('Отправить на согласование удаление последнего дня диапазона?')) {
           const newEnd = new Date(parseISO(statusEnd))
           newEnd.setDate(newEnd.getDate() - 1)
           const newEndStr = formatDate(newEnd, 'yyyy-MM-dd')
           
-          await updateDayStatus(status.id, {
-            ...status,
-            endDate: newEndStr
+            await addApprovalRequest({
+              entity: 'status',
+              action: 'update',
+              authorId: user?.id || status.userId,
+              targetUserId: status.userId,
+              before: status,
+              after: {
+                ...status,
+                endDate: newEndStr
+              },
+              comment: status.comment,
           })
           loadData()
         }
@@ -179,15 +226,23 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
       
       // Если удаляется день из середины диапазона, разбиваем на два статуса
       if (dateStr > statusStart && dateStr < statusEnd) {
-        if (confirm('Удалить этот день из диапазона? Диапазон будет разбит на две части.')) {
+          if (confirm('Отправить на согласование удаление этого дня? Диапазон будет разбит на две части.')) {
           // Создаем первый статус (до удаляемого дня)
           const firstEnd = new Date(parseISO(dateStr))
           firstEnd.setDate(firstEnd.getDate() - 1)
           const firstEndStr = formatDate(firstEnd, 'yyyy-MM-dd')
           
-          await updateDayStatus(status.id, {
-            ...status,
-            endDate: firstEndStr
+            await addApprovalRequest({
+              entity: 'status',
+              action: 'update',
+              authorId: user?.id || status.userId,
+              targetUserId: status.userId,
+              before: status,
+              after: {
+                ...status,
+                endDate: firstEndStr
+              },
+              comment: status.comment,
           })
           
           // Создаем второй статус (после удаляемого дня)
@@ -195,12 +250,21 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
           secondStart.setDate(secondStart.getDate() + 1)
           const secondStartStr = formatDate(secondStart, 'yyyy-MM-dd')
           
-          await addDayStatus({
-            userId: status.userId,
-            date: secondStartStr,
-            endDate: statusEnd,
-            type: status.type,
-            comment: status.comment
+            await addApprovalRequest({
+              entity: 'status',
+              action: 'create',
+              authorId: user?.id || status.userId,
+              targetUserId: status.userId,
+              before: null,
+              after: {
+                id: '',
+                userId: status.userId,
+                date: secondStartStr,
+                endDate: statusEnd,
+                type: status.type,
+                comment: status.comment
+              },
+              comment: status.comment,
           })
           
           loadData()
@@ -210,8 +274,16 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
     }
 
     // Если статус без endDate или удаляется весь диапазон, удаляем полностью
-    if (confirm('Удалить статус?')) {
-      await deleteDayStatus(status.id)
+    if (confirm('Отправить на согласование удаление статуса?')) {
+      await addApprovalRequest({
+        entity: 'status',
+        action: 'delete',
+        authorId: user?.id || status.userId,
+        targetUserId: status.userId,
+        before: status,
+        after: null,
+        comment: status.comment,
+      })
       loadData()
     }
   }
@@ -299,6 +371,16 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
     })
   }
 
+  const getApprovalsForDay = (date: string): ApprovalRequest[] => {
+    return approvals.filter((a) => {
+      const afterDate = (a.after as any)?.date || (a.after as any)?.endDate
+      const beforeDate = (a.before as any)?.date || (a.before as any)?.endDate
+      const dateToCheck = afterDate || beforeDate
+      if (!dateToCheck) return false
+      return dateToCheck === date
+    })
+  }
+
   const navigateWeek = (direction: 'prev' | 'next') => {
     const newDate = new Date(selectedWeek)
     if (direction === 'prev') {
@@ -364,17 +446,86 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
           const dateStr = formatDate(day, 'yyyy-MM-dd')
           const daySlots = getSlotsForDay(dateStr)
           const dayStatuses = getStatusesForDay(dateStr)
+          const dayApprovals = getApprovalsForDay(dateStr)
+          const isToday = isSameDate(day, today)
+          const dayCardBase = 'relative rounded-xl p-4 sm:p-5 border transition-all duration-300'
+          const dayCardTone = theme === 'dark' ? 'bg-gray-800/70 border-gray-700 shadow-md' : 'bg-gray-50 border-gray-200 shadow-sm'
+          const dayCardHighlight = theme === 'dark'
+            ? 'border-emerald-500/70 bg-gradient-to-br from-emerald-900/30 via-gray-800 to-gray-900/80 ring-2 ring-emerald-400/40 shadow-[0_20px_40px_-24px_rgba(52,211,153,0.8)]'
+            : 'border-emerald-300 bg-gradient-to-br from-emerald-50 via-white to-green-50 ring-2 ring-emerald-200/70 shadow-[0_20px_40px_-24px_rgba(52,211,153,0.6)]'
 
           return (
             <div
               key={dateStr}
-              className={`rounded-xl p-4 sm:p-5 border ${theme === 'dark' ? 'bg-gray-800/70 border-gray-700' : 'bg-gray-50 border-gray-200'}`}
+              className={`${dayCardBase} ${dayCardTone} ${isToday ? dayCardHighlight : ''}`}
             >
+              {isToday && (
+                <div className="absolute top-3 right-3 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500 text-white text-xs font-semibold shadow-lg ring-2 ring-white/50 dark:ring-emerald-200/30">
+                  <span className="w-2 h-2 rounded-full bg-white animate-ping" />
+                  <span className="relative">Сегодня</span>
+                </div>
+              )}
               <h3 className={`text-lg font-semibold mb-3 ${headingColor}`}>
                 {formatDate(day, 'dd.MM.yyyy')}
               </h3>
 
               <div className="space-y-3 sm:space-y-4">
+                {/* Approvals awaiting/rejected */}
+                {dayApprovals.length > 0 && (
+                  <div className="space-y-2">
+                    {dayApprovals.map((approval) => {
+                      const isPending = approval.status === 'pending'
+                      const tone = isPending
+                        ? 'bg-amber-50 text-amber-900 border border-amber-200 shadow-inner dark:bg-amber-900/25 dark:text-amber-50 dark:border-amber-700'
+                        : 'bg-rose-50 text-rose-900 border border-rose-200 shadow-inner dark:bg-rose-900/25 dark:text-rose-50 dark:border-rose-700'
+                      const entityLabel = approval.entity === 'slot' ? 'Слот' : 'Статус'
+                      const actionLabel =
+                        approval.action === 'create'
+                          ? 'Создание'
+                          : approval.action === 'update'
+                          ? 'Изменение'
+                          : 'Удаление'
+                      const slotData = (approval.after as WorkSlot) || (approval.before as WorkSlot)
+                      const statusData = (approval.after as DayStatus) || (approval.before as DayStatus)
+                      const changePreview =
+                        approval.entity === 'slot'
+                          ? `${formatDate(slotData?.date || dateStr, 'dd.MM')} · ${slotData?.slots?.map((s) => `${s.start}-${s.end}`).join(', ')}`
+                          : `${formatDate(statusData?.date || dateStr, 'dd.MM')} · ${
+                              statusData?.type === 'dayoff'
+                                ? 'Выходной'
+                                : statusData?.type === 'sick'
+                                ? 'Больничный'
+                                : 'Отпуск'
+                            }${statusData?.endDate ? ` (${formatDate(statusData.endDate, 'dd.MM')})` : ''}`
+
+                      return (
+                        <div
+                          key={approval.id}
+                          className={`rounded-xl px-3 py-3 sm:px-4 sm:py-3 text-sm sm:text-base flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 ring-1 ring-inset ring-black/5 dark:ring-white/5 ${tone}`}
+                        >
+                          <div className="flex flex-col gap-1">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/70 dark:bg-white/10 text-xs font-semibold">
+                                {entityLabel} · {actionLabel}
+                              </span>
+                              <span className="text-xs sm:text-sm font-semibold">
+                                {isPending ? 'На согласовании' : 'Отклонено'}
+                              </span>
+                            </div>
+                            <span className="text-xs sm:text-sm opacity-80">{changePreview}</span>
+                            {approval.adminComment && (
+                              <span className="text-xs sm:text-sm opacity-80">Комментарий: {approval.adminComment}</span>
+                            )}
+                          </div>
+                          <div className="text-xs sm:text-sm opacity-80 text-right">
+                            Автор: {approval.authorId === approval.targetUserId ? 'участник' : approval.authorId}
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+
                 {/* Statuses */}
                 {dayStatuses.map((status) => {
                   const { displayName } = resolveUser(status.userId)
@@ -501,7 +652,7 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
                                 <Edit className="w-4 h-4 text-white" />
                               </button>
                               <button
-                                onClick={() => handleDeleteSlot(slot.id)}
+                              onClick={() => handleDeleteSlot(slot)}
                                 className="p-1.5 bg-white/20 hover:bg-white/30 rounded-lg transition-colors"
                               >
                                 <Trash2 className="w-4 h-4 text-white" />

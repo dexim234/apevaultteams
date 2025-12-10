@@ -12,7 +12,7 @@ import {
   orderBy,
 } from 'firebase/firestore'
 import { db } from '@/firebase/config'
-import { WorkSlot, DayStatus, Earnings, RatingData, Referral, Call, Task, TaskStatus, Note, TaskPriority, StageAssignee } from '@/types'
+import { WorkSlot, DayStatus, Earnings, RatingData, Referral, Call, Task, TaskStatus, Note, TaskPriority, StageAssignee, ApprovalRequest, ApprovalStatus } from '@/types'
 
 const DATA_RETENTION_DAYS = 30
 
@@ -221,6 +221,201 @@ export const updateDayStatus = async (id: string, updates: Partial<DayStatus>) =
 export const deleteDayStatus = async (id: string) => {
   const statusRef = doc(db, 'dayStatuses', id)
   await deleteDoc(statusRef)
+}
+
+// Approval Requests
+const APPROVAL_COLLECTION = 'approvalRequests'
+
+const mapApprovalSnapshot = (docSnap: any): ApprovalRequest => {
+  const data = docSnap.data() as any
+  return {
+    id: docSnap.id,
+    entity: data?.entity || 'slot',
+    action: data?.action || 'create',
+    status: data?.status || 'pending',
+    authorId: data?.authorId || '',
+    targetUserId: data?.targetUserId || '',
+    before: data?.before ?? null,
+    after: data?.after ?? null,
+    comment: data?.comment,
+    adminComment: data?.adminComment,
+    reviewedBy: data?.reviewedBy,
+    createdAt: data?.createdAt || '',
+    updatedAt: data?.updatedAt || '',
+  }
+}
+
+const applySlotChange = async (request: ApprovalRequest) => {
+  const beforeSlot = request.before as WorkSlot | null | undefined
+  const afterSlot = request.after as WorkSlot | null | undefined
+
+  switch (request.action) {
+    case 'create': {
+      if (!afterSlot) {
+        throw new Error('No slot payload for creation')
+      }
+      const { id: _id, ...payload } = afterSlot
+      await addWorkSlot(payload)
+      return
+    }
+    case 'update': {
+      const targetId = (afterSlot as WorkSlot | undefined)?.id || beforeSlot?.id
+      if (!targetId || !afterSlot) {
+        throw new Error('No slot payload for update')
+      }
+      const { id: _id, ...payload } = afterSlot
+      await updateWorkSlot(targetId, payload)
+      return
+    }
+    case 'delete': {
+      if (!beforeSlot?.id) {
+        throw new Error('No slot id for delete')
+      }
+      await deleteWorkSlot(beforeSlot.id)
+      return
+    }
+    default:
+      return
+  }
+}
+
+const applyStatusChange = async (request: ApprovalRequest) => {
+  const beforeStatus = request.before as DayStatus | null | undefined
+  const afterStatus = request.after as DayStatus | null | undefined
+
+  switch (request.action) {
+    case 'create': {
+      if (!afterStatus) {
+        throw new Error('No status payload for creation')
+      }
+      const { id: _id, ...payload } = afterStatus
+      await addDayStatus(payload)
+      return
+    }
+    case 'update': {
+      const targetId = (afterStatus as DayStatus | undefined)?.id || beforeStatus?.id
+      if (!targetId || !afterStatus) {
+        throw new Error('No status payload for update')
+      }
+      const { id: _id, ...payload } = afterStatus
+      await updateDayStatus(targetId, payload)
+      return
+    }
+    case 'delete': {
+      if (!beforeStatus?.id) {
+        throw new Error('No status id for delete')
+      }
+      await deleteDayStatus(beforeStatus.id)
+      return
+    }
+    default:
+      return
+  }
+}
+
+export const addApprovalRequest = async (
+  request: Omit<ApprovalRequest, 'id' | 'status' | 'createdAt' | 'updatedAt' | 'reviewedBy'>
+) => {
+  const approvalsRef = collection(db, APPROVAL_COLLECTION)
+  const now = new Date().toISOString()
+  const payload = {
+    ...request,
+    status: 'pending' as const,
+    createdAt: now,
+    updatedAt: now,
+  }
+  const cleanPayload = Object.fromEntries(
+    Object.entries(payload).filter(([, value]) => value !== undefined)
+  )
+  const result = await addDoc(approvalsRef, cleanPayload)
+  return result
+}
+
+export const getApprovalRequests = async (
+  status?: ApprovalStatus,
+  authorId?: string,
+  targetUserId?: string
+) => {
+  const approvalsRef = collection(db, APPROVAL_COLLECTION)
+  let q: ReturnType<typeof query>
+
+  if (status) {
+    q = query(approvalsRef, where('status', '==', status))
+  } else if (authorId) {
+    q = query(approvalsRef, where('authorId', '==', authorId))
+  } else if (targetUserId) {
+    q = query(approvalsRef, where('targetUserId', '==', targetUserId))
+  } else {
+    q = query(approvalsRef)
+  }
+
+  const snapshot = await getDocs(q)
+  let results = snapshot.docs.map(mapApprovalSnapshot)
+
+  // Additional in-memory filters to avoid composite indexes
+  if (status) {
+    results = results.filter((r) => r.status === status)
+  }
+  if (authorId) {
+    results = results.filter((r) => r.authorId === authorId)
+  }
+  if (targetUserId) {
+    results = results.filter((r) => r.targetUserId === targetUserId)
+  }
+
+  // Sort by creation time descending
+  results.sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+
+  return results
+}
+
+export const updateApprovalRequest = async (id: string, updates: Partial<ApprovalRequest>) => {
+  const ref = doc(db, APPROVAL_COLLECTION, id)
+  const cleanUpdates = Object.fromEntries(
+    Object.entries({
+      ...updates,
+      updatedAt: new Date().toISOString(),
+    }).filter(([, value]) => value !== undefined)
+  )
+  await updateDoc(ref, cleanUpdates)
+}
+
+export const approveApprovalRequest = async (id: string, adminId: string, adminComment?: string) => {
+  const ref = doc(db, APPROVAL_COLLECTION, id)
+  const snap = await getDoc(ref)
+  if (!snap.exists()) return
+
+  const request = mapApprovalSnapshot(snap)
+  if (request.status !== 'pending') return
+
+  if (request.entity === 'slot') {
+    await applySlotChange(request)
+  } else {
+    await applyStatusChange(request)
+  }
+
+  await updateDoc(ref, {
+    status: 'approved',
+    adminComment: adminComment ?? request.adminComment,
+    reviewedBy: adminId,
+    updatedAt: new Date().toISOString(),
+  })
+}
+
+export const rejectApprovalRequest = async (id: string, adminId: string, adminComment: string) => {
+  const ref = doc(db, APPROVAL_COLLECTION, id)
+  const snap = await getDoc(ref)
+  if (!snap.exists()) return
+
+  const request = mapApprovalSnapshot(snap)
+  if (request.status !== 'pending') return
+
+  await updateDoc(ref, {
+    status: 'rejected',
+    adminComment,
+    reviewedBy: adminId,
+    updatedAt: new Date().toISOString(),
+  })
 }
 
 // Earnings

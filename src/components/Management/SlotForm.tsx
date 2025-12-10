@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import { useAuthStore } from '@/store/authStore'
 import { useThemeStore } from '@/store/themeStore'
 import { useAdminStore } from '@/store/adminStore'
-import { addWorkSlot, updateWorkSlot, getWorkSlots, cleanupOldData } from '@/services/firestoreService'
+import { addApprovalRequest, getWorkSlots } from '@/services/firestoreService'
 import { calculateHours, timeOverlaps, formatDate, getDatesInRange, normalizeDatesList, parseTime } from '@/utils/dateUtils'
 import { X, Plus, Trash2, Edit } from 'lucide-react'
 import { WorkSlot, TimeSlot, TEAM_MEMBERS } from '@/types'
@@ -457,7 +457,8 @@ export const SlotForm = ({ slot, onClose, onSave }: SlotFormProps) => {
         throw new Error(`[${getMemberName(targetUserId)} • ${formatDate(new Date(dateStr), 'dd.MM.yyyy')}] ${validationError}`)
       }
 
-      const slotData: Omit<WorkSlot, 'id'> = {
+      const slotData: WorkSlot = {
+        id: slot?.id || '',
         userId: targetUserId,
         date: dateStr,
         slots: adjustedSlots,
@@ -465,11 +466,15 @@ export const SlotForm = ({ slot, onClose, onSave }: SlotFormProps) => {
         participants,
       }
 
-      if (slot) {
-        await updateWorkSlot(slot.id, slotData)
-      } else {
-        await addWorkSlot(slotData)
-      }
+      await addApprovalRequest({
+        entity: 'slot',
+        action: slot ? 'update' : 'create',
+        authorId: user?.id || targetUserId,
+        targetUserId,
+        before: slot ? slot : null,
+        after: slotData,
+        comment: comment || undefined,
+      })
     }
 
     console.log('Starting save process...')
@@ -510,12 +515,6 @@ export const SlotForm = ({ slot, onClose, onSave }: SlotFormProps) => {
         for (const targetUserId of targetUsers) {
           await createSlotForUserDate(targetUserId, date)
         }
-      }
-
-      try {
-        await cleanupOldData()
-      } catch (cleanupError) {
-        console.error('Cleanup after slot save failed:', cleanupError)
       }
 
       onSave()
@@ -1078,7 +1077,7 @@ export const SlotForm = ({ slot, onClose, onSave }: SlotFormProps) => {
                 disabled={loading || slots.length === 0}
                 className="flex-1 px-4 py-2.5 sm:py-2 bg-[#4E6E49] hover:bg-[#4E6E49] disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg sm:rounded-xl transition-colors text-sm sm:text-base font-medium touch-manipulation active:scale-95 disabled:active:scale-100"
               >
-                {loading ? 'Сохранение...' : 'Сохранить'}
+                {loading ? 'Отправка...' : 'Отправить на согласование'}
               </button>
               <button
                 onClick={onClose}

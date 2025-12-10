@@ -3,9 +3,9 @@ import { useState, useEffect } from 'react'
 import { useThemeStore } from '@/store/themeStore'
 import { useAuthStore } from '@/store/authStore'
 import { useAdminStore } from '@/store/adminStore'
-import { getWorkSlots, getDayStatuses, deleteWorkSlot, deleteDayStatus } from '@/services/firestoreService'
+import { getWorkSlots, getDayStatuses, addApprovalRequest, getApprovalRequests } from '@/services/firestoreService'
 import { formatDate, calculateHours, getWeekDays } from '@/utils/dateUtils'
-import { WorkSlot, DayStatus } from '@/types'
+import { WorkSlot, DayStatus, ApprovalRequest } from '@/types'
 import { TEAM_MEMBERS } from '@/types'
 import { Edit, Trash2, Info, CheckCircle2, Calendar as CalendarIcon } from 'lucide-react'
 
@@ -25,6 +25,7 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
   const { isAdmin } = useAdminStore()
   const [slots, setSlots] = useState<WorkSlot[]>([])
   const [statuses, setStatuses] = useState<DayStatus[]>([])
+  const [approvals, setApprovals] = useState<ApprovalRequest[]>([])
   const [selectedWeek, setSelectedWeek] = useState(new Date())
   const [loading, setLoading] = useState(true)
 
@@ -77,10 +78,11 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
       const weekStart = formatDate(weekStartDate, 'yyyy-MM-dd')
       const weekEnd = formatDate(weekEndDate, 'yyyy-MM-dd')
 
-      // Load all slots and statuses for the week, not filtered by user
-      const [allSlots, allStatuses] = await Promise.all([
+      // Load all slots, statuses and approval requests for the week, not filtered by user
+      const [allSlots, allStatuses, allApprovals] = await Promise.all([
         getWorkSlots(),
-        getDayStatuses()
+        getDayStatuses(),
+        getApprovalRequests()
       ])
 
       // Filter by week range
@@ -101,6 +103,25 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
         ? weekStatuses.filter((s) => s.userId === selectedUserId)
         : weekStatuses
 
+      const weekApprovals = allApprovals.filter((a) => {
+        const afterDate = (a.after as any)?.date || (a.after as any)?.endDate
+        const beforeDate = (a.before as any)?.date || (a.before as any)?.endDate
+        const dateToCheck = afterDate || beforeDate
+        if (!dateToCheck) return false
+        return dateToCheck >= weekStart && dateToCheck <= weekEnd
+      })
+
+      const scopedApprovals = weekApprovals.filter((a) => {
+        if (a.status === 'approved') return false
+        if (selectedUserId) {
+          return a.targetUserId === selectedUserId || a.authorId === selectedUserId
+        }
+        if (isAdmin) return true
+        const currentUserId = user?.id
+        if (!currentUserId) return false
+        return a.authorId === currentUserId || a.targetUserId === currentUserId
+      })
+
       console.log('Loaded slots:', {
         weekStart,
         weekEnd,
@@ -112,6 +133,7 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
 
       setSlots(filteredSlots)
       setStatuses(filteredStatuses)
+      setApprovals(scopedApprovals)
     } catch (error) {
       console.error('Error loading data:', error)
     } finally {
@@ -119,26 +141,145 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
     }
   }
 
-  const handleDeleteSlot = async (id: string) => {
-    if (!isAdmin && user?.id !== slots.find((s) => s.id === id)?.userId) {
+  const handleDeleteSlot = async (slot: WorkSlot) => {
+    if (!isAdmin && user?.id !== slot.userId) {
       alert('Только администратор может удалять чужие слоты')
       return
     }
 
-    if (confirm('Удалить слот?')) {
-      await deleteWorkSlot(id)
+    if (confirm('Отправить на согласование удаление слота?')) {
+      await addApprovalRequest({
+        entity: 'slot',
+        action: 'delete',
+        authorId: user?.id || slot.userId,
+        targetUserId: slot.userId,
+        before: slot,
+        after: null,
+        comment: slot.comment,
+      })
       loadData()
     }
   }
 
-  const handleDeleteStatus = async (id: string) => {
-    if (!isAdmin && user?.id !== statuses.find((s) => s.id === id)?.userId) {
+  const handleDeleteStatus = async (status: DayStatus, dateStr?: string) => {
+    if (!isAdmin && user?.id !== status.userId) {
       alert('Только администратор может удалять чужие статусы')
       return
     }
 
-    if (confirm('Удалить статус?')) {
-      await deleteDayStatus(id)
+    // Если статус имеет endDate и удаляется не весь диапазон, нужно обновить диапазон
+    if (status.endDate && dateStr) {
+      const statusStart = status.date
+      const statusEnd = status.endDate
+
+      // Если удаляется первый день диапазона, обновляем дату начала
+      if (dateStr === statusStart) {
+        if (confirm('Отправить на согласование удаление первого дня диапазона?')) {
+          const newStart = new Date(statusStart)
+          newStart.setDate(newStart.getDate() + 1)
+          const newStartStr = formatDate(newStart, 'yyyy-MM-dd')
+
+          await addApprovalRequest({
+            entity: 'status',
+            action: 'update',
+            authorId: user?.id || status.userId,
+            targetUserId: status.userId,
+            before: status,
+            after: {
+              ...status,
+              date: newStartStr,
+            },
+            comment: status.comment,
+          })
+          loadData()
+        }
+        return
+      }
+
+      // Если удаляется последний день диапазона, обновляем дату окончания
+      if (dateStr === statusEnd) {
+        if (confirm('Отправить на согласование удаление последнего дня диапазона?')) {
+          const newEnd = new Date(statusEnd)
+          newEnd.setDate(newEnd.getDate() - 1)
+          const newEndStr = formatDate(newEnd, 'yyyy-MM-dd')
+
+          await addApprovalRequest({
+            entity: 'status',
+            action: 'update',
+            authorId: user?.id || status.userId,
+            targetUserId: status.userId,
+            before: status,
+            after: {
+              ...status,
+              endDate: newEndStr,
+            },
+            comment: status.comment,
+          })
+          loadData()
+        }
+        return
+      }
+
+      // Если удаляется день из середины диапазона, разбиваем на два статуса
+      if (dateStr > statusStart && dateStr < statusEnd) {
+        if (confirm('Отправить на согласование удаление этого дня? Диапазон будет разбит на две части.')) {
+          // Создаем первый статус (до удаляемого дня)
+          const firstEnd = new Date(dateStr)
+          firstEnd.setDate(firstEnd.getDate() - 1)
+          const firstEndStr = formatDate(firstEnd, 'yyyy-MM-dd')
+
+          await addApprovalRequest({
+            entity: 'status',
+            action: 'update',
+            authorId: user?.id || status.userId,
+            targetUserId: status.userId,
+            before: status,
+            after: {
+              ...status,
+              endDate: firstEndStr,
+            },
+            comment: status.comment,
+          })
+
+          // Создаем второй статус (после удаляемого дня)
+          const secondStart = new Date(dateStr)
+          secondStart.setDate(secondStart.getDate() + 1)
+          const secondStartStr = formatDate(secondStart, 'yyyy-MM-dd')
+
+          await addApprovalRequest({
+            entity: 'status',
+            action: 'create',
+            authorId: user?.id || status.userId,
+            targetUserId: status.userId,
+            before: null,
+            after: {
+              id: '',
+              userId: status.userId,
+              date: secondStartStr,
+              endDate: statusEnd,
+              type: status.type,
+              comment: status.comment,
+            },
+            comment: status.comment,
+          })
+
+          loadData()
+        }
+        return
+      }
+    }
+
+    // Если статус без endDate или удаляется весь диапазон, удаляем полностью
+    if (confirm('Отправить на согласование удаление статуса?')) {
+      await addApprovalRequest({
+        entity: 'status',
+        action: 'delete',
+        authorId: user?.id || status.userId,
+        targetUserId: status.userId,
+        before: status,
+        after: null,
+        comment: status.comment,
+      })
       loadData()
     }
   }
@@ -222,6 +363,18 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
       // Otherwise, check exact match
       return s.date === date
     }) || null
+  }
+
+  const getApprovalsForDay = (userId: string, date: string): ApprovalRequest[] => {
+    return approvals.filter((a) => {
+      if (a.status === 'approved') return false
+      if (a.targetUserId !== userId && a.authorId !== userId) return false
+      const afterDate = (a.after as any)?.date || (a.after as any)?.endDate
+      const beforeDate = (a.before as any)?.date || (a.before as any)?.endDate
+      const dateToCheck = afterDate || beforeDate
+      if (!dateToCheck) return false
+      return dateToCheck === date
+    })
   }
 
   const getUserStats = (userId: string) => {
@@ -383,9 +536,47 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
                     const dateStr = formatDate(day, 'yyyy-MM-dd')
                     const slot = getSlotForDay(user.id, dateStr)
                     const status = getStatusForDay(user.id, dateStr)
+                    const dayApprovals = getApprovalsForDay(user.id, dateStr)
 
                       return (
                         <td key={dateStr} className="px-1 sm:px-2 py-2 sm:py-3 text-center border-l border-r border-transparent hover:border-blue-500/20 transition-colors min-w-[80px] sm:min-w-[100px]">
+                        {dayApprovals.length > 0 && (
+                          <div className="space-y-1 mb-1">
+                            {dayApprovals.map((approval) => {
+                              const isPending = approval.status === 'pending'
+                              const entityLabel = approval.entity === 'slot' ? 'Слот' : 'Статус'
+                              const actionLabel =
+                                approval.action === 'create'
+                                  ? 'Создание'
+                                  : approval.action === 'update'
+                                  ? 'Изменение'
+                                  : 'Удаление'
+                              const slotData = (approval.after as WorkSlot) || (approval.before as WorkSlot)
+                              const statusData = (approval.after as DayStatus) || (approval.before as DayStatus)
+                              const preview =
+                                approval.entity === 'slot'
+                                  ? slotData?.slots?.map((s) => `${s.start}-${s.end}`).join(', ')
+                                  : statusData?.type === 'dayoff'
+                                  ? 'Выходной'
+                                  : statusData?.type === 'sick'
+                                  ? 'Больничный'
+                                  : 'Отпуск'
+
+                              return (
+                                <div
+                                  key={approval.id}
+                                  className={`rounded-md px-2 py-1 text-[11px] sm:text-xs font-medium ${
+                                    isPending
+                                      ? 'bg-amber-100 text-amber-900 dark:bg-amber-900/30 dark:text-amber-50'
+                                      : 'bg-rose-100 text-rose-900 dark:bg-rose-900/30 dark:text-rose-50'
+                                  }`}
+                                >
+                                  {entityLabel} · {actionLabel} · {isPending ? 'На согласовании' : 'Отклонено'} {preview ? `(${preview})` : ''}
+                                </div>
+                              )
+                            })}
+                          </div>
+                        )}
                         {slot ? (
                           <div className="space-y-2">
                             {(() => {
@@ -449,7 +640,7 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
                                     <Edit className="w-3 h-3" />
                                   </button>
                                   <button
-                                    onClick={() => handleDeleteSlot(slot.id)}
+                                    onClick={() => handleDeleteSlot(slot)}
                                     className="p-1 text-red-500 hover:bg-red-500 hover:text-white rounded"
                                   >
                                     <Trash2 className="w-3 h-3" />
@@ -500,7 +691,7 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
                                     <Edit className="w-3 h-3" />
                                   </button>
                                   <button
-                                    onClick={() => handleDeleteStatus(status.id)}
+                                    onClick={() => handleDeleteStatus(status, dateStr)}
                                     className="p-1 text-red-500 hover:bg-red-500 hover:text-white rounded"
                                   >
                                     <Trash2 className="w-3 h-3" />

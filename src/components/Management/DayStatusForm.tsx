@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import { useAuthStore } from '@/store/authStore'
 import { useThemeStore } from '@/store/themeStore'
 import { useAdminStore } from '@/store/adminStore'
-import { addDayStatus, updateDayStatus, getDayStatuses } from '@/services/firestoreService'
+import { addApprovalRequest, getDayStatuses } from '@/services/firestoreService'
 import { formatDate, isSameDate, getDatesInRange, normalizeDatesList } from '@/utils/dateUtils'
 import { X } from 'lucide-react'
 import { DayStatus, TEAM_MEMBERS } from '@/types'
@@ -273,7 +273,8 @@ export const DayStatusForm = ({ type, status, onClose, onSave }: DayStatusFormPr
         throw new Error(`[${getMemberName(targetUserId)} • ${formatDate(payload.date, 'dd.MM.yyyy')}] ${validationError}`)
       }
 
-      const statusData: Omit<DayStatus, 'id'> = {
+      const statusData: DayStatus = {
+        id: status?.id || '',
         userId: targetUserId,
         date: payload.date,
         type,
@@ -281,11 +282,15 @@ export const DayStatusForm = ({ type, status, onClose, onSave }: DayStatusFormPr
         ...(comment && { comment }),
       }
 
-      if (status) {
-        await updateDayStatus(status.id, statusData)
-      } else {
-        await addDayStatus(statusData)
-      }
+      await addApprovalRequest({
+        entity: 'status',
+        action: status ? 'update' : 'create',
+        authorId: user?.id || targetUserId,
+        targetUserId,
+        before: status ? status : null,
+        after: statusData,
+        comment: comment || undefined,
+      })
     }
 
     console.log('Starting save process...')
@@ -852,7 +857,7 @@ export const DayStatusForm = ({ type, status, onClose, onSave }: DayStatusFormPr
                 disabled={loading}
                 className={`flex-1 px-4 py-2.5 sm:py-2 ${typeColors[type]} hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg sm:rounded-xl transition-colors text-sm sm:text-base font-medium touch-manipulation active:scale-95 disabled:active:scale-100`}
               >
-                {loading ? 'Сохранение...' : 'Сохранить'}
+                {loading ? 'Отправка...' : 'Отправить на согласование'}
               </button>
               <button
                 onClick={onClose}

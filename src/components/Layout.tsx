@@ -6,6 +6,7 @@ import {
   Moon,
   Sun,
   Shield,
+  CheckCircle2,
   Zap,
   Settings,
   Calendar,
@@ -32,6 +33,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
     { path: '/earnings', label: 'Заработок', icon: DollarSign },
     { path: '/tasks', label: 'Задачи', icon: CheckSquare },
     { path: '/rating', label: 'Рейтинг', icon: TrendingUp },
+    ...(isAdmin ? [{ path: '/approvals', label: 'Согласования', icon: CheckCircle2 }] : []),
   ]
 
   const isFunctionalityActive = functionalitySubItems.some(item => location.pathname === item.path)
@@ -149,6 +151,17 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                 >
                   <Shield className="w-4 h-4" />
                   <span>Админ</span>
+                  <ArrowUpRight className="w-4 h-4 opacity-70" />
+                </Link>
+              )}
+              {isAdmin && (
+                <Link
+                  to="/approvals"
+                  data-active={location.pathname === '/approvals'}
+                  className="nav-chip"
+                >
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>Согласования</span>
                   <ArrowUpRight className="w-4 h-4 opacity-70" />
                 </Link>
               )}

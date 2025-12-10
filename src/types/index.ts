@@ -37,6 +37,26 @@ export interface DayStatus {
   endDate?: string // for multi-day statuses
 }
 
+export type ApprovalEntity = 'slot' | 'status'
+export type ApprovalAction = 'create' | 'update' | 'delete'
+export type ApprovalStatus = 'pending' | 'approved' | 'rejected'
+
+export interface ApprovalRequest {
+  id: string
+  entity: ApprovalEntity
+  action: ApprovalAction
+  status: ApprovalStatus
+  authorId: string
+  targetUserId: string
+  before?: WorkSlot | DayStatus | null
+  after?: WorkSlot | DayStatus | null
+  comment?: string // note from author
+  adminComment?: string // decision note
+  reviewedBy?: string
+  createdAt: string
+  updatedAt: string
+}
+
 // Earnings types
 export type EarningsCategory = 'memecoins' | 'futures' | 'nft' | 'spot' | 'polymarket' | 'staking' | 'other'
 
