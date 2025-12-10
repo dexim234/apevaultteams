@@ -28,10 +28,11 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
   const [approvals, setApprovals] = useState<ApprovalRequest[]>([])
   const [selectedWeek, setSelectedWeek] = useState(new Date())
   const [loading, setLoading] = useState(true)
+  const todayStr = formatDate(new Date(), 'yyyy-MM-dd')
 
   const nicknameMap: Record<string, string> = {
     '1': 'Dex',
-    '2': 'Merc',
+    '2': 'Enowk',
     '3': 'Xenia',
     '4': 'Olenka',
     '5': 'Sydney',
@@ -175,7 +176,7 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
       // Если удаляется первый день диапазона, обновляем дату начала
       if (dateStr === statusStart) {
         if (confirm('Отправить на согласование удаление первого дня диапазона?')) {
-          const newStart = new Date(statusStart)
+          const newStart = new Date(statusStart + 'T00:00:00')
           newStart.setDate(newStart.getDate() + 1)
           const newStartStr = formatDate(newStart, 'yyyy-MM-dd')
 
@@ -199,7 +200,7 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
       // Если удаляется последний день диапазона, обновляем дату окончания
       if (dateStr === statusEnd) {
         if (confirm('Отправить на согласование удаление последнего дня диапазона?')) {
-          const newEnd = new Date(statusEnd)
+          const newEnd = new Date(statusEnd + 'T00:00:00')
           newEnd.setDate(newEnd.getDate() - 1)
           const newEndStr = formatDate(newEnd, 'yyyy-MM-dd')
 
@@ -224,7 +225,7 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
       if (dateStr > statusStart && dateStr < statusEnd) {
         if (confirm('Отправить на согласование удаление этого дня? Диапазон будет разбит на две части.')) {
           // Создаем первый статус (до удаляемого дня)
-          const firstEnd = new Date(dateStr)
+          const firstEnd = new Date(dateStr + 'T00:00:00')
           firstEnd.setDate(firstEnd.getDate() - 1)
           const firstEndStr = formatDate(firstEnd, 'yyyy-MM-dd')
 
@@ -242,7 +243,7 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
           })
 
           // Создаем второй статус (после удаляемого дня)
-          const secondStart = new Date(dateStr)
+          const secondStart = new Date(dateStr + 'T00:00:00')
           secondStart.setDate(secondStart.getDate() + 1)
           const secondStartStr = formatDate(secondStart, 'yyyy-MM-dd')
 
@@ -539,7 +540,14 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
                     const dayApprovals = getApprovalsForDay(user.id, dateStr)
 
                       return (
-                        <td key={dateStr} className="px-1 sm:px-2 py-2 sm:py-3 text-center border-l border-r border-transparent hover:border-blue-500/20 transition-colors min-w-[80px] sm:min-w-[100px]">
+                        <td
+                          key={dateStr}
+                          className={`px-1 sm:px-2 py-2 sm:py-3 text-center border-l border-r border-transparent hover:border-blue-500/20 transition-colors min-w-[80px] sm:min-w-[100px] ${
+                            dateStr === todayStr
+                              ? 'bg-emerald-50 dark:bg-emerald-900/20 ring-1 ring-emerald-300/70 dark:ring-emerald-500/40'
+                              : ''
+                          }`}
+                        >
                         {dayApprovals.length > 0 && (
                           <div className="space-y-1 mb-1">
                             {dayApprovals.map((approval) => {
@@ -572,6 +580,9 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
                                   }`}
                                 >
                                   {entityLabel} · {actionLabel} · {isPending ? 'На согласовании' : 'Отклонено'} {preview ? `(${preview})` : ''}
+                                  {!isPending && approval.adminComment && (
+                                    <span className="block text-[10px] sm:text-[11px] opacity-80">Комментарий: {approval.adminComment}</span>
+                                  )}
                                 </div>
                               )
                             })}

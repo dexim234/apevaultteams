@@ -33,6 +33,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
     { path: '/earnings', label: 'Заработок', icon: DollarSign },
     { path: '/tasks', label: 'Задачи', icon: CheckSquare },
     { path: '/rating', label: 'Рейтинг', icon: TrendingUp },
+    ...(isAdmin ? [{ path: '/call', label: 'HUB', icon: Zap }] : []),
     ...(isAdmin ? [{ path: '/approvals', label: 'Согласования', icon: CheckCircle2 }] : []),
   ]
 
@@ -71,15 +72,17 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
             </div>
 
             <nav className="hidden lg:flex items-center gap-2 flex-1 justify-center">
-              <Link
-                to="/call"
-                data-active={location.pathname === '/call'}
-                className="nav-chip"
-              >
-                <Zap className="w-4 h-4" />
-                <span>HUB</span>
-                <ArrowUpRight className="w-4 h-4 opacity-70" />
-              </Link>
+              {!isAdmin && (
+                <Link
+                  to="/call"
+                  data-active={location.pathname === '/call'}
+                  className="nav-chip"
+                >
+                  <Zap className="w-4 h-4" />
+                  <span>HUB</span>
+                  <ArrowUpRight className="w-4 h-4 opacity-70" />
+                </Link>
+              )}
 
               <div className="relative">
                 <button
@@ -123,15 +126,17 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                 )}
               </div>
 
-              <Link
-                to="/about"
-                data-active={location.pathname === '/about'}
-                className="nav-chip"
-              >
-                <Info className="w-4 h-4" />
-                <span>О нас</span>
-                <ArrowUpRight className="w-4 h-4 opacity-70" />
-              </Link>
+              {!isAdmin && (
+                <Link
+                  to="/about"
+                  data-active={location.pathname === '/about'}
+                  className="nav-chip"
+                >
+                  <Info className="w-4 h-4" />
+                  <span>О нас</span>
+                  <ArrowUpRight className="w-4 h-4 opacity-70" />
+                </Link>
+              )}
 
               <Link
                 to="/profile"
@@ -199,16 +204,18 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
         <div className="max-w-5xl mx-auto">
           <div className="glass-panel rounded-2xl shadow-2xl border border-white/60 dark:border-white/10">
             <div className="grid grid-cols-4 divide-x divide-white/40 dark:divide-white/5">
-              <Link
-                to="/call"
-                className={`flex flex-col items-center justify-center gap-1 py-3 ${location.pathname === '/call' ? 'text-[#4E6E49]' : theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}
-              >
-                <Zap className="w-5 h-5" />
-                <div className="flex items-center gap-1">
-                  <span className="text-[11px] font-semibold">HUB</span>
-                  <ArrowUpRight className="w-3 h-3 opacity-70" />
-                </div>
-              </Link>
+              {!isAdmin && (
+                <Link
+                  to="/call"
+                  className={`flex flex-col items-center justify-center gap-1 py-3 ${location.pathname === '/call' ? 'text-[#4E6E49]' : theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}
+                >
+                  <Zap className="w-5 h-5" />
+                  <div className="flex items-center gap-1">
+                    <span className="text-[11px] font-semibold">HUB</span>
+                    <ArrowUpRight className="w-3 h-3 opacity-70" />
+                  </div>
+                </Link>
+              )}
               <button
                 onClick={() => {
                   setShowFunctionalityMenu(!showFunctionalityMenu)
@@ -221,16 +228,18 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                   <ChevronDown className="w-3 h-3 opacity-70" />
                 </div>
               </button>
-              <Link
-                to="/about"
-                className={`flex flex-col items-center justify-center gap-1 py-3 ${location.pathname === '/about' ? 'text-[#4E6E49]' : theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}
-              >
-                <Info className="w-5 h-5" />
-                <div className="flex items-center gap-1">
-                  <span className="text-[11px] font-semibold">О нас</span>
-                  <ArrowUpRight className="w-3 h-3 opacity-70" />
-                </div>
-              </Link>
+              {!isAdmin && (
+                <Link
+                  to="/about"
+                  className={`flex flex-col items-center justify-center gap-1 py-3 ${location.pathname === '/about' ? 'text-[#4E6E49]' : theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}
+                >
+                  <Info className="w-5 h-5" />
+                  <div className="flex items-center gap-1">
+                    <span className="text-[11px] font-semibold">О нас</span>
+                    <ArrowUpRight className="w-3 h-3 opacity-70" />
+                  </div>
+                </Link>
+              )}
               <Link
                 to="/profile"
                 className={`flex flex-col items-center justify-center gap-1 py-3 ${location.pathname === '/profile' ? 'text-[#4E6E49]' : theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}

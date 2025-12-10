@@ -332,7 +332,7 @@ export const DayStatusForm = ({ type, status, onClose, onSave }: DayStatusFormPr
 
   const nicknameMap: Record<string, string> = {
     '1': 'Dex',
-    '2': 'Merc',
+    '2': 'Enowk',
     '3': 'Xenia',
     '4': 'Olenka',
     '5': 'Sydney',

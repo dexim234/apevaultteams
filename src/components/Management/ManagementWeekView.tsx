@@ -32,7 +32,7 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
 
   const nicknameMap: Record<string, string> = {
     '1': 'Dex',
-    '2': 'Merc',
+    '2': 'Enowk',
     '3': 'Xenia',
     '4': 'Olenka',
     '5': 'Sydney',
@@ -228,7 +228,7 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
       if (dateStr > statusStart && dateStr < statusEnd) {
           if (confirm('Отправить на согласование удаление этого дня? Диапазон будет разбит на две части.')) {
           // Создаем первый статус (до удаляемого дня)
-          const firstEnd = new Date(parseISO(dateStr))
+            const firstEnd = new Date(parseISO(dateStr))
           firstEnd.setDate(firstEnd.getDate() - 1)
           const firstEndStr = formatDate(firstEnd, 'yyyy-MM-dd')
           
@@ -246,7 +246,7 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
           })
           
           // Создаем второй статус (после удаляемого дня)
-          const secondStart = new Date(parseISO(dateStr))
+            const secondStart = new Date(parseISO(dateStr))
           secondStart.setDate(secondStart.getDate() + 1)
           const secondStartStr = formatDate(secondStart, 'yyyy-MM-dd')
           

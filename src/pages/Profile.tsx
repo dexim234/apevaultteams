@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Layout } from '@/components/Layout'
 import { useThemeStore } from '@/store/themeStore'
 import { useAuthStore } from '@/store/authStore'
-import { useAdminStore } from '@/store/adminStore'
+import { useAdminStore, ADMIN_PASSWORD } from '@/store/adminStore'
 import {
   getTasks,
   getRatingData,
@@ -16,6 +16,7 @@ import {
   updateNote,
   deleteNote,
 } from '@/services/firestoreService'
+import { getApprovalRequests } from '@/services/firestoreService'
 import {
   getWeekRange,
   getLastNDaysRange,
@@ -73,8 +74,11 @@ export const Profile = () => {
   })
   const [loading, setLoading] = useState(true)
   const [loginCopied, setLoginCopied] = useState(false)
+  const [notifications, setNotifications] = useState<
+    { id: string; text: string; status: string; updatedAt: string }[]
+  >([])
 
-  const userData = user || (isAdmin ? { name: 'Администратор', login: 'admin', password: 'admin' } : null)
+  const userData = user || (isAdmin ? { name: 'Администратор', login: 'admin', password: ADMIN_PASSWORD } : null)
   const profileAvatar = user?.id ? TEAM_MEMBERS.find((m) => m.id === user.id)?.avatar : undefined
   const profileInitial = userData?.name ? userData.name.charAt(0).toUpperCase() : 'A'
 
@@ -197,6 +201,28 @@ export const Profile = () => {
           weeklyEarnings,
           weeklyMessages
         )
+
+      // Approvals notifications (24h)
+      if (user) {
+        const approvals = await getApprovalRequests()
+        const cutoff = Date.now() - 24 * 60 * 60 * 1000
+        const relevant = approvals.filter((a) => {
+          if (a.status === 'pending') return false
+          if (a.authorId !== user.id && a.targetUserId !== user.id) return false
+          const updated = Date.parse(a.updatedAt || a.createdAt)
+          return updated >= cutoff
+        })
+        setNotifications(
+          relevant.map((a) => ({
+            id: a.id,
+            status: a.status,
+            updatedAt: a.updatedAt,
+            text: `${a.entity === 'slot' ? 'Слот' : 'Статус'} • ${
+              a.status === 'approved' ? 'Подтверждено' : 'Отклонено'
+            }${a.adminComment ? `: ${a.adminComment}` : ''}`,
+          }))
+        )
+      }
 
         setRating({ ...updatedData, rating: calculatedRating })
         setRatingBreakdown(breakdown)
@@ -399,6 +425,18 @@ export const Profile = () => {
   return (
     <Layout>
       <div className="space-y-6">
+        {notifications.length > 0 && (
+          <div className="rounded-2xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/20 p-4 shadow-sm">
+            <p className="text-sm font-semibold text-emerald-900 dark:text-emerald-100 mb-2">Уведомления (последние 24 часа)</p>
+            <div className="space-y-1.5">
+              {notifications.map((n) => (
+                <div key={n.id} className="text-sm text-emerald-900 dark:text-emerald-50">
+                  {n.text}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
         <div className={`rounded-2xl p-6 border ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-white'} shadow-lg`}>
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">

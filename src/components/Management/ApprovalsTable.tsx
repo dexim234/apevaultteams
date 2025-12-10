@@ -61,14 +61,18 @@ export const ApprovalsTable = () => {
   const { user } = useAuthStore()
   const [approvals, setApprovals] = useState<ApprovalRequest[]>([])
   const [loading, setLoading] = useState(true)
+  const [submittingId, setSubmittingId] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
   const loadApprovals = async () => {
     setLoading(true)
+    setError(null)
     try {
       const data = await getApprovalRequests()
       setApprovals(data)
     } catch (error) {
       console.error('Не удалось загрузить заявки на согласование', error)
+      setError('Не удалось загрузить заявки')
     } finally {
       setLoading(false)
     }
@@ -79,14 +83,34 @@ export const ApprovalsTable = () => {
   }, [])
 
   const handleApprove = async (approvalId: string) => {
-    await approveApprovalRequest(approvalId, user?.id || 'admin')
-    await loadApprovals()
+    if (submittingId) return
+    setSubmittingId(approvalId)
+    setError(null)
+    try {
+      await approveApprovalRequest(approvalId, user?.id || 'admin')
+      await loadApprovals()
+    } catch (e) {
+      console.error('Ошибка при подтверждении', e)
+      setError('Не удалось подтвердить заявку')
+    } finally {
+      setSubmittingId(null)
+    }
   }
 
   const handleReject = async (approvalId: string) => {
+    if (submittingId) return
     const adminComment = prompt('Комментарий для отклонения заявки', 'Уточните детали') || 'Отклонено без комментария'
-    await rejectApprovalRequest(approvalId, user?.id || 'admin', adminComment)
-    await loadApprovals()
+    setSubmittingId(approvalId)
+    setError(null)
+    try {
+      await rejectApprovalRequest(approvalId, user?.id || 'admin', adminComment)
+      await loadApprovals()
+    } catch (e) {
+      console.error('Ошибка при отклонении', e)
+      setError('Не удалось отклонить заявку')
+    } finally {
+      setSubmittingId(null)
+    }
   }
 
   const renderChangePreview = (approval: ApprovalRequest) => {
@@ -122,6 +146,11 @@ export const ApprovalsTable = () => {
           Обновить
         </button>
       </div>
+      {error && (
+        <div className="px-4 py-3 bg-rose-100 text-rose-900 dark:bg-rose-900/30 dark:text-rose-100 text-sm">
+          {error}
+        </div>
+      )}
 
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-800 text-sm">
@@ -173,15 +202,17 @@ export const ApprovalsTable = () => {
                     <div className="flex flex-col gap-2">
                       <button
                         onClick={() => handleApprove(approval.id)}
-                        className="px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-semibold"
+                        disabled={!!submittingId}
+                        className="px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-400 text-white text-xs sm:text-sm font-semibold"
                       >
-                        Подтвердить и применить
+                        {submittingId === approval.id ? 'Применяем...' : 'Подтвердить и применить'}
                       </button>
                       <button
                         onClick={() => handleReject(approval.id)}
-                        className="px-3 py-2 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-xs sm:text-sm font-semibold"
+                        disabled={!!submittingId}
+                        className="px-3 py-2 rounded-lg bg-rose-600 hover:bg-rose-700 disabled:bg-rose-400 text-white text-xs sm:text-sm font-semibold"
                       >
-                        Отклонить
+                        {submittingId === approval.id ? 'Отклоняем...' : 'Отклонить'}
                       </button>
                     </div>
                   ) : (
