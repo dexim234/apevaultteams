@@ -545,42 +545,20 @@ export const TaskKanban = ({ tasks, onUpdate, onEdit, onDelete }: TaskKanbanProp
                                 {TEAM_MEMBERS.find(m => m.id === task.createdBy)?.name || 'Неизвестно'}
                               </span>
                             </div>
-                          <div className="flex items-center gap-1">
-                            <span className={`font-medium ${theme === 'dark' ? 'text-[#4E6E49]' : 'text-[#4E6E49]'}`}>ГИ:</span>
-                            <span className={theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}>
-                              {task.mainExecutor ? TEAM_MEMBERS.find(m => m.id === task.mainExecutor)?.name || task.mainExecutor : '—'}
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <span className={`font-medium ${theme === 'dark' ? 'text-[#4E6E49]' : 'text-[#4E6E49]'}`}>ВИ:</span>
-                            <span className={theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}>
-                              {task.leadExecutor ? TEAM_MEMBERS.find(m => m.id === task.leadExecutor)?.name || task.leadExecutor : '—'}
-                            </span>
-                          </div>
-                          <div className="flex flex-col gap-1">
-                            <div className={`flex items-center gap-1 ${theme === 'dark' ? 'text-[#4E6E49]' : 'text-[#4E6E49]'}`}>
-                              <span className="font-medium">Исполнители:</span>
+                            <div className="flex flex-col gap-1">
+                              <div className={`flex items-center gap-1 ${theme === 'dark' ? 'text-[#4E6E49]' : 'text-[#4E6E49]'}`}>
+                                <span className="font-medium">Исполнители:</span>
+                              </div>
+                              {assigneeDetails.length > 0 ? (
+                                assigneeDetails.map((assignee) => (
+                                  <div key={assignee.member.id} className={`text-[11px] sm:text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} flex flex-wrap gap-1`}>
+                                    <span className="font-medium">{assignee.member.name}</span>
+                                  </div>
+                                ))
+                              ) : (
+                                <span className={theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}>Не назначены</span>
+                              )}
                             </div>
-                            {assigneeDetails.length > 0 ? (
-                              assigneeDetails.map((assignee) => (
-                                <div key={assignee.member.id} className={`text-[11px] sm:text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} flex flex-wrap gap-1`}>
-                                  <span className="font-medium">{assignee.member.name}</span>
-                                  <span>•</span>
-                                  <span>
-                                    {assignee.priority === 'high' ? 'Высокий' : assignee.priority === 'medium' ? 'Средний' : 'Низкий'}
-                                  </span>
-                                  {assignee.comment && (
-                                    <>
-                                      <span>•</span>
-                                      <span className="truncate max-w-[140px] sm:max-w-[180px]">{assignee.comment}</span>
-                                    </>
-                                  )}
-                                </div>
-                              ))
-                            ) : (
-                              <span className={theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}>Не назначены</span>
-                            )}
-                          </div>
                           </div>
                           <div className={`flex items-center gap-2 flex-wrap ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                             {task.startTime && (
@@ -843,22 +821,21 @@ export const TaskKanban = ({ tasks, onUpdate, onEdit, onDelete }: TaskKanbanProp
                       <div className="flex items-center justify-between">
                         <p className={`font-semibold ${headingColor}`}>{stage.name}</p>
                         <p className="text-xs text-gray-500">
-                          {stage.approvals?.filter((a) => a.status === 'approved').length || 0}/{stage.approvals?.length || 0} подтверждений
+                      {stage.approvals?.filter((a) => a.status === 'approved').length || 0}/{stage.approvals?.length || 0} подтверждений
                         </p>
                       </div>
-                      {stage.assignees && stage.assignees.length > 0 && (
-                        <div className="space-y-1 text-xs">
-                          {stage.assignees.map((a) => {
-                            const member = TEAM_MEMBERS.find((m) => m.id === a.userId)
-                            return (
-                              <div key={a.userId} className="flex items-start justify-between gap-2">
-                                <span className="font-medium">{member?.name || a.userId}</span>
-                                {a.comment && <span className="text-gray-500 truncate">{a.comment}</span>}
-                              </div>
-                            )
-                          })}
-                        </div>
-                      )}
+                  {stage.assignees && stage.assignees.length > 0 && (
+                    <div className="space-y-1 text-xs">
+                      {stage.assignees.map((a) => {
+                        const member = TEAM_MEMBERS.find((m) => m.id === a.userId)
+                        return (
+                          <div key={a.userId} className="flex items-start justify-between gap-2">
+                            <span className="font-medium">{member?.name || a.userId}</span>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  )}
                     </div>
                   ))}
                 </div>

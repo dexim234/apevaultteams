@@ -181,41 +181,6 @@ export const TaskCard = ({ task, onEdit, onDelete, onUpdate }: TaskCardProps) =>
     }
   }
 
-  const getPriorityColor = () => {
-    switch (task.priority) {
-      case 'urgent':
-        return theme === 'dark' ? 'text-rose-300' : 'text-rose-600'
-      case 'high':
-        return theme === 'dark' ? 'text-red-400' : 'text-red-600'
-      case 'medium':
-        return theme === 'dark' ? 'text-yellow-400' : 'text-yellow-600'
-      default:
-        return theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-    }
-  }
-
-  const getAssigneePriorityStyles = (priority: TaskPriority) => {
-    const map = {
-      urgent: {
-        label: 'Экстренный',
-        classes: theme === 'dark' ? 'bg-rose-600/20 text-rose-100 border-rose-500/50' : 'bg-rose-50 text-rose-700 border-rose-200',
-      },
-      high: {
-        label: 'Высокий',
-        classes: theme === 'dark' ? 'bg-red-500/20 text-red-300 border-red-500/40' : 'bg-red-50 text-red-600 border-red-200',
-      },
-      medium: {
-        label: 'Средний',
-        classes: theme === 'dark' ? 'bg-yellow-500/20 text-yellow-300 border-yellow-500/40' : 'bg-yellow-50 text-yellow-700 border-yellow-200',
-      },
-      low: {
-        label: 'Низкий',
-        classes: theme === 'dark' ? 'bg-gray-500/20 text-gray-300 border-gray-500/40' : 'bg-gray-50 text-gray-700 border-gray-200',
-      },
-    }
-    return map[priority]
-  }
-
   const getStatusColor = () => {
     const colorMap: Record<TaskStatus, string> = {
       in_progress: theme === 'dark' ? 'bg-blue-500/20 border-blue-500/50 text-blue-400' : 'bg-blue-50 border-blue-200 text-blue-700',
@@ -271,25 +236,21 @@ export const TaskCard = ({ task, onEdit, onDelete, onUpdate }: TaskCardProps) =>
               </h3>
             </div>
             <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-              {/* Category */}
               <span className={`px-2.5 py-1 rounded-lg text-xs sm:text-sm font-medium ${getCategoryColor().bg} ${getCategoryColor().text} inline-flex items-center gap-1.5`}>
                 <CategoryIcon className="w-4 h-4" />
                 {categoryInfo.label}
               </span>
-              {/* Status */}
               <span className={`px-2.5 py-1 rounded-lg text-xs sm:text-sm font-medium border ${getStatusColor()}`}>
                 {statusInfo.label}
               </span>
-              {/* Priority */}
-              <span className={`text-xs sm:text-sm font-medium inline-flex items-center gap-1.5 ${getPriorityColor()}`}>
-                {task.priority === 'urgent' || task.priority === 'high' ? <Flame className="w-4 h-4" /> : task.priority === 'medium' ? <Radio className="w-4 h-4" /> : <Feather className="w-4 h-4" />}
+              <span className={`px-2.5 py-1 rounded-lg text-xs sm:text-sm font-medium border ${theme === 'dark' ? 'border-yellow-500/40 text-yellow-200 bg-yellow-500/10' : 'border-yellow-200 text-yellow-700 bg-yellow-50'}`}>
                 {task.priority === 'urgent'
-                  ? 'Экстренный'
+                  ? 'Экстренный приоритет'
                   : task.priority === 'high'
-                    ? 'Высокий'
+                    ? 'Высокий приоритет'
                     : task.priority === 'medium'
-                      ? 'Средний'
-                      : 'Низкий'}
+                      ? 'Средний приоритет'
+                      : 'Низкий приоритет'}
               </span>
             </div>
           </div>
@@ -338,18 +299,6 @@ export const TaskCard = ({ task, onEdit, onDelete, onUpdate }: TaskCardProps) =>
               </span>
               <span className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
                 {createdByUser?.name || 'Неизвестно'}
-              </span>
-            </div>
-            <div className="flex items-center gap-2 text-xs sm:text-sm">
-              <span className={`font-medium ${theme === 'dark' ? 'text-[#4E6E49]' : 'text-[#4E6E49]'}`}>ГИ:</span>
-              <span className={theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}>
-                {task.mainExecutor ? TEAM_MEMBERS.find((m) => m.id === task.mainExecutor)?.name || task.mainExecutor : '—'}
-              </span>
-            </div>
-            <div className="flex items-center gap-2 text-xs sm:text-sm">
-              <span className={`font-medium ${theme === 'dark' ? 'text-[#4E6E49]' : 'text-[#4E6E49]'}`}>ВИ:</span>
-              <span className={theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}>
-                {task.leadExecutor ? TEAM_MEMBERS.find((m) => m.id === task.leadExecutor)?.name || task.leadExecutor : '—'}
               </span>
             </div>
 
