@@ -324,12 +324,6 @@ export const TaskCard = ({ task, onEdit, onDelete, onUpdate }: TaskCardProps) =>
           {/* Due date and time */}
           <div className="flex items-center gap-3 flex-wrap text-xs sm:text-sm">
             <span className="inline-flex items-center gap-1">
-              <AlarmClock className={`w-4 h-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`} />
-              <span className={theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}>
-                Старт: {task.startTime || '—'}
-              </span>
-            </span>
-            <span className="inline-flex items-center gap-1">
               <Calendar className={`w-4 h-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`} />
               <span className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
                 Дедлайн: {formatDate(new Date(task.dueDate), 'dd.MM.yyyy')} {task.dueTime}

@@ -561,12 +561,6 @@ export const TaskKanban = ({ tasks, onUpdate, onEdit, onDelete }: TaskKanbanProp
                             </div>
                           </div>
                           <div className={`flex items-center gap-2 flex-wrap ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                            {task.startTime && (
-                              <span className="inline-flex items-center gap-1">
-                                <AlarmClock className="w-3.5 h-3.5" />
-                                {task.startTime}
-                              </span>
-                            )}
                             <span className="inline-flex items-center gap-1">
                               <CalendarClock className="w-3.5 h-3.5" />
                               {formatDate(new Date(task.dueDate), 'dd.MM.yyyy')}
@@ -576,6 +570,17 @@ export const TaskKanban = ({ tasks, onUpdate, onEdit, onDelete }: TaskKanbanProp
                               {task.dueTime}
                             </span>
                             <TaskDeadlineBadge dueDate={task.dueDate} dueTime={task.dueTime} theme={theme} size="compact" />
+                          </div>
+                          <div className="flex items-center gap-1 text-[11px]">
+                            <span className={`px-2 py-0.5 rounded-full border ${theme === 'dark' ? 'border-yellow-500/40 text-yellow-200 bg-yellow-500/10' : 'border-yellow-200 text-yellow-700 bg-yellow-50'}`}>
+                              {task.priority === 'urgent'
+                                ? 'Экстренный приоритет'
+                                : task.priority === 'high'
+                                  ? 'Высокий приоритет'
+                                  : task.priority === 'medium'
+                                    ? 'Средний приоритет'
+                                    : 'Низкий приоритет'}
+                            </span>
                           </div>
                           {total > 0 && (
                             <div className={`flex items-center justify-between gap-2 ${theme === 'dark' ? 'text-yellow-300' : 'text-yellow-700'}`}>
