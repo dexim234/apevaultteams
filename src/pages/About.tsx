@@ -156,7 +156,7 @@ export const About = () => {
                 Принципы, которые держат нас на вершине
               </h2>
               <div className="flex gap-2">
-                <Link to="/rules" className="pill" data-active="false">
+                <Link to="/rules" className="pill justify-center text-center" data-active="false">
                   Ознакомиться с правилами
                   <ArrowUpRight className="w-4 h-4" />
                 </Link>

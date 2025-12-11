@@ -4,11 +4,11 @@ import { parseISO } from 'date-fns'
 import { useThemeStore } from '@/store/themeStore'
 import { useAuthStore } from '@/store/authStore'
 import { useAdminStore } from '@/store/adminStore'
-import { getWorkSlots, getDayStatuses, addApprovalRequest, getApprovalRequests, deleteWorkSlot, updateDayStatus, addDayStatus, deleteDayStatus } from '@/services/firestoreService'
+import { getWorkSlots, getDayStatuses, addApprovalRequest, deleteWorkSlot, updateDayStatus, addDayStatus, deleteDayStatus } from '@/services/firestoreService'
 import { formatDate, getWeekDays, isSameDate } from '@/utils/dateUtils'
-import { WorkSlot, DayStatus, ApprovalRequest } from '@/types'
+import { WorkSlot, DayStatus } from '@/types'
 import { TEAM_MEMBERS } from '@/types'
-import { Edit, Trash2, Info, CheckCircle2, Calendar as CalendarIcon } from 'lucide-react'
+import { Edit, Trash2, CheckCircle2, Calendar as CalendarIcon } from 'lucide-react'
 
 type SlotFilter = 'all' | 'upcoming' | 'completed'
 
@@ -26,7 +26,6 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
   const { isAdmin } = useAdminStore()
   const [slots, setSlots] = useState<WorkSlot[]>([])
   const [statuses, setStatuses] = useState<DayStatus[]>([])
-  const [approvals, setApprovals] = useState<ApprovalRequest[]>([])
   const [selectedWeek, setSelectedWeek] = useState(new Date())
   const [loading, setLoading] = useState(true)
 
@@ -83,10 +82,9 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
       const weekEnd = formatDate(weekEndDate, 'yyyy-MM-dd')
 
       // Load all slots, statuses and approval requests for the week, not filtered by user
-      const [allSlots, allStatuses, allApprovals] = await Promise.all([
+      const [allSlots, allStatuses] = await Promise.all([
         getWorkSlots(),
-        getDayStatuses(),
-        getApprovalRequests()
+        getDayStatuses()
       ])
 
       // Filter by week range
@@ -107,25 +105,6 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
         ? weekStatuses.filter((s) => s.userId === selectedUserId)
         : weekStatuses
 
-      const weekApprovals = allApprovals.filter((a) => {
-        const afterDate = (a.after as any)?.date || (a.after as any)?.endDate
-        const beforeDate = (a.before as any)?.date || (a.before as any)?.endDate
-        const dateToCheck = afterDate || beforeDate
-        if (!dateToCheck) return false
-        return dateToCheck >= weekStart && dateToCheck <= weekEnd
-      })
-
-      const scopedApprovals = weekApprovals.filter((a) => {
-        if (a.status === 'approved') return false
-        if (selectedUserId) {
-          return a.targetUserId === selectedUserId || a.authorId === selectedUserId
-        }
-        if (isAdmin) return true
-        const currentUserId = user?.id
-        if (!currentUserId) return false
-        return a.authorId === currentUserId || a.targetUserId === currentUserId
-      })
-
       console.log('Loaded slots (week view):', {
         weekStart,
         weekEnd,
@@ -137,7 +116,6 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
 
       setSlots(filteredSlots)
       setStatuses(filteredStatuses)
-      setApprovals(scopedApprovals)
     } catch (error) {
       console.error('Error loading data:', error)
     } finally {
@@ -406,16 +384,6 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
     })
   }
 
-  const getApprovalsForDay = (date: string): ApprovalRequest[] => {
-    return approvals.filter((a) => {
-      const afterDate = (a.after as any)?.date || (a.after as any)?.endDate
-      const beforeDate = (a.before as any)?.date || (a.before as any)?.endDate
-      const dateToCheck = afterDate || beforeDate
-      if (!dateToCheck) return false
-      return dateToCheck === date
-    })
-  }
-
   const navigateWeek = (direction: 'prev' | 'next') => {
     const newDate = new Date(selectedWeek)
     if (direction === 'prev') {
@@ -481,7 +449,6 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
           const dateStr = formatDate(day, 'yyyy-MM-dd')
           const daySlots = getSlotsForDay(dateStr)
           const dayStatuses = getStatusesForDay(dateStr)
-          const dayApprovals = getApprovalsForDay(dateStr)
           const isToday = isSameDate(day, today)
           const dayCardBase = 'relative rounded-xl p-4 sm:p-5 border transition-all duration-300'
           const dayCardTone = theme === 'dark' ? 'bg-gray-800/70 border-gray-700 shadow-md' : 'bg-gray-50 border-gray-200 shadow-sm'
@@ -505,62 +472,6 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
               </h3>
 
               <div className="space-y-3 sm:space-y-4">
-                {/* Approvals awaiting/rejected */}
-                {dayApprovals.length > 0 && (
-                  <div className="space-y-2">
-                    {dayApprovals.map((approval) => {
-                      const isPending = approval.status === 'pending'
-                      const tone = isPending
-                        ? 'bg-amber-50 text-amber-900 border border-amber-200 shadow-inner dark:bg-amber-900/25 dark:text-amber-50 dark:border-amber-700'
-                        : 'bg-rose-50 text-rose-900 border border-rose-200 shadow-inner dark:bg-rose-900/25 dark:text-rose-50 dark:border-rose-700'
-                      const entityLabel = approval.entity === 'slot' ? 'Слот' : 'Статус'
-                      const actionLabel =
-                        approval.action === 'create'
-                          ? 'Создание'
-                          : approval.action === 'update'
-                          ? 'Изменение'
-                          : 'Удаление'
-                      const slotData = (approval.after as WorkSlot) || (approval.before as WorkSlot)
-                      const statusData = (approval.after as DayStatus) || (approval.before as DayStatus)
-                      const changePreview =
-                        approval.entity === 'slot'
-                          ? `${formatDate(slotData?.date || dateStr, 'dd.MM')} · ${slotData?.slots?.map((s) => `${s.start}-${s.end}`).join(', ')}`
-                          : `${formatDate(statusData?.date || dateStr, 'dd.MM')} · ${
-                              statusData?.type === 'dayoff'
-                                ? 'Выходной'
-                                : statusData?.type === 'sick'
-                                ? 'Больничный'
-                                : 'Отпуск'
-                            }${statusData?.endDate ? ` (${formatDate(statusData.endDate, 'dd.MM')})` : ''}`
-
-                      return (
-                        <div
-                          key={approval.id}
-                          className={`rounded-xl px-3 py-3 sm:px-4 sm:py-3 text-sm sm:text-base flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 ring-1 ring-inset ring-black/5 dark:ring-white/5 ${tone}`}
-                        >
-                          <div className="flex flex-col gap-1">
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/70 dark:bg-white/10 text-xs font-semibold">
-                                {entityLabel} · {actionLabel}
-                              </span>
-                              <span className="text-xs sm:text-sm font-semibold">
-                                {isPending ? 'На согласовании' : 'Отклонено'}
-                              </span>
-                            </div>
-                            <span className="text-xs sm:text-sm opacity-80">{changePreview}</span>
-                            {approval.adminComment && (
-                              <span className="text-xs sm:text-sm opacity-80">Комментарий: {approval.adminComment}</span>
-                            )}
-                          </div>
-                          <div className="text-xs sm:text-sm opacity-80 text-right">
-                            Автор: {approval.authorId === approval.targetUserId ? 'участник' : approval.authorId}
-                          </div>
-                        </div>
-                      )
-                    })}
-                  </div>
-                )}
-
                 {/* Statuses */}
                 {dayStatuses.map((status) => {
                   const { displayName } = resolveUser(status.userId)
@@ -576,14 +487,6 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
                         <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/70 dark:bg-white/10 text-xs sm:text-sm font-semibold">
                           {status.type === 'dayoff' ? 'Выходной' : status.type === 'sick' ? 'Больничный' : 'Отпуск'}
                         </span>
-                        {status.comment && (
-                          <div className="relative group/status-comment self-center sm:self-auto">
-                            <Info className="w-4 h-4 text-current cursor-help" />
-                            <div className="pointer-events-none absolute bottom-full left-1/2 sm:left-0 -translate-x-1/2 sm:translate-x-0 mb-2 p-2 bg-[#0A0A0A] text-white text-xs rounded-lg opacity-0 group-hover/status-comment:opacity-100 transition-opacity z-10 whitespace-nowrap">
-                              {status.comment}
-                            </div>
-                          </div>
-                        )}
                       </div>
                       <div className="flex gap-2 justify-center sm:justify-end w-full">
                         {(isAdmin || user?.id === status.userId) ? (
@@ -752,14 +655,6 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
                             )}
                           </div>
                         ))}
-                        {slot.comment && (
-                          <div className="relative group/slot-comment flex items-center gap-2 pt-2">
-                            <Info className="w-4 h-4 text-white cursor-help" />
-                            <div className="pointer-events-none absolute bottom-full left-0 mb-2 p-2 bg-[#0A0A0A] text-white text-xs rounded-lg opacity-0 group-hover/slot-comment:opacity-100 transition-opacity z-10 whitespace-nowrap">
-                              {slot.comment}
-                            </div>
-                          </div>
-                        )}
                       </div>
                     </div>
                   )

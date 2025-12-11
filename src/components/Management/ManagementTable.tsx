@@ -3,11 +3,11 @@ import { useState, useEffect } from 'react'
 import { useThemeStore } from '@/store/themeStore'
 import { useAuthStore } from '@/store/authStore'
 import { useAdminStore } from '@/store/adminStore'
-import { getWorkSlots, getDayStatuses, addApprovalRequest, getApprovalRequests, deleteWorkSlot, updateDayStatus, addDayStatus, deleteDayStatus } from '@/services/firestoreService'
+import { getWorkSlots, getDayStatuses, addApprovalRequest, deleteWorkSlot, updateDayStatus, addDayStatus, deleteDayStatus } from '@/services/firestoreService'
 import { formatDate, calculateHours, getWeekDays } from '@/utils/dateUtils'
-import { WorkSlot, DayStatus, ApprovalRequest } from '@/types'
+import { WorkSlot, DayStatus } from '@/types'
 import { TEAM_MEMBERS } from '@/types'
-import { Edit, Trash2, Info, CheckCircle2, Calendar as CalendarIcon } from 'lucide-react'
+import { Edit, Trash2, CheckCircle2, Calendar as CalendarIcon } from 'lucide-react'
 
 type SlotFilter = 'all' | 'upcoming' | 'completed'
 
@@ -25,7 +25,6 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
   const { isAdmin } = useAdminStore()
   const [slots, setSlots] = useState<WorkSlot[]>([])
   const [statuses, setStatuses] = useState<DayStatus[]>([])
-  const [approvals, setApprovals] = useState<ApprovalRequest[]>([])
   const [selectedWeek, setSelectedWeek] = useState(new Date())
   const [loading, setLoading] = useState(true)
   const todayStr = formatDate(new Date(), 'yyyy-MM-dd')
@@ -80,10 +79,9 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
       const weekEnd = formatDate(weekEndDate, 'yyyy-MM-dd')
 
       // Load all slots, statuses and approval requests for the week, not filtered by user
-      const [allSlots, allStatuses, allApprovals] = await Promise.all([
+      const [allSlots, allStatuses] = await Promise.all([
         getWorkSlots(),
-        getDayStatuses(),
-        getApprovalRequests()
+        getDayStatuses()
       ])
 
       // Filter by week range
@@ -104,25 +102,6 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
         ? weekStatuses.filter((s) => s.userId === selectedUserId)
         : weekStatuses
 
-      const weekApprovals = allApprovals.filter((a) => {
-        const afterDate = (a.after as any)?.date || (a.after as any)?.endDate
-        const beforeDate = (a.before as any)?.date || (a.before as any)?.endDate
-        const dateToCheck = afterDate || beforeDate
-        if (!dateToCheck) return false
-        return dateToCheck >= weekStart && dateToCheck <= weekEnd
-      })
-
-      const scopedApprovals = weekApprovals.filter((a) => {
-        if (a.status === 'approved') return false
-        if (selectedUserId) {
-          return a.targetUserId === selectedUserId || a.authorId === selectedUserId
-        }
-        if (isAdmin) return true
-        const currentUserId = user?.id
-        if (!currentUserId) return false
-        return a.authorId === currentUserId || a.targetUserId === currentUserId
-      })
-
       console.log('Loaded slots:', {
         weekStart,
         weekEnd,
@@ -134,7 +113,6 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
 
       setSlots(filteredSlots)
       setStatuses(filteredStatuses)
-      setApprovals(scopedApprovals)
     } catch (error) {
       console.error('Error loading data:', error)
     } finally {
@@ -400,18 +378,6 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
     }) || null
   }
 
-  const getApprovalsForDay = (userId: string, date: string): ApprovalRequest[] => {
-    return approvals.filter((a) => {
-      if (a.status === 'approved') return false
-      if (a.targetUserId !== userId && a.authorId !== userId) return false
-      const afterDate = (a.after as any)?.date || (a.after as any)?.endDate
-      const beforeDate = (a.before as any)?.date || (a.before as any)?.endDate
-      const dateToCheck = afterDate || beforeDate
-      if (!dateToCheck) return false
-      return dateToCheck === date
-    })
-  }
-
   const getUserStats = (userId: string) => {
     const userSlots = slots.filter((s) => s.userId === userId)
     const totalHours = userSlots.reduce((sum, slot) => sum + calculateHours(slot.slots), 0)
@@ -571,7 +537,6 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
                     const dateStr = formatDate(day, 'yyyy-MM-dd')
                     const slot = getSlotForDay(user.id, dateStr)
                     const status = getStatusForDay(user.id, dateStr)
-                    const dayApprovals = getApprovalsForDay(user.id, dateStr)
 
                       return (
                         <td
@@ -582,46 +547,6 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
                               : ''
                           }`}
                         >
-                        {dayApprovals.length > 0 && (
-                          <div className="space-y-1 mb-1">
-                            {dayApprovals.map((approval) => {
-                              const isPending = approval.status === 'pending'
-                              const entityLabel = approval.entity === 'slot' ? 'Слот' : 'Статус'
-                              const actionLabel =
-                                approval.action === 'create'
-                                  ? 'Создание'
-                                  : approval.action === 'update'
-                                  ? 'Изменение'
-                                  : 'Удаление'
-                              const slotData = (approval.after as WorkSlot) || (approval.before as WorkSlot)
-                              const statusData = (approval.after as DayStatus) || (approval.before as DayStatus)
-                              const preview =
-                                approval.entity === 'slot'
-                                  ? slotData?.slots?.map((s) => `${s.start}-${s.end}`).join(', ')
-                                  : statusData?.type === 'dayoff'
-                                  ? 'Выходной'
-                                  : statusData?.type === 'sick'
-                                  ? 'Больничный'
-                                  : 'Отпуск'
-
-                              return (
-                                <div
-                                  key={approval.id}
-                                  className={`rounded-md px-2 py-1 text-[11px] sm:text-xs font-medium ${
-                                    isPending
-                                      ? 'bg-amber-100 text-amber-900 dark:bg-amber-900/30 dark:text-amber-50'
-                                      : 'bg-rose-100 text-rose-900 dark:bg-rose-900/30 dark:text-rose-50'
-                                  }`}
-                                >
-                                  {entityLabel} · {actionLabel} · {isPending ? 'На согласовании' : 'Отклонено'} {preview ? `(${preview})` : ''}
-                                  {!isPending && approval.adminComment && (
-                                    <span className="block text-[10px] sm:text-[11px] opacity-80">Комментарий: {approval.adminComment}</span>
-                                  )}
-                                </div>
-                              )
-                            })}
-                          </div>
-                        )}
                         {slot ? (
                           <div className="space-y-2">
                             {(() => {
@@ -667,14 +592,6 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
                                 </div>
                               ))
                             })()}
-                            {slot.comment && (
-                              <div className="flex items-center justify-center group/slot-comment relative">
-                                <Info className="w-4 h-4 text-gray-400 cursor-help" />
-                                <div className="pointer-events-none absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-[#0A0A0A] text-white text-xs rounded opacity-0 group-hover/slot-comment:opacity-100 transition-opacity whitespace-nowrap z-10">
-                                  {slot.comment}
-                                </div>
-                              </div>
-                            )}
                             <div className="flex gap-1 justify-center">
                               {(isAdmin || user?.id === slot.userId) ? (
                                 <>
@@ -718,14 +635,6 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
                             >
                               {status.type === 'dayoff' ? 'Выходной' : status.type === 'sick' ? 'Больничный' : 'Отпуск'}
                             </div>
-                            {status.comment && (
-                              <div className="flex items-center justify-center group/status-comment relative">
-                                <Info className="w-4 h-4 text-gray-400 cursor-help" />
-                                <div className="pointer-events-none absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-[#0A0A0A] text-white text-xs rounded opacity-0 group-hover/status-comment:opacity-100 transition-opacity whitespace-nowrap z-10">
-                                  {status.comment}
-                                </div>
-                              </div>
-                            )}
                             <div className="flex gap-1 justify-center">
                               {(isAdmin || user?.id === status.userId) ? (
                                 <>

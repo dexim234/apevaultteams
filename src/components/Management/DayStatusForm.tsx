@@ -261,6 +261,17 @@ export const DayStatusForm = ({ type, status, onClose, onSave }: DayStatusFormPr
       return
     }
 
+    if (adminBulkMode && dateMode === 'range') {
+      if (!rangeStart || !rangeEnd) {
+        setError('Укажите даты начала и окончания')
+        return
+      }
+      if (new Date(rangeEnd) < new Date(rangeStart)) {
+        setError('Дата окончания не может быть раньше даты начала')
+        return
+      }
+    }
+
     const datePayloads = getDatePayloads()
     if (datePayloads.length === 0) {
       setError('Выберите даты')
