@@ -37,7 +37,6 @@ export const DeleteSlotsForm = ({ onClose, onSave }: DeleteSlotsFormProps) => {
   useScrollLock()
 
   const weekDays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс']
-  const activeMode = deleteByWeekDay ? 'По дню недели' : deleteByDates ? 'По датам' : deleteByDateRange ? 'Диапазон' : 'Не выбран'
   const selectionInfo = deleteByWeekDay
     ? (selectedWeekDays.length > 0 ? selectedWeekDays.map((d) => weekDays[d]).join(', ') : 'Дни недели')
     : deleteByDates
