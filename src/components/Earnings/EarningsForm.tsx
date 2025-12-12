@@ -543,7 +543,7 @@ export const EarningsForm = ({ onClose, onSave, editingEarning }: EarningsFormPr
                         className="w-4 h-4"
                       />
                       <span className={theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}>
-                        @{member.login}
+                        {getUserNicknameSync(member.id)}
                       </span>
                     </label>
                   ))}
@@ -592,7 +592,7 @@ export const EarningsForm = ({ onClose, onSave, editingEarning }: EarningsFormPr
                         theme === 'dark' ? 'border-gray-800 bg-gray-800/70 text-gray-100' : 'border-gray-200 bg-white text-gray-800'
                       }`}
                     >
-                      @{TEAM_MEMBERS.find((m) => m.id === pid)?.login || pid}
+                      {getUserNicknameSync(pid)}
                     </span>
                   ))
                 )}

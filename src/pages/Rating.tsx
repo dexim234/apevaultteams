@@ -200,7 +200,7 @@ export const Rating = () => {
   }, [ratings])
 
   const topMember = sortedRatings[0]
-  const topMemberName = topMember ? TEAM_MEMBERS.find((m) => m.id === topMember.userId)?.login || '—' : '—'
+  const topMemberName = topMember ? getUserNicknameSync(topMember.userId) : '—'
   const todayLabel = new Date().toLocaleDateString('ru-RU')
 
   type HeroTone = 'emerald' | 'amber' | 'blue' | 'slate' | 'purple' | 'pink' | 'indigo'
@@ -488,7 +488,7 @@ export const Rating = () => {
                         key={member.id}
                         className="border-t border-white/10 hover:bg-white/5 transition-colors"
                       >
-                        <td className="py-3 px-4 font-semibold text-white whitespace-nowrap">@{member.login}</td>
+                        <td className="py-3 px-4 font-semibold text-white whitespace-nowrap">{getUserNicknameSync(member.id)}</td>
                         <td className="py-3 px-4 text-white/80 whitespace-nowrap">
                           {activity ? formatDateTime(activity.loginAt) : '—'}
                         </td>
@@ -589,7 +589,7 @@ export const Rating = () => {
                           key={member.id}
                           className="border-t border-white/10 hover:bg-white/5 transition-colors"
                         >
-                          <td className="py-3 px-4 font-semibold text-white whitespace-nowrap">@{member.login}</td>
+                          <td className="py-3 px-4 font-semibold text-white whitespace-nowrap">{getUserNicknameSync(member.id)}</td>
                           <td className="py-3 px-4 text-white/80 whitespace-nowrap text-center">
                             {totalSessions > 0 ? totalSessions : '—'}
                           </td>

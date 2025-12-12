@@ -3,7 +3,7 @@ import { CheckCircle2, Clock, ThumbsDown, CheckSquare, Square } from 'lucide-rea
 import { getApprovalRequests, approveApprovalRequest, rejectApprovalRequest } from '@/services/firestoreService'
 import { ApprovalRequest, DayStatus, WorkSlot, UserNickname } from '@/types'
 import { formatDate } from '@/utils/dateUtils'
-import { getUserNicknameSync } from '@/utils/userUtils'
+import { getUserNicknameSync, clearNicknameCache } from '@/utils/userUtils'
 import { useAuthStore } from '@/store/authStore'
 
 const actionLabelMap: Record<ApprovalRequest['action'], string> = {
@@ -104,7 +104,12 @@ export const ApprovalsTable = () => {
     setSubmittingId(approvalId)
     setError(null)
     try {
+      const approval = approvals.find(a => a.id === approvalId)
       await approveApprovalRequest(approvalId, user?.id || 'admin')
+      // Clear nickname cache if this was a nickname change request
+      if (approval?.entity === 'login') {
+        clearNicknameCache(approval.targetUserId)
+      }
       await loadApprovals()
       setSelectedIds((prev) => prev.filter((id) => id !== approvalId))
     } catch (e: any) {
@@ -138,7 +143,12 @@ export const ApprovalsTable = () => {
     setError(null)
     try {
       for (const id of selectedIds) {
+        const approval = approvals.find(a => a.id === id)
         await approveApprovalRequest(id, user?.id || 'admin')
+        // Clear nickname cache if this was a nickname change request
+        if (approval?.entity === 'login') {
+          clearNicknameCache(approval.targetUserId)
+        }
       }
       await loadApprovals()
       setSelectedIds([])

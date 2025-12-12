@@ -3,6 +3,7 @@ import { useThemeStore } from '@/store/themeStore'
 import { getRatingBreakdown } from '@/utils/ratingUtils'
 import { RatingData, TEAM_MEMBERS } from '@/types'
 import { formatHours } from '@/utils/dateUtils'
+import { getUserNicknameSync } from '@/utils/userUtils'
 import { Calendar, Heart, Plane, Clock, DollarSign, Users, MessageSquare, TrendingUp, Info } from 'lucide-react'
 import { useState } from 'react'
 
@@ -206,7 +207,7 @@ export const RatingCard = ({ rating, place }: RatingCardProps) => {
             <p className={`text-[11px] uppercase tracking-[0.12em] ${mutedColor}`}>Участник</p>
             <div className="flex items-center gap-2 flex-wrap">
               <h3 className={`text-2xl font-bold ${headingColor} truncate`}>
-                @{member?.login || 'unknown'}
+                {member ? getUserNicknameSync(member.id) : 'unknown'}
               </h3>
             </div>
             <div className="flex items-center gap-2 mt-1">

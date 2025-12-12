@@ -1,6 +1,7 @@
 // Earnings statistics table
 import { useThemeStore } from '@/store/themeStore'
 import { formatDate, getWeekRange } from '@/utils/dateUtils'
+import { getUserNicknameSync } from '@/utils/userUtils'
 import { Earnings } from '@/types'
 import { TEAM_MEMBERS } from '@/types'
 import { TrendingUp } from 'lucide-react'
@@ -103,7 +104,7 @@ export const EarningsTable = ({ earnings }: EarningsTableProps) => {
                         theme === 'dark' ? 'hover:bg-gray-700/30' : 'hover:bg-gray-50'
                       }`}
                     >
-                      <td className={`px-4 py-3 font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>@{member.login}</td>
+                      <td className={`px-4 py-3 font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{getUserNicknameSync(member.id)}</td>
                       <td className={`px-4 py-3 text-right font-semibold ${theme === 'dark' ? 'text-[#4E6E49]' : 'text-[#4E6E49]'}`}>{stats.totalEarnings.toFixed(2)} ₽</td>
                       <td className={`px-4 py-3 text-right font-semibold ${theme === 'dark' ? 'text-purple-400' : 'text-purple-600'}`}>{stats.totalPool.toFixed(2)} ₽</td>
                     </tr>
@@ -141,7 +142,7 @@ export const EarningsTable = ({ earnings }: EarningsTableProps) => {
                         theme === 'dark' ? 'hover:bg-gray-700/30' : 'hover:bg-gray-50'
                       }`}
                     >
-                      <td className={`px-4 py-3 font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>@{member.login}</td>
+                      <td className={`px-4 py-3 font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{getUserNicknameSync(member.id)}</td>
                       <td className={`px-4 py-3 text-right font-semibold ${theme === 'dark' ? 'text-[#4E6E49]' : 'text-[#4E6E49]'}`}>{stats.totalEarnings.toFixed(2)} ₽</td>
                       <td className={`px-4 py-3 text-right font-semibold ${theme === 'dark' ? 'text-purple-400' : 'text-purple-600'}`}>{stats.totalPool.toFixed(2)} ₽</td>
                     </tr>
