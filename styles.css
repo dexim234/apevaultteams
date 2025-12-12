@@ -1,0 +1,619 @@
+/* Reset and base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: #0A0A0A;
+    color: #4E6E49;
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Header styles */
+.header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 40px 20px;
+    border-bottom: 2px solid #4E6E49;
+    position: relative;
+    overflow: hidden;
+}
+
+.brand {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+.brand-logo {
+    font-size: 4rem;
+    margin-bottom: 15px;
+    animation: crocSway 3s ease-in-out infinite;
+}
+
+.brand-info {
+    text-align: center;
+}
+
+.brand-name {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #4E6E49;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    background: linear-gradient(45deg, #4E6E49, #6b8f5f, #4E6E49);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.brand-tagline {
+    font-size: 1.1rem;
+    color: #FFFFFF;
+    margin: 5px 0 0 0;
+    font-weight: 500;
+    opacity: 0.9;
+}
+
+.title {
+    font-size: 2.8rem;
+    font-weight: 700;
+    color: #4E6E49;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow: 0 2px 4px rgba(78, 110, 73, 0.3);
+}
+
+
+
+
+/* Croc sway animation */
+@keyframes crocSway {
+    0%, 100% {
+        transform: rotate(0deg) scale(1);
+    }
+    25% {
+        transform: rotate(-3deg) scale(1.05);
+    }
+    50% {
+        transform: rotate(3deg) scale(1.08);
+    }
+    75% {
+        transform: rotate(-2deg) scale(1.05);
+    }
+}
+
+/* Stage styles */
+.stage {
+    background: rgba(78, 110, 73, 0.05);
+    border: 1px solid rgba(78, 110, 73, 0.2);
+    border-radius: 15px;
+    margin-bottom: 30px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.stage:hover {
+    border-color: #4E6E49;
+    box-shadow: 0 8px 32px rgba(78, 110, 73, 0.1);
+}
+
+.stage-header {
+    background: linear-gradient(135deg, #4E6E49 0%, rgba(78, 110, 73, 0.9) 100%);
+    padding: 30px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+
+.stage-title {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #FFFFFF;
+    margin-bottom: 8px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 1;
+}
+
+.stage-goal {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 400;
+    font-style: italic;
+    position: relative;
+    z-index: 1;
+}
+
+
+
+/* Croc launch animation */
+@keyframes crocLaunch {
+    0%, 100% { transform: translateY(-50%) rotate(0deg); }
+    50% { transform: translateY(-50%) rotate(5deg); }
+}
+
+.final-decision .stage-header {
+    background: linear-gradient(135deg, #2d4a2d 0%, #4E6E49 100%);
+}
+
+/* Checklist styles */
+.checklist {
+    padding: 30px;
+}
+
+.item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 25px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 10px;
+    border: 1px solid rgba(78, 110, 73, 0.1);
+    transition: all 0.3s ease;
+}
+
+.item:hover {
+    background: rgba(78, 110, 73, 0.05);
+    border-color: rgba(78, 110, 73, 0.3);
+}
+
+.checkbox {
+    appearance: none;
+    width: 24px;
+    height: 24px;
+    border: 2px solid #4E6E49;
+    border-radius: 6px;
+    margin-right: 20px;
+    margin-top: 4px;
+    cursor: pointer;
+    position: relative;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+}
+
+.checkbox:checked {
+    background-color: #4E6E49;
+    border-color: #4E6E49;
+}
+
+.checkbox:checked::after {
+    content: '🐊';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 14px;
+    animation: checkCroc 0.5s ease-out;
+}
+
+.checkbox:checked {
+    background-color: #4E6E49;
+    border-color: #4E6E49;
+    animation: checkboxPulse 0.3s ease-out;
+}
+
+/* Check croc animation */
+@keyframes checkCroc {
+    0% {
+        transform: translate(-50%, -50%) scale(0) rotate(180deg);
+        opacity: 0;
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.2) rotate(90deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1) rotate(0deg);
+        opacity: 1;
+    }
+}
+
+/* Checkbox pulse animation */
+@keyframes checkboxPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.checkbox:hover {
+    border-color: #FFFFFF;
+    box-shadow: 0 0 10px rgba(78, 110, 73, 0.3);
+}
+
+.item-content {
+    flex: 1;
+    cursor: pointer;
+}
+
+.item-content strong {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #4E6E49;
+    display: block;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.item-content ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.item-content li {
+    color: #FFFFFF;
+    margin-bottom: 8px;
+    padding-left: 20px;
+    position: relative;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.item-content li::before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #4E6E49;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+/* Progress section */
+.progress-section {
+    background: linear-gradient(135deg, rgba(78, 110, 73, 0.05) 0%, rgba(78, 110, 73, 0.08) 100%);
+    border: 1px solid rgba(78, 110, 73, 0.2);
+    border-radius: 20px;
+    padding: 40px 30px;
+    margin: 50px 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #4E6E49, #6b8f5f, #4E6E49);
+}
+
+.progress-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.progress-header h3 {
+    font-size: 1.5rem;
+    color: #4E6E49;
+    font-weight: 600;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.ape-icon {
+    font-size: 1.8rem;
+    animation: crocWiggle 3s ease-in-out infinite;
+}
+
+.progress-container {
+    margin-bottom: 25px;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 24px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(78, 110, 73, 0.3);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4E6E49 0%, #6b8f5f 50%, #4E6E49 100%);
+    width: 0%;
+    transition: width 0.8s ease;
+    border-radius: 12px;
+    position: relative;
+}
+
+.progress-fill::after {
+    content: '🐊';
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1rem;
+    opacity: 0;
+    animation: crocFly 2s ease-in-out infinite;
+}
+
+.progress-text {
+    font-size: 1.1rem;
+    color: #FFFFFF;
+    margin-top: 15px;
+    font-weight: 500;
+}
+
+.progress-percentage {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #4E6E49;
+    margin-top: 15px;
+    text-shadow: 0 2px 4px rgba(78, 110, 73, 0.3);
+}
+
+
+/* Croc wiggle animation */
+@keyframes crocWiggle {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-3deg); }
+    75% { transform: rotate(3deg); }
+}
+
+/* Croc fly animation */
+@keyframes crocFly {
+    0%, 100% { opacity: 0; transform: translateY(-50%) rotate(0deg); }
+    50% { opacity: 1; transform: translateY(-50%) rotate(-5deg); }
+}
+
+/* Footer */
+.footer {
+    text-align: center;
+    padding: 50px 20px;
+    border-top: 2px solid rgba(78, 110, 73, 0.3);
+    margin-top: 60px;
+    background: linear-gradient(135deg, rgba(78, 110, 73, 0.02) 0%, rgba(78, 110, 73, 0.05) 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #4E6E49, transparent);
+}
+
+.footer-content {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 50px;
+    align-items: center;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.footer-brand {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.footer-logo {
+    font-size: 3rem;
+    animation: crocDance 4s ease-in-out infinite;
+}
+
+.footer-brand-text h3 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #4E6E49;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.footer-brand-text p {
+    font-size: 0.9rem;
+    color: #FFFFFF;
+    margin: 5px 0 0 0;
+    opacity: 0.8;
+}
+
+.footer-description {
+    text-align: center;
+}
+
+.footer-description p {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1rem;
+    font-weight: 300;
+    margin: 0 0 10px 0;
+}
+
+.footer-tagline {
+    font-size: 1.1rem !important;
+    color: #4E6E49 !important;
+    font-weight: 600 !important;
+    margin: 0 !important;
+    font-style: normal !important;
+}
+
+/* Croc dance animation */
+@keyframes crocDance {
+    0%, 100% { transform: rotate(0deg) scale(1); }
+    25% { transform: rotate(-3deg) scale(1.03); }
+    50% { transform: rotate(3deg) scale(1.06); }
+    75% { transform: rotate(-2deg) scale(1.03); }
+}
+
+/* Responsive footer */
+@media (max-width: 768px) {
+    .footer-content {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+
+    .title {
+        font-size: 2.2rem;
+    }
+
+
+    .stage-header {
+        padding: 20px;
+    }
+
+    .stage-title {
+        font-size: 1.5rem;
+    }
+
+    .checklist {
+        padding: 20px;
+    }
+
+    .item {
+        padding: 15px;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .checkbox {
+        margin-bottom: 15px;
+        margin-right: 0;
+    }
+
+    .progress-section {
+        padding: 20px;
+    }
+
+    .progress-percentage {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .title {
+        font-size: 1.8rem;
+    }
+
+    .stage-title {
+        font-size: 1.3rem;
+    }
+
+    .item-content strong {
+        font-size: 1rem;
+    }
+
+    .item-content li {
+        font-size: 0.9rem;
+    }
+}
+
+/* Animation for completed items */
+.item.completed {
+    background: rgba(78, 110, 73, 0.1);
+    border-color: #4E6E49;
+}
+
+.item.completed .item-content strong {
+    color: #FFFFFF;
+}
+
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #0A0A0A;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #4E6E49;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(78, 110, 73, 0.8);
+}
+
+/* Стили для кнопки сброса */
+.reset-button {
+    background: linear-gradient(135deg, rgba(78, 110, 73, 0.1) 0%, rgba(78, 110, 73, 0.05) 100%);
+    border: 1px solid #4E6E49;
+    color: #4E6E49;
+    padding: 12px 24px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    margin-top: 25px;
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+    letter-spacing: 0.5px;
+    font-size: 0.9rem;
+}
+
+.reset-button::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(78, 110, 73, 0.1);
+    border-radius: 50%;
+    transition: all 0.4s ease;
+    transform: translate(-50%, -50%);
+}
+
+.reset-button:hover {
+    background: linear-gradient(135deg, #4E6E49 0%, #6b8f5f 100%);
+    color: #FFFFFF;
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 25px rgba(78, 110, 73, 0.4);
+}
+
+.reset-button:hover::before {
+    width: 200px;
+    height: 200px;
+}
+
+.reset-button:active {
+    transform: translateY(-1px) scale(1.02);
+}
+
