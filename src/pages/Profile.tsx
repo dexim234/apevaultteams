@@ -111,7 +111,21 @@ export const Profile = () => {
     const interval = setInterval(checkNicknameUpdates, 30000)
     checkNicknameUpdates() // Check immediately
     
-    return () => clearInterval(interval)
+    // Listen for immediate nickname updates
+    const handleNicknameUpdate = async (event: Event) => {
+      const customEvent = event as CustomEvent<{ userId: string }>
+      const { userId } = customEvent.detail || {}
+      if (userId === user?.id) {
+        await checkNicknameUpdates()
+      }
+    }
+    
+    window.addEventListener('nicknameUpdated', handleNicknameUpdate)
+    
+    return () => {
+      clearInterval(interval)
+      window.removeEventListener('nicknameUpdated', handleNicknameUpdate as EventListener)
+    }
   }, [user?.id, isAdmin])
 
   const loadProfileData = async () => {

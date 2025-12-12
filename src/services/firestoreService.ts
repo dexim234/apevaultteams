@@ -13,7 +13,7 @@ import {
 } from 'firebase/firestore'
 import { db } from '@/firebase/config'
 import { WorkSlot, DayStatus, Earnings, RatingData, Referral, Call, Task, TaskStatus, Note, TaskPriority, StageAssignee, ApprovalRequest, ApprovalStatus, UserActivity, UserNickname } from '@/types'
-import { clearNicknameCache } from '@/utils/userUtils'
+import { clearNicknameCache, getUserNicknameAsync } from '@/utils/userUtils'
 
 const DATA_RETENTION_DAYS = 30
 
@@ -474,8 +474,10 @@ export const approveApprovalRequest = async (id: string, adminId: string, adminC
     await applyReferralChange(request)
   } else if (request.entity === 'login') {
     await applyLoginChange(request)
-    // Clear nickname cache after approval
+    // Clear nickname cache and reload new value after approval
     clearNicknameCache(request.targetUserId)
+    // Force reload new nickname into cache
+    await getUserNicknameAsync(request.targetUserId)
   }
 
   const approvePayload: Record<string, any> = {

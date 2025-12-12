@@ -268,6 +268,32 @@ export const Rating = () => {
     loadCustomNicknames()
   }, [])
 
+  // Listen for nickname updates and reload nicknames
+  useEffect(() => {
+    const handleNicknameUpdate = async (event: Event) => {
+      const customEvent = event as CustomEvent<{ userId: string }>
+      const { userId } = customEvent.detail || {}
+      if (userId) {
+        // Reload nickname for the updated user
+        await getUserNicknameAsync(userId)
+        // Force component re-render by updating state
+        setRatings(prev => [...prev])
+      } else {
+        // Reload all nicknames if userId not specified
+        clearAllNicknameCache()
+        for (const member of TEAM_MEMBERS) {
+          await getUserNicknameAsync(member.id)
+        }
+        setRatings(prev => [...prev])
+      }
+    }
+
+    window.addEventListener('nicknameUpdated', handleNicknameUpdate)
+    return () => {
+      window.removeEventListener('nicknameUpdated', handleNicknameUpdate)
+    }
+  }, [])
+
   const handleAddReferral = () => {
     setActiveReferral(null)
     setShowReferralForm(true)

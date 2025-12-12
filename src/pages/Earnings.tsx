@@ -9,7 +9,7 @@ import { getEarnings } from '@/services/firestoreService'
 import { Earnings as EarningsType, EARNINGS_CATEGORY_META, EarningsCategory, TEAM_MEMBERS } from '@/types'
 import { Plus, DollarSign, TrendingUp, Sparkles, Wallet, PiggyBank, PieChart, Rocket, LineChart, Image, Coins, BarChart3, ShieldCheck } from 'lucide-react'
 import { getWeekRange, formatDate } from '@/utils/dateUtils'
-import { getUserNicknameSync } from '@/utils/userUtils'
+import { getUserNicknameSync, getUserNicknameAsync } from '@/utils/userUtils'
 
 export const Earnings = () => {
   const { theme } = useThemeStore()
@@ -82,6 +82,30 @@ export const Earnings = () => {
   useEffect(() => {
     calculateStats()
   }, [earnings])
+
+  // Listen for nickname updates and force re-render
+  useEffect(() => {
+    const handleNicknameUpdate = async (event: Event) => {
+      const customEvent = event as CustomEvent<{ userId: string }>
+      const { userId } = customEvent.detail || {}
+      if (userId) {
+        // Reload nickname for the updated user
+        await getUserNicknameAsync(userId)
+      } else {
+        // Reload all nicknames if userId not specified
+        for (const member of TEAM_MEMBERS) {
+          await getUserNicknameAsync(member.id)
+        }
+      }
+      // Force component re-render by updating earnings state
+      setEarnings(prev => [...prev])
+    }
+
+    window.addEventListener('nicknameUpdated', handleNicknameUpdate)
+    return () => {
+      window.removeEventListener('nicknameUpdated', handleNicknameUpdate)
+    }
+  }, [])
 
   const loadEarnings = async () => {
     setLoading(true)

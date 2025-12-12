@@ -3,7 +3,7 @@ import { CheckCircle2, Clock, ThumbsDown, CheckSquare, Square } from 'lucide-rea
 import { getApprovalRequests, approveApprovalRequest, rejectApprovalRequest } from '@/services/firestoreService'
 import { ApprovalRequest, DayStatus, WorkSlot } from '@/types'
 import { formatDate } from '@/utils/dateUtils'
-import { getUserNicknameSync, clearNicknameCache } from '@/utils/userUtils'
+import { getUserNicknameSync, clearNicknameCache, getUserNicknameAsync } from '@/utils/userUtils'
 import { useAuthStore } from '@/store/authStore'
 
 const actionLabelMap: Record<ApprovalRequest['action'], string> = {
@@ -106,9 +106,13 @@ export const ApprovalsTable = () => {
     try {
       const approval = approvals.find(a => a.id === approvalId)
       await approveApprovalRequest(approvalId, user?.id || 'admin')
-      // Clear nickname cache if this was a nickname change request
+      // Clear nickname cache and reload new value if this was a nickname change request
       if (approval?.entity === 'login') {
         clearNicknameCache(approval.targetUserId)
+        // Force reload new nickname into cache
+        await getUserNicknameAsync(approval.targetUserId)
+        // Dispatch custom event to notify all components about nickname update
+        window.dispatchEvent(new CustomEvent('nicknameUpdated', { detail: { userId: approval.targetUserId } }))
       }
       await loadApprovals()
       setSelectedIds((prev) => prev.filter((id) => id !== approvalId))
@@ -145,9 +149,13 @@ export const ApprovalsTable = () => {
       for (const id of selectedIds) {
         const approval = approvals.find(a => a.id === id)
         await approveApprovalRequest(id, user?.id || 'admin')
-        // Clear nickname cache if this was a nickname change request
+        // Clear nickname cache and reload new value if this was a nickname change request
         if (approval?.entity === 'login') {
           clearNicknameCache(approval.targetUserId)
+          // Force reload new nickname into cache
+          await getUserNicknameAsync(approval.targetUserId)
+          // Dispatch custom event to notify all components about nickname update
+          window.dispatchEvent(new CustomEvent('nicknameUpdated', { detail: { userId: approval.targetUserId } }))
         }
       }
       await loadApprovals()
