@@ -41,10 +41,10 @@ export type ApprovalEntity = 'slot' | 'status' | 'earning' | 'referral' | 'login
 export type ApprovalAction = 'create' | 'update' | 'delete'
 export type ApprovalStatus = 'pending' | 'approved' | 'rejected'
 
-export interface UserLogin {
+export interface UserNickname {
   id: string
   userId: string
-  login: string // Custom login (nickname)
+  nickname: string // Custom nickname (отображается в расписании и везде на сайте)
   createdAt: string
   updatedAt: string
 }
@@ -56,8 +56,8 @@ export interface ApprovalRequest {
   status: ApprovalStatus
   authorId: string
   targetUserId: string
-  before?: WorkSlot | DayStatus | Earnings | Referral | UserLogin | null
-  after?: WorkSlot | DayStatus | Earnings | Referral | UserLogin | null
+  before?: WorkSlot | DayStatus | Earnings | Referral | UserNickname | null
+  after?: WorkSlot | DayStatus | Earnings | Referral | UserNickname | null
   comment?: string // note from author
   adminComment?: string // decision note
   reviewedBy?: string

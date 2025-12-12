@@ -17,6 +17,7 @@ import {
   X,
 } from 'lucide-react'
 import { formatDate } from '@/utils/dateUtils'
+import { getUserNicknameSync } from '@/utils/userUtils'
 import { TaskDeadlineBadge } from './TaskDeadlineBadge'
 import { CATEGORY_ICONS } from './categoryIcons'
 
@@ -294,7 +295,7 @@ export const TaskCard = ({ task, onEdit, onDelete, onUpdate }: TaskCardProps) =>
                 Автор:
               </span>
               <span className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
-                {createdByUser?.name || 'Неизвестно'}
+                {task.createdBy ? getUserNicknameSync(task.createdBy) : 'Неизвестно'}
               </span>
             </div>
 
@@ -310,7 +311,7 @@ export const TaskCard = ({ task, onEdit, onDelete, onUpdate }: TaskCardProps) =>
                 <div className="mt-2 space-y-1">
                   {assignedUsers.map((assignee) => (
                     <div key={assignee.member.id} className={`text-sm ${theme === 'dark' ? 'text-gray-100' : 'text-gray-800'}`}>
-                      {assignee.member.name}
+                      {getUserNicknameSync(assignee.member.id)}
                     </div>
                   ))}
                 </div>

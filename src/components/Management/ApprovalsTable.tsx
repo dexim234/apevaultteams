@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
 import { CheckCircle2, Clock, ThumbsDown, CheckSquare, Square } from 'lucide-react'
 import { getApprovalRequests, approveApprovalRequest, rejectApprovalRequest } from '@/services/firestoreService'
-import { ApprovalRequest, DayStatus, TEAM_MEMBERS, WorkSlot, UserLogin } from '@/types'
+import { ApprovalRequest, DayStatus, TEAM_MEMBERS, WorkSlot, UserNickname } from '@/types'
 import { formatDate } from '@/utils/dateUtils'
+import { getUserNicknameSync } from '@/utils/userUtils'
 import { useAuthStore } from '@/store/authStore'
 
 const actionLabelMap: Record<ApprovalRequest['action'], string> = {
@@ -44,7 +45,7 @@ const statusBadgeMap: Record<ApprovalRequest['status'], JSX.Element> = {
 }
 
 const getMemberName = (userId: string) =>
-  TEAM_MEMBERS.find((m) => m.id === userId)?.name || userId
+  getUserNicknameSync(userId)
 
 const safeFormatDate = (value?: string | Date) => {
   if (!value) return '—'
@@ -195,11 +196,11 @@ export const ApprovalsTable = () => {
       return `${formatStatusPreview(beforeStatus)} → ${formatStatusPreview(afterStatus)}`
     }
     if (approval.entity === 'login') {
-      const beforeLogin = approval.before as UserLogin | null
-      const afterLogin = approval.after as UserLogin | null
-      const beforeValue = beforeLogin?.login || '—'
-      const afterValue = afterLogin?.login || '—'
-      return `@${beforeValue} → @${afterValue}`
+      const beforeNickname = approval.before as UserNickname | null
+      const afterNickname = approval.after as UserNickname | null
+      const beforeValue = beforeNickname?.nickname || '—'
+      const afterValue = afterNickname?.nickname || '—'
+      return `${beforeValue} → ${afterValue}`
     }
     // For other entities (earning, referral), show basic info
     return approval.after ? 'Изменение' : approval.before ? 'Удаление' : 'Создание'

@@ -29,14 +29,6 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
   const [selectedWeek, setSelectedWeek] = useState(new Date())
   const [loading, setLoading] = useState(true)
 
-  const nicknameMap: Record<string, string> = {
-    '1': 'Dex',
-    '2': 'Enowk',
-    '3': 'Xenia',
-    '4': 'Olenka',
-    '5': 'Sydney',
-  }
-
   const legacyIdMap: Record<string, string> = {
     artyom: '1',
     adel: '2',
@@ -49,7 +41,7 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
     const member = TEAM_MEMBERS.find((u) => u.id === userId) || TEAM_MEMBERS.find((u) => legacyIdMap[userId] === u.id)
     return {
       member,
-      displayName: nicknameMap[member?.id || userId] || member?.name || userId,
+      displayName: getUserNicknameSync(member?.id || userId),
     }
   }
 

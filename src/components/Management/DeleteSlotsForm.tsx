@@ -5,6 +5,7 @@ import { useThemeStore } from '@/store/themeStore'
 import { useAdminStore } from '@/store/adminStore'
 import { getWorkSlots, deleteWorkSlot, getDayStatuses, deleteDayStatus, addApprovalRequest } from '@/services/firestoreService'
 import { formatDate } from '@/utils/dateUtils'
+import { getUserNicknameSync } from '@/utils/userUtils'
 import { X, Trash2 } from 'lucide-react'
 import { TEAM_MEMBERS, DayStatus } from '@/types'
 import { useScrollLock } from '@/hooks/useScrollLock'
@@ -44,7 +45,7 @@ export const DeleteSlotsForm = ({ onClose, onSave }: DeleteSlotsFormProps) => {
     : deleteByDateRange
     ? (dateRangeStart && dateRangeEnd ? `${formatDate(dateRangeStart, 'dd.MM')}–${formatDate(dateRangeEnd, 'dd.MM')}` : 'Укажите диапазон')
     : 'Выберите режим'
-  const selectedNames = selectedUserIds.map((id) => TEAM_MEMBERS.find((m) => m.id === id)?.name || id).join(', ')
+  const selectedNames = selectedUserIds.map((id) => getUserNicknameSync(id)).join(', ')
 
   const handleUserToggle = (userId: string) => {
     setSelectedUserIds((prev) => (prev.includes(userId) ? prev.filter((id) => id !== userId) : [...prev, userId]))
@@ -176,7 +177,7 @@ export const DeleteSlotsForm = ({ onClose, onSave }: DeleteSlotsFormProps) => {
       const usersText =
         targetUserIds.length > 1
           ? `${targetUserIds.length} участников`
-          : TEAM_MEMBERS.find((m) => m.id === targetUserIds[0])?.name || 'участника'
+          : getUserNicknameSync(targetUserIds[0]) || 'участника'
       const weekDaysText = selectedWeekDays.map((d) => weekDays[d]).join(', ')
       const typeText =
         deleteType === 'slots'
@@ -366,7 +367,7 @@ export const DeleteSlotsForm = ({ onClose, onSave }: DeleteSlotsFormProps) => {
                               : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                           }`}
                         >
-                          {member.name}
+                          {getUserNicknameSync(member.id)}
                         </button>
                       )
                     })}

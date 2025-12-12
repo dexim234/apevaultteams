@@ -5,6 +5,7 @@ import { useThemeStore } from '@/store/themeStore'
 import { useAdminStore } from '@/store/adminStore'
 import { addApprovalRequest, getDayStatuses, addDayStatus, updateDayStatus } from '@/services/firestoreService'
 import { formatDate, isSameDate, getDatesInRange, normalizeDatesList } from '@/utils/dateUtils'
+import { getUserNicknameSync } from '@/utils/userUtils'
 import { X } from 'lucide-react'
 import { DayStatus, TEAM_MEMBERS } from '@/types'
 import { useScrollLock } from '@/hooks/useScrollLock'
@@ -124,7 +125,7 @@ export const DayStatusForm = ({ type, status, onClose, onSave }: DayStatusFormPr
     return user?.id ? [user.id] : []
   }
 
-  const getMemberName = (userId: string) => nicknameMap[userId] || TEAM_MEMBERS.find((member) => member.id === userId)?.name || userId
+  const getMemberName = (userId: string) => getUserNicknameSync(userId)
 
   const getDatePayloads = (currentType: 'dayoff' | 'sick' | 'vacation'): { date: string; endDate?: string }[] => {
     if (adminBulkMode) {
@@ -427,13 +428,6 @@ export const DayStatusForm = ({ type, status, onClose, onSave }: DayStatusFormPr
     vacation: 'bg-orange-500',
   }
 
-  const nicknameMap: Record<string, string> = {
-    '1': 'Dex',
-    '2': 'Enowk',
-    '3': 'Xenia',
-    '4': 'Olenka',
-    '5': 'Sydney',
-  }
 
   const previewDates =
     adminBulkMode && dateMode === 'range'
@@ -650,7 +644,7 @@ export const DayStatusForm = ({ type, status, onClose, onSave }: DayStatusFormPr
                             onChange={() => toggleUserSelection(member.id)}
                             className="hidden"
                           />
-                          {nicknameMap[member.id] || member.name}
+                          {getUserNicknameSync(member.id)}
                         </label>
                       )
                     })}

@@ -12,7 +12,8 @@ import {
   orderBy,
 } from 'firebase/firestore'
 import { db } from '@/firebase/config'
-import { WorkSlot, DayStatus, Earnings, RatingData, Referral, Call, Task, TaskStatus, Note, TaskPriority, StageAssignee, ApprovalRequest, ApprovalStatus, UserActivity, UserLogin } from '@/types'
+import { WorkSlot, DayStatus, Earnings, RatingData, Referral, Call, Task, TaskStatus, Note, TaskPriority, StageAssignee, ApprovalRequest, ApprovalStatus, UserActivity, UserNickname } from '@/types'
+import { clearNicknameCache } from '@/utils/userUtils'
 
 const DATA_RETENTION_DAYS = 30
 
@@ -371,16 +372,16 @@ const applyReferralChange = async (request: ApprovalRequest) => {
 }
 
 const applyLoginChange = async (request: ApprovalRequest) => {
-  const afterL = request.after as UserLogin | null | undefined
+  const afterN = request.after as UserNickname | null | undefined
 
   switch (request.action) {
     case 'update': {
-      if (!afterL || !afterL.login) throw new Error('No login payload for update')
-      await setUserLogin(request.targetUserId, afterL.login)
+      if (!afterN || !afterN.nickname) throw new Error('No nickname payload for update')
+      await setUserNickname(request.targetUserId, afterN.nickname)
       return
     }
     case 'delete': {
-      await deleteUserLogin(request.targetUserId)
+      await deleteUserNickname(request.targetUserId)
       return
     }
     default:
@@ -473,9 +474,8 @@ export const approveApprovalRequest = async (id: string, adminId: string, adminC
     await applyReferralChange(request)
   } else if (request.entity === 'login') {
     await applyLoginChange(request)
-    // Clear login cache after approval
-    const { clearLoginCache } = require('@/utils/userUtils')
-    clearLoginCache(request.targetUserId)
+    // Clear nickname cache after approval
+    clearNicknameCache(request.targetUserId)
   }
 
   const approvePayload: Record<string, any> = {
@@ -1205,10 +1205,10 @@ export const markActivityAsInactive = async (id: string, logoutAt: string, sessi
   })
 }
 
-// User Login (Custom Nickname) management
-export const getUserLogin = async (userId: string): Promise<UserLogin | null> => {
-  const loginsRef = collection(db, 'userLogins')
-  const q = query(loginsRef, where('userId', '==', userId))
+// User Nickname management
+export const getUserNickname = async (userId: string): Promise<UserNickname | null> => {
+  const nicknamesRef = collection(db, 'userNicknames')
+  const q = query(nicknamesRef, where('userId', '==', userId))
   const snapshot = await getDocs(q)
   
   if (snapshot.empty) return null
@@ -1217,33 +1217,33 @@ export const getUserLogin = async (userId: string): Promise<UserLogin | null> =>
   return {
     id: snapshot.docs[0].id,
     userId: data.userId || '',
-    login: data.login || '',
+    nickname: data.nickname || '',
     createdAt: data.createdAt || new Date().toISOString(),
     updatedAt: data.updatedAt || new Date().toISOString(),
   }
 }
 
-export const getUserLoginValue = async (userId: string): Promise<string | null> => {
-  const userLogin = await getUserLogin(userId)
-  return userLogin?.login || null
+export const getUserNicknameValue = async (userId: string): Promise<string | null> => {
+  const userNickname = await getUserNickname(userId)
+  return userNickname?.nickname || null
 }
 
-export const setUserLogin = async (userId: string, login: string): Promise<string> => {
-  const loginsRef = collection(db, 'userLogins')
-  const existing = await getUserLogin(userId)
+export const setUserNickname = async (userId: string, nickname: string): Promise<string> => {
+  const nicknamesRef = collection(db, 'userNicknames')
+  const existing = await getUserNickname(userId)
   const now = new Date().toISOString()
   
   if (existing) {
-    const ref = doc(db, 'userLogins', existing.id)
+    const ref = doc(db, 'userNicknames', existing.id)
     await updateDoc(ref, {
-      login,
+      nickname,
       updatedAt: now,
     })
     return existing.id
   } else {
-    const res = await addDoc(loginsRef, {
+    const res = await addDoc(nicknamesRef, {
       userId,
-      login,
+      nickname,
       createdAt: now,
       updatedAt: now,
     })
@@ -1251,10 +1251,10 @@ export const setUserLogin = async (userId: string, login: string): Promise<strin
   }
 }
 
-export const deleteUserLogin = async (userId: string): Promise<void> => {
-  const existing = await getUserLogin(userId)
+export const deleteUserNickname = async (userId: string): Promise<void> => {
+  const existing = await getUserNickname(userId)
   if (existing) {
-    await deleteDoc(doc(db, 'userLogins', existing.id))
+    await deleteDoc(doc(db, 'userNicknames', existing.id))
   }
 }
 

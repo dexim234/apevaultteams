@@ -16,6 +16,7 @@ import {
   X,
 } from 'lucide-react'
 import { CATEGORY_ICONS } from './categoryIcons'
+import { getUserNicknameSync } from '@/utils/userUtils'
 
 interface TaskFiltersProps {
   selectedCategory: TaskCategory | 'all'
@@ -276,7 +277,7 @@ export const TaskFilters = ({
                   }`}
                 >
                   <CircleDot className={`w-3 h-3 ${isSelected ? 'text-[#4E6E49]' : 'text-gray-400'}`} />
-                  {member.name}
+                  {getUserNicknameSync(member.id)}
                 </button>
               )
             })}

@@ -5,6 +5,7 @@ import { useAuthStore } from '@/store/authStore'
 import { useAdminStore } from '@/store/adminStore'
 import { getWorkSlots, getDayStatuses, addApprovalRequest, deleteWorkSlot, updateDayStatus, addDayStatus, deleteDayStatus } from '@/services/firestoreService'
 import { formatDate, calculateHours, getWeekDays } from '@/utils/dateUtils'
+import { getUserNicknameSync } from '@/utils/userUtils'
 import { WorkSlot, DayStatus } from '@/types'
 import { TEAM_MEMBERS } from '@/types'
 import { Edit, Trash2, CheckCircle2, Calendar as CalendarIcon } from 'lucide-react'
@@ -29,14 +30,6 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
   const [loading, setLoading] = useState(true)
   const todayStr = formatDate(new Date(), 'yyyy-MM-dd')
 
-  const nicknameMap: Record<string, string> = {
-    '1': 'Dex',
-    '2': 'Enowk',
-    '3': 'Xenia',
-    '4': 'Olenka',
-    '5': 'Sydney',
-  }
-
   const legacyIdMap: Record<string, string> = {
     artyom: '1',
     adel: '2',
@@ -47,7 +40,7 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
 
   const getDisplayName = (userId: string) => {
     const member = TEAM_MEMBERS.find((u) => u.id === userId) || TEAM_MEMBERS.find((u) => legacyIdMap[userId] === u.id)
-    return nicknameMap[member?.id || userId] || member?.name || userId
+    return getUserNicknameSync(member?.id || userId)
   }
 
   const weekDays = getWeekDays(selectedWeek)

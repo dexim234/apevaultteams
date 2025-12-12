@@ -9,6 +9,7 @@ import { getEarnings } from '@/services/firestoreService'
 import { Earnings as EarningsType, EARNINGS_CATEGORY_META, EarningsCategory, TEAM_MEMBERS } from '@/types'
 import { Plus, DollarSign, TrendingUp, Sparkles, Wallet, PiggyBank, PieChart, Rocket, LineChart, Image, Coins, BarChart3, ShieldCheck } from 'lucide-react'
 import { getWeekRange, formatDate } from '@/utils/dateUtils'
+import { getUserNicknameSync } from '@/utils/userUtils'
 
 export const Earnings = () => {
   const { theme } = useThemeStore()
@@ -32,8 +33,7 @@ export const Earnings = () => {
   const getNetValue = (earning: EarningsType) => Math.max(earning.amount - getPoolValue(earning), 0)
   const getParticipants = (earning: EarningsType) => earning.participants?.length ? earning.participants : [earning.userId]
   const getUserName = (userId: string) => {
-    const { getUserLoginSync } = require('@/utils/userUtils')
-    return getUserLoginSync(userId) || userId
+    return getUserNicknameSync(userId) || userId
   }
   const getCategoryIcon = (key: EarningsCategory, className = 'w-4 h-4') => {
     switch (key) {

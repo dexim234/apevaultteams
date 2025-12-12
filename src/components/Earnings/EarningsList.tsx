@@ -6,6 +6,7 @@ import { useAdminStore } from '@/store/adminStore'
 import { deleteEarnings, addApprovalRequest } from '@/services/firestoreService'
 import { Earnings, EARNINGS_CATEGORY_META, EarningsCategory } from '@/types'
 import { formatDate } from '@/utils/dateUtils'
+import { getUserNicknameSync } from '@/utils/userUtils'
 import { Edit2, Trash2, Rocket, LineChart, Image, Coins, BarChart3, ShieldCheck, Sparkles, Wallet2 } from 'lucide-react'
 
 interface EarningsListProps {
@@ -84,8 +85,7 @@ export const EarningsList = ({ earnings, onEdit, onDelete }: EarningsListProps) 
   }
 
   const getUserName = (userId: string) => {
-    const { getUserLoginSync } = require('@/utils/userUtils')
-    return getUserLoginSync(userId) || userId
+    return getUserNicknameSync(userId) || userId
   }
 
   const canEditOrDelete = (earning: Earnings) => {

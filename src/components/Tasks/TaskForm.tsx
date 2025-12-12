@@ -14,6 +14,7 @@ import {
 import { X, FileText, Tag, Sparkles, Target, Calendar, Clock, Users, Plus, Trash, MessageCircle } from 'lucide-react'
 import { CATEGORY_ICONS } from './categoryIcons'
 import { formatDate } from '@/utils/dateUtils'
+import { getUserNicknameSync } from '@/utils/userUtils'
 import { useScrollLock } from '@/hooks/useScrollLock'
 
 interface TaskFormProps {
@@ -406,7 +407,7 @@ export const TaskForm = ({ onClose, onSave, editingTask }: TaskFormProps) => {
                                   : `${borderColor} ${inputBg}`
                               }`}
                             >
-                              <span className={isSelected ? 'text-[#4E6E49]' : headingColor}>{member.name}</span>
+                              <span className={isSelected ? 'text-[#4E6E49]' : headingColor}>{getUserNicknameSync(member.id)}</span>
                             </button>
                           )
                         })}

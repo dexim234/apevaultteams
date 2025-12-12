@@ -7,6 +7,7 @@ import { updateTask } from '@/services/firestoreService'
 import { Task, TaskPriority, TaskStatus, TASK_STATUSES, TEAM_MEMBERS, TaskApproval, TASK_CATEGORIES } from '@/types'
 import { CalendarClock, Check, CheckSquare, Clock3, MoreVertical, X, AlertCircle } from 'lucide-react'
 import { formatDate } from '@/utils/dateUtils'
+import { getUserNicknameSync } from '@/utils/userUtils'
 import { TaskDeadlineBadge } from './TaskDeadlineBadge'
 import { CATEGORY_ICONS } from './categoryIcons'
 
@@ -552,7 +553,7 @@ export const TaskKanban = ({ tasks, onUpdate, onEdit, onDelete }: TaskKanbanProp
                               {assigneeDetails.length > 0 ? (
                                 assigneeDetails.map((assignee) => (
                                   <div key={assignee.member.id} className={`text-[11px] sm:text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} flex flex-wrap gap-1`}>
-                                    <span className="font-medium">{assignee.member.name}</span>
+                                    <span className="font-medium">{getUserNicknameSync(assignee.member.id)}</span>
                                   </div>
                                 ))
                               ) : (

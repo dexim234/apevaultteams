@@ -15,7 +15,7 @@ import {
   addNote,
   updateNote,
   deleteNote,
-  getUserLogin,
+  getUserNickname,
   addApprovalRequest,
 } from '@/services/firestoreService'
 import {
@@ -46,6 +46,7 @@ import {
 } from 'lucide-react'
 import { useNavigate, Link } from 'react-router-dom'
 import { TEAM_MEMBERS, Note } from '@/types'
+import { getUserNicknameSync } from '@/utils/userUtils'
 
 export const Profile = () => {
   const { theme } = useThemeStore()
@@ -76,10 +77,10 @@ export const Profile = () => {
   })
   const [loading, setLoading] = useState(true)
   const [loginCopied, setLoginCopied] = useState(false)
-  const [customLogin, setCustomLogin] = useState<string | null>(null)
-  const [newLogin, setNewLogin] = useState('')
-  const [isEditingLogin, setIsEditingLogin] = useState(false)
-  const [loginRequestPending, setLoginRequestPending] = useState(false)
+  const [customNickname, setCustomNickname] = useState<string | null>(null)
+  const [newNickname, setNewNickname] = useState('')
+  const [isEditingNickname, setIsEditingNickname] = useState(false)
+  const [nicknameRequestPending, setNicknameRequestPending] = useState(false)
 
   const userData = user || (isAdmin ? { name: 'Администратор', login: 'admin', password: ADMIN_PASSWORD } : null)
   const profileAvatar = user?.id ? TEAM_MEMBERS.find((m) => m.id === user.id)?.avatar : undefined
@@ -93,22 +94,22 @@ export const Profile = () => {
     }
   }, [user, isAdmin])
 
-  // Refresh custom login when approval might be processed
+  // Refresh custom nickname when approval might be processed
   useEffect(() => {
-    const checkLoginUpdates = async () => {
+    const checkNicknameUpdates = async () => {
       if (user?.id && !isAdmin) {
-        const userLogin = await getUserLogin(user.id)
-        if (userLogin) {
-          setCustomLogin(userLogin.login)
+        const userNickname = await getUserNickname(user.id)
+        if (userNickname) {
+          setCustomNickname(userNickname.nickname)
         } else {
-          setCustomLogin(null)
+          setCustomNickname(null)
         }
       }
     }
     
-    // Check every 30 seconds for login updates
-    const interval = setInterval(checkLoginUpdates, 30000)
-    checkLoginUpdates() // Check immediately
+    // Check every 30 seconds for nickname updates
+    const interval = setInterval(checkNicknameUpdates, 30000)
+    checkNicknameUpdates() // Check immediately
     
     return () => clearInterval(interval)
   }, [user?.id, isAdmin])
@@ -256,10 +257,10 @@ export const Profile = () => {
             setNotes(userNotes)
             saveLocalNotes(userNotes)
             
-            // Load custom login
-            const userLogin = await getUserLogin(user.id)
-            if (userLogin) {
-              setCustomLogin(userLogin.login)
+            // Load custom nickname
+            const userNickname = await getUserNickname(user.id)
+            if (userNickname) {
+              setCustomNickname(userNickname.nickname)
             }
           } else if (isAdmin) {
             const allNotes = await getUserNotes(undefined, true)
@@ -394,7 +395,7 @@ export const Profile = () => {
   }
 
   const handleCopyLogin = () => {
-    const loginToCopy = customLogin || userData?.login
+    const loginToCopy = userData?.login
     if (loginToCopy) {
       navigator.clipboard.writeText(loginToCopy)
       setLoginCopied(true)
@@ -402,41 +403,42 @@ export const Profile = () => {
     }
   }
 
-  const handleRequestLoginChange = async () => {
-    if (!user?.id || !newLogin.trim()) return
+  const handleRequestNicknameChange = async () => {
+    if (!user?.id || !newNickname.trim()) return
     
-    const trimmedLogin = newLogin.trim()
-    const currentLogin = customLogin || userData?.login || ''
+    const trimmedNickname = newNickname.trim()
+    const { getUserNicknameSync } = await import('@/utils/userUtils')
+    const currentNickname = customNickname || getUserNicknameSync(user.id) || ''
     
-    // Check if login is different
-    if (trimmedLogin === currentLogin) {
-      setIsEditingLogin(false)
-      setNewLogin('')
+    // Check if nickname is different
+    if (trimmedNickname === currentNickname) {
+      setIsEditingNickname(false)
+      setNewNickname('')
       return
     }
     
-    setLoginRequestPending(true)
+    setNicknameRequestPending(true)
     try {
-      const currentUserLogin = await getUserLogin(user.id)
+      const currentUserNickname = await getUserNickname(user.id)
       
       await addApprovalRequest({
         entity: 'login',
         action: 'update',
         authorId: user.id,
         targetUserId: user.id,
-        before: currentUserLogin || { id: '', userId: user.id, login: currentLogin, createdAt: '', updatedAt: '' },
-        after: { id: '', userId: user.id, login: trimmedLogin, createdAt: '', updatedAt: '' },
-        comment: `Запрос на изменение ника с "${currentLogin}" на "${trimmedLogin}"`,
+        before: currentUserNickname || { id: '', userId: user.id, nickname: currentNickname, createdAt: '', updatedAt: '' },
+        after: { id: '', userId: user.id, nickname: trimmedNickname, createdAt: '', updatedAt: '' },
+        comment: `Запрос на изменение ника с "${currentNickname}" на "${trimmedNickname}"`,
       })
       
-      setIsEditingLogin(false)
-      setNewLogin('')
+      setIsEditingNickname(false)
+      setNewNickname('')
       alert('Запрос на изменение ника отправлен на согласование администратору')
     } catch (error) {
-      console.error('Error requesting login change:', error)
+      console.error('Error requesting nickname change:', error)
       alert('Ошибка при отправке запроса на изменение ника')
     } finally {
-      setLoginRequestPending(false)
+      setNicknameRequestPending(false)
     }
   }
 
@@ -551,11 +553,12 @@ export const Profile = () => {
                     <div className={`p-4 rounded-xl border ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-white'} shadow-sm`}>
                       <div className="flex items-center justify-between mb-1">
                         <p className={`text-xs font-semibold uppercase tracking-wide ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Ник</p>
-                        {!isEditingLogin && user && !isAdmin && (
+                        {!isEditingNickname && user && !isAdmin && (
                           <button
-                            onClick={() => {
-                              setIsEditingLogin(true)
-                              setNewLogin(customLogin || userData.login)
+                            onClick={async () => {
+                              const { getUserNicknameSync } = await import('@/utils/userUtils')
+                              setIsEditingNickname(true)
+                              setNewNickname(customNickname || getUserNicknameSync(user.id) || '')
                             }}
                             className={`text-xs px-2 py-1 rounded-lg border transition ${theme === 'dark' ? 'border-white/10 bg-white/5 hover:border-white/30 text-white' : 'border-gray-200 bg-white hover:border-gray-300 text-gray-700'}`}
                           >
@@ -564,34 +567,34 @@ export const Profile = () => {
                           </button>
                         )}
                       </div>
-                      {isEditingLogin ? (
+                      {isEditingNickname ? (
                         <div className="space-y-2 mt-1">
                           <input
                             type="text"
-                            value={newLogin}
-                            onChange={(e) => setNewLogin(e.target.value)}
+                            value={newNickname}
+                            onChange={(e) => setNewNickname(e.target.value)}
                             placeholder="Введите новый ник"
                             className={`w-full px-3 py-2 rounded-lg border ${theme === 'dark' ? 'border-white/10 bg-white/5 text-white' : 'border-gray-200 bg-white text-gray-900'} text-sm`}
-                            disabled={loginRequestPending}
+                            disabled={nicknameRequestPending}
                           />
                           <div className="flex gap-2">
                             <button
-                              onClick={handleRequestLoginChange}
-                              disabled={loginRequestPending || !newLogin.trim()}
+                              onClick={handleRequestNicknameChange}
+                              disabled={nicknameRequestPending || !newNickname.trim()}
                               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
-                                loginRequestPending || !newLogin.trim()
+                                nicknameRequestPending || !newNickname.trim()
                                   ? 'opacity-50 cursor-not-allowed'
                                   : 'bg-[#4E6E49] text-white hover:bg-[#3d5639]'
                               }`}
                             >
-                              {loginRequestPending ? 'Отправка...' : 'Отправить на согласование'}
+                              {nicknameRequestPending ? 'Отправка...' : 'Отправить на согласование'}
                             </button>
                             <button
                               onClick={() => {
-                                setIsEditingLogin(false)
-                                setNewLogin('')
+                                setIsEditingNickname(false)
+                                setNewNickname('')
                               }}
-                              disabled={loginRequestPending}
+                              disabled={nicknameRequestPending}
                               className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition ${
                                 theme === 'dark' ? 'border-white/10 bg-white/5 hover:border-white/30 text-white' : 'border-gray-200 bg-white hover:border-gray-300 text-gray-700'
                               }`}
@@ -605,16 +608,24 @@ export const Profile = () => {
                         </div>
                       ) : (
                         <div className="flex items-center gap-2 mt-1">
-                          <p className={`text-lg font-bold ${headingColor}`}>@{customLogin || userData.login}</p>
-                          <button
-                            onClick={handleCopyLogin}
-                            className={`p-2 rounded-lg border transition ${loginCopied ? 'bg-[#4E6E49] text-white border-[#4E6E49]' : theme === 'dark' ? 'border-white/10 bg-white/5 hover:border-white/30' : 'border-gray-200 bg-white hover:border-gray-300'}`}
-                            title="Скопировать ник"
-                          >
-                            {loginCopied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                          </button>
+                          <p className={`text-lg font-bold ${headingColor}`}>
+                            {user?.id ? getUserNicknameSync(user.id) : '—'}
+                          </p>
                         </div>
                       )}
+                    </div>
+                    <div className={`p-4 rounded-xl border ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-white'} shadow-sm`}>
+                      <p className={`text-xs font-semibold uppercase tracking-wide ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Логин</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <p className={`text-lg font-bold ${headingColor}`}>{userData.login}</p>
+                        <button
+                          onClick={handleCopyLogin}
+                          className={`p-2 rounded-lg border transition ${loginCopied ? 'bg-[#4E6E49] text-white border-[#4E6E49]' : theme === 'dark' ? 'border-white/10 bg-white/5 hover:border-white/30' : 'border-gray-200 bg-white hover:border-gray-300'}`}
+                          title="Скопировать логин"
+                        >
+                          {loginCopied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                        </button>
+                      </div>
                     </div>
                   </div>
                   <div className="mt-4 space-y-2">

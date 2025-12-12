@@ -5,6 +5,7 @@ import { useThemeStore } from '@/store/themeStore'
 import { useAdminStore } from '@/store/adminStore'
 import { addApprovalRequest, getWorkSlots, addWorkSlot, updateWorkSlot } from '@/services/firestoreService'
 import { calculateHours, timeOverlaps, formatDate, getDatesInRange, normalizeDatesList, parseTime } from '@/utils/dateUtils'
+import { getUserNicknameSync } from '@/utils/userUtils'
 import { X, Plus, Trash2, Edit, CalendarDays, Calendar } from 'lucide-react'
 import { WorkSlot, TimeSlot, TEAM_MEMBERS } from '@/types'
 import { useScrollLock } from '@/hooks/useScrollLock'
@@ -427,7 +428,7 @@ export const SlotForm = ({ slot, onClose, onSave }: SlotFormProps) => {
   }
 
   const getMemberName = (userId: string): string => {
-    return TEAM_MEMBERS.find((member) => member.id === userId)?.name || userId
+    return getUserNicknameSync(userId)
   }
 
   const validateSlot = async (slotDate: string, timeSlots: TimeSlot[]): Promise<string | null> => {
@@ -698,7 +699,7 @@ export const SlotForm = ({ slot, onClose, onSave }: SlotFormProps) => {
                           onChange={() => toggleUserSelection(member.id)}
                           className="hidden"
                         />
-                        {member.name}
+                        {getUserNicknameSync(member.id)}
                       </label>
                     ))}
                   </div>

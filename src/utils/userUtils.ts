@@ -1,56 +1,71 @@
 // Utility functions for user data
 import { TEAM_MEMBERS } from '@/types'
-import { getUserLoginValue } from '@/services/firestoreService'
+import { getUserNicknameValue } from '@/services/firestoreService'
 
-// Cache for custom logins to avoid multiple async calls
-const loginCache = new Map<string, string | null>()
+// Default nickname map (from ManagementTable)
+const defaultNicknameMap: Record<string, string> = {
+  '1': 'Dex',
+  '2': 'Enowk',
+  '3': 'Xenia',
+  '4': 'Olenka',
+  '5': 'Sydney',
+}
+
+// Cache for custom nicknames to avoid multiple async calls
+const nicknameCache = new Map<string, string | null>()
 
 /**
- * Get user login (nickname) - checks custom login first, then default
+ * Get user nickname - checks custom nickname first, then default nickname map, then login
  * This is a synchronous version that uses cache
  */
-export const getUserLoginSync = (userId: string): string => {
+export const getUserNicknameSync = (userId: string): string => {
   // Check cache first
-  const cached = loginCache.get(userId)
+  const cached = nicknameCache.get(userId)
   if (cached !== undefined) {
-    return cached || TEAM_MEMBERS.find((m) => m.id === userId)?.login || userId
+    return cached || defaultNicknameMap[userId] || TEAM_MEMBERS.find((m) => m.id === userId)?.login || userId
   }
   
   // Return default if not in cache
-  return TEAM_MEMBERS.find((m) => m.id === userId)?.login || userId
+  return defaultNicknameMap[userId] || TEAM_MEMBERS.find((m) => m.id === userId)?.login || userId
 }
 
 /**
- * Get user login (nickname) - async version that fetches from Firestore
+ * Get user nickname - async version that fetches from Firestore
  * Use this when you need the most up-to-date value
  */
-export const getUserLoginAsync = async (userId: string): Promise<string> => {
+export const getUserNicknameAsync = async (userId: string): Promise<string> => {
   try {
-    const customLogin = await getUserLoginValue(userId)
-    if (customLogin) {
-      loginCache.set(userId, customLogin)
-      return customLogin
+    const customNickname = await getUserNicknameValue(userId)
+    if (customNickname) {
+      nicknameCache.set(userId, customNickname)
+      return customNickname
     }
     
-    const defaultLogin = TEAM_MEMBERS.find((m) => m.id === userId)?.login || userId
-    loginCache.set(userId, null) // Cache null to indicate no custom login
-    return defaultLogin
+    const defaultNickname = defaultNicknameMap[userId] || TEAM_MEMBERS.find((m) => m.id === userId)?.login || userId
+    nicknameCache.set(userId, null) // Cache null to indicate no custom nickname
+    return defaultNickname
   } catch (error) {
-    console.error('Error fetching user login:', error)
-    return getUserLoginSync(userId)
+    console.error('Error fetching user nickname:', error)
+    return getUserNicknameSync(userId)
   }
 }
 
 /**
- * Clear login cache for a user (call after login change is approved)
+ * Clear nickname cache for a user (call after nickname change is approved)
  */
-export const clearLoginCache = (userId: string) => {
-  loginCache.delete(userId)
+export const clearNicknameCache = (userId: string) => {
+  nicknameCache.delete(userId)
 }
 
 /**
- * Clear all login cache
+ * Clear all nickname cache
  */
-export const clearAllLoginCache = () => {
-  loginCache.clear()
+export const clearAllNicknameCache = () => {
+  nicknameCache.clear()
 }
+
+// Legacy aliases for backward compatibility (will be removed)
+export const getUserLoginSync = getUserNicknameSync
+export const getUserLoginAsync = getUserNicknameAsync
+export const clearLoginCache = clearNicknameCache
+export const clearAllLoginCache = clearAllNicknameCache

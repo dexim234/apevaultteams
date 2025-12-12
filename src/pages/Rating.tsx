@@ -9,7 +9,7 @@ import { ReferralForm } from '@/components/Rating/ReferralForm'
 import { getRatingData, getEarnings, getDayStatuses, getReferrals, getWorkSlots, getWeeklyMessages, deleteReferral, addApprovalRequest, getLatestUserActivities, getUserActivitiesLast24Hours } from '@/services/firestoreService'
 import { getLastNDaysRange, getWeekRange, formatDate, calculateHours, countDaysInPeriod } from '@/utils/dateUtils'
 import { calculateRating, getRatingBreakdown } from '@/utils/ratingUtils'
-import { getUserLoginAsync, clearAllLoginCache } from '@/utils/userUtils'
+import { getUserNicknameAsync, clearAllNicknameCache, getUserNicknameSync } from '@/utils/userUtils'
 import { RatingData, Referral, TEAM_MEMBERS, UserActivity } from '@/types'
 
 export const Rating = () => {
@@ -254,19 +254,18 @@ export const Rating = () => {
 
   const getMemberNameById = (id: string) => {
     // Use sync version for immediate display, will be updated when cache is populated
-    const { getUserLoginSync } = require('@/utils/userUtils')
-    return getUserLoginSync(id) || '—'
+    return getUserNicknameSync(id) || '—'
   }
   
-  // Load custom logins on mount
+  // Load custom nicknames on mount
   useEffect(() => {
-    const loadCustomLogins = async () => {
-      clearAllLoginCache()
+    const loadCustomNicknames = async () => {
+      clearAllNicknameCache()
       for (const member of TEAM_MEMBERS) {
-        await getUserLoginAsync(member.id)
+        await getUserNicknameAsync(member.id)
       }
     }
-    loadCustomLogins()
+    loadCustomNicknames()
   }, [])
 
   const handleAddReferral = () => {
