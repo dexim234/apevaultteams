@@ -4,7 +4,7 @@ import { useThemeStore } from '@/store/themeStore'
 import { useAuthStore } from '@/store/authStore'
 import { useAdminStore } from '@/store/adminStore'
 import { deleteEarnings, addApprovalRequest } from '@/services/firestoreService'
-import { Earnings, EARNINGS_CATEGORY_META, EarningsCategory, TEAM_MEMBERS } from '@/types'
+import { Earnings, EARNINGS_CATEGORY_META, EarningsCategory } from '@/types'
 import { formatDate } from '@/utils/dateUtils'
 import { Edit2, Trash2, Rocket, LineChart, Image, Coins, BarChart3, ShieldCheck, Sparkles, Wallet2 } from 'lucide-react'
 
