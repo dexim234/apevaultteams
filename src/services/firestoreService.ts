@@ -1112,7 +1112,7 @@ export const getUserActivities = async (userId?: string): Promise<UserActivity[]
 
   const snapshot = await getDocs(q)
   return snapshot.docs.map((docSnap) => {
-    const data = docSnap.data()
+    const data = docSnap.data() as any
     return {
       id: docSnap.id,
       userId: data.userId || '',
@@ -1133,7 +1133,7 @@ export const getLatestUserActivities = async (): Promise<UserActivity[]> => {
   const snapshot = await getDocs(q)
   
   const allActivities = snapshot.docs.map((docSnap) => {
-    const data = docSnap.data()
+    const data = docSnap.data() as any
     return {
       id: docSnap.id,
       userId: data.userId || '',
