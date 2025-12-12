@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { CheckCircle2, Clock, ThumbsDown, CheckSquare, Square } from 'lucide-react'
 import { getApprovalRequests, approveApprovalRequest, rejectApprovalRequest } from '@/services/firestoreService'
-import { ApprovalRequest, DayStatus, WorkSlot, UserNickname } from '@/types'
+import { ApprovalRequest, DayStatus, WorkSlot } from '@/types'
 import { formatDate } from '@/utils/dateUtils'
 import { getUserNicknameSync, clearNicknameCache } from '@/utils/userUtils'
 import { useAuthStore } from '@/store/authStore'
