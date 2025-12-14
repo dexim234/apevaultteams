@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import { useAuthStore } from '@/store/authStore'
 import { useThemeStore } from '@/store/themeStore'
 import { useAdminStore } from '@/store/adminStore'
-import { addApprovalRequest, getWorkSlots, addWorkSlot, updateWorkSlot } from '@/services/firestoreService'
+import { addApprovalRequest, getWorkSlots, addWorkSlot, updateWorkSlot, checkRestriction } from '@/services/firestoreService'
 import { calculateHours, timeOverlaps, formatDate, getDatesInRange, normalizeDatesList, parseTime } from '@/utils/dateUtils'
 import { getUserNicknameSync } from '@/utils/userUtils'
 import { X, Plus, Trash2, Edit, CalendarDays, Calendar } from 'lucide-react'
@@ -498,6 +498,14 @@ export const SlotForm = ({ slot, onClose, onSave }: SlotFormProps) => {
     }
 
     const createSlotForUserDate = async (targetUserId: string, dateStr: string, participants: string[] = [targetUserId]) => {
+      // Check restrictions for slot creation
+      if (!isAdmin) {
+        const restrictionCheck = await checkRestriction('slots', dateStr)
+        if (restrictionCheck.restricted) {
+          throw new Error(`[${getMemberName(targetUserId)} • ${formatDate(new Date(dateStr), 'dd.MM.yyyy')}] ${restrictionCheck.reason}`)
+        }
+      }
+
       // Пересчитываем endDate под каждую целевую дату, чтобы слоты, переходящие через полночь,
       // сдвигались на следующий день именно относительно текущей даты цикла.
       const adjustedSlots: TimeSlot[] = slots.map((s) => {

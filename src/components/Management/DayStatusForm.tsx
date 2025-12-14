@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import { useAuthStore } from '@/store/authStore'
 import { useThemeStore } from '@/store/themeStore'
 import { useAdminStore } from '@/store/adminStore'
-import { addApprovalRequest, getDayStatuses, addDayStatus, updateDayStatus } from '@/services/firestoreService'
+import { addApprovalRequest, getDayStatuses, addDayStatus, updateDayStatus, checkRestriction } from '@/services/firestoreService'
 import { formatDate, isSameDate, getDatesInRange, normalizeDatesList } from '@/utils/dateUtils'
 import { getUserNicknameSync } from '@/utils/userUtils'
 import { X } from 'lucide-react'
@@ -356,6 +356,12 @@ export const DayStatusForm = ({ type, status, onClose, onSave }: DayStatusFormPr
 
     const saveStatusFor = async (targetUserId: string, payload: { date: string; endDate?: string }) => {
       if (!isAdmin) {
+        // Check restrictions for status creation
+        const restrictionCheck = await checkRestriction(selectedType, payload.date)
+        if (restrictionCheck.restricted) {
+          throw new Error(`[${getMemberName(targetUserId)} • ${formatDate(new Date(payload.date), 'dd.MM.yyyy')}] ${restrictionCheck.reason}`)
+        }
+
         const validationError = await validateStatus(targetUserId, payload.date, payload.endDate, selectedType)
         if (validationError) {
           throw new Error(`[${getMemberName(targetUserId)} • ${formatDate(payload.date, 'dd.MM.yyyy')}] ${validationError}`)

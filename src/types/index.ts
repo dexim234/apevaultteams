@@ -37,6 +37,21 @@ export interface DayStatus {
   endDate?: string // for multi-day statuses
 }
 
+// Restriction types
+export type RestrictionType = 'slots' | 'dayoff' | 'sick' | 'vacation' | 'all'
+
+export interface Restriction {
+  id: string
+  type: RestrictionType // what to restrict
+  startDate: string // YYYY-MM-DD format
+  endDate?: string // YYYY-MM-DD format for ranges, optional for single dates
+  startTime?: string // HH:mm format, optional - if set, restriction starts from this time
+  comment?: string
+  createdBy: string // admin user ID
+  createdAt: string
+  isActive: boolean
+}
+
 export type ApprovalEntity = 'slot' | 'status' | 'earning' | 'referral' | 'login'
 export type ApprovalAction = 'create' | 'update' | 'delete'
 export type ApprovalStatus = 'pending' | 'approved' | 'rejected'

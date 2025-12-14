@@ -11,3 +11,4 @@ export const UserNickname = ({ userId, className = '', fallback = 'unknown' }: U
   const nickname = useUserNickname(userId)
   return <span className={className}>{nickname || fallback}</span>
 }
+

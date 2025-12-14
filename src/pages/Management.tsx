@@ -20,15 +20,17 @@ import {
   Activity,
   ArrowUpRight,
   ArrowDownRight,
+  Shield,
 } from 'lucide-react'
 import { TEAM_MEMBERS } from '@/types'
 import { DeleteSlotsForm } from '@/components/Management/DeleteSlotsForm'
+import { RestrictionForm } from '@/components/Management/RestrictionForm'
 import { getWorkSlots, getDayStatuses } from '@/services/firestoreService'
 import { getWeekDays, formatDate } from '@/utils/dateUtils'
 
 type ViewMode = 'table' | 'week'
 export type SlotFilter = 'all' | 'upcoming' | 'completed'
-type ActionType = 'add-slot' | 'delete-slots' | 'absence'
+type ActionType = 'add-slot' | 'delete-slots' | 'absence' | 'restriction'
 
 export const Management = () => {
   const { theme } = useThemeStore()
@@ -37,6 +39,7 @@ export const Management = () => {
   const [showSlotForm, setShowSlotForm] = useState(false)
   const [showDeleteSlotsForm, setShowDeleteSlotsForm] = useState(false)
   const [showStatusForm, setShowStatusForm] = useState(false)
+  const [showRestrictionForm, setShowRestrictionForm] = useState(false)
   const [statusType, setStatusType] = useState<'dayoff' | 'sick' | 'vacation' | null>(null)
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null)
   const [editingSlot, setEditingSlot] = useState<any>(null)
@@ -287,10 +290,16 @@ export const Management = () => {
     setShowDeleteSlotsForm(true)
   }
 
+  const handleManageRestrictions = () => {
+    setShowRestrictionForm(true)
+    setActionType('restriction')
+  }
+
   const handleFormClose = () => {
     setShowSlotForm(false)
     setShowDeleteSlotsForm(false)
     setShowStatusForm(false)
+    setShowRestrictionForm(false)
     setStatusType(null)
     setEditingSlot(null)
     setEditingStatus(null)
@@ -542,12 +551,13 @@ export const Management = () => {
               <p className={`text-sm font-semibold ${headingColor}`}>Действие</p>
               <span className="text-[11px] uppercase tracking-wide text-gray-500 dark:text-gray-400">выбор задачи</span>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
               {[
                 { key: 'add-slot', label: 'Добавить слот', desc: 'Разовое или серия', icon: <PlusCircle className="w-5 h-5" />, tone: 'bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-100 dark:border-emerald-800', action: handleAddSlot },
                 { key: 'delete-slots', label: 'Очистить расписание', desc: 'Удалить слоты/статусы', icon: <Trash2 className="w-5 h-5" />, tone: 'bg-rose-100 text-rose-800 border-rose-200 dark:bg-rose-900/30 dark:text-rose-100 dark:border-rose-800', action: handleDeleteSlots },
                 { key: 'absence', label: 'Добавить отсутствие', desc: 'Выходной, больничный, отпуск', icon: <Moon className="w-5 h-5" />, tone: 'bg-teal-100 text-teal-800 border-teal-200 dark:bg-teal-900/30 dark:text-teal-100 dark:border-teal-800', action: handleAddAbsence },
-              ].map((action) => (
+                { key: 'restriction', label: 'Управление ограничениями', desc: 'Запретить создание записей', icon: <Shield className="w-5 h-5" />, tone: 'bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-900/30 dark:text-orange-100 dark:border-orange-800', action: handleManageRestrictions, adminOnly: true },
+              ].filter(action => !action.adminOnly || isAdmin).map((action) => (
                 <button
                   key={action.key}
                   onClick={() => {
@@ -661,6 +671,13 @@ export const Management = () => {
           <DayStatusForm
             type={statusType || undefined}
             status={editingStatus}
+            onClose={handleFormClose}
+            onSave={handleFormClose}
+          />
+        )}
+
+        {showRestrictionForm && (
+          <RestrictionForm
             onClose={handleFormClose}
             onSave={handleFormClose}
           />

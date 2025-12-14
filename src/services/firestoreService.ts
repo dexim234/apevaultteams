@@ -12,8 +12,9 @@ import {
   orderBy,
 } from 'firebase/firestore'
 import { db } from '@/firebase/config'
-import { WorkSlot, DayStatus, Earnings, RatingData, Referral, Call, Task, TaskStatus, Note, TaskPriority, StageAssignee, ApprovalRequest, ApprovalStatus, UserActivity, UserNickname } from '@/types'
+import { WorkSlot, DayStatus, Earnings, RatingData, Referral, Call, Task, TaskStatus, Note, TaskPriority, StageAssignee, ApprovalRequest, ApprovalStatus, UserActivity, UserNickname, Restriction } from '@/types'
 import { clearNicknameCache, getUserNicknameAsync } from '@/utils/userUtils'
+import { formatDate } from '@/utils/dateUtils'
 
 const DATA_RETENTION_DAYS = 30
 
@@ -222,6 +223,142 @@ export const updateDayStatus = async (id: string, updates: Partial<DayStatus>) =
 export const deleteDayStatus = async (id: string) => {
   const statusRef = doc(db, 'dayStatuses', id)
   await deleteDoc(statusRef)
+}
+
+// Restrictions
+export const getRestrictions = async (isActive?: boolean) => {
+  const restrictionsRef = collection(db, 'restrictions')
+  let q: ReturnType<typeof query>
+
+  if (isActive !== undefined) {
+    q = query(restrictionsRef, where('isActive', '==', isActive))
+  } else {
+    q = query(restrictionsRef)
+  }
+
+  const snapshot = await getDocs(q)
+  const results = snapshot.docs.map((doc) => {
+    const data = doc.data() as any
+    return {
+      id: doc.id,
+      type: data?.type || 'all',
+      startDate: data?.startDate || '',
+      endDate: data?.endDate,
+      startTime: data?.startTime,
+      comment: data?.comment,
+      createdBy: data?.createdBy || '',
+      createdAt: data?.createdAt || '',
+      isActive: data?.isActive ?? true,
+    } as Restriction
+  })
+
+  // Sort by start date in memory to avoid index requirement
+  results.sort((a, b) => a.startDate.localeCompare(b.startDate))
+
+  return results
+}
+
+export const addRestriction = async (restriction: Omit<Restriction, 'id'>) => {
+  try {
+    const restrictionsRef = collection(db, 'restrictions')
+    // Remove undefined values before saving
+    const cleanRestriction = Object.fromEntries(
+      Object.entries(restriction).filter(([_, value]) => value !== undefined)
+    )
+    const result = await addDoc(restrictionsRef, cleanRestriction)
+    return result
+  } catch (error) {
+    console.error('Error adding restriction:', error)
+    throw error
+  }
+}
+
+export const updateRestriction = async (id: string, updates: Partial<Restriction>) => {
+  const restrictionRef = doc(db, 'restrictions', id)
+
+  // Remove undefined values before updating
+  const cleanUpdates = Object.fromEntries(
+    Object.entries(updates).filter(([_, value]) => value !== undefined)
+  )
+  await updateDoc(restrictionRef, cleanUpdates)
+}
+
+export const deleteRestriction = async (id: string) => {
+  const restrictionRef = doc(db, 'restrictions', id)
+  await deleteDoc(restrictionRef)
+}
+
+// Check if a specific action is restricted for given date/time
+export const checkRestriction = async (
+  actionType: RestrictionType,
+  date: string,
+  time?: string
+): Promise<{ restricted: boolean; restriction?: Restriction; reason?: string }> => {
+  try {
+    const restrictions = await getRestrictions(true)
+
+    for (const restriction of restrictions) {
+      // Check if restriction applies to this action type
+      if (restriction.type !== 'all' && restriction.type !== actionType) {
+        continue
+      }
+
+      // Check date range
+      const checkDate = new Date(date)
+      const startDate = new Date(restriction.startDate)
+
+      let dateInRange = false
+      if (restriction.endDate) {
+        const endDate = new Date(restriction.endDate)
+        dateInRange = checkDate >= startDate && checkDate <= endDate
+      } else {
+        dateInRange = checkDate.getTime() === startDate.getTime()
+      }
+
+      if (!dateInRange) {
+        continue
+      }
+
+      // If no time restriction, then it's restricted
+      if (!restriction.startTime) {
+        return {
+          restricted: true,
+          restriction,
+          reason: `Запрещено создавать ${restrictionTypeToLabel(actionType)} на ${formatDate(checkDate, 'dd.MM.yyyy')}`
+        }
+      }
+
+      // Check time restriction
+      if (time && restriction.startTime) {
+        const checkTime = time
+        const restrictTime = restriction.startTime
+
+        if (checkTime >= restrictTime) {
+          return {
+            restricted: true,
+            restriction,
+            reason: `Запрещено создавать ${restrictionTypeToLabel(actionType)} после ${restrictTime} на ${formatDate(checkDate, 'dd.MM.yyyy')}`
+          }
+        }
+      }
+    }
+
+    return { restricted: false }
+  } catch (error) {
+    console.error('Error checking restrictions:', error)
+    return { restricted: false } // Allow on error to avoid blocking users
+  }
+}
+
+const restrictionTypeToLabel = (type: RestrictionType): string => {
+  const labels: Record<RestrictionType, string> = {
+    slots: 'слоты',
+    dayoff: 'выходные',
+    sick: 'больничные',
+    vacation: 'отпуска',
+    all: 'любые записи',
+  }
+  return labels[type]
 }
 
 // Approval Requests
