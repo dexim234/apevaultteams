@@ -50,7 +50,7 @@ export const RestrictionForm = ({ restriction, onClose, onSave }: RestrictionFor
   }
 
   const handleSave = async () => {
-    if (!isAdmin || !user) {
+    if (!isAdmin) {
       setError('Только администратор может управлять ограничениями')
       return
     }
@@ -105,7 +105,7 @@ export const RestrictionForm = ({ restriction, onClose, onSave }: RestrictionFor
         ...(isRange && endDate !== startDate && { endDate }),
         ...(hasTimeRestriction && startTime && { startTime }),
         ...(comment && { comment }),
-        createdBy: user.id,
+        createdBy: user?.id || 'admin',
         createdAt: restriction?.createdAt || new Date().toISOString(),
         isActive,
       }
