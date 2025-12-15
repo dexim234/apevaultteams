@@ -17,7 +17,7 @@ interface ManagementTableProps {
   slotFilter: SlotFilter
   onEditSlot: (slot: WorkSlot) => void
   onEditStatus: (status: DayStatus) => void
-  setStatusType: (type: 'dayoff' | 'sick' | 'vacation' | 'absence') => void
+  setStatusType: (type: 'dayoff' | 'sick' | 'vacation' | 'absence' | null) => void
   setShowStatusForm: (show: boolean) => void
   refreshKey: number
 }
