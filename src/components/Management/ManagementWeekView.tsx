@@ -653,10 +653,15 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
                   )
                 })}
 
-                {daySlots.length === 0 && dayStatuses.length === 0 && (
+                {daySlots.length === 0 && dayStatuses.length === 0 && dateStr === formatDate(today, 'yyyy-MM-dd') && (
                   <div className={`rounded-lg px-3 py-2 text-xs font-semibold ring-1 ring-inset ring-black/5 dark:ring-white/10 ${statusTone.absence}`}>
                     Прогул
                   </div>
+                )}
+                {daySlots.length === 0 && dayStatuses.length === 0 && dateStr !== formatDate(today, 'yyyy-MM-dd') && (
+                  <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                    Нет данных
+                  </p>
                 )}
               </div>
             </div>

@@ -665,7 +665,7 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
                               )}
                             </div>
                           </div>
-                        ) : (
+                        ) : dateStr === todayStr ? (
                           <div className="space-y-1">
                             <div
                               className={`rounded-lg px-3 py-2 text-xs font-semibold ring-1 ring-inset ring-black/5 dark:ring-white/10 ${statusTone.absence}`}
@@ -673,6 +673,8 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
                               Прогул
                             </div>
                           </div>
+                        ) : (
+                          <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>—</span>
                         )}
                       </td>
                     )
