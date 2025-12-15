@@ -665,13 +665,17 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
                               )}
                             </div>
                           </div>
-                        ) : dateStr === todayStr ? (
+                        ) : !slot && !status && dateStr === todayStr ? (
                           <div className="space-y-1">
-                            <div
-                              className={`rounded-lg px-3 py-2 text-xs font-semibold ring-1 ring-inset ring-black/5 dark:ring-white/10 ${statusTone.absence}`}
+                            <button
+                              onClick={() => {
+                                setStatusType('absence')
+                                setShowStatusForm(true)
+                              }}
+                              className="w-full rounded-lg px-3 py-2 text-xs font-semibold bg-red-50 text-red-700 border border-red-200 hover:bg-red-100 dark:bg-red-900/30 dark:text-red-100 dark:border-red-800 transition-colors"
                             >
-                              Прогул
-                            </div>
+                              + Прогул
+                            </button>
                           </div>
                         ) : (
                           <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>—</span>
