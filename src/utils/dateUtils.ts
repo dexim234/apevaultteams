@@ -55,9 +55,9 @@ export const calculateHours = (slots: { start: string; end: string; endDate?: st
     const startMinutes = startHour * 60 + startMin
     const endMinutes = endHour * 60 + endMin
     
-    // If slot crosses midnight (end < start) or has endDate, add 24 hours
+    // If slot crosses midnight (end < start), add 24 hours
     let diff = (endMinutes - startMinutes) / 60
-    if (diff < 0 || slot.endDate) {
+    if (diff < 0) {
       diff += 24 // Add 24 hours for slots crossing midnight
     }
     
