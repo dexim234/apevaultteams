@@ -630,7 +630,7 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
                               {status.type === 'dayoff' ? 'Выходной' : status.type === 'sick' ? 'Больничный' : status.type === 'vacation' ? 'Отпуск' : 'Прогул'}
                             </div>
                             <div className="flex gap-1 justify-center">
-                              {(isAdmin || user?.id === status.userId) ? (
+                              {(isAdmin || (status.type !== 'absence' && user?.id === status.userId)) ? (
                                 <>
                                   <button
                                     onClick={() => onEditStatus(status)}
@@ -646,23 +646,6 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
                                   </button>
                                 </>
                               ) : (
-                                <>
-                                  <button
-                                    disabled
-                                    className="p-1 text-gray-400 cursor-not-allowed rounded"
-                                    title="Вы можете редактировать только свои статусы"
-                                  >
-                                    <Edit className="w-3 h-3" />
-                                  </button>
-                                  <button
-                                    disabled
-                                    className="p-1 text-gray-400 cursor-not-allowed rounded"
-                                    title="Вы можете удалять только свои статусы"
-                                  >
-                                    <Trash2 className="w-3 h-3" />
-                                  </button>
-                                </>
-                              )}
                                 <>
                                   <button
                                     disabled

@@ -22,7 +22,7 @@ export const DeleteSlotsForm = ({ onClose, onSave }: DeleteSlotsFormProps) => {
   const headingColor = theme === 'dark' ? 'text-white' : 'text-gray-900'
 
   const [selectedUserIds, setSelectedUserIds] = useState<string[]>(isAdmin ? [] : user?.id ? [user.id] : [])
-  const [deleteType, setDeleteType] = useState<'slots' | 'dayoff' | 'sick' | 'vacation'>('slots')
+  const [deleteType, setDeleteType] = useState<'slots' | 'dayoff' | 'sick' | 'vacation' | 'absence'>('slots')
 
   const [deleteByWeekDay, setDeleteByWeekDay] = useState(false)
   const [deleteByDates, setDeleteByDates] = useState(false)
@@ -186,7 +186,9 @@ export const DeleteSlotsForm = ({ onClose, onSave }: DeleteSlotsFormProps) => {
           ? 'выходные'
           : deleteType === 'sick'
           ? 'больничные'
-          : 'отпуска'
+          : deleteType === 'vacation'
+          ? 'отпуска'
+          : 'прогулы'
       const scopeText = deleteByWeekDay
         ? `по дням недели (${weekDaysText})`
         : deleteByDates
@@ -233,7 +235,7 @@ export const DeleteSlotsForm = ({ onClose, onSave }: DeleteSlotsFormProps) => {
                 targetUserId: status.userId,
                 before: status,
                 after: null,
-                comment: `Удаление ${deleteType === 'dayoff' ? 'выходного' : deleteType === 'sick' ? 'больничного' : 'отпуска'} ${formatDate(status.date, 'dd.MM.yyyy')}`,
+                comment: `Удаление ${deleteType === 'dayoff' ? 'выходного' : deleteType === 'sick' ? 'больничного' : deleteType === 'vacation' ? 'отпуска' : 'прогула'} ${formatDate(status.date, 'dd.MM.yyyy')}`,
               })
             }
           }
@@ -283,7 +285,7 @@ export const DeleteSlotsForm = ({ onClose, onSave }: DeleteSlotsFormProps) => {
               <div className="space-y-2">
                 {[
                   { label: 'Участники', detail: selectedNames || 'Не выбрано', done: selectedUserIds.length > 0 || !isAdmin },
-                  { label: 'Тип удаления', detail: deleteType === 'slots' ? 'Слоты' : deleteType === 'dayoff' ? 'Выходные' : deleteType === 'sick' ? 'Больничные' : 'Отпуска', done: true },
+                  { label: 'Тип удаления', detail: deleteType === 'slots' ? 'Слоты' : deleteType === 'dayoff' ? 'Выходные' : deleteType === 'sick' ? 'Больничные' : deleteType === 'vacation' ? 'Отпуска' : 'Прогулы', done: true },
                   { label: 'Режим', detail: selectionInfo, done: selectionInfo !== 'Выберите режим' },
                 ].map((step, index) => (
                   <div
@@ -318,6 +320,7 @@ export const DeleteSlotsForm = ({ onClose, onSave }: DeleteSlotsFormProps) => {
                     { key: 'dayoff', label: 'Выходные' },
                     { key: 'sick', label: 'Больничные' },
                     { key: 'vacation', label: 'Отпуска' },
+                    ...(isAdmin ? [{ key: 'absence', label: 'Прогулы' }] : []),
                   ].map((item) => (
                     <button
                       key={item.key}
