@@ -95,10 +95,12 @@ export const SlotForm = ({ slot, onClose, onSave }: SlotFormProps) => {
       return
     }
 
-    // Check if slot crosses midnight
-    const slotCrossesMidnight = crossesMidnight && currentStart >= currentEnd
+    // Check if slot crosses midnight (either checkbox checked or time indicates crossing)
+    const timeIndicatesCrossing = parseTime(currentStart) >= parseTime(currentEnd)
+    const slotCrossesMidnight = crossesMidnight || timeIndicatesCrossing
 
-    if (!slotCrossesMidnight && currentStart >= currentEnd) {
+    // Validate time: if time indicates crossing but user didn't acknowledge it, show error
+    if (timeIndicatesCrossing && !crossesMidnight) {
       setError('Время окончания должно быть позже времени начала. Включите "Переходит через полночь" для слотов, переходящих на следующий день.')
       return
     }
@@ -433,16 +435,32 @@ export const SlotForm = ({ slot, onClose, onSave }: SlotFormProps) => {
 
   const validateSlot = async (slotDate: string, timeSlots: TimeSlot[]): Promise<string | null> => {
     // Get all existing slots on this date (excluding the current slot if editing)
-    const allExistingSlots = await getWorkSlots(undefined, slotDate)
-    const existingSlots = allExistingSlots.filter(s => s.id !== slot?.id)
-    
+    const allExistingSlotsOnDate = await getWorkSlots(undefined, slotDate)
+    const existingSlotsOnDate = allExistingSlotsOnDate.filter(s => s.id !== slot?.id)
+
     // Check max 3 people per slot (for overlapping times)
     for (const timeSlot of timeSlots) {
-      for (const existingSlot of existingSlots) {
+      // Check overlaps with slots on the same date
+      for (const existingSlot of existingSlotsOnDate) {
         if (timeOverlaps(timeSlot, existingSlot.slots[0])) {
           const overlappingCount = existingSlot.participants.length
           if (overlappingCount >= 3) {
             return `Слот ${timeSlot.start}-${timeSlot.end} уже занят максимальным количеством участников (3)`
+          }
+        }
+      }
+
+      // If this slot crosses midnight, also check overlaps with slots on the next day
+      if (timeSlot.endDate) {
+        const nextDaySlots = await getWorkSlots(undefined, timeSlot.endDate)
+        const nextDayExistingSlots = nextDaySlots.filter(s => s.id !== slot?.id)
+
+        for (const existingSlot of nextDayExistingSlots) {
+          if (timeOverlaps(timeSlot, existingSlot.slots[0])) {
+            const overlappingCount = existingSlot.participants.length
+            if (overlappingCount >= 3) {
+              return `Слот ${timeSlot.start}-${timeSlot.end} (до ${timeSlot.endDate}) уже занят максимальным количеством участников (3)`
+            }
           }
         }
       }

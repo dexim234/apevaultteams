@@ -119,14 +119,31 @@ export const normalizeDatesList = (dates: string[]): string[] => {
 }
 
 export const timeOverlaps = (
-  slot1: { start: string; end: string },
-  slot2: { start: string; end: string }
+  slot1: { start: string; end: string; endDate?: string },
+  slot2: { start: string; end: string; endDate?: string }
 ): boolean => {
   const s1 = parseTime(slot1.start)
   const e1 = parseTime(slot1.end)
   const s2 = parseTime(slot2.start)
   const e2 = parseTime(slot2.end)
-  return (s1 < e2 && e1 > s2)
+
+  // Check if slots cross midnight
+  const slot1Crosses = slot1.endDate || e1 <= s1
+  const slot2Crosses = slot2.endDate || e2 <= s2
+
+  // If neither crosses midnight, simple comparison
+  if (!slot1Crosses && !slot2Crosses) {
+    return (s1 < e2 && e1 > s2)
+  }
+
+  // Handle midnight-crossing slots
+  const minutesInDay = 24 * 60
+
+  // Normalize times: if slot crosses midnight, end time is next day
+  const e1Normalized = slot1Crosses ? e1 + minutesInDay : e1
+  const e2Normalized = slot2Crosses ? e2 + minutesInDay : e2
+
+  return (s1 < e2Normalized && e1Normalized > s2)
 }
 
 export const getMoscowTime = (): Date => {
