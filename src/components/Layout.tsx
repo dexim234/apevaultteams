@@ -10,7 +10,6 @@ import {
   Moon,
   Sun,
   CheckCircle2,
-  Zap,
   Settings,
   Calendar,
   DollarSign,

@@ -3,7 +3,7 @@ import { CheckCircle2, Clock, ThumbsDown, CheckSquare, Square } from 'lucide-rea
 import { getApprovalRequests, approveApprovalRequest, rejectApprovalRequest } from '@/services/firestoreService'
 import { ApprovalRequest, DayStatus, WorkSlot } from '@/types'
 import { formatDate } from '@/utils/dateUtils'
-import { getUserNicknameSync, clearNicknameCache, getUserNicknameAsync } from '@/utils/userUtils'
+import { clearNicknameCache, getUserNicknameAsync } from '@/utils/userUtils'
 import { UserNickname } from '@/components/UserNickname'
 import { useAuthStore } from '@/store/authStore'
 import { useAdminStore } from '@/store/adminStore'

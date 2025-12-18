@@ -13,7 +13,6 @@ import {
   Copy,
   Check,
   Search,
-  Zap,
   Sparkles,
   Filter,
   Shield,
@@ -28,6 +27,7 @@ import {
   FileCode,
   MapPin,
   ShieldAlert,
+  CalendarCheck,
   Activity,
   TrendingUp,
   Octagon,
@@ -112,7 +112,6 @@ export const CallPage = () => {
   const textColor = theme === 'dark' ? 'text-white' : 'text-gray-900'
   const subtleColor = theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
   const borderColor = theme === 'dark' ? 'border-gray-800' : 'border-gray-200'
-  const headingColor = theme === 'dark' ? 'text-white' : 'text-gray-900'
   const cardBg = theme === 'dark'
     ? 'border-[#4E6E49]/30 bg-gradient-to-br from-[#1a1a1a] via-[#1a1a1a] to-[#0A0A0A]'
     : 'border-green-200 bg-gradient-to-br from-white via-green-50/30 to-white'
