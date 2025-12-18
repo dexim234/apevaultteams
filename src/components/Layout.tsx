@@ -35,7 +35,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
   const [showToolsMenu, setShowToolsMenu] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
   const [notifications, setNotifications] = useState<{ id: string; text: string; time: string; status: string; timestamp?: number }[]>([])
-  
+
   // Track user activity
   useUserActivity()
 
@@ -78,11 +78,11 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
         const cutoff = Date.now() - 6 * 60 * 60 * 1000 // 6 hours
         const now = Date.now()
         const oneHourMs = 60 * 60 * 1000
-        
+
         // Получаем просмотренные уведомления из localStorage
         const viewedKey = `viewedNotifications_${user.id}`
         const viewedIds = JSON.parse(localStorage.getItem(viewedKey) || '[]')
-        
+
         // 1. Согласования
         const approvals = await getApprovalRequests()
         const approvalNotifications = approvals
@@ -112,25 +112,25 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
             // Новые задачи (созданы за последние 6 часов)
             const createdAt = Date.parse(task.createdAt)
             const isNew = !Number.isNaN(createdAt) && createdAt >= cutoff && !viewedIds.includes(`task_new_${task.id}`)
-            
+
             // Дедлайн за час или прошел
             if (!task.dueDate || !task.dueTime) return isNew
-            
+
             const deadline = new Date(`${task.dueDate}T${task.dueTime}`)
             const deadlineMs = deadline.getTime()
             if (Number.isNaN(deadlineMs)) return isNew
-            
+
             const diffMs = deadlineMs - now
             const isDueInHour = diffMs > 0 && diffMs <= oneHourMs && !viewedIds.includes(`task_due_${task.id}`)
             // Просроченные задачи показываем только если дедлайн прошел не более 6 часов назад
             const isOverdue = diffMs < 0 && diffMs >= -cutoff && !viewedIds.includes(`task_overdue_${task.id}`)
-            
+
             return isNew || isDueInHour || isOverdue
           })
           .map((task) => {
             const createdAt = Date.parse(task.createdAt)
             const isNew = !Number.isNaN(createdAt) && createdAt >= cutoff && !viewedIds.includes(`task_new_${task.id}`)
-            
+
             if (isNew) {
               const timestamp = Date.parse(task.createdAt)
               return {
@@ -141,13 +141,13 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                 timestamp: Number.isNaN(timestamp) ? now : timestamp,
               }
             }
-            
+
             if (!task.dueDate || !task.dueTime) return null
-            
+
             const deadline = new Date(`${task.dueDate}T${task.dueTime}`)
             const deadlineMs = deadline.getTime()
             if (Number.isNaN(deadlineMs)) return null
-            
+
             const diffMs = deadlineMs - now
             if (diffMs > 0 && diffMs <= oneHourMs && !viewedIds.includes(`task_due_${task.id}`)) {
               return {
@@ -158,7 +158,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                 timestamp: deadlineMs,
               }
             }
-            
+
             if (diffMs < 0 && diffMs >= -cutoff && !viewedIds.includes(`task_overdue_${task.id}`)) {
               return {
                 id: `task_overdue_${task.id}`,
@@ -168,7 +168,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                 timestamp: deadlineMs,
               }
             }
-            
+
             return null
           })
           .filter((n): n is { id: string; text: string; time: string; status: string; timestamp: number } => n !== null)
@@ -180,10 +180,10 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
           .filter((slot) => {
             if (viewedIds.includes(`slot_ended_${slot.id}`)) return false
             if (!slot.slots || slot.slots.length === 0) return false
-            
+
             const lastSlot = slot.slots[slot.slots.length - 1]
             if (!lastSlot) return false
-            
+
             // Вычисляем время окончания слота
             let slotEnd: Date
             if (lastSlot.endDate) {
@@ -195,10 +195,10 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
               const [hours, minutes] = lastSlot.end.split(':').map(Number)
               slotEnd.setHours(hours, minutes, 0, 0)
             }
-            
+
             const slotEndMs = slotEnd.getTime()
             if (Number.isNaN(slotEndMs)) return false
-            
+
             // Слот завершился и это было за последние 6 часов
             return slotEndMs < now && slotEndMs >= (now - cutoff)
           })
@@ -214,7 +214,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
               const [hours, minutes] = lastSlot.end.split(':').map(Number)
               slotEnd.setHours(hours, minutes, 0, 0)
             }
-            
+
             return {
               id: `slot_ended_${slot.id}`,
               status: 'ended',
@@ -256,16 +256,6 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="app-shell">
 
-      {/* Permanent protection notice */}
-      <div className="fixed bottom-2 right-2 z-50">
-        <div className={`px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm border ${
-          theme === 'dark'
-            ? 'bg-black/50 border-white/20 text-white/70'
-            : 'bg-white/50 border-gray-300 text-gray-600'
-        }`}>
-          🔒 Защищено от скриншотов
-        </div>
-      </div>
 
       <div className="absolute inset-0 pointer-events-none -z-10 overflow-hidden">
         <div className="absolute -top-24 -left-12 w-80 h-80 bg-gradient-to-br from-[#4E6E49]/25 via-transparent to-transparent blur-3xl" />
@@ -316,17 +306,16 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                             key={item.path}
                             to={item.path}
                             onClick={() => setShowToolsMenu(false)}
-                            className={`flex items-center gap-3 px-4 py-3 transition-colors ${
-                              isToolsSubItemActive(item.path)
+                            className={`flex items-center gap-3 px-4 py-3 transition-colors ${isToolsSubItemActive(item.path)
                                 ? 'bg-gradient-to-r from-[#4E6E49]/15 to-[#4E6E49]/5 text-[#4E6E49] dark:from-[#4E6E49]/20 dark:text-[#4E6E49]'
                                 : theme === 'dark'
-                                ? 'hover:bg-white/5 text-gray-200'
-                                : 'hover:bg-gray-50 text-gray-800'
-                            }`}
+                                  ? 'hover:bg-white/5 text-gray-200'
+                                  : 'hover:bg-gray-50 text-gray-800'
+                              }`}
                           >
                             <item.icon className="w-4 h-4 flex-shrink-0" />
-                          <span className="font-semibold flex-1">{item.label}</span>
-                          <ArrowUpRight className="w-4 h-4 opacity-70" />
+                            <span className="font-semibold flex-1">{item.label}</span>
+                            <ArrowUpRight className="w-4 h-4 opacity-70" />
                           </Link>
                         ))}
                       </div>
@@ -358,17 +347,16 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                             key={item.path}
                             to={item.path}
                             onClick={() => setShowFuncsMenu(false)}
-                            className={`flex items-center gap-3 px-4 py-3 transition-colors ${
-                              isFuncsSubItemActive(item.path)
+                            className={`flex items-center gap-3 px-4 py-3 transition-colors ${isFuncsSubItemActive(item.path)
                                 ? 'bg-gradient-to-r from-[#4E6E49]/15 to-[#4E6E49]/5 text-[#4E6E49] dark:from-[#4E6E49]/20 dark:text-[#4E6E49]'
                                 : theme === 'dark'
-                                ? 'hover:bg-white/5 text-gray-200'
-                                : 'hover:bg-gray-50 text-gray-800'
-                            }`}
+                                  ? 'hover:bg-white/5 text-gray-200'
+                                  : 'hover:bg-gray-50 text-gray-800'
+                              }`}
                           >
                             <item.icon className="w-4 h-4 flex-shrink-0" />
-                          <span className="font-semibold flex-1">{item.label}</span>
-                          <ArrowUpRight className="w-4 h-4 opacity-70" />
+                            <span className="font-semibold flex-1">{item.label}</span>
+                            <ArrowUpRight className="w-4 h-4 opacity-70" />
                           </Link>
                         ))}
                       </div>
@@ -551,17 +539,16 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                   key={item.path}
                   to={item.path}
                   onClick={() => setShowFuncsMenu(false)}
-                  className={`flex items-center gap-3 px-4 py-3 transition-colors ${
-                    isFuncsSubItemActive(item.path)
+                  className={`flex items-center gap-3 px-4 py-3 transition-colors ${isFuncsSubItemActive(item.path)
                       ? 'bg-gradient-to-r from-[#4E6E49]/15 to-[#4E6E49]/5 text-[#4E6E49] dark:from-[#4E6E49]/20 dark:text-[#4E6E49]'
                       : theme === 'dark'
-                      ? 'hover:bg-white/5 text-gray-200'
-                      : 'hover:bg-gray-50 text-gray-800'
-                  }`}
+                        ? 'hover:bg-white/5 text-gray-200'
+                        : 'hover:bg-gray-50 text-gray-800'
+                    }`}
                 >
                   <item.icon className="w-4 h-4 flex-shrink-0" />
-                <span className="font-semibold flex-1">{item.label}</span>
-                <ArrowUpRight className="w-4 h-4 opacity-70" />
+                  <span className="font-semibold flex-1">{item.label}</span>
+                  <ArrowUpRight className="w-4 h-4 opacity-70" />
                 </Link>
               ))}
             </div>
@@ -579,17 +566,16 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                   key={item.path}
                   to={item.path}
                   onClick={() => setShowToolsMenu(false)}
-                  className={`flex items-center gap-3 px-4 py-3 transition-colors ${
-                    isToolsSubItemActive(item.path)
+                  className={`flex items-center gap-3 px-4 py-3 transition-colors ${isToolsSubItemActive(item.path)
                       ? 'bg-gradient-to-r from-[#4E6E49]/15 to-[#4E6E49]/5 text-[#4E6E49] dark:from-[#4E6E49]/20 dark:text-[#4E6E49]'
                       : theme === 'dark'
-                      ? 'hover:bg-white/5 text-gray-200'
-                      : 'hover:bg-gray-50 text-gray-800'
-                  }`}
+                        ? 'hover:bg-white/5 text-gray-200'
+                        : 'hover:bg-gray-50 text-gray-800'
+                    }`}
                 >
                   <item.icon className="w-4 h-4 flex-shrink-0" />
-                <span className="font-semibold flex-1">{item.label}</span>
-                <ArrowUpRight className="w-4 h-4 opacity-70" />
+                  <span className="font-semibold flex-1">{item.label}</span>
+                  <ArrowUpRight className="w-4 h-4 opacity-70" />
                 </Link>
               ))}
             </div>
