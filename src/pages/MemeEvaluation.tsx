@@ -7,9 +7,19 @@ export const MemeEvaluation = () => {
 
   const subTextColor = theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
   const headingColor = theme === 'dark' ? 'text-white' : 'text-gray-900'
-  const cardBg = 'bg-[#10141c]'
+  const cardBg = theme === 'dark' ? 'bg-[#10141c]' : 'bg-white'
   const calmBorder = 'border-[#48a35e]/60'
-  const cardShadow = 'shadow-[0_24px_80px_rgba(0,0,0,0.45)]'
+  const cardShadow = theme === 'dark' ? 'shadow-[0_24px_80px_rgba(0,0,0,0.45)]' : 'shadow-[0_24px_80px_rgba(0,0,0,0.15)]'
+
+  const headerBg = theme === 'dark' ? 'bg-[#10141c]' : 'bg-white'
+  const headerBorder = theme === 'dark' ? 'border-[#48a35e]/60' : 'border-[#48a35e]/40'
+  const headerShadow = theme === 'dark' ? 'shadow-[0_24px_80px_rgba(0,0,0,0.45)]' : 'shadow-[0_24px_80px_rgba(0,0,0,0.1)]'
+
+  const iconBg = theme === 'dark' ? 'bg-white/10 border-white/20' : 'bg-[#4E6E49]/10 border-[#4E6E49]/30'
+  const iconText = theme === 'dark' ? 'text-white' : 'text-[#4E6E49]'
+
+  const chipBg = theme === 'dark' ? 'bg-white/10 border-white/20' : 'bg-gray-100 border-gray-300'
+  const chipText = theme === 'dark' ? 'text-white' : 'text-gray-800'
 
   useEffect(() => {
     // Load the checklist functionality
@@ -163,22 +173,22 @@ export const MemeEvaluation = () => {
     <Layout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="relative overflow-hidden rounded-3xl border border-[#48a35e]/60 shadow-[0_24px_80px_rgba(0,0,0,0.45)] bg-[#10141c]">
+        <div className={`relative overflow-hidden rounded-3xl border ${headerBorder} ${headerShadow} ${headerBg}`}>
           <div className="absolute inset-0 pointer-events-none">
             <div className="absolute -left-16 -bottom-10 w-80 h-80 bg-emerald-500/18 blur-3xl"></div>
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.08),transparent_45%)]"></div>
+            <div className={`absolute inset-0 ${theme === 'dark' ? 'bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.08),transparent_45%)]' : 'bg-[radial-gradient(circle_at_50%_0%,rgba(78,110,73,0.05),transparent_45%)]'}`}></div>
           </div>
 
           <div className="relative p-6 sm:p-8 space-y-6">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
               <div className="space-y-3 max-w-3xl">
                 <div className="flex items-start gap-3">
-                  <div className="p-3 rounded-2xl bg-white/10 border border-white/20 text-white shadow-inner">
+                  <div className={`p-3 rounded-2xl ${iconBg} ${iconText} shadow-inner`}>
                     <span className="text-2xl">🐊</span>
                   </div>
                   <div className="space-y-2">
-                    <h1 className="text-3xl sm:text-4xl font-black text-white leading-tight">Оценка мемкоина</h1>
-                    <p className="text-sm text-white/70">
+                    <h1 className={`text-3xl sm:text-4xl font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'} leading-tight`}>Оценка мемкоина</h1>
+                    <p className={`text-sm ${theme === 'dark' ? 'text-white/70' : 'text-gray-600'}`}>
                       Полный чек-лист проверки мемкоина. Систематический анализ для безопасного входа.
                     </p>
                     <div className="flex flex-wrap gap-2">
@@ -188,7 +198,7 @@ export const MemeEvaluation = () => {
                           className={`px-4 py-1.5 rounded-full text-xs font-semibold border ${
                             idx === 0
                               ? 'bg-emerald-500 text-white border-emerald-300/60 shadow-md'
-                              : 'bg-white/10 text-white border-white/20'
+                              : `${chipBg} ${chipText} border-gray-300`
                           }`}
                         >
                           {chip}
@@ -214,7 +224,7 @@ export const MemeEvaluation = () => {
 
             <div className="space-y-4">
               {/* Checklist items */}
-              <div className="meme-item flex items-start gap-4 p-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all duration-200">
+              <div className={`meme-item flex items-start gap-4 p-4 rounded-xl border ${theme === 'dark' ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-gray-200 bg-gray-50 hover:bg-gray-100'} transition-all duration-200`}>
                 <input type="checkbox" id="meme-1-1" className="meme-checkbox w-5 h-5 mt-1 accent-[#4E6E49] rounded flex-shrink-0" />
                 <label htmlFor="meme-1-1" className="flex-1 cursor-pointer">
                   <strong className={`font-semibold block mb-2 ${headingColor}`}>Market Cap</strong>
@@ -225,7 +235,7 @@ export const MemeEvaluation = () => {
                 </label>
               </div>
 
-              <div className="meme-item flex items-start gap-4 p-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all duration-200">
+              <div className="meme-item flex items-start gap-4 p-4 rounded-xl ${theme === 'dark' ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-gray-200 bg-gray-50 hover:bg-gray-100'} transition-all duration-200">
                 <input type="checkbox" id="meme-1-2" className="meme-checkbox w-5 h-5 mt-1 accent-[#4E6E49] rounded flex-shrink-0" />
                 <label htmlFor="meme-1-2" className="flex-1 cursor-pointer">
                   <strong className={`font-semibold block mb-2 ${headingColor}`}>Объём торгов</strong>
@@ -236,7 +246,7 @@ export const MemeEvaluation = () => {
                 </label>
               </div>
 
-              <div className="meme-item flex items-start gap-4 p-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all duration-200">
+              <div className="meme-item flex items-start gap-4 p-4 rounded-xl ${theme === 'dark' ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-gray-200 bg-gray-50 hover:bg-gray-100'} transition-all duration-200">
                 <input type="checkbox" id="meme-1-3" className="meme-checkbox w-5 h-5 mt-1 accent-[#4E6E49] rounded flex-shrink-0" />
                 <label htmlFor="meme-1-3" className="flex-1 cursor-pointer">
                   <strong className={`font-semibold block mb-2 ${headingColor}`}>Холдеры</strong>
@@ -247,7 +257,7 @@ export const MemeEvaluation = () => {
                 </label>
               </div>
 
-              <div className="meme-item flex items-start gap-4 p-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all duration-200">
+              <div className="meme-item flex items-start gap-4 p-4 rounded-xl ${theme === 'dark' ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-gray-200 bg-gray-50 hover:bg-gray-100'} transition-all duration-200">
                 <input type="checkbox" id="meme-1-4" className="meme-checkbox w-5 h-5 mt-1 accent-[#4E6E49] rounded flex-shrink-0" />
                 <label htmlFor="meme-1-4" className="flex-1 cursor-pointer">
                   <strong className={`font-semibold block mb-2 ${headingColor}`}>График</strong>
@@ -258,7 +268,7 @@ export const MemeEvaluation = () => {
                 </label>
               </div>
 
-              <div className="meme-item flex items-start gap-4 p-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all duration-200">
+              <div className="meme-item flex items-start gap-4 p-4 rounded-xl ${theme === 'dark' ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-gray-200 bg-gray-50 hover:bg-gray-100'} transition-all duration-200">
                 <input type="checkbox" id="meme-1-5" className="meme-checkbox w-5 h-5 mt-1 accent-[#4E6E49] rounded flex-shrink-0" />
                 <label htmlFor="meme-1-5" className="flex-1 cursor-pointer">
                   <strong className={`font-semibold block mb-2 ${headingColor}`}>Ликвидность</strong>
@@ -280,7 +290,7 @@ export const MemeEvaluation = () => {
             </div>
 
             <div className="space-y-4">
-              <div className="meme-item flex items-start gap-4 p-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all duration-200">
+              <div className="meme-item flex items-start gap-4 p-4 rounded-xl ${theme === 'dark' ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-gray-200 bg-gray-50 hover:bg-gray-100'} transition-all duration-200">
                 <input type="checkbox" id="meme-2-1" className="meme-checkbox w-5 h-5 mt-1 accent-[#4E6E49] rounded flex-shrink-0" />
                 <label htmlFor="meme-2-1" className="flex-1 cursor-pointer">
                   <strong className={`font-semibold block mb-2 ${headingColor}`}>Откуплено бандлами</strong>
@@ -290,7 +300,7 @@ export const MemeEvaluation = () => {
                 </label>
               </div>
 
-              <div className="meme-item flex items-start gap-4 p-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all duration-200">
+              <div className="meme-item flex items-start gap-4 p-4 rounded-xl ${theme === 'dark' ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-gray-200 bg-gray-50 hover:bg-gray-100'} transition-all duration-200">
                 <input type="checkbox" id="meme-2-2" className="meme-checkbox w-5 h-5 mt-1 accent-[#4E6E49] rounded flex-shrink-0" />
                 <label htmlFor="meme-2-2" className="flex-1 cursor-pointer">
                   <strong className={`font-semibold block mb-2 ${headingColor}`}>Остаток бандлов</strong>
@@ -311,7 +321,7 @@ export const MemeEvaluation = () => {
             </div>
 
             <div className="space-y-4">
-              <div className="meme-item flex items-start gap-4 p-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all duration-200">
+              <div className="meme-item flex items-start gap-4 p-4 rounded-xl ${theme === 'dark' ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-gray-200 bg-gray-50 hover:bg-gray-100'} transition-all duration-200">
                 <input type="checkbox" id="meme-3-1" className="meme-checkbox w-5 h-5 mt-1 accent-[#4E6E49] rounded flex-shrink-0" />
                 <label htmlFor="meme-3-1" className="flex-1 cursor-pointer">
                   <strong className={`font-semibold block mb-2 ${headingColor}`}>Twitter</strong>
@@ -322,7 +332,7 @@ export const MemeEvaluation = () => {
                 </label>
               </div>
 
-              <div className="meme-item flex items-start gap-4 p-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all duration-200">
+              <div className="meme-item flex items-start gap-4 p-4 rounded-xl ${theme === 'dark' ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-gray-200 bg-gray-50 hover:bg-gray-100'} transition-all duration-200">
                 <input type="checkbox" id="meme-3-2" className="meme-checkbox w-5 h-5 mt-1 accent-[#4E6E49] rounded flex-shrink-0" />
                 <label htmlFor="meme-3-2" className="flex-1 cursor-pointer">
                   <strong className={`font-semibold block mb-2 ${headingColor}`}>Сайт</strong>
@@ -343,7 +353,7 @@ export const MemeEvaluation = () => {
             </div>
 
             <div className="space-y-4">
-              <div className="meme-item flex items-start gap-4 p-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all duration-200">
+              <div className="meme-item flex items-start gap-4 p-4 rounded-xl ${theme === 'dark' ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-gray-200 bg-gray-50 hover:bg-gray-100'} transition-all duration-200">
                 <input type="checkbox" id="meme-4-1" className="meme-checkbox w-5 h-5 mt-1 accent-[#4E6E49] rounded flex-shrink-0" />
                 <label htmlFor="meme-4-1" className="flex-1 cursor-pointer">
                   <strong className={`font-semibold block mb-2 ${headingColor}`}>Активность DEV</strong>
@@ -354,7 +364,7 @@ export const MemeEvaluation = () => {
                 </label>
               </div>
 
-              <div className="meme-item flex items-start gap-4 p-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all duration-200">
+              <div className="meme-item flex items-start gap-4 p-4 rounded-xl ${theme === 'dark' ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-gray-200 bg-gray-50 hover:bg-gray-100'} transition-all duration-200">
                 <input type="checkbox" id="meme-4-2" className="meme-checkbox w-5 h-5 mt-1 accent-[#4E6E49] rounded flex-shrink-0" />
                 <label htmlFor="meme-4-2" className="flex-1 cursor-pointer">
                   <strong className={`font-semibold block mb-2 ${headingColor}`}>История монет DEV</strong>
@@ -365,7 +375,7 @@ export const MemeEvaluation = () => {
                 </label>
               </div>
 
-              <div className="meme-item flex items-start gap-4 p-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all duration-200">
+              <div className="meme-item flex items-start gap-4 p-4 rounded-xl ${theme === 'dark' ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-gray-200 bg-gray-50 hover:bg-gray-100'} transition-all duration-200">
                 <input type="checkbox" id="meme-4-3" className="meme-checkbox w-5 h-5 mt-1 accent-[#4E6E49] rounded flex-shrink-0" />
                 <label htmlFor="meme-4-3" className="flex-1 cursor-pointer">
                   <strong className={`font-semibold block mb-2 ${headingColor}`}>Токены DEV</strong>
@@ -375,7 +385,7 @@ export const MemeEvaluation = () => {
                 </label>
               </div>
 
-              <div className="meme-item flex items-start gap-4 p-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all duration-200">
+              <div className="meme-item flex items-start gap-4 p-4 rounded-xl ${theme === 'dark' ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-gray-200 bg-gray-50 hover:bg-gray-100'} transition-all duration-200">
                 <input type="checkbox" id="meme-4-4" className="meme-checkbox w-5 h-5 mt-1 accent-[#4E6E49] rounded flex-shrink-0" />
                 <label htmlFor="meme-4-4" className="flex-1 cursor-pointer">
                   <strong className={`font-semibold block mb-2 ${headingColor}`}>Безопасность контракта</strong>
@@ -388,7 +398,7 @@ export const MemeEvaluation = () => {
                 </label>
               </div>
 
-              <div className="meme-item flex items-start gap-4 p-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all duration-200">
+              <div className="meme-item flex items-start gap-4 p-4 rounded-xl ${theme === 'dark' ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-gray-200 bg-gray-50 hover:bg-gray-100'} transition-all duration-200">
                 <input type="checkbox" id="meme-4-5" className="meme-checkbox w-5 h-5 mt-1 accent-[#4E6E49] rounded flex-shrink-0" />
                 <label htmlFor="meme-4-5" className="flex-1 cursor-pointer">
                   <strong className={`font-semibold block mb-2 ${headingColor}`}>Curve-Manipulation Check</strong>
@@ -410,7 +420,7 @@ export const MemeEvaluation = () => {
             </div>
 
             <div className="space-y-4">
-              <div className="meme-item flex items-start gap-4 p-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all duration-200">
+              <div className="meme-item flex items-start gap-4 p-4 rounded-xl ${theme === 'dark' ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-gray-200 bg-gray-50 hover:bg-gray-100'} transition-all duration-200">
                 <input type="checkbox" id="meme-5-1" className="meme-checkbox w-5 h-5 mt-1 accent-[#4E6E49] rounded flex-shrink-0" />
                 <label htmlFor="meme-5-1" className="flex-1 cursor-pointer">
                   <strong className={`font-semibold block mb-2 ${headingColor}`}>Топ-кошельки</strong>
@@ -421,7 +431,7 @@ export const MemeEvaluation = () => {
                 </label>
               </div>
 
-              <div className="meme-item flex items-start gap-4 p-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all duration-200">
+              <div className="meme-item flex items-start gap-4 p-4 rounded-xl ${theme === 'dark' ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-gray-200 bg-gray-50 hover:bg-gray-100'} transition-all duration-200">
                 <input type="checkbox" id="meme-5-2" className="meme-checkbox w-5 h-5 mt-1 accent-[#4E6E49] rounded flex-shrink-0" />
                 <label htmlFor="meme-5-2" className="flex-1 cursor-pointer">
                   <strong className={`font-semibold block mb-2 ${headingColor}`}>Кластеры</strong>
@@ -432,7 +442,7 @@ export const MemeEvaluation = () => {
                 </label>
               </div>
 
-              <div className="meme-item flex items-start gap-4 p-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all duration-200">
+              <div className="meme-item flex items-start gap-4 p-4 rounded-xl ${theme === 'dark' ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-gray-200 bg-gray-50 hover:bg-gray-100'} transition-all duration-200">
                 <input type="checkbox" id="meme-5-3" className="meme-checkbox w-5 h-5 mt-1 accent-[#4E6E49] rounded flex-shrink-0" />
                 <label htmlFor="meme-5-3" className="flex-1 cursor-pointer">
                   <strong className={`font-semibold block mb-2 ${headingColor}`}>Фермы</strong>
@@ -443,7 +453,7 @@ export const MemeEvaluation = () => {
                 </label>
               </div>
 
-              <div className="meme-item flex items-start gap-4 p-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all duration-200">
+              <div className="meme-item flex items-start gap-4 p-4 rounded-xl ${theme === 'dark' ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-gray-200 bg-gray-50 hover:bg-gray-100'} transition-all duration-200">
                 <input type="checkbox" id="meme-5-4" className="meme-checkbox w-5 h-5 mt-1 accent-[#4E6E49] rounded flex-shrink-0" />
                 <label htmlFor="meme-5-4" className="flex-1 cursor-pointer">
                   <strong className={`font-semibold block mb-2 ${headingColor}`}>PNL/RPL-анализ</strong>
@@ -453,7 +463,7 @@ export const MemeEvaluation = () => {
                 </label>
               </div>
 
-              <div className="meme-item flex items-start gap-4 p-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all duration-200">
+              <div className="meme-item flex items-start gap-4 p-4 rounded-xl ${theme === 'dark' ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-gray-200 bg-gray-50 hover:bg-gray-100'} transition-all duration-200">
                 <input type="checkbox" id="meme-5-5" className="meme-checkbox w-5 h-5 mt-1 accent-[#4E6E49] rounded flex-shrink-0" />
                 <label htmlFor="meme-5-5" className="flex-1 cursor-pointer">
                   <strong className={`font-semibold block mb-2 ${headingColor}`}>Активность торговли</strong>
@@ -465,7 +475,7 @@ export const MemeEvaluation = () => {
                 </label>
               </div>
 
-              <div className="meme-item flex items-start gap-4 p-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all duration-200">
+              <div className="meme-item flex items-start gap-4 p-4 rounded-xl ${theme === 'dark' ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-gray-200 bg-gray-50 hover:bg-gray-100'} transition-all duration-200">
                 <input type="checkbox" id="meme-5-6" className="meme-checkbox w-5 h-5 mt-1 accent-[#4E6E49] rounded flex-shrink-0" />
                 <label htmlFor="meme-5-6" className="flex-1 cursor-pointer">
                   <strong className={`font-semibold block mb-2 ${headingColor}`}>Время удержания токена</strong>
@@ -486,7 +496,7 @@ export const MemeEvaluation = () => {
             </div>
 
             <div className="space-y-4">
-              <div className="meme-item flex items-start gap-4 p-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all duration-200">
+              <div className="meme-item flex items-start gap-4 p-4 rounded-xl ${theme === 'dark' ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-gray-200 bg-gray-50 hover:bg-gray-100'} transition-all duration-200">
                 <input type="checkbox" id="meme-6-1" className="meme-checkbox w-5 h-5 mt-1 accent-[#4E6E49] rounded flex-shrink-0" />
                 <label htmlFor="meme-6-1" className="flex-1 cursor-pointer">
                   <strong className={`font-semibold block mb-2 ${headingColor}`}>Фибо</strong>
@@ -496,7 +506,7 @@ export const MemeEvaluation = () => {
                 </label>
               </div>
 
-              <div className="meme-item flex items-start gap-4 p-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all duration-200">
+              <div className="meme-item flex items-start gap-4 p-4 rounded-xl ${theme === 'dark' ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-gray-200 bg-gray-50 hover:bg-gray-100'} transition-all duration-200">
                 <input type="checkbox" id="meme-6-2" className="meme-checkbox w-5 h-5 mt-1 accent-[#4E6E49] rounded flex-shrink-0" />
                 <label htmlFor="meme-6-2" className="flex-1 cursor-pointer">
                   <strong className={`font-semibold block mb-2 ${headingColor}`}>Уровни</strong>
@@ -506,7 +516,7 @@ export const MemeEvaluation = () => {
                 </label>
               </div>
 
-              <div className="meme-item flex items-start gap-4 p-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all duration-200">
+              <div className="meme-item flex items-start gap-4 p-4 rounded-xl ${theme === 'dark' ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-gray-200 bg-gray-50 hover:bg-gray-100'} transition-all duration-200">
                 <input type="checkbox" id="meme-6-3" className="meme-checkbox w-5 h-5 mt-1 accent-[#4E6E49] rounded flex-shrink-0" />
                 <label htmlFor="meme-6-3" className="flex-1 cursor-pointer">
                   <strong className={`font-semibold block mb-2 ${headingColor}`}>Вход</strong>
@@ -516,7 +526,7 @@ export const MemeEvaluation = () => {
                 </label>
               </div>
 
-              <div className="meme-item flex items-start gap-4 p-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all duration-200">
+              <div className="meme-item flex items-start gap-4 p-4 rounded-xl ${theme === 'dark' ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-gray-200 bg-gray-50 hover:bg-gray-100'} transition-all duration-200">
                 <input type="checkbox" id="meme-6-4" className="meme-checkbox w-5 h-5 mt-1 accent-[#4E6E49] rounded flex-shrink-0" />
                 <label htmlFor="meme-6-4" className="flex-1 cursor-pointer">
                   <strong className={`font-semibold block mb-2 ${headingColor}`}>Дополнительно</strong>
@@ -539,7 +549,7 @@ export const MemeEvaluation = () => {
             </div>
 
             <div className="space-y-4">
-              <div className="meme-item flex items-start gap-4 p-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all duration-200">
+              <div className="meme-item flex items-start gap-4 p-4 rounded-xl ${theme === 'dark' ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-gray-200 bg-gray-50 hover:bg-gray-100'} transition-all duration-200">
                 <input type="checkbox" id="meme-7-1" className="meme-checkbox w-5 h-5 mt-1 accent-[#4E6E49] rounded flex-shrink-0" />
                 <label htmlFor="meme-7-1" className="flex-1 cursor-pointer">
                   <strong className={`font-semibold block mb-2 ${headingColor}`}>Стоп-логика</strong>
@@ -550,7 +560,7 @@ export const MemeEvaluation = () => {
                 </label>
               </div>
 
-              <div className="meme-item flex items-start gap-4 p-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all duration-200">
+              <div className="meme-item flex items-start gap-4 p-4 rounded-xl ${theme === 'dark' ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-gray-200 bg-gray-50 hover:bg-gray-100'} transition-all duration-200">
                 <input type="checkbox" id="meme-7-2" className="meme-checkbox w-5 h-5 mt-1 accent-[#4E6E49] rounded flex-shrink-0" />
                 <label htmlFor="meme-7-2" className="flex-1 cursor-pointer">
                   <strong className={`font-semibold block mb-2 ${headingColor}`}>Целевые зоны</strong>
@@ -571,7 +581,7 @@ export const MemeEvaluation = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="meme-item flex items-start gap-3 p-4 rounded-xl border border-white/10 bg-white/5">
+              <div className={`meme-item flex items-start gap-3 p-4 rounded-xl ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-gray-50'}`}>
                 <div className="text-2xl">📈</div>
                 <div>
                   <strong className={`font-semibold block mb-1 ${headingColor}`}>Уровни Фибоначчи</strong>
@@ -579,7 +589,7 @@ export const MemeEvaluation = () => {
                 </div>
               </div>
 
-              <div className="meme-item flex items-start gap-3 p-4 rounded-xl border border-white/10 bg-white/5">
+              <div className={`meme-item flex items-start gap-3 p-4 rounded-xl ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-gray-50'}`}>
                 <div className="text-2xl">🎯</div>
                 <div>
                   <strong className={`font-semibold block mb-1 ${headingColor}`}>Зона входа</strong>
@@ -587,7 +597,7 @@ export const MemeEvaluation = () => {
                 </div>
               </div>
 
-              <div className="meme-item flex items-start gap-3 p-4 rounded-xl border border-white/10 bg-white/5">
+              <div className={`meme-item flex items-start gap-3 p-4 rounded-xl ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-gray-50'}`}>
                 <div className="text-2xl">🛡️</div>
                 <div>
                   <strong className={`font-semibold block mb-1 ${headingColor}`}>Stop Loss</strong>
@@ -595,7 +605,7 @@ export const MemeEvaluation = () => {
                 </div>
               </div>
 
-              <div className="meme-item flex items-start gap-3 p-4 rounded-xl border border-white/10 bg-white/5">
+              <div className={`meme-item flex items-start gap-3 p-4 rounded-xl ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-gray-50'}`}>
                 <div className="text-2xl">⚠️</div>
                 <div>
                   <strong className={`font-semibold block mb-1 ${headingColor}`}>Альтернативный вход</strong>
@@ -603,7 +613,7 @@ export const MemeEvaluation = () => {
                 </div>
               </div>
 
-              <div className="meme-item flex items-start gap-3 p-4 rounded-xl border border-white/10 bg-white/5">
+              <div className={`meme-item flex items-start gap-3 p-4 rounded-xl ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-gray-50'}`}>
                 <div className="text-2xl">🚀</div>
                 <div>
                   <strong className={`font-semibold block mb-1 ${headingColor}`}>Сигнал роста</strong>
@@ -611,7 +621,7 @@ export const MemeEvaluation = () => {
                 </div>
               </div>
 
-              <div className="meme-item flex items-start gap-3 p-4 rounded-xl border border-white/10 bg-white/5">
+              <div className={`meme-item flex items-start gap-3 p-4 rounded-xl ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-gray-50'}`}>
                 <div className="text-2xl">💰</div>
                 <div>
                   <strong className={`font-semibold block mb-1 ${headingColor}`}>Take Profit</strong>
@@ -619,7 +629,7 @@ export const MemeEvaluation = () => {
                 </div>
               </div>
 
-              <div className="meme-item flex items-start gap-3 p-4 rounded-xl border border-white/10 bg-white/5">
+              <div className={`meme-item flex items-start gap-3 p-4 rounded-xl ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-gray-50'}`}>
                 <div className="text-2xl">🏠</div>
                 <div>
                   <strong className={`font-semibold block mb-1 ${headingColor}`}>Правило выхода</strong>
@@ -627,7 +637,7 @@ export const MemeEvaluation = () => {
                 </div>
               </div>
 
-              <div className="meme-item flex items-start gap-3 p-4 rounded-xl border border-white/10 bg-white/5">
+              <div className={`meme-item flex items-start gap-3 p-4 rounded-xl ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-gray-50'}`}>
                 <div className="text-2xl">⏰</div>
                 <div>
                   <strong className={`font-semibold block mb-1 ${headingColor}`}>Тайминг входа</strong>
@@ -635,7 +645,7 @@ export const MemeEvaluation = () => {
                 </div>
               </div>
 
-              <div className="meme-item flex items-start gap-3 p-4 rounded-xl border border-white/10 bg-white/5">
+              <div className={`meme-item flex items-start gap-3 p-4 rounded-xl ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-gray-50'}`}>
                 <div className="text-2xl">✅</div>
                 <div>
                   <strong className={`font-semibold block mb-1 ${headingColor}`}>Минимальные суммы</strong>
@@ -643,11 +653,11 @@ export const MemeEvaluation = () => {
                 </div>
               </div>
 
-              <div className="meme-item flex items-start gap-3 p-4 rounded-xl border border-white/10 bg-white/5">
+              <div className={`meme-item flex items-start gap-3 p-4 rounded-xl ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-gray-50'}`}>
                 <div className="text-2xl">🔍</div>
                 <div>
                   <strong className={`font-semibold block mb-1 ${headingColor}`}>Сервисы проверки</strong>
-                  <p className={`text-sm ${subTextColor}`}>Используйте для анализа: <a href="https://rugcheck.xyz" className="text-[#4E6E49] underline" target="_blank">rugcheck.xyz</a> и <a href="https://gmgn.ai/?chain=sol" className="text-[#4E6E49] underline" target="_blank">gmgn.ai</a></p>
+                  <p className={`text-sm ${subTextColor}`}>Используйте для анализа: <a href="https://rugcheck.xyz" className={`underline ${theme === 'dark' ? 'text-[#4E6E49]' : 'text-[#4E6E49]'}`} target="_blank">rugcheck.xyz</a> и <a href="https://gmgn.ai/?chain=sol" className={`underline ${theme === 'dark' ? 'text-[#4E6E49]' : 'text-[#4E6E49]'}`} target="_blank">gmgn.ai</a></p>
                 </div>
               </div>
             </div>
@@ -667,16 +677,16 @@ export const MemeEvaluation = () => {
                 <p className={`text-sm ${subTextColor}`}>завершено</p>
               </div>
 
-              <div className="w-full h-8 bg-white/5 rounded-full overflow-hidden border border-white/10">
-                <div
-                  id="meme-progress-fill"
-                  className="h-full bg-gradient-to-r from-[#4E6E49] to-[#6b8f5f] transition-all duration-800 ease-out relative"
-                >
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2 text-white text-sm opacity-0 animate-pulse">
-                    🐊
-                  </div>
+            <div className={`w-full h-8 ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-200'} rounded-full overflow-hidden border ${theme === 'dark' ? 'border-white/10' : 'border-gray-300'}`}>
+              <div
+                id="meme-progress-fill"
+                className="h-full bg-gradient-to-r from-[#4E6E49] to-[#6b8f5f] transition-all duration-800 ease-out relative"
+              >
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 text-white text-sm opacity-0 animate-pulse">
+                  🐊
                 </div>
               </div>
+            </div>
 
               <div className="flex items-center justify-between text-center">
                 <div className="flex-1">
@@ -692,7 +702,7 @@ export const MemeEvaluation = () => {
               <div className="flex justify-center">
                 <button
                   id="meme-reset-button"
-                  className="px-6 py-3 rounded-xl transition-all duration-200 border border-rose-300/60 bg-rose-500/20 text-rose-50 hover:bg-rose-500/30 font-semibold flex items-center gap-2"
+                  className={`px-6 py-3 rounded-xl transition-all duration-200 border ${theme === 'dark' ? 'border-rose-300/60 bg-rose-500/20 text-rose-50 hover:bg-rose-500/30' : 'border-rose-400 bg-rose-50 text-rose-700 hover:bg-rose-100'} font-semibold flex items-center gap-2`}
                 >
                   <span>🗑️</span>
                   <span>Сбросить прогресс</span>

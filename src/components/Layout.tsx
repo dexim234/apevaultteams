@@ -294,17 +294,17 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                 </button>
                 {showToolsMenu && (
                   <>
-                    <div className="fixed inset-0 z-40" onClick={() => setShowFuncsMenu(false)} />
+                    <div className="fixed inset-0 z-40" onClick={() => setShowToolsMenu(false)} />
                     <div className="absolute top-[calc(100%+12px)] left-0 min-w-[220px] glass-panel rounded-2xl border border-white/40 dark:border-white/10 shadow-2xl z-50 overflow-hidden">
                       <div className="accent-dots" />
                       <div className="relative z-10 divide-y divide-gray-100/60 dark:divide-white/5">
-                        {funcsSubItems.map((item) => (
+                        {toolsSubItems.map((item) => (
                           <Link
                             key={item.path}
                             to={item.path}
-                            onClick={() => setShowFuncsMenu(false)}
+                            onClick={() => setShowToolsMenu(false)}
                             className={`flex items-center gap-3 px-4 py-3 transition-colors ${
-                              isFuncsSubItemActive(item.path)
+                              isToolsSubItemActive(item.path)
                                 ? 'bg-gradient-to-r from-[#4E6E49]/15 to-[#4E6E49]/5 text-[#4E6E49] dark:from-[#4E6E49]/20 dark:text-[#4E6E49]'
                                 : theme === 'dark'
                                 ? 'hover:bg-white/5 text-gray-200'
@@ -336,17 +336,17 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                 </button>
                 {showFuncsMenu && (
                   <>
-                    <div className="fixed inset-0 z-40" onClick={() => setShowToolsMenu(false)} />
+                    <div className="fixed inset-0 z-40" onClick={() => setShowFuncsMenu(false)} />
                     <div className="absolute top-[calc(100%+12px)] left-0 min-w-[220px] glass-panel rounded-2xl border border-white/40 dark:border-white/10 shadow-2xl z-50 overflow-hidden">
                       <div className="accent-dots" />
                       <div className="relative z-10 divide-y divide-gray-100/60 dark:divide-white/5">
-                        {toolsSubItems.map((item) => (
+                        {funcsSubItems.map((item) => (
                           <Link
                             key={item.path}
                             to={item.path}
-                            onClick={() => setShowToolsMenu(false)}
+                            onClick={() => setShowFuncsMenu(false)}
                             className={`flex items-center gap-3 px-4 py-3 transition-colors ${
-                              isToolsSubItemActive(item.path)
+                              isFuncsSubItemActive(item.path)
                                 ? 'bg-gradient-to-r from-[#4E6E49]/15 to-[#4E6E49]/5 text-[#4E6E49] dark:from-[#4E6E49]/20 dark:text-[#4E6E49]'
                                 : theme === 'dark'
                                 ? 'hover:bg-white/5 text-gray-200'
@@ -469,7 +469,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                 onClick={() => {
                   setShowToolsMenu(!showToolsMenu)
                 }}
-                className={`flex flex-col items-center justify-center gap-1 py-3 ${isToolsActive ? 'text-[#4E6E49]' : theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}
+                className={`w-full flex flex-col items-center justify-center gap-1 py-3 ${isToolsActive ? 'text-[#4E6E49]' : theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}
               >
                 <Settings className="w-5 h-5" />
                 <div className="flex items-center gap-1">
@@ -481,7 +481,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                 onClick={() => {
                   setShowFuncsMenu(!showFuncsMenu)
                 }}
-                className={`flex flex-col items-center justify-center gap-1 py-3 ${isFuncsActive ? 'text-[#4E6E49]' : theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}
+                className={`w-full flex flex-col items-center justify-center gap-1 py-3 ${isFuncsActive ? 'text-[#4E6E49]' : theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}
               >
                 <Settings className="w-5 h-5" />
                 <div className="flex items-center gap-1">
@@ -492,7 +492,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
               {!isAdmin && (
                 <Link
                   to="/about"
-                  className={`flex flex-col items-center justify-center gap-1 py-3 ${location.pathname === '/about' ? 'text-[#4E6E49]' : theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}
+                  className={`w-full flex flex-col items-center justify-center gap-1 py-3 ${location.pathname === '/about' ? 'text-[#4E6E49]' : theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}
                 >
                   <Info className="w-5 h-5" />
                   <div className="flex items-center gap-1">
@@ -503,7 +503,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
               )}
               <Link
                 to="/profile"
-                className={`flex flex-col items-center justify-center gap-1 py-3 ${location.pathname === '/profile' ? 'text-[#4E6E49]' : theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}
+                className={`w-full flex flex-col items-center justify-center gap-1 py-3 ${location.pathname === '/profile' ? 'text-[#4E6E49]' : theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}
               >
                 <User className="w-5 h-5" />
                 <div className="flex items-center gap-1">
