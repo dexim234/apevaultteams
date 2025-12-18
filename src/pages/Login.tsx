@@ -4,7 +4,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
 import { useThemeStore } from '@/store/themeStore'
 import { useAdminStore } from '@/store/adminStore'
-import { Moon, Sun, Shield, User, Users, Download, Send } from 'lucide-react'
+import { Moon, Sun, Shield, User, Users } from 'lucide-react'
 import logo from '../assets/logo.png'
 
 // Declare Telegram WebApp types
@@ -189,39 +189,7 @@ export const Login = () => {
                 Защищенный доступ
               </div>
 
-              <div className={`w-full mt-4 rounded-xl border ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-white/80'} p-4 text-left space-y-3`}>
-                <div className="flex items-center gap-2 text-sm font-semibold">
-                  <Shield className="w-4 h-4 text-[#4E6E49]" />
-                  <span className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>Правила и доступ</span>
-                </div>
-                <ul className={`text-xs leading-relaxed space-y-1 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                  <li>• Пользуемся данными из бота: логин + пароль.</li>
-                  <li>• Админ пароль: только для доверенных (режим администратора).</li>
-                  <li>• Правила: открыты на странице «Правила» на сайте.</li>
-                </ul>
-                <div className="flex flex-col sm:flex-row gap-2 mt-2">
-                  <a
-                    href="/rules.pdf"
-                    download
-                    className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-semibold rounded-lg bg-gradient-to-r from-[#4E6E49] to-emerald-600 text-white shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all"
-                  >
-                    <Download className="w-3.5 h-3.5" />
-                    Скачать правила
-                  </a>
-                  <a
-                    href="https://t.me/artyommedoed"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-semibold rounded-lg border transition-all hover:-translate-y-0.5 ${theme === 'dark'
-                      ? 'border-white/10 bg-white/5 text-white hover:bg-white/10'
-                      : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
-                      }`}
-                  >
-                    <Send className="w-3.5 h-3.5" />
-                    Админ (TG)
-                  </a>
-                </div>
-              </div>
+
             </div>
 
             <div className="section-card rounded-2xl p-6 lg:p-7 border border-white/60 dark:border-white/10 shadow-xl">
