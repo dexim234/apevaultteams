@@ -9,7 +9,7 @@ import { formatDate, getWeekDays, isSameDate, getMoscowTime } from '@/utils/date
 import { getUserNicknameSync } from '@/utils/userUtils'
 import { WorkSlot, DayStatus } from '@/types'
 import { TEAM_MEMBERS } from '@/types'
-import { Edit, Trash2, CheckCircle2, Calendar as CalendarIcon } from 'lucide-react'
+import { Edit, Trash2, CheckCircle2, Calendar as CalendarIcon, ChevronDown, ChevronUp } from 'lucide-react'
 
 type SlotFilter = 'all' | 'upcoming' | 'completed'
 
@@ -29,6 +29,7 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
   const [statuses, setStatuses] = useState<DayStatus[]>([])
   const [selectedWeek, setSelectedWeek] = useState(new Date())
   const [loading, setLoading] = useState(true)
+  const [breaksExpanded, setBreaksExpanded] = useState<Record<string, boolean>>({})
 
   const legacyIdMap: Record<string, string> = {
     artyom: '1',
@@ -402,6 +403,13 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
     setSelectedWeek(newDate)
   }
 
+  const toggleBreaksVisibility = (slotId: string) => {
+    setBreaksExpanded(prev => ({
+      ...prev,
+      [slotId]: !prev[slotId]
+    }))
+  }
+
   if (loading) {
     return (
       <div className={`rounded-lg p-8 text-center ${theme === 'dark' ? 'bg-[#1a1a1a]' : 'bg-white'}`}>
@@ -635,8 +643,28 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
                                 )}
                               </div>
                             </div>
-                            {/* Breaks */}
+                            {/* Toggle breaks button */}
                             {s.breaks && s.breaks.length > 0 && (
+                              <div className="flex justify-center">
+                                <button
+                                  onClick={() => toggleBreaksVisibility(slot.id)}
+                                  className={`p-1 rounded-md transition-all duration-200 hover:scale-110 ${
+                                    breaksExpanded[slot.id]
+                                      ? 'text-white hover:text-white/80'
+                                      : 'text-white/70 hover:text-white'
+                                  }`}
+                                  title={breaksExpanded[slot.id] ? 'Скрыть перерывы' : 'Показать перерывы'}
+                                >
+                                  {breaksExpanded[slot.id] ? (
+                                    <ChevronUp className="w-4 h-4" />
+                                  ) : (
+                                    <ChevronDown className="w-4 h-4" />
+                                  )}
+                                </button>
+                              </div>
+                            )}
+                            {/* Breaks */}
+                            {s.breaks && s.breaks.length > 0 && breaksExpanded[slot.id] && (
                               <div className="space-y-1 w-full">
                                 <div className={`text-[10px] ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} font-medium text-center sm:text-left`}>Перерывы:</div>
                                 {s.breaks.map((breakItem, breakIdx) => (

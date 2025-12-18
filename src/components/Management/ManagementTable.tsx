@@ -9,7 +9,7 @@ import { getUserNicknameSync } from '@/utils/userUtils'
 import { UserNickname } from '@/components/UserNickname'
 import { WorkSlot, DayStatus } from '@/types'
 import { TEAM_MEMBERS } from '@/types'
-import { Edit, Trash2, CheckCircle2, Calendar as CalendarIcon } from 'lucide-react'
+import { Edit, Trash2, CheckCircle2, Calendar as CalendarIcon, ChevronDown, ChevronUp } from 'lucide-react'
 
 type SlotFilter = 'all' | 'upcoming' | 'completed'
 
@@ -29,6 +29,7 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
   const [statuses, setStatuses] = useState<DayStatus[]>([])
   const [selectedWeek, setSelectedWeek] = useState(new Date())
   const [loading, setLoading] = useState(true)
+  const [breaksExpanded, setBreaksExpanded] = useState<Record<string, boolean>>({})
   const todayStr = formatDate(new Date(), 'yyyy-MM-dd')
 
   const legacyIdMap: Record<string, string> = {
@@ -401,6 +402,13 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
     setSelectedWeek(newDate)
   }
 
+  const toggleBreaksVisibility = (slotId: string) => {
+    setBreaksExpanded(prev => ({
+      ...prev,
+      [slotId]: !prev[slotId]
+    }))
+  }
+
   if (loading) {
     return (
       <div className={`rounded-lg p-8 text-center ${theme === 'dark' ? 'bg-[#1a1a1a]' : 'bg-white'}`}>
@@ -571,8 +579,28 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
                                         )}
                                       </div>
                                     </div>
-                                    {/* Breaks */}
+                                    {/* Toggle breaks button */}
                                     {s.breaks && s.breaks.length > 0 && (
+                                      <div className="flex justify-center">
+                                        <button
+                                          onClick={() => toggleBreaksVisibility(slot.id)}
+                                          className={`p-1 rounded-md transition-all duration-200 hover:scale-110 ${
+                                            breaksExpanded[slot.id]
+                                              ? theme === 'dark' ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-800'
+                                              : theme === 'dark' ? 'text-gray-400 hover:text-gray-300' : 'text-gray-500 hover:text-gray-600'
+                                          }`}
+                                          title={breaksExpanded[slot.id] ? 'Скрыть перерывы' : 'Показать перерывы'}
+                                        >
+                                          {breaksExpanded[slot.id] ? (
+                                            <ChevronUp className="w-4 h-4" />
+                                          ) : (
+                                            <ChevronDown className="w-4 h-4" />
+                                          )}
+                                        </button>
+                                      </div>
+                                    )}
+                                    {/* Breaks */}
+                                    {s.breaks && s.breaks.length > 0 && breaksExpanded[slot.id] && (
                                       <div className="space-y-1">
                                         <div className={`text-[10px] ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} font-medium`}>Перерывы:</div>
                                         {s.breaks.map((breakItem, breakIdx) => (
@@ -680,7 +708,7 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
                         <div>Выходных: {stats.daysOff}</div>
                         <div>Больничных: {stats.sickDays}</div>
                         <div>Отпусков: {stats.vacationDays}</div>
-                        <div>Прогудов: {stats.absenceDays}</div>
+                        <div>Прогулов: {stats.absenceDays}</div>
                       </div>
                     </td>
                   </tr>
