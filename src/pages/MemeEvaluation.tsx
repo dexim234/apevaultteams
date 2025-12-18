@@ -22,7 +22,7 @@ export const MemeEvaluation = () => {
 
       if (!checkboxes.length || !progressFill || !checkedCount || !totalCount || !progressPercentage) return
 
-      totalCount.textContent = checkboxes.length
+      totalCount.textContent = checkboxes.length.toString()
       loadProgress()
 
       // Add event listeners for checkboxes
@@ -45,7 +45,7 @@ export const MemeEvaluation = () => {
       const percentage = Math.round((checkedCountValue / totalCountValue) * 100)
 
       // Update counters
-      checkedCount.textContent = checkedCountValue
+      checkedCount.textContent = checkedCountValue.toString()
       progressPercentage.textContent = percentage + '%'
 
       // Animate progress bar
@@ -53,8 +53,9 @@ export const MemeEvaluation = () => {
 
       // Add/remove completed class for items
       checkboxes.forEach(checkbox => {
+        const inputCheckbox = checkbox as HTMLInputElement
         const item = checkbox.closest('.meme-item')
-        if (checkbox.checked) {
+        if (inputCheckbox.checked) {
           item?.classList.add('completed')
         } else {
           item?.classList.remove('completed')
@@ -105,7 +106,7 @@ export const MemeEvaluation = () => {
       const totalCountValue = checkboxes.length
       const percentage = Math.round((checkedCountValue / totalCountValue) * 100)
 
-      checkedCount.textContent = checkedCountValue
+      checkedCount.textContent = checkedCountValue.toString()
       progressPercentage.textContent = percentage + '%'
       progressFill.style.width = percentage + '%'
     }
@@ -129,8 +130,8 @@ export const MemeEvaluation = () => {
 
     // Add smooth scrolling to stages
     document.querySelectorAll('.meme-stage-title').forEach(title => {
-      title.addEventListener('click', function() {
-        const stage = this.closest('.meme-stage')
+      title.addEventListener('click', (e) => {
+        const stage = (e.currentTarget as Element).closest('.meme-stage')
         stage?.scrollIntoView({ behavior: 'smooth', block: 'start' })
       })
     })
@@ -392,7 +393,7 @@ export const MemeEvaluation = () => {
         </div>
       </div>
 
-      <style jsx>{`
+      <style>{`
         .completed {
           background: rgba(255, 255, 255, 0.1) !important;
           border-color: #4E6E49 !important;
