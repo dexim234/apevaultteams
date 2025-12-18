@@ -417,6 +417,6 @@ export const MemeEvaluation = () => {
           color: white;
         }
       `}</style>
-    </div>
+    </Layout>
   )
 }
