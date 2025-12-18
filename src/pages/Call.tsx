@@ -572,9 +572,9 @@ export const CallPage = () => {
         </div>
 
         {/* Category mini-cards (坐在灰色背景上) */}
-        <div className={`${sectionCardClass} shadow-2xl relative overflow-hidden`}>
+        <div className={`${sectionCardClass} shadow-2xl relative overflow-hidden p-6 sm:p-8`}>
           <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
-          <div className="relative z-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 p-6 sm:p-8">
+          <div className="relative z-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {(Object.keys(CATEGORY_META) as CallCategory[]).map((cat) => {
               const meta = CATEGORY_META[cat]
               const stats = categoryStats[cat]
