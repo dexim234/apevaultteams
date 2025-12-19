@@ -31,7 +31,6 @@ import { getWeekDays, formatDate, getMoscowTime } from '@/utils/dateUtils'
 
 type ViewMode = 'table' | 'week'
 export type SlotFilter = 'all' | 'upcoming' | 'completed'
-type ActionType = 'add-slot' | 'delete-slots' | 'absence' | 'restriction'
 
 export const Management = () => {
   const { theme } = useThemeStore()
@@ -46,7 +45,6 @@ export const Management = () => {
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null)
   const [editingSlot, setEditingSlot] = useState<any>(null)
   const [editingStatus, setEditingStatus] = useState<any>(null)
-  const [actionType, setActionType] = useState<ActionType>('add-slot')
   const [refreshKey, setRefreshKey] = useState(0)
   const [stats, setStats] = useState({
     slotsThisWeek: 0,
@@ -294,7 +292,6 @@ export const Management = () => {
     setStatusType(null)
     setEditingStatus(null)
     setShowStatusForm(true)
-    setActionType('absence')
   }
 
   const handleEditStatus = (status: any) => {
@@ -309,7 +306,6 @@ export const Management = () => {
 
   const handleManageRestrictions = () => {
     setShowRestrictionForm(true)
-    setActionType('restriction')
   }
 
   const handleFormClose = () => {
@@ -578,7 +574,6 @@ export const Management = () => {
                 <button
                   key={action.key}
                   onClick={() => {
-                    setActionType(action.key as ActionType)
                     action.action()
                   }}
                   className={`text-center rounded-xl border px-3 py-3 transition-all shadow-sm flex flex-col items-center gap-2 h-full ${
