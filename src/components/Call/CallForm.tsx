@@ -9,9 +9,10 @@ import type {
   CallDetails,
   CallRiskLevel,
   CallSentiment,
+  Network,
 } from '@/types'
 import { TEAM_MEMBERS } from '@/types'
-import { Sparkles, Rocket, LineChart, Image, Coins, Shield, Target, Info, MapPin, TrendingUp, AlertTriangle, Settings, MessageSquare, Eye, X, Check, Hash, Globe2, Wand2, Clock3, Link2, Activity, Gauge, Timer, ScrollText, Building2, CalendarClock, Percent, Octagon } from 'lucide-react'
+import { Sparkles, Rocket, LineChart, Image, Coins, Shield, Target, Info, MapPin, TrendingUp, AlertTriangle, Settings, MessageSquare, Eye, X, Check, Hash, Globe2, Wand2, Clock3, Link2, Activity, Gauge, Timer, ScrollText, Building2, CalendarClock, Percent, Octagon, Network as NetworkIcon } from 'lucide-react'
 
 interface CallFormProps {
   onSuccess?: () => void
@@ -554,7 +555,7 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory }: C
       case 'nft':
         addMetric('Коллекция', d.collectionLink, <Link2 className="w-4 h-4" />)
         addMetric('Маркетплейс', d.marketplace, <Building2 className="w-4 h-4" />)
-        addMetric('Сеть', d.network ? String(d.network).toUpperCase() : '', <Network className="w-4 h-4" />)
+        addMetric('Сеть', d.network ? String(d.network).toUpperCase() : '', <NetworkIcon className="w-4 h-4" />)
         addMetric('Вход', d.entryPrice, <MapPin className="w-4 h-4" />)
         addMetric('Редкость', d.rarity, <Sparkles className="w-4 h-4" />)
         addMetric('Тип сигнала', d.signalType ? d.signalType.toUpperCase() : '', <Wand2 className="w-4 h-4" />)
