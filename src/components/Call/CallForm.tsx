@@ -103,27 +103,27 @@ const CATEGORY_SECTIONS: Record<CallCategory, Record<string, SectionConfig>> = {
 
 const CATEGORY_FIELDS: Record<CallCategory, FieldConfig[]> = {
   memecoins: [
-    { key: 'coinName', label: 'Название монеты', placeholder: 'PEPE', section: 'basic', required: true },
-    { key: 'ticker', label: 'Тикер', placeholder: 'PEPE', section: 'basic', required: true },
-    { key: 'network', label: 'Сеть', type: 'select', options: networkOptions, section: 'basic', required: true },
+    { key: 'coinName', label: 'Название монеты', placeholder: 'PEPE', section: 'basic' },
+    { key: 'ticker', label: 'Тикер', placeholder: 'PEPE', section: 'basic' },
+    { key: 'network', label: 'Сеть', type: 'select', options: networkOptions, section: 'basic' },
     { key: 'contract', label: 'Контракт', placeholder: '0x...', section: 'basic' },
     { key: 'signalType', label: 'Тип сигнала', type: 'select', options: [
       { value: 'buy', label: 'Buy' },
       { value: 'sell', label: 'Sell' },
       { value: 'hold', label: 'Hold' },
       { value: 'alert', label: 'Alert' },
-    ], section: 'basic', required: true },
-    { key: 'reason', label: 'Причина входа', placeholder: 'Хайп, крупные покупки, листинг...', type: 'textarea', section: 'entry', required: true },
-    { key: 'entryCap', label: 'Зона входа в капитализации', placeholder: '10M-15M', section: 'entry', required: true },
-    { key: 'targets', label: 'Цели (TP1/TP2/TP3)', placeholder: '20M / 30M / 50M', section: 'targets', required: true },
+    ], section: 'basic' },
+    { key: 'reason', label: 'Причина входа', placeholder: 'Хайп, крупные покупки, листинг...', type: 'textarea', section: 'entry' },
+    { key: 'entryCap', label: 'Зона входа в капитализации', placeholder: '10M-15M', section: 'entry' },
+    { key: 'targets', label: 'Цели (TP1/TP2/TP3)', placeholder: '20M / 30M / 50M', section: 'targets' },
     { key: 'stopLoss', label: 'Стоп-лосс', placeholder: '5M или -25%', section: 'targets' },
     { key: 'riskLevel', label: 'Риск-уровень', type: 'select', options: [
       { value: 'low', label: 'Низкий' },
       { value: 'medium', label: 'Средний' },
       { value: 'high', label: 'Высокий' },
       { value: 'ultra', label: 'Ультра-высокий' },
-    ], section: 'targets', required: true },
-    { key: 'risks', label: 'Риски', placeholder: 'Разворот тренда, низкая ликвидность', type: 'textarea', section: 'targets', required: true },
+    ], section: 'targets' },
+    { key: 'risks', label: 'Риски', placeholder: 'Разворот тренда, низкая ликвидность', type: 'textarea', section: 'targets' },
     { key: 'holdPlan', label: 'План удержания', type: 'select', options: [
       { value: 'flip', label: 'Флип' },
       { value: 'short', label: 'Краткосрок' },
@@ -134,129 +134,129 @@ const CATEGORY_FIELDS: Record<CallCategory, FieldConfig[]> = {
     { key: 'traderComment', label: 'Комментарий трейдера', type: 'textarea', placeholder: 'Доп. наблюдения, планы', section: 'additional' },
   ],
   futures: [
-    { key: 'pair', label: 'Пара', placeholder: 'BTC/USDT', section: 'basic', required: true },
+    { key: 'pair', label: 'Пара', placeholder: 'BTC/USDT', section: 'basic' },
     { key: 'direction', label: 'Направление', type: 'select', options: [
       { value: 'long', label: 'Long' },
       { value: 'short', label: 'Short' },
-    ], section: 'basic', required: true },
-    { key: 'leverage', label: 'Рекомендованное плечо', placeholder: 'x3 - x10', section: 'entry', required: true },
+    ], section: 'basic' },
+    { key: 'leverage', label: 'Рекомендованное плечо', placeholder: 'x3 - x10', section: 'entry' },
     { key: 'entryPrice', label: 'Цена входа', placeholder: '69500', section: 'entry' },
-    { key: 'entryZone', label: 'Зоны входа (min-max)', placeholder: '69000 - 70000', section: 'entry', required: true },
-    { key: 'positionSize', label: 'Размер позиции (% от депо)', placeholder: '2-5%', section: 'entry', required: true },
-    { key: 'targets', label: 'Цели (TP1/TP2/TP3)', placeholder: '71000 / 72500 / 74000', section: 'targets', required: true },
-    { key: 'stopLoss', label: 'SL уровень', placeholder: '68000', section: 'targets', required: true },
+    { key: 'entryZone', label: 'Зоны входа (min-max)', placeholder: '69000 - 70000', section: 'entry' },
+    { key: 'positionSize', label: 'Размер позиции (% от депо)', placeholder: '2-5%', section: 'entry' },
+    { key: 'targets', label: 'Цели (TP1/TP2/TP3)', placeholder: '71000 / 72500 / 74000', section: 'targets' },
+    { key: 'stopLoss', label: 'SL уровень', placeholder: '68000', section: 'targets' },
     { key: 'riskLevel', label: 'Риск-уровень', type: 'select', options: [
       { value: 'low', label: 'Низкий' },
       { value: 'medium', label: 'Средний' },
       { value: 'high', label: 'Высокий' },
       { value: 'ultra', label: 'Ультра-высокий' },
-    ], section: 'targets', required: true },
+    ], section: 'targets' },
     { key: 'signalStyle', label: 'Тип сигнала', type: 'select', options: [
       { value: 'breakout', label: 'Breakout' },
       { value: 'retest', label: 'Retest' },
       { value: 'range', label: 'Range' },
       { value: 'scalping', label: 'Scalping' },
       { value: 'swing', label: 'Swing' },
-    ], section: 'strategy', required: true },
+    ], section: 'strategy' },
     { key: 'timeframe', label: 'Таймфрейм анализа', type: 'select', options: [
       { value: '1m', label: '1m' },
       { value: '5m', label: '5m' },
       { value: '15m', label: '15m' },
       { value: '1h', label: '1h' },
       { value: '4h', label: '4h' },
-    ], section: 'strategy', required: true },
-    { key: 'reason', label: 'Причина входа (анализ)', placeholder: 'Тренд, объемы, дивергенция...', type: 'textarea', section: 'strategy', required: true },
-    { key: 'risks', label: 'Риски', placeholder: 'Резкий вброс, низкая волатильность', type: 'textarea', section: 'additional', required: true },
+    ], section: 'strategy' },
+    { key: 'reason', label: 'Причина входа (анализ)', placeholder: 'Тренд, объемы, дивергенция...', type: 'textarea', section: 'strategy' },
+    { key: 'risks', label: 'Риски', placeholder: 'Резкий вброс, низкая волатильность', type: 'textarea', section: 'additional' },
   ],
   nft: [
-    { key: 'collectionLink', label: 'Коллекция (ссылка)', placeholder: 'https://...', section: 'basic', required: true },
+    { key: 'collectionLink', label: 'Коллекция (ссылка)', placeholder: 'https://...', section: 'basic' },
     { key: 'nftLink', label: 'NFT (ссылка)', placeholder: 'https://.../item', section: 'basic' },
-    { key: 'marketplace', label: 'Маркетплейс', placeholder: 'OpenSea / Magic Eden', section: 'basic', required: true },
-    { key: 'network', label: 'Сеть', type: 'select', options: networkOptions, section: 'basic', required: true },
-    { key: 'entryPrice', label: 'Рекомендованная цена входа', placeholder: '1.2 ETH', section: 'entry', required: true },
+    { key: 'marketplace', label: 'Маркетплейс', placeholder: 'OpenSea / Magic Eden', section: 'basic' },
+    { key: 'network', label: 'Сеть', type: 'select', options: networkOptions, section: 'basic' },
+    { key: 'entryPrice', label: 'Рекомендованная цена входа', placeholder: '1.2 ETH', section: 'entry' },
     { key: 'rarity', label: 'Редкость / атрибуты', placeholder: 'Rank < 5%', section: 'entry' },
-    { key: 'minLiquidity', label: 'Минимальная ликвидность', placeholder: 'Floor 2 ETH, объём 120 ETH', section: 'entry', required: true },
+    { key: 'minLiquidity', label: 'Минимальная ликвидность', placeholder: 'Floor 2 ETH, объём 120 ETH', section: 'entry' },
     { key: 'signalType', label: 'Тип сигнала', type: 'select', options: [
       { value: 'buy', label: 'Buy' },
       { value: 'sell', label: 'Sell' },
       { value: 'mint', label: 'Mint' },
-    ], section: 'entry', required: true },
+    ], section: 'entry' },
     { key: 'holdingHorizon', label: 'Срок удержания', type: 'select', options: [
       { value: 'flip', label: 'Скоростной флип' },
       { value: 'short', label: 'Краткосрок' },
       { value: 'medium', label: 'Среднесрок' },
       { value: 'long', label: 'Долгосрок' },
-    ], section: 'targets', required: true },
-    { key: 'targetPrice', label: 'Цель продажи / Target price', placeholder: '3 ETH', section: 'targets', required: true },
-    { key: 'risks', label: 'Риски', placeholder: 'Падение спроса, фальшивый объём', type: 'textarea', section: 'targets', required: true },
-    { key: 'reason', label: 'Причина входа', placeholder: 'Минт, хайп, инсайд', type: 'textarea', section: 'additional', required: true },
+    ], section: 'targets' },
+    { key: 'targetPrice', label: 'Цель продажи / Target price', placeholder: '3 ETH', section: 'targets' },
+    { key: 'risks', label: 'Риски', placeholder: 'Падение спроса, фальшивый объём', type: 'textarea', section: 'targets' },
+    { key: 'reason', label: 'Причина входа', placeholder: 'Минт, хайп, инсайд', type: 'textarea', section: 'additional' },
     { key: 'traderComment', label: 'Комментарий трейдера', type: 'textarea', placeholder: 'Что смотрим, когда фиксируем', section: 'additional' },
   ],
   spot: [
-    { key: 'coin', label: 'Монета', placeholder: 'BTC', section: 'basic', required: true },
-    { key: 'entryCap', label: 'Капитализация входа', placeholder: '500M', section: 'entry', required: true },
-    { key: 'positionSize', label: 'Размер позиции', placeholder: '5-10% портфеля', section: 'entry', required: true },
-    { key: 'targets', label: 'Цели (TP1/TP2/TP3)', placeholder: '550M / 650M / 750M', section: 'targets', required: true },
+    { key: 'coin', label: 'Монета', placeholder: 'BTC', section: 'basic' },
+    { key: 'entryCap', label: 'Капитализация входа', placeholder: '500M', section: 'entry' },
+    { key: 'positionSize', label: 'Размер позиции', placeholder: '5-10% портфеля', section: 'entry' },
+    { key: 'targets', label: 'Цели (TP1/TP2/TP3)', placeholder: '550M / 650M / 750M', section: 'targets' },
     { key: 'stopLoss', label: 'SL', placeholder: '-10%', section: 'targets' },
     { key: 'holdingHorizon', label: 'Горизонт удержания', type: 'select', options: [
       { value: 'short', label: 'Краткосрок' },
       { value: 'medium', label: 'Среднесрок' },
       { value: 'long', label: 'Долгосрок' },
-    ], section: 'targets', required: true },
+    ], section: 'targets' },
     { key: 'riskLevel', label: 'Риск-уровень', type: 'select', options: [
       { value: 'low', label: 'Низкий' },
       { value: 'medium', label: 'Средний' },
       { value: 'high', label: 'Высокий' },
       { value: 'ultra', label: 'Ультра-высокий' },
-    ], section: 'targets', required: true },
-    { key: 'reason', label: 'Причина входа', placeholder: 'Фундаментал, хайп', type: 'textarea', section: 'additional', required: true },
-    { key: 'risks', label: 'Риски', placeholder: 'Регуляторика, конкуренты', type: 'textarea', section: 'additional', required: true },
+    ], section: 'targets' },
+    { key: 'reason', label: 'Причина входа', placeholder: 'Фундаментал, хайп', type: 'textarea', section: 'additional' },
+    { key: 'risks', label: 'Риски', placeholder: 'Регуляторика, конкуренты', type: 'textarea', section: 'additional' },
     { key: 'traderComment', label: 'Комментарий', type: 'textarea', placeholder: 'Условия фиксации, обновления', section: 'additional' },
   ],
   polymarket: [
-    { key: 'event', label: 'Событие', placeholder: 'Trump wins 2025', section: 'basic', required: true },
-    { key: 'eventDeadline', label: 'Срок исхода события', placeholder: '31.12.2025', section: 'basic', required: true },
+    { key: 'event', label: 'Событие', placeholder: 'Trump wins 2025', section: 'basic' },
+    { key: 'eventDeadline', label: 'Срок исхода события', placeholder: '31.12.2025', section: 'basic' },
     { key: 'positionType', label: 'Тип позиции', type: 'select', options: [
       { value: 'yes', label: 'Yes' },
       { value: 'no', label: 'No' },
-    ], section: 'entry', required: true },
-    { key: 'entryPrice', label: 'Цена входа (%)', placeholder: '42%', section: 'entry', required: true },
-    { key: 'expectedProbability', label: 'Ожидаемая вероятность (%)', placeholder: '65%', section: 'entry', required: true },
-    { key: 'maxStake', label: 'Максимальный объём ставки', placeholder: 'до $5k', section: 'entry', required: true },
-    { key: 'targetPlan', label: 'Цель', placeholder: 'Продажа до события или удержание', section: 'targets', required: true },
+    ], section: 'entry' },
+    { key: 'entryPrice', label: 'Цена входа (%)', placeholder: '42%', section: 'entry' },
+    { key: 'expectedProbability', label: 'Ожидаемая вероятность (%)', placeholder: '65%', section: 'entry' },
+    { key: 'maxStake', label: 'Максимальный объём ставки', placeholder: 'до $5k', section: 'entry' },
+    { key: 'targetPlan', label: 'Цель', placeholder: 'Продажа до события или удержание', section: 'targets' },
     { key: 'riskLevel', label: 'Риск', type: 'select', options: [
       { value: 'low', label: 'Низкий' },
       { value: 'medium', label: 'Средний' },
       { value: 'high', label: 'Высокий' },
       { value: 'ultra', label: 'Ультра-высокий' },
-    ], section: 'targets', required: true },
-    { key: 'risks', label: 'Риски', placeholder: 'Неопределённость новостей, низкая ликвидность', type: 'textarea', section: 'targets', required: true },
-    { key: 'reason', label: 'Причина входа', placeholder: 'Аналитика, инсайд', type: 'textarea', section: 'additional', required: true },
+    ], section: 'targets' },
+    { key: 'risks', label: 'Риски', placeholder: 'Неопределённость новостей, низкая ликвидность', type: 'textarea', section: 'targets' },
+    { key: 'reason', label: 'Причина входа', placeholder: 'Аналитика, инсайд', type: 'textarea', section: 'additional' },
   ],
   staking: [
-    { key: 'coin', label: 'Монета', placeholder: 'SOL', section: 'basic', required: true },
-    { key: 'platform', label: 'Платформа', placeholder: 'Jito, Lido...', section: 'entry', required: true },
+    { key: 'coin', label: 'Монета', placeholder: 'SOL', section: 'basic' },
+    { key: 'platform', label: 'Платформа', placeholder: 'Jito, Lido...', section: 'entry' },
     { key: 'term', label: 'Срок стейкинга', type: 'select', options: [
       { value: 'flexible', label: 'Гибкий' },
       { value: '30d', label: '30 дней' },
       { value: '90d', label: '90 дней' },
       { value: 'fixed', label: 'Фиксированный' },
-    ], section: 'entry', required: true },
-    { key: 'apy', label: 'APY', placeholder: '12-18%', section: 'entry', required: true },
-    { key: 'minDeposit', label: 'Минимальный депозит', placeholder: '100 USDT', section: 'entry', required: true },
+    ], section: 'entry' },
+    { key: 'apy', label: 'APY', placeholder: '12-18%', section: 'entry' },
+    { key: 'minDeposit', label: 'Минимальный депозит', placeholder: '100 USDT', section: 'entry' },
     { key: 'action', label: 'Тип сигнала', type: 'select', options: [
       { value: 'enter', label: 'Вход' },
       { value: 'exit', label: 'Выход' },
       { value: 'rebalance', label: 'Перераспределение' },
-    ], section: 'entry', required: true },
+    ], section: 'entry' },
     { key: 'protocolRisk', label: 'Риски протокола', type: 'select', options: [
       { value: 'low', label: 'Низкие' },
       { value: 'medium', label: 'Средние' },
       { value: 'high', label: 'Высокие' },
       { value: 'ultra', label: 'Ультра' },
-    ], section: 'targets', required: true },
-    { key: 'risks', label: 'Риски', placeholder: 'Смарт-контракт, ликвидность', type: 'textarea', section: 'targets', required: true },
-    { key: 'reason', label: 'Причина', placeholder: 'Рост доходности', type: 'textarea', section: 'additional', required: true },
+    ], section: 'targets' },
+    { key: 'risks', label: 'Риски', placeholder: 'Смарт-контракт, ликвидность', type: 'textarea', section: 'targets' },
+    { key: 'reason', label: 'Причина', placeholder: 'Рост доходности', type: 'textarea', section: 'additional' },
     { key: 'traderComment', label: 'Комментарий трейдера', type: 'textarea', placeholder: 'Тактика выхода, дополнительные условия', section: 'additional' },
   ],
 }
@@ -881,10 +881,9 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory }: C
                   {sectionFields.map((field) => (
                     <div key={field.key} className="space-y-2">
                       {field.type !== 'checkbox' && (
-                        <label className={`text-sm font-semibold ${textColor} flex items-center gap-2`}>
-                          {field.label}
-                          {field.required && <span className="text-red-500 text-xs">*</span>}
-                        </label>
+                      <label className={`text-sm font-semibold ${textColor}`}>
+                        {field.label}
+                      </label>
                       )}
                       {renderField(field)}
                     </div>
@@ -920,15 +919,13 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory }: C
             Предпросмотр
           </button>
           <button
-            type="submit"
-            disabled={loading || progress.percentage < 100}
-            className={`flex-1 py-4 sm:py-3 rounded-lg font-semibold transition-all shadow-md min-h-[48px] sm:min-h-[44px] ${
-              progress.percentage === 100
-                ? theme === 'dark'
-                  ? 'bg-gradient-to-r from-[#4E6E49] to-emerald-700 text-white hover:scale-[1.01] active:scale-[0.98] disabled:bg-gray-700'
-                  : 'bg-gradient-to-r from-[#4E6E49] to-emerald-600 text-white hover:shadow-lg active:shadow-md disabled:bg-gray-300 disabled:text-gray-600'
-                : 'bg-gray-400 text-gray-200 cursor-not-allowed'
-            }`}
+          type="submit"
+          disabled={loading}
+          className={`flex-1 py-4 sm:py-3 rounded-lg font-semibold transition-all shadow-md min-h-[48px] sm:min-h-[44px] ${
+            theme === 'dark'
+              ? 'bg-gradient-to-r from-[#4E6E49] to-emerald-700 text-white hover:scale-[1.01] active:scale-[0.98] disabled:bg-gray-700'
+              : 'bg-gradient-to-r from-[#4E6E49] to-emerald-600 text-white hover:shadow-lg active:shadow-md disabled:bg-gray-300 disabled:text-gray-600'
+          }`}
           >
             {loading ? 'Сохраняем...' : callToEdit ? 'Обновить сигнал' : 'Создать сигнал'}
           </button>
@@ -1030,7 +1027,6 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory }: C
                         const form = document.querySelector('form') as HTMLFormElement
                         form?.requestSubmit()
                       }}
-                      disabled={progress.percentage < 100}
                       className={`flex-1 px-4 py-3 rounded-xl font-semibold transition-all ${
                         progress.percentage === 100
                           ? 'bg-gradient-to-r from-[#4E6E49] to-emerald-600 text-white shadow-md hover:shadow-lg'

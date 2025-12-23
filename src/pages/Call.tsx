@@ -807,7 +807,7 @@ export const CallPage = () => {
                   <p className={subtleColor}>Сигналы есть ({calls.length}), но фильтр ничего не нашел.</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 px-4 py-2">
                   {filteredCalls.map((call) => {
                     const meta = CATEGORY_META[call.category]
                     const statusMeta = statusLabels[call.status as StatusFilter] || statusLabels.active
