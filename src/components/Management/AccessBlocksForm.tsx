@@ -162,32 +162,32 @@ export const AccessBlocksForm = ({ onClose }: AccessBlocksFormProps) => {
   return (
     <div className="fixed inset-0 bg-slate-950/75 backdrop-blur-xl flex items-start sm:items-center justify-center z-[70] p-4 overflow-y-auto">
       <div className={`w-full max-w-4xl rounded-3xl shadow-[0_24px_80px_rgba(0,0,0,0.45)] border ${theme === 'dark' ? 'bg-gradient-to-br from-[#0c1320] via-[#0b1220] to-[#08111b] border-white/10' : 'bg-gradient-to-br from-white via-slate-50 to-white border-slate-200'} max-h-[90vh] overflow-hidden`}>
-        <div className="flex flex-col h-full">
-          <div className="p-6 border-b border-white/10">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-red-500/10 text-red-500">
-                  <ShieldX className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    Управление доступом
-                  </h3>
-                  <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                    Блокировка доступа к функциям сайта
-                  </p>
-                </div>
+        <div className="p-6 border-b border-white/10">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-red-500/10 text-red-500">
+                <ShieldX className="w-5 h-5" />
               </div>
-              <button
-                onClick={onClose}
-                className={`p-2 rounded-full border ${theme === 'dark' ? 'border-white/10 text-gray-200 hover:bg-white/5' : 'border-slate-200 text-slate-600 hover:bg-slate-100'} transition-colors`}
-              >
-                <X className="w-5 h-5" />
-              </button>
+              <div>
+                <h3 className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                  Управление доступом
+                </h3>
+                <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                  Блокировка доступа к функциям сайта
+                </p>
+              </div>
             </div>
+            <button
+              onClick={onClose}
+              className={`p-2 rounded-full border ${theme === 'dark' ? 'border-white/10 text-gray-200 hover:bg-white/5' : 'border-slate-200 text-slate-600 hover:bg-slate-100'} transition-colors`}
+            >
+              <X className="w-5 h-5" />
+            </button>
           </div>
+        </div>
 
-          <div className="flex-1 overflow-y-auto p-6">
+        <div className="flex-1 overflow-y-auto">
+          <div className="p-6">
             <div className="space-y-6">
               {/* Add/Edit Form */}
               {(showAddForm || editingBlock) && (

@@ -17,6 +17,7 @@ import { Rules } from './pages/Rules'
 import { Approvals } from './pages/Approvals'
 import { MemeEvaluation } from './pages/MemeEvaluation'
 import { ProtectedRoute } from './components/ProtectedRoute'
+import { AccessBlockScreen } from './components/AccessBlockScreen'
 import { cleanupOldData } from './services/firestoreService'
 
 function App() {
@@ -35,6 +36,7 @@ function App() {
 
   return (
     <BrowserRouter>
+      <AccessBlockScreen />
       <Routes>
         <Route 
           path="/login" 

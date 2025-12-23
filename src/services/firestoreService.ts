@@ -1544,7 +1544,7 @@ export const deleteAccessBlock = async (id: string) => {
 }
 
 // Check if user has access to a specific feature
-export const checkUserAccess = async (userId: string, feature: string): Promise<{ hasAccess: boolean; reason?: string }> => {
+export const checkUserAccess = async (userId: string, feature: string): Promise<{ hasAccess: boolean; reason?: string; expiresAt?: string }> => {
   try {
     // Check for general blocks (userId is null)
     const generalBlocks = await getAccessBlocks(undefined, true)
@@ -1556,7 +1556,7 @@ export const checkUserAccess = async (userId: string, feature: string): Promise<
           await updateAccessBlock(block.id, { isActive: false })
           continue
         }
-        return { hasAccess: false, reason: block.reason }
+        return { hasAccess: false, reason: block.reason, expiresAt: block.expiresAt }
       }
     }
 
@@ -1570,14 +1570,14 @@ export const checkUserAccess = async (userId: string, feature: string): Promise<
           await updateAccessBlock(block.id, { isActive: false })
           continue
         }
-        return { hasAccess: false, reason: block.reason }
+        return { hasAccess: false, reason: block.reason, expiresAt: block.expiresAt }
       }
     }
 
-    return { hasAccess: true }
+    return { hasAccess: true, reason: undefined, expiresAt: undefined }
   } catch (error) {
     console.error('Error checking user access:', error)
-    return { hasAccess: true } // Default to allow access on error
+    return { hasAccess: true, reason: undefined, expiresAt: undefined } // Default to allow access on error
   }
 }
 

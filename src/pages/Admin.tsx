@@ -1,17 +1,12 @@
 // Admin page - dedicated page for admin mode management
-import { useState } from 'react'
 import { Layout } from '@/components/Layout'
 import { useThemeStore } from '@/store/themeStore'
 import { useAdminStore } from '@/store/adminStore'
-import { UserConflictsForm } from '@/components/Management/UserConflictsForm'
-import { AccessBlocksForm } from '@/components/Management/AccessBlocksForm'
-import { Shield, Sparkles, Lock, Key, UserX, ShieldX } from 'lucide-react'
+import { Shield, Sparkles, Lock, Key } from 'lucide-react'
 
 export const Admin = () => {
   const { theme } = useThemeStore()
   const { isAdmin } = useAdminStore()
-  const [showConflictsForm, setShowConflictsForm] = useState(false)
-  const [showAccessBlocksForm, setShowAccessBlocksForm] = useState(false)
   const headingColor = theme === 'dark' ? 'text-white' : 'text-gray-900'
   const labelColor = theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
   const cardBg = theme === 'dark' ? 'bg-[#1a1a1a]' : 'bg-white'
@@ -134,73 +129,6 @@ export const Admin = () => {
             </div>
           </div>
         </div>
-
-        {/* Access Management */}
-        <div className={`rounded-2xl p-6 ${cardBg} shadow-lg border-2 ${
-          theme === 'dark'
-            ? 'border-red-500/30 bg-gradient-to-br from-[#1a1a1a] to-red-950/20'
-            : 'border-red-200 bg-gradient-to-br from-white to-red-50/20'
-        }`}>
-          <h2 className={`text-xl font-semibold mb-4 ${headingColor} flex items-center gap-2`}>
-            <ShieldX className="w-5 h-5 text-red-500" />
-            Управление доступом и конфликтами
-          </h2>
-          <p className={`text-sm mb-6 ${labelColor}`}>
-            Настройте ограничения на совместную работу пользователей и блокировку доступа к функциям
-          </p>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <button
-              onClick={() => setShowConflictsForm(true)}
-              className={`p-4 rounded-xl border-2 transition-all hover:shadow-lg hover:-translate-y-1 ${
-                theme === 'dark'
-                  ? 'border-red-500/50 bg-red-500/10 hover:bg-red-500/20 text-white'
-                  : 'border-red-200 bg-red-50 hover:bg-red-100 text-gray-900'
-              } text-left group`}
-            >
-              <div className="flex items-center gap-3 mb-3">
-                <div className={`p-2 rounded-lg transition-colors ${
-                  theme === 'dark' ? 'bg-red-500/20 group-hover:bg-red-500/30' : 'bg-red-100 group-hover:bg-red-200'
-                }`}>
-                  <UserX className={`w-5 h-5 ${theme === 'dark' ? 'text-red-400' : 'text-red-600'}`} />
-                </div>
-                <h3 className={`font-semibold ${headingColor}`}>Конфликты пользователей</h3>
-              </div>
-              <p className={`text-sm ${labelColor}`}>
-                Запретите пользователям создавать пересекающиеся слоты. Настройте индивидуальные ограничения.
-              </p>
-            </button>
-
-            <button
-              onClick={() => setShowAccessBlocksForm(true)}
-              className={`p-4 rounded-xl border-2 transition-all hover:shadow-lg hover:-translate-y-1 ${
-                theme === 'dark'
-                  ? 'border-red-500/50 bg-red-500/10 hover:bg-red-500/20 text-white'
-                  : 'border-red-200 bg-red-50 hover:bg-red-100 text-gray-900'
-              } text-left group`}
-            >
-              <div className="flex items-center gap-3 mb-3">
-                <div className={`p-2 rounded-lg transition-colors ${
-                  theme === 'dark' ? 'bg-red-500/20 group-hover:bg-red-500/30' : 'bg-red-100 group-hover:bg-red-200'
-                }`}>
-                  <ShieldX className={`w-5 h-5 ${theme === 'dark' ? 'text-red-400' : 'text-red-600'}`} />
-                </div>
-                <h3 className={`font-semibold ${headingColor}`}>Блокировка доступа</h3>
-              </div>
-              <p className={`text-sm ${labelColor}`}>
-                Заблокируйте доступ к определенным функциям для пользователей или всех участников.
-              </p>
-            </button>
-          </div>
-        </div>
-
-        {/* Modals */}
-        {showConflictsForm && (
-          <UserConflictsForm onClose={() => setShowConflictsForm(false)} />
-        )}
-        {showAccessBlocksForm && (
-          <AccessBlocksForm onClose={() => setShowAccessBlocksForm(false)} />
-        )}
 
         {/* Admin features info */}
         <div className={`rounded-2xl p-6 ${cardBg} shadow-lg border-2 ${

@@ -581,11 +581,10 @@ export const SlotForm = ({ slot, onClose, onSave }: SlotFormProps) => {
         }
       }
 
-      if (!isAdmin) {
-        const validationError = await validateSlot(dateStr, adjustedSlots, targetUserId)
-        if (validationError) {
-          throw new Error(`[${getMemberName(targetUserId)} • ${formatDate(new Date(dateStr), 'dd.MM.yyyy')}] ${validationError}`)
-        }
+      // Check user conflicts (applies to everyone including admins)
+      const validationError = await validateSlot(dateStr, adjustedSlots, targetUserId)
+      if (validationError) {
+        throw new Error(`[${getMemberName(targetUserId)} • ${formatDate(new Date(dateStr), 'dd.MM.yyyy')}] ${validationError}`)
       }
 
       const slotData: WorkSlot = {

@@ -22,10 +22,14 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   Shield,
+  UserX,
+  ShieldX,
 } from 'lucide-react'
 import { TEAM_MEMBERS } from '@/types'
 import { DeleteSlotsForm } from '@/components/Management/DeleteSlotsForm'
 import { RestrictionForm } from '@/components/Management/RestrictionForm'
+import { UserConflictsForm } from '@/components/Management/UserConflictsForm'
+import { AccessBlocksForm } from '@/components/Management/AccessBlocksForm'
 import { getWorkSlots, getDayStatuses } from '@/services/firestoreService'
 import { getWeekDays, formatDate, getMoscowTime } from '@/utils/dateUtils'
 
@@ -41,6 +45,8 @@ export const Management = () => {
   const [showDeleteSlotsForm, setShowDeleteSlotsForm] = useState(false)
   const [showStatusForm, setShowStatusForm] = useState(false)
   const [showRestrictionForm, setShowRestrictionForm] = useState(false)
+  const [showConflictsForm, setShowConflictsForm] = useState(false)
+  const [showAccessBlocksForm, setShowAccessBlocksForm] = useState(false)
   const [statusType, setStatusType] = useState<'dayoff' | 'sick' | 'vacation' | null>(null)
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null)
   const [editingSlot, setEditingSlot] = useState<any>(null)
@@ -308,11 +314,21 @@ export const Management = () => {
     setShowRestrictionForm(true)
   }
 
+  const handleManageConflicts = () => {
+    setShowConflictsForm(true)
+  }
+
+  const handleManageAccessBlocks = () => {
+    setShowAccessBlocksForm(true)
+  }
+
   const handleFormClose = () => {
     setShowSlotForm(false)
     setShowDeleteSlotsForm(false)
     setShowStatusForm(false)
     setShowRestrictionForm(false)
+    setShowConflictsForm(false)
+    setShowAccessBlocksForm(false)
     setStatusType(null)
     setEditingSlot(null)
     setEditingStatus(null)
@@ -570,6 +586,8 @@ export const Management = () => {
                 { key: 'delete-slots', label: 'Очистить расписание', desc: 'Удалить слоты/статусы', icon: <Trash2 className="w-5 h-5" />, tone: 'bg-rose-100 text-rose-800 border-rose-200 dark:bg-rose-900/30 dark:text-rose-100 dark:border-rose-800', action: handleDeleteSlots },
                 { key: 'absence', label: 'Добавить отсутствие', desc: 'Выходной, больничный, отпуск', icon: <Moon className="w-5 h-5" />, tone: 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-100 dark:border-blue-800', action: handleAddAbsence },
                 { key: 'restriction', label: 'Управление ограничениями', desc: 'Запретить создание записей', icon: <Shield className="w-5 h-5" />, tone: 'bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-900/30 dark:text-orange-100 dark:border-orange-800', action: handleManageRestrictions, adminOnly: true },
+                { key: 'conflicts', label: 'Конфликты пользователей', desc: 'Ограничения совместной работы', icon: <UserX className="w-5 h-5" />, tone: 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-100 dark:border-red-800', action: handleManageConflicts, adminOnly: true },
+                { key: 'access-blocks', label: 'Блокировка доступа', desc: 'Ограничение функций', icon: <ShieldX className="w-5 h-5" />, tone: 'bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/30 dark:text-purple-100 dark:border-purple-800', action: handleManageAccessBlocks, adminOnly: true },
               ].filter(action => !action.adminOnly || isAdmin).map((action) => (
                 <button
                   key={action.key}
@@ -691,6 +709,14 @@ export const Management = () => {
             onClose={handleFormClose}
             onSave={handleFormClose}
           />
+        )}
+
+        {showConflictsForm && (
+          <UserConflictsForm onClose={() => setShowConflictsForm(false)} />
+        )}
+
+        {showAccessBlocksForm && (
+          <AccessBlocksForm onClose={() => setShowAccessBlocksForm(false)} />
         )}
       </div>
     </Layout>
