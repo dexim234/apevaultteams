@@ -414,9 +414,9 @@ export const CallPage = () => {
     switch (call.category) {
       case 'memecoins':
         addMetric('Монета', d.coinName, <Coins className="w-4 h-4" />)
-        addMetric('Тикер', d.ticker, <Hash className="w-4 h-4" />, d.ticker)
+        addMetric('Тикер', shortenValue(d.ticker, 8), <Hash className="w-4 h-4" />, d.ticker)
         addMetric('Сеть', d.network ? String(d.network).toUpperCase() : '', <Globe2 className="w-4 h-4" />)
-        addMetric('Контракт', shortenValue(d.contract), <FileCode className="w-4 h-4" />, d.contract)
+        addMetric('Контракт', shortenValue(d.contract, 12), <FileCode className="w-4 h-4" />, d.contract)
         addMetric('Тип сигнала', d.signalType ? d.signalType.toUpperCase() : '', <Wand2 className="w-4 h-4" />)
         addMetric('Зона входа', d.entryCap, <MapPin className="w-4 h-4" />)
         addMetric('Цели', d.targets, <Target className="w-4 h-4" />)

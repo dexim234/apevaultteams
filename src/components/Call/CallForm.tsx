@@ -516,6 +516,15 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory }: C
 
   const getRiskLevel = (call: Call): CallRiskLevel => call.riskLevel || getDetails(call).riskLevel || getDetails(call).protocolRisk || 'medium'
 
+  // Function to shorten long values like contracts
+  const shortenValue = (value?: string, max = 28) => {
+    if (!value) return ''
+    if (value.length <= max) return value
+    const head = value.slice(0, Math.floor(max / 2))
+    const tail = value.slice(-6)
+    return `${head}...${tail}`
+  }
+
   // Copy renderCategoryMetrics from Call.tsx
   const renderCategoryMetrics = (call: Call) => {
     const d = getDetails(call)
@@ -531,7 +540,7 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory }: C
     switch (call.category) {
       case 'memecoins':
         addMetric('Монета', d.coinName, <Coins className="w-4 h-4" />)
-        addMetric('Тикер', d.ticker, <Hash className="w-4 h-4" />)
+        addMetric('Тикер', shortenValue(d.ticker, 8), <Hash className="w-4 h-4" />)
         addMetric('Сеть', d.network ? String(d.network).toUpperCase() : '', <Globe2 className="w-4 h-4" />)
         addMetric('Тип сигнала', d.signalType ? d.signalType.toUpperCase() : '', <Wand2 className="w-4 h-4" />)
         addMetric('Зона входа', d.entryCap, <MapPin className="w-4 h-4" />)
