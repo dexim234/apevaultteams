@@ -10,9 +10,12 @@ import {
   query,
   where,
   orderBy,
+  DocumentData,
+  QuerySnapshot,
+  DocumentSnapshot,
 } from 'firebase/firestore'
-import { db } from '@/firebase/config'
-import { WorkSlot, DayStatus, Earnings, RatingData, Referral, Call, Task, TaskStatus, Note, TaskPriority, StageAssignee, ApprovalRequest, ApprovalStatus, UserActivity, UserNickname, Restriction, RestrictionType, UserConflict, AccessBlock, AiAlert } from '@/types'
+import { db } from '@/firebase/config' // Keep original path for db
+import { WorkSlot, DayStatus, Earnings, RatingData, Referral, Call, Task, TaskStatus, Note, TaskPriority, StageAssignee, ApprovalRequest, ApprovalStatus, UserActivity, UserNickname, Restriction, RestrictionType, UserConflict, AccessBlock, AiAlert, User } from '@/types' // Add User to existing types
 import { clearNicknameCache, getUserNicknameAsync } from '@/utils/userUtils'
 import { formatDate } from '@/utils/dateUtils'
 
@@ -22,7 +25,7 @@ const pad = (value: number) => value.toString().padStart(2, '0')
 const getRetentionThresholds = () => {
   const thresholdDate = new Date()
   thresholdDate.setDate(thresholdDate.getDate() - DATA_RETENTION_DAYS)
-  const dateOnly = `${thresholdDate.getFullYear()}-${pad(thresholdDate.getMonth() + 1)}-${pad(thresholdDate.getDate())}`
+  const dateOnly = `${thresholdDate.getFullYear()} -${pad(thresholdDate.getMonth() + 1)} -${pad(thresholdDate.getDate())} `
   return {
     dateOnly,
     iso: thresholdDate.toISOString(),
@@ -33,7 +36,7 @@ const cleanupCollectionByField = async (collectionName: string, fieldName: strin
   const collectionRef = collection(db, collectionName)
   const q = query(collectionRef, where(fieldName, '<', threshold))
   const snapshot = await getDocs(q)
-  await Promise.all(snapshot.docs.map((docSnap) => deleteDoc(doc(db, collectionName, docSnap.id))))
+  await Promise.all(snapshot.docs.map((docSnap: any) => deleteDoc(doc(db, collectionName, docSnap.id))))
 }
 
 export const cleanupOldData = async () => {
@@ -72,7 +75,7 @@ export const getWorkSlots = async (userId?: string, date?: string) => {
   }
 
   const snapshot = await getDocs(q)
-  let results = snapshot.docs.map((doc) => {
+  let results = snapshot.docs.map((doc: any) => {
     const data = doc.data() as any
     // Convert old format (break) to new format (breaks array) for backward compatibility
     const slots = (data?.slots || []).map((slot: any) => {
@@ -99,11 +102,11 @@ export const getWorkSlots = async (userId?: string, date?: string) => {
 
   // Filter by date in memory if both userId and date provided
   if (userId && date) {
-    results = results.filter((s) => s.date === date)
+    results = results.filter((s: WorkSlot) => s.date === date)
   }
 
   // Sort by date in memory to avoid index requirement
-  results.sort((a, b) => a.date.localeCompare(b.date))
+  results.sort((a: WorkSlot, b: WorkSlot) => a.date.localeCompare(b.date))
 
   return results
 }
@@ -115,7 +118,7 @@ export const addWorkSlot = async (slot: Omit<WorkSlot, 'id'>) => {
     console.log('addWorkSlot: Collection reference created')
     // Remove undefined values before saving
     const cleanSlot = Object.fromEntries(
-      Object.entries(slot).filter(([_, value]) => value !== undefined)
+      Object.entries(slot).filter(([_, value]: [string, any]) => value !== undefined)
     )
     console.log('addWorkSlot: Clean slot prepared:', cleanSlot)
     console.log('addWorkSlot: Calling addDoc...')
@@ -137,7 +140,7 @@ export const updateWorkSlot = async (id: string, updates: Partial<WorkSlot>) => 
 
   // Remove undefined values before updating
   const cleanUpdates = Object.fromEntries(
-    Object.entries(updates).filter(([_, value]) => value !== undefined)
+    Object.entries(updates).filter(([_, value]: [string, any]) => value !== undefined)
   )
   await updateDoc(slotRef, cleanUpdates)
 }
@@ -169,7 +172,7 @@ export const getDayStatuses = async (userId?: string, date?: string) => {
   }
 
   const snapshot = await getDocs(q)
-  let results = snapshot.docs.map((doc) => {
+  let results = snapshot.docs.map((doc: any) => {
     const data = doc.data() as any
     return {
       id: doc.id,
@@ -183,11 +186,11 @@ export const getDayStatuses = async (userId?: string, date?: string) => {
 
   // Filter by date in memory if both userId and date provided
   if (userId && date) {
-    results = results.filter((s) => s.date === date)
+    results = results.filter((s: WorkSlot) => s.date === date)
   }
 
   // Sort by date in memory to avoid index requirement
-  results.sort((a, b) => a.date.localeCompare(b.date))
+  results.sort((a: WorkSlot, b: WorkSlot) => a.date.localeCompare(b.date))
 
   return results
 }
@@ -197,7 +200,7 @@ export const addDayStatus = async (status: Omit<DayStatus, 'id'>) => {
     const statusesRef = collection(db, 'dayStatuses')
     // Remove undefined values before saving
     const cleanStatus = Object.fromEntries(
-      Object.entries(status).filter(([_, value]) => value !== undefined)
+      Object.entries(status).filter(([_, value]: [string, any]) => value !== undefined)
     )
     console.log('Adding day status:', cleanStatus)
     const result = await addDoc(statusesRef, cleanStatus)
@@ -215,7 +218,7 @@ export const updateDayStatus = async (id: string, updates: Partial<DayStatus>) =
 
   // Remove undefined values before updating
   const cleanUpdates = Object.fromEntries(
-    Object.entries(updates).filter(([_, value]) => value !== undefined)
+    Object.entries(updates).filter(([_, value]: [string, any]) => value !== undefined)
   )
   await updateDoc(statusRef, cleanUpdates)
 }
@@ -237,7 +240,7 @@ export const getRestrictions = async (isActive?: boolean) => {
   }
 
   const snapshot = await getDocs(q)
-  const results = snapshot.docs.map((doc) => {
+  const results = snapshot.docs.map((doc: any) => {
     const data = doc.data() as any
     return {
       id: doc.id,
@@ -254,7 +257,7 @@ export const getRestrictions = async (isActive?: boolean) => {
   })
 
   // Sort by start date in memory to avoid index requirement
-  results.sort((a, b) => a.startDate.localeCompare(b.startDate))
+  results.sort((a: Restriction, b: Restriction) => a.startDate.localeCompare(b.startDate))
 
   return results
 }
@@ -264,7 +267,7 @@ export const addRestriction = async (restriction: Omit<Restriction, 'id'>) => {
     const restrictionsRef = collection(db, 'restrictions')
     // Remove undefined values before saving
     const cleanRestriction = Object.fromEntries(
-      Object.entries(restriction).filter(([_, value]) => value !== undefined)
+      Object.entries(restriction).filter(([_, value]: [string, any]) => value !== undefined)
     )
     const result = await addDoc(restrictionsRef, cleanRestriction)
     return result
@@ -279,7 +282,7 @@ export const updateRestriction = async (id: string, updates: Partial<Restriction
 
   // Remove undefined values before updating
   const cleanUpdates = Object.fromEntries(
-    Object.entries(updates).filter(([_, value]) => value !== undefined)
+    Object.entries(updates).filter(([_, value]: [string, any]) => value !== undefined)
   )
   await updateDoc(restrictionRef, cleanUpdates)
 }
@@ -306,7 +309,7 @@ export const checkRestriction = async (
       }
 
       const checkDate = new Date(date)
-      const restrictionDateTime = new Date(`${restriction.startDate}${restriction.startTime ? `T${restriction.startTime}` : ''}`)
+      const restrictionDateTime = new Date(`${restriction.startDate}${restriction.startTime ? `T${restriction.startTime}` : ''} `)
 
       // Check if blockFutureDates restriction is active
       if (restriction.blockFutureDates && now >= restrictionDateTime) {
@@ -319,7 +322,7 @@ export const checkRestriction = async (
           return {
             restricted: true,
             restriction,
-            reason: `После ${formatDate(restrictionDateTime, 'dd.MM.yyyy')}${restriction.startTime ? ` ${restriction.startTime}` : ''} запрещено создавать ${restrictionTypeToLabel(actionType)} на следующий день ${formatDate(nextDay, 'dd.MM.yyyy')}`
+            reason: `После ${formatDate(restrictionDateTime, 'dd.MM.yyyy')}${restriction.startTime ? ` ${restriction.startTime}` : ''} запрещено создавать ${restrictionTypeToLabel(actionType)} на следующий день ${formatDate(nextDay, 'dd.MM.yyyy')} `
           }
         }
       }
@@ -344,7 +347,7 @@ export const checkRestriction = async (
         return {
           restricted: true,
           restriction,
-          reason: `Запрещено создавать ${restrictionTypeToLabel(actionType)} на ${formatDate(checkDate, 'dd.MM.yyyy')}`
+          reason: `Запрещено создавать ${restrictionTypeToLabel(actionType)} на ${formatDate(checkDate, 'dd.MM.yyyy')} `
         }
       }
 
@@ -357,7 +360,7 @@ export const checkRestriction = async (
           return {
             restricted: true,
             restriction,
-            reason: `Запрещено создавать ${restrictionTypeToLabel(actionType)} после ${restrictTime} на ${formatDate(checkDate, 'dd.MM.yyyy')}`
+            reason: `Запрещено создавать ${restrictionTypeToLabel(actionType)} после ${restrictTime} на ${formatDate(checkDate, 'dd.MM.yyyy')} `
           }
         }
       }
@@ -385,7 +388,7 @@ const restrictionTypeToLabel = (type: RestrictionType): string => {
 // Approval Requests
 const APPROVAL_COLLECTION = 'approvalRequests'
 
-const mapApprovalSnapshot = (docSnap: any): ApprovalRequest => {
+const mapApprovalSnapshot = (docSnap: DocumentSnapshot<DocumentData>): ApprovalRequest => {
   const data = docSnap.data() as any
   const nowIso = new Date().toISOString()
   return {
@@ -559,7 +562,7 @@ export const addApprovalRequest = async (
     updatedAt: now,
   }
   const cleanPayload = Object.fromEntries(
-    Object.entries(payload).filter(([, value]) => value !== undefined)
+    Object.entries(payload).filter(([, value]: [string, any]) => value !== undefined)
   )
   const result = await addDoc(approvalsRef, cleanPayload)
   return result
@@ -588,17 +591,17 @@ export const getApprovalRequests = async (
 
   // Additional in-memory filters to avoid composite indexes
   if (status) {
-    results = results.filter((r) => r.status === status)
+    results = results.filter((r: ApprovalRequest) => r.status === status)
   }
   if (authorId) {
-    results = results.filter((r) => r.authorId === authorId)
+    results = results.filter((r: ApprovalRequest) => r.authorId === authorId)
   }
   if (targetUserId) {
-    results = results.filter((r) => r.targetUserId === targetUserId)
+    results = results.filter((r: ApprovalRequest) => r.targetUserId === targetUserId)
   }
 
   // Sort by creation time descending
-  results.sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+  results.sort((a: ApprovalRequest, b: ApprovalRequest) => b.createdAt.localeCompare(a.createdAt))
 
   return results
 }
@@ -609,7 +612,7 @@ export const updateApprovalRequest = async (id: string, updates: Partial<Approva
     Object.entries({
       ...updates,
       updatedAt: new Date().toISOString(),
-    }).filter(([, value]) => value !== undefined)
+    }).filter(([, value]: [string, any]) => value !== undefined)
   )
   await updateDoc(ref, cleanUpdates)
 }
@@ -686,7 +689,7 @@ export const getEarnings = async (userId?: string, startDate?: string, endDate?:
   }
 
   const snapshot = await getDocs(q)
-  let results = snapshot.docs.map((doc) => {
+  let results = snapshot.docs.map((doc: any) => {
     const data = doc.data() as any
     return {
       id: doc.id,
@@ -704,7 +707,7 @@ export const getEarnings = async (userId?: string, startDate?: string, endDate?:
 
   // Filter by userId in memory (check both userId field and participants array)
   if (userId) {
-    results = results.filter((e) => {
+    results = results.filter((e: Earnings) => {
       const allParticipants = e.participants && e.participants.length > 0
         ? [...e.participants, e.userId]
         : [e.userId]
@@ -714,14 +717,14 @@ export const getEarnings = async (userId?: string, startDate?: string, endDate?:
 
   // Filter by date range in memory if userId is also provided
   if (userId && startDate && endDate) {
-    results = results.filter((e) => e.date >= startDate && e.date <= endDate)
+    results = results.filter((e: Earnings) => e.date >= startDate && e.date <= endDate)
   } else if (!userId && startDate && endDate) {
     // Already filtered by query, but ensure consistency
-    results = results.filter((e) => e.date >= startDate && e.date <= endDate)
+    results = results.filter((e: Earnings) => e.date >= startDate && e.date <= endDate)
   }
 
   // Sort by date descending in memory to avoid index requirement
-  results.sort((a, b) => b.date.localeCompare(a.date))
+  results.sort((a: any, b: any) => b.date.localeCompare(a.date))
 
   return results
 }
@@ -731,7 +734,7 @@ export const addEarnings = async (earning: Omit<Earnings, 'id'>) => {
     const earningsRef = collection(db, 'earnings')
     // Remove undefined values before saving
     const cleanEarning = Object.fromEntries(
-      Object.entries(earning).filter(([_, value]) => value !== undefined)
+      Object.entries(earning).filter(([_, value]: [string, any]) => value !== undefined)
     )
     console.log('Adding earnings:', cleanEarning)
     const result = await addDoc(earningsRef, cleanEarning)
@@ -749,7 +752,7 @@ export const updateEarnings = async (id: string, updates: Partial<Earnings>) => 
 
   // Remove undefined values before updating
   const cleanUpdates = Object.fromEntries(
-    Object.entries(updates).filter(([_, value]) => value !== undefined)
+    Object.entries(updates).filter(([_, value]: [string, any]) => value !== undefined)
   )
   await updateDoc(earningRef, cleanUpdates)
 }
@@ -769,7 +772,7 @@ export const getRatingData = async (userId?: string) => {
   }
 
   const snapshot = await getDocs(q)
-  return snapshot.docs.map((doc) => {
+  return snapshot.docs.map((doc: any) => {
     const data = doc.data()
     return {
       id: doc.id,
@@ -799,7 +802,7 @@ export const getWeeklyMessages = async (userId: string, weekStart: string, weekE
     const snapshot = await getDocs(q)
 
     // Filter by date range in memory
-    const weeklyMessages = snapshot.docs.filter(doc => {
+    const weeklyMessages = snapshot.docs.filter((doc: any) => {
       const data = doc.data()
       const date = data.date || ''
       return date >= weekStart && date <= weekEnd
@@ -834,7 +837,7 @@ export const addReferral = async (referral: Omit<Referral, 'id'>) => {
   try {
     const referralsRef = collection(db, 'referrals')
     const cleanReferral = Object.fromEntries(
-      Object.entries(referral).filter(([_, value]) => value !== undefined)
+      Object.entries(referral).filter(([_, value]: [string, any]) => value !== undefined)
     )
     console.log('Adding referral:', cleanReferral)
     const result = await addDoc(referralsRef, cleanReferral)
@@ -858,7 +861,7 @@ export const getReferrals = async (ownerId?: string, startDate?: string, endDate
   }
 
   const snapshot = await getDocs(q)
-  let referrals = snapshot.docs.map((docSnap) => {
+  let referrals = snapshot.docs.map((docSnap: any) => {
     const data = docSnap.data() as Omit<Referral, 'id'>
     return {
       id: docSnap.id,
@@ -872,17 +875,17 @@ export const getReferrals = async (ownerId?: string, startDate?: string, endDate
   })
 
   if (startDate && endDate) {
-    referrals = referrals.filter((referral) => referral.createdAt >= startDate && referral.createdAt <= endDate)
+    referrals = referrals.filter((referral: Referral) => referral.createdAt >= startDate && referral.createdAt <= endDate)
   }
 
-  return referrals.sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1))
+  return referrals.sort((a: Referral, b: Referral) => (a.createdAt < b.createdAt ? 1 : -1))
 }
 
 export const updateReferral = async (id: string, updates: Partial<Referral>) => {
   const referralRef = doc(db, 'referrals', id)
 
   const cleanUpdates = Object.fromEntries(
-    Object.entries(updates).filter(([_, value]) => value !== undefined)
+    Object.entries(updates).filter(([_, value]: [string, any]) => value !== undefined)
   )
   await updateDoc(referralRef, cleanUpdates)
 }
@@ -961,7 +964,7 @@ export const getCalls = async (filters?: {
   }
 
   const snapshot = await getDocs(q)
-  let calls = snapshot.docs.map((doc) => {
+  let calls = snapshot.docs.map((doc: any) => {
     const data = doc.data() as any
     const category = (data.category as Call['category']) || 'memecoins'
 
@@ -1021,17 +1024,17 @@ export const getCalls = async (filters?: {
 
   // Apply additional filters in memory
   if (filters?.category) {
-    calls = calls.filter(c => c.category === filters.category)
+    calls = calls.filter((c: Call) => c.category === filters.category)
   }
   if (filters?.riskLevel) {
-    calls = calls.filter(c => c.riskLevel === filters.riskLevel)
+    calls = calls.filter((c: Call) => c.riskLevel === filters.riskLevel)
   }
 
   // Filter by active (24 hours) if needed
   if (filters?.activeOnly && !filters.status) {
     const yesterday = new Date()
     yesterday.setHours(yesterday.getHours() - 24)
-    calls = calls.filter(c => {
+    calls = calls.filter((c: Call) => {
       const createdAt = new Date(c.createdAt)
       return c.status === 'active' && createdAt >= yesterday
     })
@@ -1099,7 +1102,7 @@ export const getTasks = async (filters?: {
 
   const normalizeStageAssignees = (assignees: any[] = []): StageAssignee[] =>
     assignees
-      .filter((a) => a?.userId)
+      .filter((a: any) => a?.userId)
       .slice(0, 10)
       .map((a) => ({
         userId: a.userId,
@@ -1108,7 +1111,7 @@ export const getTasks = async (filters?: {
         instruction: a.instruction,
       }))
 
-  let tasks = snapshot.docs.map((doc) => {
+  let tasks = snapshot.docs.map((doc: any) => {
     const data = doc.data() as any
     const rawAssignees = Array.isArray(data.assignees)
       ? data.assignees
@@ -1127,7 +1130,7 @@ export const getTasks = async (filters?: {
         ? data.executors
         : []
     const normalizedStages = (data.stages || []).map((stage: any) => ({
-      id: stage.id || `stage-${Date.now()}`,
+      id: stage.id || `stage - ${Date.now()} `,
       name: stage.name || 'Этап',
       description: stage.description,
       responsible: stage.responsible === 'all' ? 'all' : Array.isArray(stage.responsible) ? stage.responsible : (stage.assignees || []).map((a: any) => a.userId),
@@ -1177,7 +1180,7 @@ export const getTasks = async (filters?: {
   const now = new Date()
   const twelveHoursAgo = new Date(now.getTime() - 12 * 60 * 60 * 1000)
 
-  const tasksToDelete = tasks.filter(task => {
+  const tasksToDelete = tasks.filter((task: Task) => {
     if (task.status === 'closed' && task.closedAt) {
       const closedDate = new Date(task.closedAt)
       return closedDate < twelveHoursAgo
@@ -1187,9 +1190,9 @@ export const getTasks = async (filters?: {
 
   // Delete old closed tasks
   if (tasksToDelete.length > 0) {
-    await Promise.all(tasksToDelete.map(task => deleteTask(task.id)))
+    await Promise.all(tasksToDelete.map((task: Task) => deleteTask(task.id)))
     // Remove deleted tasks from the list
-    tasks = tasks.filter(task => !tasksToDelete.find(t => t.id === task.id))
+    tasks = tasks.filter((task: Task) => !tasksToDelete.find(t => t.id === task.id))
   }
 
   // Apply assignedTo filter in memory (array-contains doesn't work well with multiple users)
@@ -1197,10 +1200,10 @@ export const getTasks = async (filters?: {
     if (Array.isArray(filters.assignedTo)) {
       const selected = filters.assignedTo
       if (selected.length > 0) {
-        tasks = tasks.filter((t) => selected.some((userId) => t.assignedTo.includes(userId)))
+        tasks = tasks.filter((t: Task) => selected.some((userId) => t.assignedTo.includes(userId)))
       }
     } else {
-      tasks = tasks.filter((t) => t.assignedTo.includes(filters.assignedTo as string))
+      tasks = tasks.filter((t: Task) => t.assignedTo.includes(filters.assignedTo as string))
     }
   }
 
@@ -1214,7 +1217,7 @@ export const updateTask = async (id: string, updates: Partial<Task>): Promise<vo
     Object.entries({
       ...updates,
       updatedAt: new Date().toISOString(),
-    }).filter(([_, value]) => value !== undefined)
+    }).filter(([_, value]: [string, any]) => value !== undefined)
   )
   await updateDoc(taskRef, cleanUpdates as any)
 }
@@ -1236,7 +1239,7 @@ export const getUserNotes = async (userId?: string, includeAllForAdmin: boolean 
   }
 
   const snapshot = await getDocs(q)
-  const notes = snapshot.docs.map((docSnap) => {
+  const notes = snapshot.docs.map((docSnap: any) => {
     const data = docSnap.data() as any
     return {
       id: docSnap.id,
@@ -1249,9 +1252,9 @@ export const getUserNotes = async (userId?: string, includeAllForAdmin: boolean 
     } as Note
   })
 
-  notes.sort((a, b) => (b.updatedAt || '').localeCompare(a.updatedAt || ''))
+  notes.sort((a: Note, b: Note) => (b.updatedAt || '').localeCompare(a.updatedAt || ''))
   if (userId && !includeAllForAdmin) {
-    return notes.filter((n) => n.userId === userId)
+    return notes.filter((n: Note) => n.userId === userId)
   }
   return notes
 }
@@ -1273,7 +1276,7 @@ export const updateNote = async (id: string, updates: Partial<Omit<Note, 'id' | 
     Object.entries({
       ...updates,
       updatedAt: new Date().toISOString(),
-    }).filter(([_, value]) => value !== undefined)
+    }).filter(([_, value]: [string, any]) => value !== undefined)
   )
   await updateDoc(noteRef, cleanUpdates as any)
 }
@@ -1295,7 +1298,7 @@ export const getUserActivities = async (userId?: string): Promise<UserActivity[]
   }
 
   const snapshot = await getDocs(q)
-  return snapshot.docs.map((docSnap) => {
+  return snapshot.docs.map((docSnap: any) => {
     const data = docSnap.data() as any
     return {
       id: docSnap.id,
@@ -1317,7 +1320,7 @@ export const getLatestUserActivities = async (): Promise<UserActivity[]> => {
   const q = query(activitiesRef, orderBy('loginAt', 'desc'))
   const snapshot = await getDocs(q)
 
-  const allActivities = snapshot.docs.map((docSnap) => {
+  const allActivities = snapshot.docs.map((docSnap: any) => {
     const data = docSnap.data() as any
     return {
       id: docSnap.id,
@@ -1353,7 +1356,7 @@ export const addUserActivity = async (activity: Omit<UserActivity, 'id'>): Promi
 export const updateUserActivity = async (id: string, updates: Partial<Omit<UserActivity, 'id' | 'userId'>>): Promise<void> => {
   const activityRef = doc(db, 'userActivities', id)
   const cleanUpdates = Object.fromEntries(
-    Object.entries(updates).filter(([_, value]) => value !== undefined)
+    Object.entries(updates).filter(([_, value]: [string, any]) => value !== undefined)
   )
   await updateDoc(activityRef, cleanUpdates as any)
 }
@@ -1428,7 +1431,7 @@ export const getUserActivitiesLast24Hours = async (): Promise<UserActivity[]> =>
   const q = query(activitiesRef, orderBy('loginAt', 'desc'))
   const snapshot = await getDocs(q)
 
-  const allActivities = snapshot.docs.map((docSnap) => {
+  const allActivities = snapshot.docs.map((docSnap: any) => {
     const data = docSnap.data() as any
     return {
       id: docSnap.id,
@@ -1444,14 +1447,14 @@ export const getUserActivitiesLast24Hours = async (): Promise<UserActivity[]> =>
   })
 
   // Filter activities from last 24 hours
-  return allActivities.filter((activity) => {
+  return allActivities.filter((activity: UserActivity) => {
     const loginTime = new Date(activity.loginAt)
     return loginTime >= last24Hours
   })
 }
 
 // User Conflicts
-export const getUserConflicts = async (userId?: string, isActive?: boolean) => {
+export const getUserConflicts = async (userId?: string, isActive?: boolean): Promise<UserConflict[]> => {
   const conflictsRef = collection(db, 'userConflicts')
   let q: ReturnType<typeof query>
 
@@ -1465,8 +1468,8 @@ export const getUserConflicts = async (userId?: string, isActive?: boolean) => {
     q = query(conflictsRef)
   }
 
-  const snapshot = await getDocs(q)
-  return snapshot.docs.map((doc) => {
+  const snapshot: QuerySnapshot<DocumentData> = await getDocs(q)
+  return snapshot.docs.map((doc: any) => {
     const data = doc.data() as any
     return {
       id: doc.id,
@@ -1497,7 +1500,7 @@ export const deleteUserConflict = async (id: string) => {
 }
 
 // Access Blocks
-export const getAccessBlocks = async (userId?: string, isActive?: boolean) => {
+export const getAccessBlocks = async (userId?: string, isActive?: boolean): Promise<AccessBlock[]> => {
   const blocksRef = collection(db, 'accessBlocks')
   let q: ReturnType<typeof query>
 
@@ -1511,8 +1514,8 @@ export const getAccessBlocks = async (userId?: string, isActive?: boolean) => {
     q = query(blocksRef)
   }
 
-  const snapshot = await getDocs(q)
-  return snapshot.docs.map((doc) => {
+  const snapshot: QuerySnapshot<DocumentData> = await getDocs(q)
+  return snapshot.docs.map((doc: any) => {
     const data = doc.data() as any
     return {
       id: doc.id,
@@ -1583,20 +1586,29 @@ export const checkUserAccess = async (userId: string, feature: string): Promise<
 
 
 // AI - AO Alerts
-export const getAiAlerts = async () => {
+export const getAiAlerts = async (): Promise<AiAlert[]> => {
   const alertsRef = collection(db, 'aiAlerts')
   const q = query(alertsRef, orderBy('createdAt', 'desc'))
-  const snapshot = await getDocs(q)
-  return snapshot.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data(),
-  } as AiAlert))
+  const querySnapshot: QuerySnapshot<DocumentData> = await getDocs(q) // Corrected from usersRef to q
+  return querySnapshot.docs.map((docSnap: any) => ({
+    id: docSnap.id,
+    ...docSnap.data(),
+  } as AiAlert)) // Corrected type to AiAlert
+}
+
+export const getUserById = async (userId: string): Promise<User | null> => {
+  const userRef = doc(db, 'users', userId)
+  const docSnap: DocumentSnapshot<DocumentData> = await getDoc(userRef)
+  if (docSnap.exists()) {
+    return { id: docSnap.id, ...docSnap.data() } as User
+  }
+  return null
 }
 
 export const addAiAlert = async (alert: Omit<AiAlert, 'id'>) => {
   const alertsRef = collection(db, 'aiAlerts')
   const cleanAlert = Object.fromEntries(
-    Object.entries(alert).filter(([_, value]) => value !== undefined)
+    Object.entries(alert).filter(([_, value]: [string, any]) => value !== undefined)
   )
   const result = await addDoc(alertsRef, cleanAlert)
   return result
@@ -1605,7 +1617,7 @@ export const addAiAlert = async (alert: Omit<AiAlert, 'id'>) => {
 export const updateAiAlert = async (id: string, updates: Partial<AiAlert>) => {
   const alertRef = doc(db, 'aiAlerts', id)
   const cleanUpdates = Object.fromEntries(
-    Object.entries(updates).filter(([_, value]) => value !== undefined)
+    Object.entries(updates).filter(([_, value]: [string, any]) => value !== undefined)
   )
   await updateDoc(alertRef, cleanUpdates)
 }

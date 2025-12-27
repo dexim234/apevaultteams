@@ -1,23 +1,22 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Layout } from '@/components/Layout'
 import { useThemeStore } from '@/store/themeStore'
 import { useAuthStore } from '@/store/authStore'
-import { useAdminStore } from '@/store/adminStore'
 import { getAiAlerts, addAiAlert, updateAiAlert, deleteAiAlert } from '@/services/firestoreService'
 import { AiAlert } from '@/types'
-import { TrendingUp, Plus, Edit, Trash2, Save, X, Copy, Check, Terminal } from 'lucide-react'
-import { useScrollLock } from '@/hooks/useScrollLock'
+import { Plus, Edit, Trash2, Save, X, Copy, Check, Terminal, Table, FileText } from 'lucide-react'
 
 export const AiAoAlerts = () => {
     const { theme } = useThemeStore()
     const { user } = useAuthStore()
-    const { isAdmin } = useAdminStore()
 
     const [alerts, setAlerts] = useState<AiAlert[]>([])
     const [loading, setLoading] = useState(true)
     const [showModal, setShowModal] = useState(false)
     const [editingAlert, setEditingAlert] = useState<AiAlert | null>(null)
     const [copyingId, setCopyingId] = useState<string | null>(null)
+    const [isCopyingAll, setIsCopyingAll] = useState(false)
+    const [isCopyingTable, setIsCopyingTable] = useState(false)
 
     // Form state
     const [formData, setFormData] = useState<Partial<AiAlert>>({
@@ -55,6 +54,54 @@ export const AiAoAlerts = () => {
         navigator.clipboard.writeText(text)
         setCopyingId(id)
         setTimeout(() => setCopyingId(null), 2000)
+    }
+
+    const handleCopyAllData = () => {
+        const text = alerts.map((a: AiAlert) =>
+            `${a.signalDate}\t${a.signalTime}\t${a.marketCap || '-'}\t${a.address}\t${a.maxDrop || '-'}\t${a.maxProfit || '-'}\t${a.comment || ''}`
+        ).join('\n')
+        const header = "Дата\tВремя\tMarket Cap\tАдрес\tМакс. Падение\tМакс. Профит\tКомментарий\n"
+        navigator.clipboard.writeText(header + text)
+        setIsCopyingAll(true)
+        setTimeout(() => setIsCopyingAll(false), 2000)
+    }
+
+    const handleCopyTable = () => {
+        // Construct HTML for rich copying (Excel compatible)
+        const html = `
+      <table border="1">
+        <thead>
+          <tr>
+            <th>Дата</th>
+            <th>Время</th>
+            <th>Market Cap</th>
+            <th>Адрес</th>
+            <th>Макс. Падение</th>
+            <th>Макс. Профит</th>
+            <th>Комментарий</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${alerts.map((a: AiAlert) => `
+            <tr>
+              <td>${a.signalDate}</td>
+              <td>${a.signalTime}</td>
+              <td>${a.marketCap || '-'}</td>
+              <td>${a.address}</td>
+              <td>${a.maxDrop || '-'}</td>
+              <td>${a.maxProfit || '-'}</td>
+              <td>${a.comment || ''}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `
+        const type = "text/html"
+        const blob = new Blob([html], { type })
+        const data = [new ClipboardItem({ [type]: blob })]
+        navigator.clipboard.write(data)
+        setIsCopyingTable(true)
+        setTimeout(() => setIsCopyingTable(false), 2000)
     }
 
     const handleDelete = async (id: string) => {
@@ -97,7 +144,7 @@ export const AiAoAlerts = () => {
                 comment: ''
             })
             await loadAlerts()
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error saving alert:', error)
         }
     }
@@ -112,7 +159,7 @@ export const AiAoAlerts = () => {
                         <div className={`absolute inset-0 ${theme === 'dark' ? 'bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.05),transparent_45%)]' : 'bg-[radial-gradient(circle_at_50%_0%,rgba(78,110,73,0.05),transparent_45%)]'}`}></div>
                     </div>
 
-                    <div className="relative p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+                    <div className="relative p-6 sm:p-8 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-6">
                         <div className="flex items-center gap-4">
                             <div className={`p-3 rounded-2xl ${theme === 'dark' ? 'bg-white/10 border-white/20' : 'bg-[#4E6E49]/10 border-[#4E6E49]/30'} shadow-inner`}>
                                 <Terminal className={`w-8 h-8 ${theme === 'dark' ? 'text-white' : 'text-[#4E6E49]'}`} />
@@ -123,20 +170,58 @@ export const AiAoAlerts = () => {
                             </div>
                         </div>
 
-                        <button
-                            onClick={() => {
-                                setEditingAlert(null)
-                                setFormData({
-                                    signalDate: new Date().toISOString().split('T')[0],
-                                    signalTime: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }),
-                                })
-                                setShowModal(true)
-                            }}
-                            className="px-4 py-2 rounded-xl bg-[#4E6E49] hover:bg-[#3d5a39] text-white font-semibold transition-colors flex items-center gap-2 shadow-lg shadow-[#4E6E49]/20"
-                        >
-                            <Plus className="w-4 h-4" />
-                            <span>Добавить сигнал</span>
-                        </button>
+                        <div className="flex flex-wrap items-center gap-3">
+                            <button
+                                onClick={handleCopyAllData}
+                                disabled={alerts.length === 0}
+                                className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 border ${theme === 'dark' ? 'bg-white/5 border-white/10 hover:bg-white/10 text-gray-300' : 'bg-gray-100 border-gray-200 hover:bg-gray-200 text-gray-700'} disabled:opacity-50`}
+                            >
+                                {isCopyingAll ? (
+                                    <>
+                                        <Check className="w-4 h-4 text-green-500" />
+                                        <span>Данные скопированы</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <FileText className="w-4 h-4" />
+                                        <span>Копировать данные</span>
+                                    </>
+                                )}
+                            </button>
+
+                            <button
+                                onClick={handleCopyTable}
+                                disabled={alerts.length === 0}
+                                className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 border ${theme === 'dark' ? 'bg-white/5 border-white/10 hover:bg-white/10 text-gray-300' : 'bg-gray-100 border-gray-200 hover:bg-gray-200 text-gray-700'} disabled:opacity-50`}
+                            >
+                                {isCopyingTable ? (
+                                    <>
+                                        <Check className="w-4 h-4 text-green-500" />
+                                        <span>Таблица скопирована</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Table className="w-4 h-4" />
+                                        <span>Копировать таблицу</span>
+                                    </>
+                                )}
+                            </button>
+
+                            <button
+                                onClick={() => {
+                                    setEditingAlert(null)
+                                    setFormData({
+                                        signalDate: new Date().toISOString().split('T')[0],
+                                        signalTime: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }),
+                                    })
+                                    setShowModal(true)
+                                }}
+                                className="px-4 py-2 rounded-xl bg-[#4E6E49] hover:bg-[#3d5a39] text-white font-semibold transition-colors flex items-center gap-2 shadow-lg shadow-[#4E6E49]/20 ml-auto"
+                            >
+                                <Plus className="w-4 h-4" />
+                                <span>Добавить сигнал</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -164,7 +249,7 @@ export const AiAoAlerts = () => {
                                         <td colSpan={6} className="p-8 text-center text-gray-500">Нет сигналов</td>
                                     </tr>
                                 ) : (
-                                    alerts.map((alert) => (
+                                    alerts.map((alert: AiAlert) => (
                                         <tr key={alert.id} className={`${theme === 'dark' ? 'hover:bg-white/5' : 'hover:bg-gray-50'} transition-colors`}>
                                             <td className="p-4 whitespace-nowrap">
                                                 <div className={`font-mono font-medium ${headingColor}`}>{alert.signalDate}</div>
@@ -243,7 +328,7 @@ export const AiAoAlerts = () => {
                                         type="date"
                                         required
                                         value={formData.signalDate}
-                                        onChange={(e) => setFormData({ ...formData, signalDate: e.target.value })}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, signalDate: e.target.value })}
                                         className={`w-full p-3 rounded-xl border outline-none transition-all ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white focus:border-[#4E6E49]' : 'bg-white border-gray-200 text-gray-900 focus:border-[#4E6E49]'}`}
                                     />
                                 </div>
@@ -253,7 +338,7 @@ export const AiAoAlerts = () => {
                                         type="time"
                                         required
                                         value={formData.signalTime}
-                                        onChange={(e) => setFormData({ ...formData, signalTime: e.target.value })}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, signalTime: e.target.value })}
                                         className={`w-full p-3 rounded-xl border outline-none transition-all ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white focus:border-[#4E6E49]' : 'bg-white border-gray-200 text-gray-900 focus:border-[#4E6E49]'}`}
                                     />
                                 </div>
@@ -266,7 +351,7 @@ export const AiAoAlerts = () => {
                                     required
                                     placeholder="Адрес контракта..."
                                     value={formData.address || ''}
-                                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, address: e.target.value })}
                                     className={`w-full p-3 rounded-xl border outline-none transition-all font-mono text-sm ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white focus:border-[#4E6E49]' : 'bg-white border-gray-200 text-gray-900 focus:border-[#4E6E49]'}`}
                                 />
                             </div>
@@ -278,7 +363,7 @@ export const AiAoAlerts = () => {
                                         type="text"
                                         placeholder="e.g. 300,77"
                                         value={formData.marketCap || ''}
-                                        onChange={(e) => setFormData({ ...formData, marketCap: e.target.value })}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, marketCap: e.target.value })}
                                         className={`w-full p-3 rounded-xl border outline-none transition-all ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white focus:border-[#4E6E49]' : 'bg-white border-gray-200 text-gray-900 focus:border-[#4E6E49]'}`}
                                     />
                                 </div>
@@ -288,7 +373,7 @@ export const AiAoAlerts = () => {
                                         type="text"
                                         placeholder="e.g. -16"
                                         value={formData.maxDrop || ''}
-                                        onChange={(e) => setFormData({ ...formData, maxDrop: e.target.value })}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, maxDrop: e.target.value })}
                                         className={`w-full p-3 rounded-xl border outline-none transition-all ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white focus:border-[#4E6E49]' : 'bg-white border-gray-200 text-gray-900 focus:border-[#4E6E49]'}`}
                                     />
                                 </div>
@@ -298,7 +383,7 @@ export const AiAoAlerts = () => {
                                         type="text"
                                         placeholder="e.g. +28"
                                         value={formData.maxProfit || ''}
-                                        onChange={(e) => setFormData({ ...formData, maxProfit: e.target.value })}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, maxProfit: e.target.value })}
                                         className={`w-full p-3 rounded-xl border outline-none transition-all ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white focus:border-[#4E6E49]' : 'bg-white border-gray-200 text-gray-900 focus:border-[#4E6E49]'}`}
                                     />
                                 </div>
@@ -310,7 +395,7 @@ export const AiAoAlerts = () => {
                                     type="text"
                                     placeholder="Дополнительная информация..."
                                     value={formData.comment || ''}
-                                    onChange={(e) => setFormData({ ...formData, comment: e.target.value })}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, comment: e.target.value })}
                                     className={`w-full p-3 rounded-xl border outline-none transition-all ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white focus:border-[#4E6E49]' : 'bg-white border-gray-200 text-gray-900 focus:border-[#4E6E49]'}`}
                                 />
                             </div>

@@ -444,3 +444,11 @@ export interface AiAlert {
   createdBy: string
 }
 
+export interface ActivityLog {
+  id: string
+  userId: string
+  action: string
+  details?: string
+  createdAt: string
+}
+
