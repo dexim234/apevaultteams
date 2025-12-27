@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import { useThemeStore } from '@/store/themeStore'
 import { useAuthStore } from '@/store/authStore'
+import { useAdminStore } from '@/store/adminStore'
 import { getAccessBlocks, addAccessBlock, updateAccessBlock, deleteAccessBlock } from '@/services/firestoreService'
 import { useScrollLock } from '@/hooks/useScrollLock'
 import { AccessBlock, AccessFeature, TEAM_MEMBERS } from '@/types'
@@ -25,6 +26,7 @@ const ACCESS_FEATURES: { value: AccessFeature; label: string; description: strin
 export const AccessBlocksForm = ({ onClose }: AccessBlocksFormProps) => {
   const { theme } = useThemeStore()
   const { user } = useAuthStore()
+  const { isAdmin } = useAdminStore()
   useScrollLock()
   const [blocks, setBlocks] = useState<AccessBlock[]>([])
   const [loading, setLoading] = useState(true)
@@ -58,7 +60,7 @@ export const AccessBlocksForm = ({ onClose }: AccessBlocksFormProps) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!user) {
+    if (!user && !isAdmin) {
       setError('Пользователь не найден (необходима авторизация)')
       return
     }
@@ -69,7 +71,7 @@ export const AccessBlocksForm = ({ onClose }: AccessBlocksFormProps) => {
       const blockData = {
         ...formData,
         userId: formData.userId || undefined, // Convert empty string to undefined for general blocks
-        createdBy: user.id,
+        createdBy: user?.id || 'admin',
         createdAt: new Date().toISOString(),
         expiresAt: formData.expiresAt || undefined
       }
@@ -171,7 +173,7 @@ export const AccessBlocksForm = ({ onClose }: AccessBlocksFormProps) => {
 
   return (
     <div className="fixed inset-0 bg-slate-950/75 backdrop-blur-xl flex items-start sm:items-center justify-center z-[70] p-4 overflow-y-auto touch-manipulation">
-      <div className={`w-full max-w-4xl rounded-3xl shadow-[0_24px_80px_rgba(0,0,0,0.45)] border ${theme === 'dark' ? 'bg-gradient-to-br from-[#0c1320] via-[#0b1220] to-[#08111b] border-white/10' : 'bg-gradient-to-br from-white via-slate-50 to-white border-slate-200'} max-h-[90vh] overflow-hidden`}>
+      <div className={`w-full max-w-4xl rounded-3xl shadow-[0_24px_80px_rgba(0,0,0,0.45)] border ${theme === 'dark' ? 'bg-gradient-to-br from-[#0c1320] via-[#0b1220] to-[#08111b] border-white/10' : 'bg-gradient-to-br from-white via-slate-50 to-white border-slate-200'} max-h-[90vh] overflow-hidden flex flex-col`}>
         <div className="p-6 border-b border-white/10">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
