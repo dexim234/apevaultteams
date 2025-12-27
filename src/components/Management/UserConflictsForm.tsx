@@ -3,8 +3,9 @@ import { useState, useEffect } from 'react'
 import { useThemeStore } from '@/store/themeStore'
 import { useAuthStore } from '@/store/authStore'
 import { getUserConflicts, addUserConflict, updateUserConflict, deleteUserConflict } from '@/services/firestoreService'
+import { useScrollLock } from '@/hooks/useScrollLock'
 import { UserConflict, TEAM_MEMBERS } from '@/types'
-import { X, Plus, Trash2, Edit, Save, UserX } from 'lucide-react'
+import { X, Plus, Trash2, Edit, Save, UserX, AlertCircle } from 'lucide-react'
 
 interface UserConflictsFormProps {
   onClose: () => void
@@ -13,9 +14,11 @@ interface UserConflictsFormProps {
 export const UserConflictsForm = ({ onClose }: UserConflictsFormProps) => {
   const { theme } = useThemeStore()
   const { user } = useAuthStore()
+  useScrollLock()
   const [conflicts, setConflicts] = useState<UserConflict[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
   const [editingConflict, setEditingConflict] = useState<UserConflict | null>(null)
   const [showAddForm, setShowAddForm] = useState(false)
 
@@ -43,9 +46,13 @@ export const UserConflictsForm = ({ onClose }: UserConflictsFormProps) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!user) return
+    if (!user) {
+      setError('Пользователь не найден (необходима авторизация)')
+      return
+    }
 
     setSaving(true)
+    setError('')
     try {
       const conflictData = {
         ...formData,
@@ -63,8 +70,9 @@ export const UserConflictsForm = ({ onClose }: UserConflictsFormProps) => {
       resetForm()
       setShowAddForm(false)
       setEditingConflict(null)
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving conflict:', error)
+      setError(error.message || 'Ошибка при сохранении конфликта')
     } finally {
       setSaving(false)
     }
@@ -78,6 +86,7 @@ export const UserConflictsForm = ({ onClose }: UserConflictsFormProps) => {
       reason: conflict.reason || '',
       isActive: conflict.isActive
     })
+    setError('')
     setShowAddForm(true)
   }
 
@@ -102,6 +111,7 @@ export const UserConflictsForm = ({ onClose }: UserConflictsFormProps) => {
   }
 
   const resetForm = () => {
+    setError('')
     setFormData({
       userId: '',
       restrictedUserId: '',
@@ -126,7 +136,7 @@ export const UserConflictsForm = ({ onClose }: UserConflictsFormProps) => {
   }
 
   return (
-    <div className="fixed inset-0 bg-slate-950/75 backdrop-blur-xl flex items-start sm:items-center justify-center z-[70] p-4 overflow-y-auto">
+    <div className="fixed inset-0 bg-slate-950/75 backdrop-blur-xl flex items-start sm:items-center justify-center z-[70] p-4 overflow-y-auto touch-manipulation">
       <div className={`w-full max-w-4xl rounded-3xl shadow-[0_24px_80px_rgba(0,0,0,0.45)] border ${theme === 'dark' ? 'bg-gradient-to-br from-[#0c1320] via-[#0b1220] to-[#08111b] border-white/10' : 'bg-gradient-to-br from-white via-slate-50 to-white border-slate-200'} max-h-[90vh] overflow-hidden`}>
         <div className="p-6 border-b border-white/10">
           <div className="flex items-center justify-between">
@@ -161,6 +171,13 @@ export const UserConflictsForm = ({ onClose }: UserConflictsFormProps) => {
                   <h4 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                     {editingConflict ? 'Редактировать конфликт' : 'Добавить конфликт'}
                   </h4>
+
+                  {error && (
+                    <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20 flex items-start gap-3">
+                      <AlertCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
+                      <p className="text-sm text-red-500">{error}</p>
+                    </div>
+                  )}
 
                   <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -264,7 +281,10 @@ export const UserConflictsForm = ({ onClose }: UserConflictsFormProps) => {
                       Активные конфликты ({conflicts.filter(c => c.isActive).length})
                     </h4>
                     <button
-                      onClick={() => setShowAddForm(true)}
+                      onClick={() => {
+                        setError('')
+                        setShowAddForm(true)
+                      }}
                       className="px-4 py-2 bg-[#4E6E49] hover:bg-[#4E6E49] text-white rounded-lg transition-colors flex items-center gap-2"
                     >
                       <Plus className="w-4 h-4" />
@@ -286,15 +306,14 @@ export const UserConflictsForm = ({ onClose }: UserConflictsFormProps) => {
                       {conflicts.map((conflict) => (
                         <div
                           key={conflict.id}
-                          className={`flex items-center justify-between p-4 rounded-xl border ${
-                            conflict.isActive
-                              ? theme === 'dark'
-                                ? 'border-red-500/30 bg-red-500/10'
-                                : 'border-red-200 bg-red-50'
-                              : theme === 'dark'
-                                ? 'border-gray-600 bg-gray-700/50'
-                                : 'border-gray-200 bg-gray-50'
-                          }`}
+                          className={`flex items-center justify-between p-4 rounded-xl border ${conflict.isActive
+                            ? theme === 'dark'
+                              ? 'border-red-500/30 bg-red-500/10'
+                              : 'border-red-200 bg-red-50'
+                            : theme === 'dark'
+                              ? 'border-gray-600 bg-gray-700/50'
+                              : 'border-gray-200 bg-gray-50'
+                            }`}
                         >
                           <div className="flex-1">
                             <div className={`font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
@@ -313,13 +332,12 @@ export const UserConflictsForm = ({ onClose }: UserConflictsFormProps) => {
                           <div className="flex items-center gap-2">
                             <button
                               onClick={() => handleToggleActive(conflict)}
-                              className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-                                conflict.isActive
-                                  ? 'bg-red-500 text-white'
-                                  : theme === 'dark'
-                                    ? 'bg-gray-600 text-gray-300'
-                                    : 'bg-gray-200 text-gray-700'
-                              }`}
+                              className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${conflict.isActive
+                                ? 'bg-red-500 text-white'
+                                : theme === 'dark'
+                                  ? 'bg-gray-600 text-gray-300'
+                                  : 'bg-gray-200 text-gray-700'
+                                }`}
                             >
                               {conflict.isActive ? 'Активен' : 'Неактивен'}
                             </button>

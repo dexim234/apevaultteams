@@ -3,8 +3,9 @@ import { useState, useEffect } from 'react'
 import { useThemeStore } from '@/store/themeStore'
 import { useAuthStore } from '@/store/authStore'
 import { getAccessBlocks, addAccessBlock, updateAccessBlock, deleteAccessBlock } from '@/services/firestoreService'
+import { useScrollLock } from '@/hooks/useScrollLock'
 import { AccessBlock, AccessFeature, TEAM_MEMBERS } from '@/types'
-import { X, Plus, Trash2, Edit, Save, Shield, ShieldX, Clock } from 'lucide-react'
+import { X, Plus, Trash2, Edit, Save, Shield, ShieldX, Clock, AlertCircle } from 'lucide-react'
 
 interface AccessBlocksFormProps {
   onClose: () => void
@@ -24,9 +25,11 @@ const ACCESS_FEATURES: { value: AccessFeature; label: string; description: strin
 export const AccessBlocksForm = ({ onClose }: AccessBlocksFormProps) => {
   const { theme } = useThemeStore()
   const { user } = useAuthStore()
+  useScrollLock()
   const [blocks, setBlocks] = useState<AccessBlock[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
   const [editingBlock, setEditingBlock] = useState<AccessBlock | null>(null)
   const [showAddForm, setShowAddForm] = useState(false)
 
@@ -55,9 +58,13 @@ export const AccessBlocksForm = ({ onClose }: AccessBlocksFormProps) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!user) return
+    if (!user) {
+      setError('Пользователь не найден (необходима авторизация)')
+      return
+    }
 
     setSaving(true)
+    setError('')
     try {
       const blockData = {
         ...formData,
@@ -77,8 +84,9 @@ export const AccessBlocksForm = ({ onClose }: AccessBlocksFormProps) => {
       resetForm()
       setShowAddForm(false)
       setEditingBlock(null)
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving block:', error)
+      setError(error.message || 'Ошибка при сохранении блокировки')
     } finally {
       setSaving(false)
     }
@@ -93,6 +101,7 @@ export const AccessBlocksForm = ({ onClose }: AccessBlocksFormProps) => {
       blockFeatures: block.blockFeatures,
       isActive: block.isActive
     })
+    setError('')
     setShowAddForm(true)
   }
 
@@ -126,6 +135,7 @@ export const AccessBlocksForm = ({ onClose }: AccessBlocksFormProps) => {
   }
 
   const resetForm = () => {
+    setError('')
     setFormData({
       userId: '',
       reason: '',
@@ -160,7 +170,7 @@ export const AccessBlocksForm = ({ onClose }: AccessBlocksFormProps) => {
   }
 
   return (
-    <div className="fixed inset-0 bg-slate-950/75 backdrop-blur-xl flex items-start sm:items-center justify-center z-[70] p-4 overflow-y-auto">
+    <div className="fixed inset-0 bg-slate-950/75 backdrop-blur-xl flex items-start sm:items-center justify-center z-[70] p-4 overflow-y-auto touch-manipulation">
       <div className={`w-full max-w-4xl rounded-3xl shadow-[0_24px_80px_rgba(0,0,0,0.45)] border ${theme === 'dark' ? 'bg-gradient-to-br from-[#0c1320] via-[#0b1220] to-[#08111b] border-white/10' : 'bg-gradient-to-br from-white via-slate-50 to-white border-slate-200'} max-h-[90vh] overflow-hidden`}>
         <div className="p-6 border-b border-white/10">
           <div className="flex items-center justify-between">
@@ -196,6 +206,13 @@ export const AccessBlocksForm = ({ onClose }: AccessBlocksFormProps) => {
                     {editingBlock ? 'Редактировать блокировку' : 'Добавить блокировку'}
                   </h4>
 
+                  {error && (
+                    <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20 flex items-start gap-3">
+                      <AlertCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
+                      <p className="text-sm text-red-500">{error}</p>
+                    </div>
+                  )}
+
                   <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
                       <label className={`block text-sm font-medium mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
@@ -221,15 +238,14 @@ export const AccessBlocksForm = ({ onClose }: AccessBlocksFormProps) => {
                         {ACCESS_FEATURES.map((feature) => (
                           <label
                             key={feature.value}
-                            className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
-                              formData.blockFeatures.includes(feature.value)
-                                ? theme === 'dark'
-                                  ? 'border-red-500/50 bg-red-500/10'
-                                  : 'border-red-200 bg-red-50'
-                                : theme === 'dark'
-                                  ? 'border-gray-600 hover:border-gray-500'
-                                  : 'border-gray-200 hover:border-gray-300'
-                            }`}
+                            className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${formData.blockFeatures.includes(feature.value)
+                              ? theme === 'dark'
+                                ? 'border-red-500/50 bg-red-500/10'
+                                : 'border-red-200 bg-red-50'
+                              : theme === 'dark'
+                                ? 'border-gray-600 hover:border-gray-500'
+                                : 'border-gray-200 hover:border-gray-300'
+                              }`}
                           >
                             <input
                               type="checkbox"
@@ -328,7 +344,10 @@ export const AccessBlocksForm = ({ onClose }: AccessBlocksFormProps) => {
                       Активные блокировки ({blocks.filter(b => b.isActive).length})
                     </h4>
                     <button
-                      onClick={() => setShowAddForm(true)}
+                      onClick={() => {
+                        setError('')
+                        setShowAddForm(true)
+                      }}
                       className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors flex items-center gap-2"
                     >
                       <Plus className="w-4 h-4" />
@@ -350,15 +369,14 @@ export const AccessBlocksForm = ({ onClose }: AccessBlocksFormProps) => {
                       {blocks.map((block) => (
                         <div
                           key={block.id}
-                          className={`flex items-center justify-between p-4 rounded-xl border ${
-                            block.isActive && !isExpired(block.expiresAt)
-                              ? theme === 'dark'
-                                ? 'border-red-500/30 bg-red-500/10'
-                                : 'border-red-200 bg-red-50'
-                              : theme === 'dark'
-                                ? 'border-gray-600 bg-gray-700/50'
-                                : 'border-gray-200 bg-gray-50'
-                          }`}
+                          className={`flex items-center justify-between p-4 rounded-xl border ${block.isActive && !isExpired(block.expiresAt)
+                            ? theme === 'dark'
+                              ? 'border-red-500/30 bg-red-500/10'
+                              : 'border-red-200 bg-red-50'
+                            : theme === 'dark'
+                              ? 'border-gray-600 bg-gray-700/50'
+                              : 'border-gray-200 bg-gray-50'
+                            }`}
                         >
                           <div className="flex-1">
                             <div className={`font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
@@ -383,13 +401,12 @@ export const AccessBlocksForm = ({ onClose }: AccessBlocksFormProps) => {
                           <div className="flex items-center gap-2">
                             <button
                               onClick={() => handleToggleActive(block)}
-                              className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-                                block.isActive && !isExpired(block.expiresAt)
-                                  ? 'bg-red-500 text-white'
-                                  : theme === 'dark'
-                                    ? 'bg-gray-600 text-gray-300'
-                                    : 'bg-gray-200 text-gray-700'
-                              }`}
+                              className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${block.isActive && !isExpired(block.expiresAt)
+                                ? 'bg-red-500 text-white'
+                                : theme === 'dark'
+                                  ? 'bg-gray-600 text-gray-300'
+                                  : 'bg-gray-200 text-gray-700'
+                                }`}
                             >
                               {block.isActive && !isExpired(block.expiresAt) ? 'Активна' : 'Неактивна'}
                             </button>
