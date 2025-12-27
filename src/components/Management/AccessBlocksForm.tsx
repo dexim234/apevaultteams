@@ -69,17 +69,19 @@ export const AccessBlocksForm = ({ onClose }: AccessBlocksFormProps) => {
     setError('')
     try {
       const blockData = {
-        ...formData,
-        userId: formData.userId || undefined, // Convert empty string to undefined for general blocks
+        reason: formData.reason,
+        blockFeatures: formData.blockFeatures,
+        isActive: formData.isActive,
         createdBy: user?.id || 'admin',
         createdAt: new Date().toISOString(),
-        expiresAt: formData.expiresAt || undefined
+        ...(formData.userId ? { userId: formData.userId } : {}),
+        ...(formData.expiresAt ? { expiresAt: formData.expiresAt } : {})
       }
 
       if (editingBlock) {
         await updateAccessBlock(editingBlock.id, blockData)
       } else {
-        await addAccessBlock(blockData)
+        await addAccessBlock(blockData as any)
       }
 
       await loadBlocks()
