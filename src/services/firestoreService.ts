@@ -102,11 +102,11 @@ export const getWorkSlots = async (userId?: string, date?: string) => {
 
   // Filter by date in memory if both userId and date provided
   if (userId && date) {
-    results = results.filter((s: WorkSlot) => s.date === date)
+    results = results.filter((s: DayStatus) => s.date === date)
   }
 
   // Sort by date in memory to avoid index requirement
-  results.sort((a: WorkSlot, b: WorkSlot) => a.date.localeCompare(b.date))
+  results.sort((a: DayStatus, b: DayStatus) => a.date.localeCompare(b.date))
 
   return results
 }
@@ -186,11 +186,11 @@ export const getDayStatuses = async (userId?: string, date?: string) => {
 
   // Filter by date in memory if both userId and date provided
   if (userId && date) {
-    results = results.filter((s: WorkSlot) => s.date === date)
+    results = results.filter((s: DayStatus) => s.date === date)
   }
 
   // Sort by date in memory to avoid index requirement
-  results.sort((a: WorkSlot, b: WorkSlot) => a.date.localeCompare(b.date))
+  results.sort((a: DayStatus, b: DayStatus) => a.date.localeCompare(b.date))
 
   return results
 }
@@ -388,7 +388,7 @@ const restrictionTypeToLabel = (type: RestrictionType): string => {
 // Approval Requests
 const APPROVAL_COLLECTION = 'approvalRequests'
 
-const mapApprovalSnapshot = (docSnap: DocumentSnapshot<DocumentData>): ApprovalRequest => {
+const mapApprovalSnapshot = (docSnap: any): ApprovalRequest => {
   const data = docSnap.data() as any
   const nowIso = new Date().toISOString()
   return {
@@ -1192,7 +1192,7 @@ export const getTasks = async (filters?: {
   if (tasksToDelete.length > 0) {
     await Promise.all(tasksToDelete.map((task: Task) => deleteTask(task.id)))
     // Remove deleted tasks from the list
-    tasks = tasks.filter((task: Task) => !tasksToDelete.find(t => t.id === task.id))
+    tasks = tasks.filter((task: Task) => !tasksToDelete.find((t: any) => t.id === task.id))
   }
 
   // Apply assignedTo filter in memory (array-contains doesn't work well with multiple users)
@@ -1468,7 +1468,7 @@ export const getUserConflicts = async (userId?: string, isActive?: boolean): Pro
     q = query(conflictsRef)
   }
 
-  const snapshot: QuerySnapshot<DocumentData> = await getDocs(q)
+  const snapshot: any = await getDocs(q)
   return snapshot.docs.map((doc: any) => {
     const data = doc.data() as any
     return {
@@ -1514,7 +1514,7 @@ export const getAccessBlocks = async (userId?: string, isActive?: boolean): Prom
     q = query(blocksRef)
   }
 
-  const snapshot: QuerySnapshot<DocumentData> = await getDocs(q)
+  const snapshot: any = await getDocs(q)
   return snapshot.docs.map((doc: any) => {
     const data = doc.data() as any
     return {
@@ -1589,7 +1589,7 @@ export const checkUserAccess = async (userId: string, feature: string): Promise<
 export const getAiAlerts = async (): Promise<AiAlert[]> => {
   const alertsRef = collection(db, 'aiAlerts')
   const q = query(alertsRef, orderBy('createdAt', 'desc'))
-  const querySnapshot: QuerySnapshot<DocumentData> = await getDocs(q) // Corrected from usersRef to q
+  const querySnapshot: any = await getDocs(q) // Corrected from usersRef to q
   return querySnapshot.docs.map((docSnap: any) => ({
     id: docSnap.id,
     ...docSnap.data(),
