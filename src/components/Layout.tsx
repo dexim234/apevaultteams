@@ -304,7 +304,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
 
       <div className="flex flex-col lg:flex-row min-h-screen">
         {/* Desktop Sidebar (Left) */}
-        <aside className={`hidden xl:flex ${isCollapsed ? 'w-20' : 'w-72'} h-screen fixed left-0 top-0 flex-col glass-panel border-r border-white/40 dark:border-white/10 z-50 overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]`}>
+        <aside className={`hidden xl:flex ${isCollapsed ? 'w-20' : 'w-72'} h-screen fixed left-0 top-0 flex-col glass-panel border-r border-white/40 dark:border-white/10 z-50 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]`}>
           <div className="accent-dots" />
 
           {/* Toggle Button */}
@@ -343,13 +343,15 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
             <button onClick={toggleTheme} className="flex-1 flex items-center justify-center p-2 rounded-xl border border-gray-200 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors w-full">
               {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-300" /> : <Moon className="w-4 h-4 text-gray-700" />}
             </button>
-            <button
-              onClick={() => setShowNotifications(!showNotifications)}
-              className={`flex-1 flex items-center justify-center relative p-2 rounded-xl border border-gray-200 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors w-full ${showNotifications ? 'bg-amber-500/10' : ''}`}
-            >
-              <Bell className="w-4 h-4" />
-              {notifications.length > 0 && <span className="absolute top-2 right-[35%] w-2 h-2 bg-red-500 rounded-full" />}
-            </button>
+            {!isCollapsed && (
+              <button
+                onClick={() => setShowNotifications(!showNotifications)}
+                className={`flex-1 flex items-center justify-center relative p-2 rounded-xl border border-gray-200 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors w-full ${showNotifications ? 'bg-amber-500/10' : ''}`}
+              >
+                <Bell className="w-4 h-4" />
+                {notifications.length > 0 && <span className="absolute top-2 right-[35%] w-2 h-2 bg-red-500 rounded-full" />}
+              </button>
+            )}
           </div>
 
           {showNotifications && (
@@ -389,8 +391,8 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
 
               {/* Collapsed Hover Menu */}
               {isCollapsed && (
-                <div className="fixed left-20 top-auto invisible group-hover/tools:visible opacity-0 group-hover/tools:opacity-100 transition-all duration-300 translate-x-1 group-hover/tools:translate-x-0 z-[60]">
-                  <div className="ml-2 glass-panel border border-white/40 dark:border-white/10 rounded-2xl p-2 min-w-[180px] shadow-2xl">
+                <div className="absolute left-full top-0 invisible group-hover/tools:visible opacity-0 group-hover/tools:opacity-100 transition-all duration-300 translate-x-3 group-hover/tools:translate-x-1 z-[100]">
+                  <div className="ml-2 glass-panel border border-white/40 dark:border-white/10 rounded-2xl p-2 min-w-[200px] shadow-2xl backdrop-blur-2xl">
                     <div className="px-3 py-2 mb-1 border-b border-white/10">
                       <p className="text-[10px] font-black uppercase tracking-widest text-[#4E6E49]">Инструменты</p>
                     </div>
