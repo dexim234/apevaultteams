@@ -1,6 +1,5 @@
 // Management page - main component for managing slots, days off, sick leave, and vacation
 import { useState, useEffect } from 'react'
-import { Layout } from '@/components/Layout'
 import { useThemeStore } from '@/store/themeStore'
 import { useAdminStore } from '@/store/adminStore'
 import { ManagementTable } from '@/components/Management/ManagementTable'
@@ -120,34 +119,34 @@ export const Management = () => {
     if (slotDate.getTime() === today.getTime()) {
       const now = getMoscowTime()
       const currentTime = now.getHours() * 60 + now.getMinutes() // minutes since midnight
-      
+
       // Check if any slot hasn't ended yet
       return slot.slots.some((s: any) => {
         // If slot crosses midnight (has endDate), check endDate instead
         if (s.endDate) {
           const endDate = new Date(s.endDate)
           endDate.setHours(0, 0, 0, 0)
-          
+
           // If endDate is in the future, slot is upcoming
           if (endDate > today) return true
-          
+
           // If endDate is today, check if end time hasn't passed
           if (endDate.getTime() === today.getTime()) {
             const [endHour, endMin] = s.end.split(':').map(Number)
             const endTime = endHour * 60 + endMin
             return endTime > currentTime
           }
-          
+
           return false
         }
-        
+
         // Regular same-day slot
         const [endHour, endMin] = s.end.split(':').map(Number)
         const endTime = endHour * 60 + endMin
         return endTime > currentTime
       })
     }
-    
+
     // Check if slot has endDate in the future or ends today but time hasn't passed
     const now = getMoscowTime()
     const currentTime = now.getHours() * 60 + now.getMinutes()
@@ -453,273 +452,263 @@ export const Management = () => {
 
 
   return (
-    <Layout>
-      <div className="space-y-5 sm:space-y-7">
-        {/* Hero */}
-        <div
-          id="schedule-overview"
-          className={`relative overflow-hidden ${sectionCardClass} p-5 sm:p-6 md:p-8 ${
-            theme === 'dark'
-              ? 'bg-gradient-to-br from-[#0e1b2c] via-[#0c1827] to-[#0a1420]'
-              : 'bg-gradient-to-br from-white via-emerald-50/40 to-sky-50'
+    <div className="space-y-5 sm:space-y-7">
+      {/* Hero */}
+      <div
+        id="schedule-overview"
+        className={`relative overflow-hidden ${sectionCardClass} p-5 sm:p-6 md:p-8 ${theme === 'dark'
+          ? 'bg-gradient-to-br from-[#0e1b2c] via-[#0c1827] to-[#0a1420]'
+          : 'bg-gradient-to-br from-white via-emerald-50/40 to-sky-50'
           }`}
-        >
-          <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute -top-32 -left-16 w-80 h-80 bg-gradient-to-br from-[#4E6E49]/18 via-sky-500/8 to-transparent blur-3xl" />
-            <div className="absolute top-0 right-0 w-[26rem] h-[26rem] bg-gradient-to-bl from-sky-400/14 via-emerald-400/12 to-transparent blur-3xl" />
-            <div className="absolute bottom-[-140px] left-14 w-80 h-80 bg-gradient-to-tr from-sky-300/12 via-[#4E6E49]/12 to-transparent blur-3xl" />
-          </div>
-          <div className="relative z-10 grid grid-cols-1 gap-5">
-            <div className={`${surfaceCardClass} backdrop-blur p-4 sm:p-5 space-y-4`}>
-              <div className="flex flex-col gap-4 sm:gap-5 lg:flex-row lg:items-center lg:justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="p-3 rounded-2xl bg-white/80 dark:bg-white/5 border border-white/40 dark:border-white/10 shadow-lg">
-                    <CalendarCheck className="w-6 h-6 text-[#4E6E49]" />
-                  </div>
-                  <div className="flex items-center">
-                    <h1 className={`text-xl sm:text-3xl font-extrabold leading-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                      <span className="sm:inline hidden">Расписание команды</span>
-                      <span className="sm:hidden inline">Расписание</span>
-                    </h1>
-                  </div>
+      >
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute -top-32 -left-16 w-80 h-80 bg-gradient-to-br from-[#4E6E49]/18 via-sky-500/8 to-transparent blur-3xl" />
+          <div className="absolute top-0 right-0 w-[26rem] h-[26rem] bg-gradient-to-bl from-sky-400/14 via-emerald-400/12 to-transparent blur-3xl" />
+          <div className="absolute bottom-[-140px] left-14 w-80 h-80 bg-gradient-to-tr from-sky-300/12 via-[#4E6E49]/12 to-transparent blur-3xl" />
+        </div>
+        <div className="relative z-10 grid grid-cols-1 gap-5">
+          <div className={`${surfaceCardClass} backdrop-blur p-4 sm:p-5 space-y-4`}>
+            <div className="flex flex-col gap-4 sm:gap-5 lg:flex-row lg:items-center lg:justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-3 rounded-2xl bg-white/80 dark:bg-white/5 border border-white/40 dark:border-white/10 shadow-lg">
+                  <CalendarCheck className="w-6 h-6 text-[#4E6E49]" />
+                </div>
+                <div className="flex items-center">
+                  <h1 className={`text-xl sm:text-3xl font-extrabold leading-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    <span className="sm:inline hidden">Расписание команды</span>
+                    <span className="sm:hidden inline">Расписание</span>
+                  </h1>
                 </div>
               </div>
+            </div>
 
-              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                {statCards.map((item) => {
-                  const tone = statToneMap[item.tone]
-                  return (
-                    <div
-                      key={item.label}
-                      className={`p-4 rounded-xl border-2 ${tone.border} ${tone.bg} shadow-sm space-y-2`}
-                    >
-                      <div className="flex items-start justify-between gap-3">
-                        <p className={`text-[11px] sm:text-xs font-semibold uppercase tracking-wide ${tone.text}`}>
-                          {item.label}
-                        </p>
-                        <span
-                          className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-semibold border ${tone.border} ${tone.text} ${
-                            theme === 'dark' ? 'bg-white/5' : 'bg-white/80'
-                          }`}
-                        >
-                          {item.icon}
-                        </span>
-                      </div>
-                      <p className={`text-lg sm:text-2xl font-extrabold ${headingColor}`}>
-                        {item.value}
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              {statCards.map((item) => {
+                const tone = statToneMap[item.tone]
+                return (
+                  <div
+                    key={item.label}
+                    className={`p-4 rounded-xl border-2 ${tone.border} ${tone.bg} shadow-sm space-y-2`}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <p className={`text-[11px] sm:text-xs font-semibold uppercase tracking-wide ${tone.text}`}>
+                        {item.label}
                       </p>
-                      <p className={`text-xs ${softTextColor}`}>{item.note}</p>
+                      <span
+                        className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-semibold border ${tone.border} ${tone.text} ${theme === 'dark' ? 'bg-white/5' : 'bg-white/80'
+                          }`}
+                      >
+                        {item.icon}
+                      </span>
                     </div>
-                  )
-                })}
-              </div>
+                    <p className={`text-lg sm:text-2xl font-extrabold ${headingColor}`}>
+                      {item.value}
+                    </p>
+                    <p className={`text-xs ${softTextColor}`}>{item.note}</p>
+                  </div>
+                )
+              })}
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Controls */}
-        <div
-          id="schedule-actions"
-          className={`${sectionCardClass} p-4 sm:p-5 space-y-5`}
-        >
-          <div className="space-y-3">
-            <div className="flex flex-wrap items-center gap-3 lg:justify-between">
-              <div className={`flex items-center gap-2 rounded-xl border ${theme === 'dark' ? 'border-gray-800 bg-gray-900/70' : 'border-gray-200 bg-gray-50'} px-1.5 py-1 shrink-0`}>
-                <button
-                  onClick={() => handleViewModeChange('table')}
-                  className={`px-3 sm:px-4 py-2 text-sm font-semibold flex items-center gap-2 transition-all rounded-lg ${
-                    viewMode === 'table'
-                      ? 'bg-[#4E6E49] text-white shadow-lg'
-                      : theme === 'dark' ? 'text-gray-300 hover:bg-gray-800' : 'text-gray-700 hover:bg-white'
+      {/* Controls */}
+      <div
+        id="schedule-actions"
+        className={`${sectionCardClass} p-4 sm:p-5 space-y-5`}
+      >
+        <div className="space-y-3">
+          <div className="flex flex-wrap items-center gap-3 lg:justify-between">
+            <div className={`flex items-center gap-2 rounded-xl border ${theme === 'dark' ? 'border-gray-800 bg-gray-900/70' : 'border-gray-200 bg-gray-50'} px-1.5 py-1 shrink-0`}>
+              <button
+                onClick={() => handleViewModeChange('table')}
+                className={`px-3 sm:px-4 py-2 text-sm font-semibold flex items-center gap-2 transition-all rounded-lg ${viewMode === 'table'
+                  ? 'bg-[#4E6E49] text-white shadow-lg'
+                  : theme === 'dark' ? 'text-gray-300 hover:bg-gray-800' : 'text-gray-700 hover:bg-white'
                   }`}
-                >
-                  <Table2 className="w-4 h-4" />
-                  Таблица
-                </button>
-                <button
-                  onClick={() => handleViewModeChange('week')}
-                  className={`px-3 sm:px-4 py-2 text-sm font-semibold flex items-center gap-2 transition-all rounded-lg ${
-                    viewMode === 'week'
-                      ? 'bg-[#4E6E49] text-white shadow-lg'
-                      : theme === 'dark' ? 'text-gray-300 hover:bg-gray-800' : 'text-gray-700 hover:bg-white'
+              >
+                <Table2 className="w-4 h-4" />
+                Таблица
+              </button>
+              <button
+                onClick={() => handleViewModeChange('week')}
+                className={`px-3 sm:px-4 py-2 text-sm font-semibold flex items-center gap-2 transition-all rounded-lg ${viewMode === 'week'
+                  ? 'bg-[#4E6E49] text-white shadow-lg'
+                  : theme === 'dark' ? 'text-gray-300 hover:bg-gray-800' : 'text-gray-700 hover:bg-white'
                   }`}
-                >
-                  <Calendar className="w-4 h-4" />
-                  Неделя
-                </button>
-              </div>
-
-              <div className="flex flex-wrap gap-2 shrink">
-                {[
-                  { key: 'all', label: 'Все', icon: <Calendar className="w-4 h-4" /> },
-                  { key: 'upcoming', label: 'Предстоящие', icon: <Clock className="w-4 h-4" /> },
-                  { key: 'completed', label: 'Завершённые', icon: <CalendarCheck className="w-4 h-4" /> },
-                ].map((f) => (
-                  <button
-                    key={f.key}
-                    onClick={() => setSlotFilter(f.key as SlotFilter)}
-                    className={`px-3 py-2 rounded-xl text-sm font-semibold flex items-center gap-2 transition-all border ${
-                      slotFilter === f.key
-                        ? 'bg-gradient-to-r from-[#4E6E49] to-emerald-600 text-white border-transparent shadow-lg'
-                        : theme === 'dark'
-                          ? 'border-gray-800 bg-gray-900/70 text-gray-200 hover:border-[#4E6E49]/40'
-                          : 'border-gray-200 bg-gray-50 text-gray-700 hover:border-[#4E6E49]/40'
-                    }`}
-                  >
-                    {f.icon}
-                    {f.label}
-                  </button>
-                ))}
-              </div>
+              >
+                <Calendar className="w-4 h-4" />
+                Неделя
+              </button>
             </div>
-          </div>
 
-          {/* Actions block */}
-          <div className={`${surfaceCardClass} p-3 sm:p-4 space-y-3`}>
-            <div className="flex items-center justify-between">
-              <p className={`text-sm font-semibold ${headingColor}`}>Действие</p>
-              <span className="text-[11px] uppercase tracking-wide text-gray-500 dark:text-gray-400">выбор задачи</span>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+            <div className="flex flex-wrap gap-2 shrink">
               {[
-                { key: 'add-slot', label: 'Добавить слот', desc: 'Разовое или серия', icon: <PlusCircle className="w-5 h-5" />, tone: 'bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-100 dark:border-emerald-800', action: handleAddSlot },
-                { key: 'delete-slots', label: 'Очистить расписание', desc: 'Удалить слоты/статусы', icon: <Trash2 className="w-5 h-5" />, tone: 'bg-rose-100 text-rose-800 border-rose-200 dark:bg-rose-900/30 dark:text-rose-100 dark:border-rose-800', action: handleDeleteSlots },
-                { key: 'absence', label: 'Добавить отсутствие', desc: 'Выходной, больничный, отпуск', icon: <Moon className="w-5 h-5" />, tone: 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-100 dark:border-blue-800', action: handleAddAbsence },
-                { key: 'restriction', label: 'Управление ограничениями', desc: 'Запретить создание записей', icon: <Shield className="w-5 h-5" />, tone: 'bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-900/30 dark:text-orange-100 dark:border-orange-800', action: handleManageRestrictions, adminOnly: true },
-                { key: 'conflicts', label: 'Конфликты пользователей', desc: 'Ограничения совместной работы', icon: <UserX className="w-5 h-5" />, tone: 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-100 dark:border-red-800', action: handleManageConflicts, adminOnly: true },
-                { key: 'access-blocks', label: 'Блокировка доступа', desc: 'Ограничение функций', icon: <ShieldX className="w-5 h-5" />, tone: 'bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/30 dark:text-purple-100 dark:border-purple-800', action: handleManageAccessBlocks, adminOnly: true },
-              ].filter(action => !action.adminOnly || isAdmin).map((action) => (
+                { key: 'all', label: 'Все', icon: <Calendar className="w-4 h-4" /> },
+                { key: 'upcoming', label: 'Предстоящие', icon: <Clock className="w-4 h-4" /> },
+                { key: 'completed', label: 'Завершённые', icon: <CalendarCheck className="w-4 h-4" /> },
+              ].map((f) => (
                 <button
-                  key={action.key}
-                  onClick={() => {
-                    action.action()
-                  }}
-                  className={`text-center rounded-xl border px-3 py-3 transition-all shadow-sm flex flex-col items-center gap-2 h-full ${
-                    `${action.tone} ring-2 ring-[#4E6E49]/50 shadow-lg`
-                  }`}
+                  key={f.key}
+                  onClick={() => setSlotFilter(f.key as SlotFilter)}
+                  className={`px-3 py-2 rounded-xl text-sm font-semibold flex items-center gap-2 transition-all border ${slotFilter === f.key
+                    ? 'bg-gradient-to-r from-[#4E6E49] to-emerald-600 text-white border-transparent shadow-lg'
+                    : theme === 'dark'
+                      ? 'border-gray-800 bg-gray-900/70 text-gray-200 hover:border-[#4E6E49]/40'
+                      : 'border-gray-200 bg-gray-50 text-gray-700 hover:border-[#4E6E49]/40'
+                    }`}
                 >
-                  <span className="p-2 rounded-lg bg-white/30">
-                    {action.icon}
-                  </span>
-                  <span className="flex flex-col whitespace-normal leading-snug gap-0.5 w-full">
-                    <span className="text-[13px] sm:text-sm font-semibold break-words leading-tight">{action.label}</span>
-                    <span className="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 break-words leading-tight">
-                      {action.desc}
-                    </span>
-                  </span>
+                  {f.icon}
+                  {f.label}
                 </button>
               ))}
             </div>
           </div>
+        </div>
 
-          <div className={`${surfaceCardClass} p-3 sm:p-4 space-y-2`}>
-            <p className={`text-sm font-semibold ${headingColor}`}>Members</p>
-            <div className="flex gap-2 overflow-x-auto pb-1">
+        {/* Actions block */}
+        <div className={`${surfaceCardClass} p-3 sm:p-4 space-y-3`}>
+          <div className="flex items-center justify-between">
+            <p className={`text-sm font-semibold ${headingColor}`}>Действие</p>
+            <span className="text-[11px] uppercase tracking-wide text-gray-500 dark:text-gray-400">выбор задачи</span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+            {[
+              { key: 'add-slot', label: 'Добавить слот', desc: 'Разовое или серия', icon: <PlusCircle className="w-5 h-5" />, tone: 'bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-100 dark:border-emerald-800', action: handleAddSlot },
+              { key: 'delete-slots', label: 'Очистить расписание', desc: 'Удалить слоты/статусы', icon: <Trash2 className="w-5 h-5" />, tone: 'bg-rose-100 text-rose-800 border-rose-200 dark:bg-rose-900/30 dark:text-rose-100 dark:border-rose-800', action: handleDeleteSlots },
+              { key: 'absence', label: 'Добавить отсутствие', desc: 'Выходной, больничный, отпуск', icon: <Moon className="w-5 h-5" />, tone: 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-100 dark:border-blue-800', action: handleAddAbsence },
+              { key: 'restriction', label: 'Управление ограничениями', desc: 'Запретить создание записей', icon: <Shield className="w-5 h-5" />, tone: 'bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-900/30 dark:text-orange-100 dark:border-orange-800', action: handleManageRestrictions, adminOnly: true },
+              { key: 'conflicts', label: 'Конфликты пользователей', desc: 'Ограничения совместной работы', icon: <UserX className="w-5 h-5" />, tone: 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-100 dark:border-red-800', action: handleManageConflicts, adminOnly: true },
+              { key: 'access-blocks', label: 'Блокировка доступа', desc: 'Ограничение функций', icon: <ShieldX className="w-5 h-5" />, tone: 'bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/30 dark:text-purple-100 dark:border-purple-800', action: handleManageAccessBlocks, adminOnly: true },
+            ].filter(action => !action.adminOnly || isAdmin).map((action) => (
               <button
-                onClick={() => setSelectedUserId(null)}
-                className={`px-3 py-2 rounded-xl text-sm font-semibold whitespace-nowrap border transition ${
-                  selectedUserId === null
-                    ? 'bg-gradient-to-r from-[#4E6E49] to-[#4E6E49] text-white border-transparent shadow-lg'
-                    : theme === 'dark'
+                key={action.key}
+                onClick={() => {
+                  action.action()
+                }}
+                className={`text-center rounded-xl border px-3 py-3 transition-all shadow-sm flex flex-col items-center gap-2 h-full ${`${action.tone} ring-2 ring-[#4E6E49]/50 shadow-lg`
+                  }`}
+              >
+                <span className="p-2 rounded-lg bg-white/30">
+                  {action.icon}
+                </span>
+                <span className="flex flex-col whitespace-normal leading-snug gap-0.5 w-full">
+                  <span className="text-[13px] sm:text-sm font-semibold break-words leading-tight">{action.label}</span>
+                  <span className="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 break-words leading-tight">
+                    {action.desc}
+                  </span>
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className={`${surfaceCardClass} p-3 sm:p-4 space-y-2`}>
+          <p className={`text-sm font-semibold ${headingColor}`}>Members</p>
+          <div className="flex gap-2 overflow-x-auto pb-1">
+            <button
+              onClick={() => setSelectedUserId(null)}
+              className={`px-3 py-2 rounded-xl text-sm font-semibold whitespace-nowrap border transition ${selectedUserId === null
+                ? 'bg-gradient-to-r from-[#4E6E49] to-[#4E6E49] text-white border-transparent shadow-lg'
+                : theme === 'dark'
+                  ? 'bg-gray-900/70 border-gray-800 text-gray-200 hover:border-[#4E6E49]/40'
+                  : 'bg-gray-50 border-gray-200 text-gray-700 hover:border-[#4E6E49]/40'
+                }`}
+            >
+              Все Members
+            </button>
+            {TEAM_MEMBERS.map((member) => (
+              <button
+                key={member.id}
+                onClick={() => setSelectedUserId(member.id)}
+                className={`px-3 py-2 rounded-xl text-sm font-semibold whitespace-nowrap border transition flex items-center gap-2 ${selectedUserId === member.id
+                  ? 'bg-gradient-to-r from-[#4E6E49] to-[#4E6E49] text-white border-transparent shadow-lg'
+                  : theme === 'dark'
                     ? 'bg-gray-900/70 border-gray-800 text-gray-200 hover:border-[#4E6E49]/40'
                     : 'bg-gray-50 border-gray-200 text-gray-700 hover:border-[#4E6E49]/40'
-                }`}
-              >
-                Все Members
-              </button>
-              {TEAM_MEMBERS.map((member) => (
-                <button
-                  key={member.id}
-                  onClick={() => setSelectedUserId(member.id)}
-                  className={`px-3 py-2 rounded-xl text-sm font-semibold whitespace-nowrap border transition flex items-center gap-2 ${
-                    selectedUserId === member.id
-                      ? 'bg-gradient-to-r from-[#4E6E49] to-[#4E6E49] text-white border-transparent shadow-lg'
-                      : theme === 'dark'
-                      ? 'bg-gray-900/70 border-gray-800 text-gray-200 hover:border-[#4E6E49]/40'
-                      : 'bg-gray-50 border-gray-200 text-gray-700 hover:border-[#4E6E49]/40'
                   }`}
-                >
-                  <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-gradient-to-br from-[#4E6E49]/30 to-blue-500/30 text-xs font-bold">
-                    {(nicknameMap[member.id] || member.name).charAt(0)}
-                  </span>
-                  {nicknameMap[member.id] || member.name}
-                </button>
-              ))}
-            </div>
+              >
+                <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-gradient-to-br from-[#4E6E49]/30 to-blue-500/30 text-xs font-bold">
+                  {(nicknameMap[member.id] || member.name).charAt(0)}
+                </span>
+                {nicknameMap[member.id] || member.name}
+              </button>
+            ))}
           </div>
         </div>
-
-        {/* Content view */}
-        <div id="schedule-view" className={contentCardClass}>
-          <div className={`${surfaceCardClass} p-4 sm:p-5 flex flex-col gap-4`}>
-            <div className="flex items-center justify-between flex-wrap gap-2 text-left">
-              <div className="text-left">
-                <p className={`text-sm sm:text-base font-semibold ${headingColor}`}>Расписание</p>
-                <p className={`text-xs sm:text-sm ${labelColor}`}>Слоты и статусы за выбранную неделю</p>
-              </div>
-            </div>
-
-            {viewMode === 'table' ? (
-              <ManagementWeekView
-                selectedUserId={selectedUserId}
-                slotFilter={slotFilter}
-                refreshKey={refreshKey}
-                onEditSlot={handleEditSlot}
-                onEditStatus={handleEditStatus}
-              />
-            ) : (
-              <ManagementTable
-                selectedUserId={selectedUserId}
-                slotFilter={slotFilter}
-                refreshKey={refreshKey}
-                onEditSlot={handleEditSlot}
-                onEditStatus={handleEditStatus}
-              />
-            )}
-          </div>
-        </div>
-
-        {/* Forms */}
-        {showSlotForm && (
-          <SlotForm
-            slot={editingSlot}
-            onClose={handleFormClose}
-            onSave={handleFormClose}
-          />
-        )}
-
-        {showDeleteSlotsForm && (
-          <DeleteSlotsForm
-            onClose={handleFormClose}
-            onSave={handleFormClose}
-          />
-        )}
-
-        {showStatusForm && (
-          <DayStatusForm
-            type={statusType || undefined}
-            status={editingStatus}
-            onClose={handleFormClose}
-            onSave={handleFormClose}
-          />
-        )}
-
-        {showRestrictionForm && (
-          <RestrictionForm
-            onClose={handleFormClose}
-            onSave={handleFormClose}
-          />
-        )}
-
-        {showConflictsForm && (
-          <UserConflictsForm onClose={() => setShowConflictsForm(false)} />
-        )}
-
-        {showAccessBlocksForm && (
-          <AccessBlocksForm onClose={() => setShowAccessBlocksForm(false)} />
-        )}
       </div>
-    </Layout>
+
+      {/* Content view */}
+      <div id="schedule-view" className={contentCardClass}>
+        <div className={`${surfaceCardClass} p-4 sm:p-5 flex flex-col gap-4`}>
+          <div className="flex items-center justify-between flex-wrap gap-2 text-left">
+            <div className="text-left">
+              <p className={`text-sm sm:text-base font-semibold ${headingColor}`}>Расписание</p>
+              <p className={`text-xs sm:text-sm ${labelColor}`}>Слоты и статусы за выбранную неделю</p>
+            </div>
+          </div>
+
+          {viewMode === 'table' ? (
+            <ManagementWeekView
+              selectedUserId={selectedUserId}
+              slotFilter={slotFilter}
+              refreshKey={refreshKey}
+              onEditSlot={handleEditSlot}
+              onEditStatus={handleEditStatus}
+            />
+          ) : (
+            <ManagementTable
+              selectedUserId={selectedUserId}
+              slotFilter={slotFilter}
+              refreshKey={refreshKey}
+              onEditSlot={handleEditSlot}
+              onEditStatus={handleEditStatus}
+            />
+          )}
+        </div>
+      </div>
+
+      {/* Forms */}
+      {showSlotForm && (
+        <SlotForm
+          slot={editingSlot}
+          onClose={handleFormClose}
+          onSave={handleFormClose}
+        />
+      )}
+
+      {showDeleteSlotsForm && (
+        <DeleteSlotsForm
+          onClose={handleFormClose}
+          onSave={handleFormClose}
+        />
+      )}
+
+      {showStatusForm && (
+        <DayStatusForm
+          type={statusType || undefined}
+          status={editingStatus}
+          onClose={handleFormClose}
+          onSave={handleFormClose}
+        />
+      )}
+
+      {showRestrictionForm && (
+        <RestrictionForm
+          onClose={handleFormClose}
+          onSave={handleFormClose}
+        />
+      )}
+
+      {showConflictsForm && (
+        <UserConflictsForm onClose={() => setShowConflictsForm(false)} />
+      )}
+
+      {showAccessBlocksForm && (
+        <AccessBlocksForm onClose={() => setShowAccessBlocksForm(false)} />
+      )}
+    </div>
   )
 }
 

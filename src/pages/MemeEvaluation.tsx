@@ -1,5 +1,4 @@
 import { useEffect } from 'react'
-import { Layout } from '@/components/Layout'
 import { useThemeStore } from '@/store/themeStore'
 import { TrendingUp, Target, ShieldCheck, AlertTriangle, Rocket, DollarSign, Home, Clock, CheckCircle, Search } from 'lucide-react'
 
@@ -171,7 +170,7 @@ export const MemeEvaluation = () => {
   }, [])
 
   return (
-    <Layout>
+    <>
       <div className="space-y-6">
         {/* Header */}
         <div className={`relative overflow-hidden rounded-3xl border ${headerBorder} ${headerShadow} ${headerBg}`}>
@@ -193,14 +192,13 @@ export const MemeEvaluation = () => {
                       Полный чек-лист проверки мемкоина. Систематический анализ для безопасного входа.
                     </p>
                     <div className="flex flex-wrap gap-2">
-                      {['Базовые метрики','Бандлы','Сообщество','DEV анализ'].map((chip, idx) => (
+                      {['Базовые метрики', 'Бандлы', 'Сообщество', 'DEV анализ'].map((chip, idx) => (
                         <span
                           key={chip}
-                          className={`px-4 py-1.5 rounded-full text-xs font-semibold border ${
-                            idx === 0
-                              ? 'bg-emerald-500 text-white border-emerald-300/60 shadow-md'
-                              : `${chipBg} ${chipText} border-gray-300`
-                          }`}
+                          className={`px-4 py-1.5 rounded-full text-xs font-semibold border ${idx === 0
+                            ? 'bg-emerald-500 text-white border-emerald-300/60 shadow-md'
+                            : `${chipBg} ${chipText} border-gray-300`
+                            }`}
                         >
                           {chip}
                         </span>
@@ -678,16 +676,16 @@ export const MemeEvaluation = () => {
                 <p className={`text-sm ${subTextColor}`}>завершено</p>
               </div>
 
-            <div className={`w-full h-8 ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-200'} rounded-full overflow-hidden border ${theme === 'dark' ? 'border-white/10' : 'border-gray-300'}`}>
-              <div
-                id="meme-progress-fill"
-                className="h-full bg-gradient-to-r from-[#4E6E49] to-[#6b8f5f] transition-all duration-800 ease-out relative"
-              >
-                <div className="absolute right-3 top-1/2 -translate-y-1/2 text-white text-sm opacity-0 animate-pulse">
-                  🐊
+              <div className={`w-full h-8 ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-200'} rounded-full overflow-hidden border ${theme === 'dark' ? 'border-white/10' : 'border-gray-300'}`}>
+                <div
+                  id="meme-progress-fill"
+                  className="h-full bg-gradient-to-r from-[#4E6E49] to-[#6b8f5f] transition-all duration-800 ease-out relative"
+                >
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2 text-white text-sm opacity-0 animate-pulse">
+                    🐊
+                  </div>
                 </div>
               </div>
-            </div>
 
               <div className="flex items-center justify-between text-center">
                 <div className="flex-1">
@@ -739,6 +737,6 @@ export const MemeEvaluation = () => {
           color: white;
         }
       `}</style>
-    </Layout>
+    </>
   )
 }

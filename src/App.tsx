@@ -21,6 +21,8 @@ import { ProtectedRoute } from './components/ProtectedRoute'
 import { AccessBlockScreen } from './components/AccessBlockScreen'
 import { cleanupOldData } from './services/firestoreService'
 
+import { AppLayout } from './components/AppLayout'
+
 function App() {
   const { isAuthenticated } = useAuthStore()
   const { isAdmin } = useAdminStore()
@@ -49,95 +51,107 @@ function App() {
             )
           }
         />
-        <Route
-          path="/call"
-          element={
-            <ProtectedRoute>
-              <CallPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/management"
-          element={
-            <ProtectedRoute>
-              <Management />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/earnings"
-          element={
-            <ProtectedRoute>
-              <Earnings />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/rating"
-          element={
-            <ProtectedRoute>
-              <Rating />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/tasks"
-          element={
-            <ProtectedRoute>
-              <Tasks />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/about"
-          element={
-            <ProtectedRoute>
-              <About />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="/rules" element={<Rules />} />
-        <Route
-          path="/approvals"
-          element={
-            <ProtectedRoute>
-              <Approvals />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/admin"
-          element={
-            <ProtectedRoute>
-              <Admin />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute>
-              <Profile />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/meme-evaluation"
-          element={
-            <ProtectedRoute>
-              <MemeEvaluation />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/ai-ao-alerts"
-          element={
-            <ProtectedRoute>
-              <AiAoAlerts />
-            </ProtectedRoute>
-          }
-        />
+
+        {/* Layout wrapper for all pages with navigation */}
+        <Route element={<AppLayout />}>
+          <Route
+            path="/call"
+            element={
+              <ProtectedRoute>
+                <CallPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/management"
+            element={
+              <ProtectedRoute>
+                <Management />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/earnings"
+            element={
+              <ProtectedRoute>
+                <Earnings />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/rating"
+            element={
+              <ProtectedRoute>
+                <Rating />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/tasks"
+            element={
+              <ProtectedRoute>
+                <Tasks />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/about"
+            element={
+              <ProtectedRoute>
+                <About />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/rules"
+            element={
+              <ProtectedRoute>
+                <Rules />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/approvals"
+            element={
+              <ProtectedRoute>
+                <Approvals />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute>
+                <Admin />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/meme-evaluation"
+            element={
+              <ProtectedRoute>
+                <MemeEvaluation />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/ai-ao-alerts"
+            element={
+              <ProtectedRoute>
+                <AiAoAlerts />
+              </ProtectedRoute>
+            }
+          />
+        </Route>
+
         <Route path="/" element={<Navigate to={(isAuthenticated || isAdmin) ? "/management" : "/login"} replace />} />
       </Routes>
     </BrowserRouter>

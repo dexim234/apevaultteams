@@ -1,7 +1,6 @@
 // Signals HUB page redesigned for multi-domain signals
 import { useState, useEffect, useMemo, type JSX } from 'react'
 import { useThemeStore } from '@/store/themeStore'
-import { Layout } from '@/components/Layout'
 import { CallForm } from '@/components/Call/CallForm'
 import { getCalls, deleteCall, updateCall } from '@/services/firestoreService'
 import type { Call, CallCategory, CallRiskLevel } from '@/types'
@@ -539,367 +538,365 @@ export const CallPage = () => {
 
 
   return (
-    <Layout>
-      <div className="space-y-10 pb-20">
-        {/* Hero */}
-        <div
-          className={`relative overflow-hidden ${sectionCardClass} p-5 sm:p-6 md:p-8 ${theme === 'dark'
-            ? 'bg-gradient-to-br from-[#0e1b2c] via-[#0c1827] to-[#0a1420]'
-            : 'bg-gradient-to-br from-white via-emerald-50/40 to-sky-50'
-            }`}
-        >
-          <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute -top-32 -left-16 w-80 h-80 bg-gradient-to-br from-[#4E6E49]/18 via-sky-500/8 to-transparent blur-3xl" />
-            <div className="absolute top-0 right-0 w-[26rem] h-[26rem] bg-gradient-to-bl from-sky-400/14 via-emerald-400/12 to-transparent blur-3xl" />
-            <div className="absolute bottom-[-140px] left-14 w-80 h-80 bg-gradient-to-tr from-sky-300/12 via-[#4E6E49]/12 to-transparent blur-3xl" />
-          </div>
-          <div className="relative z-10 grid grid-cols-1 gap-5">
-            <div className={`${surfaceCardClass} backdrop-blur p-4 sm:p-5 space-y-4`}>
-              <div className="flex flex-col gap-4 sm:gap-5 lg:flex-row lg:items-center lg:justify-between">
-                <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
-                  <div className="hidden sm:block p-3 rounded-2xl bg-white/80 dark:bg-white/5 border border-white/40 dark:border-white/10 shadow-lg">
-                    <CalendarCheck className="w-6 h-6 text-[#4E6E49]" />
-                  </div>
-                  <div className="flex items-center text-center sm:text-left w-full sm:w-auto justify-center sm:justify-start">
-                    <h1 className={`text-xl sm:text-3xl font-extrabold leading-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                      Signals HUB
-                    </h1>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+    <div className="space-y-10 pb-20">
+      {/* Hero */}
+      <div
+        className={`relative overflow-hidden ${sectionCardClass} p-5 sm:p-6 md:p-8 ${theme === 'dark'
+          ? 'bg-gradient-to-br from-[#0e1b2c] via-[#0c1827] to-[#0a1420]'
+          : 'bg-gradient-to-br from-white via-emerald-50/40 to-sky-50'
+          }`}
+      >
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute -top-32 -left-16 w-80 h-80 bg-gradient-to-br from-[#4E6E49]/18 via-sky-500/8 to-transparent blur-3xl" />
+          <div className="absolute top-0 right-0 w-[26rem] h-[26rem] bg-gradient-to-bl from-sky-400/14 via-emerald-400/12 to-transparent blur-3xl" />
+          <div className="absolute bottom-[-140px] left-14 w-80 h-80 bg-gradient-to-tr from-sky-300/12 via-[#4E6E49]/12 to-transparent blur-3xl" />
         </div>
-
-        {/* Category mini-cards (坐在灰色背景上) */}
-        <div className={`${sectionCardClass} shadow-2xl relative overflow-hidden p-6 sm:p-8`}>
-          <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
-          <div className="relative z-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {(Object.keys(CATEGORY_META) as CallCategory[]).map((cat) => {
-              const meta = CATEGORY_META[cat]
-              const stats = categoryStats[cat]
-              const tone = categoryTone[cat]
-              return (
-                <button
-                  key={cat}
-                  onClick={() => { setFormCategory(cat); setEditingCall(null); setShowForm(true) }}
-                  className={`p-5 rounded-[1.5rem] border-2 ${tone.border} ${tone.bg} text-left shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 space-y-3 group/card relative overflow-hidden`}
-                >
-                  <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity" />
-                  <div className="flex items-start justify-between gap-3 relative z-10">
-                    <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-bold ${tone.text} bg-white/10 border border-white/10 backdrop-blur-md`}>
-                      {meta.icon}
-                      <span>{meta.label}</span>
-                    </div>
-                    <span className={`px-2.5 py-1 rounded-lg text-[10px] font-bold border ${tone.border} ${tone.text} ${theme === 'dark' ? 'bg-black/20' : 'bg-white/50'} group-hover/card:bg-[#4E6E49] group-hover/card:text-white group-hover/card:border-transparent transition-all`}>
-                      Добавить
-                    </span>
-                  </div>
-                  <div className="pl-1 relative z-10">
-                    <p className={`text-3xl font-black ${textColor} leading-none mb-1 group-hover/card:scale-105 transition-transform origin-left`}>{stats?.total || 0}</p>
-                    <p className={`text-[10px] uppercase tracking-wider font-bold ${subtleColor} opacity-80`}>Всего сигналов • Активных {stats?.active || 0}</p>
-                  </div>
-                </button>
-              )
-            })}
-          </div>
-        </div>
-
-        {/* Filters + analytics */}
-        <div className={`${sectionCardClass} !p-0 shadow-2xl`}>
-          <div className="p-6 sm:p-8 space-y-8">
-            <div className="flex flex-col gap-3">
-              <div className="flex flex-wrap items-center gap-3">
-                <div className="flex items-center gap-2 text-sm font-semibold">
-                  <Filter className={`w-4 h-4 ${subtleColor}`} />
-                  <span className={textColor}>Фильтры</span>
+        <div className="relative z-10 grid grid-cols-1 gap-5">
+          <div className={`${surfaceCardClass} backdrop-blur p-4 sm:p-5 space-y-4`}>
+            <div className="flex flex-col gap-4 sm:gap-5 lg:flex-row lg:items-center lg:justify-between">
+              <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+                <div className="hidden sm:block p-3 rounded-2xl bg-white/80 dark:bg-white/5 border border-white/40 dark:border-white/10 shadow-lg">
+                  <CalendarCheck className="w-6 h-6 text-[#4E6E49]" />
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  {(Object.keys(statusLabels) as StatusFilter[]).map((status) => (
-                    <button
-                      key={status}
-                      onClick={() => setStatusFilter(status)}
-                      className={`px-3 py-1.5 rounded-xl text-sm font-semibold transition-all ${statusFilter === status ? pillActive : pillInactive
-                        }`}
-                    >
-                      {statusLabels[status].label}
-                    </button>
-                  ))}
+                <div className="flex items-center text-center sm:text-left w-full sm:w-auto justify-center sm:justify-start">
+                  <h1 className={`text-xl sm:text-3xl font-extrabold leading-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    Signals HUB
+                  </h1>
                 </div>
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <label className={`text-xs uppercase tracking-wider ${subtleColor} flex items-center gap-2`}>
-                  <Search className="w-4 h-4" />
-                  Поиск по всем сферам <span className="text-[11px] text-gray-500 dark:text-gray-400">{filteredCalls.length}/{calls.length}</span>
-                </label>
-                <input
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="тикер, событие, сеть, причина..."
-                  className={`w-full px-3 py-2 rounded-xl border ${borderColor} ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-50'} ${textColor} focus:outline-none focus:ring-2 focus:ring-[#4E6E49]/60`}
-                />
-              </div>
-
-              <div className="flex flex-wrap items-center gap-2">
-                <span className={`text-xs ${subtleColor} uppercase tracking-wider`}>Сфера:</span>
-                <button
-                  onClick={() => setCategoryFilter('all')}
-                  className={`px-3 py-1.5 rounded-full text-sm font-semibold border ${categoryFilter === 'all' ? pillActive : pillInactive}`}
-                >
-                  Все
-                </button>
-                {(Object.keys(CATEGORY_META) as CallCategory[]).map((cat) => (
-                  <button
-                    key={cat}
-                    onClick={() => setCategoryFilter(categoryFilter === cat ? 'all' : cat)}
-                    className={`px-3 py-1.5 rounded-full text-sm font-semibold border ${categoryFilter === cat ? pillActive : pillInactive}`}
-                  >
-                    {CATEGORY_META[cat].label}
-                  </button>
-                ))}
-              </div>
-
-              <div className="flex flex-wrap items-center gap-2">
-                <span className={`text-xs ${subtleColor} uppercase tracking-wider`}>Риск:</span>
-                {(['all', 'low', 'medium', 'high', 'ultra'] as RiskFilter[]).map((risk) => (
-                  <button
-                    key={risk}
-                    onClick={() => setRiskFilter(risk)}
-                    className={`px-3 py-1.5 rounded-full text-sm font-semibold border ${riskFilter === risk ? pillActive : pillInactive}`}
-                  >
-                    {risk === 'all' ? 'Все' : risk}
-                  </button>
-                ))}
-              </div>
-
-              <div className="flex flex-wrap items-center gap-3">
-                <span className={`text-xs ${subtleColor} uppercase tracking-wider`}>Трейдер:</span>
-                <select
-                  value={traderFilter}
-                  onChange={(e) => setTraderFilter(e.target.value)}
-                  className={`px-3 py-2 rounded-lg border ${borderColor} ${theme === 'dark' ? 'bg-gray-800 text-white' : 'bg-gray-50 text-gray-900'} text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50`}
-                >
-                  <option value="all">Все трейдеры</option>
-                  {TEAM_MEMBERS.map((t) => (
-                    <option key={t.id} value={t.id}>{t.name}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                {renderQuickStat('Всего сигналов', totals.total, textColor)}
-                {renderQuickStat('Активных', totals.active, 'text-emerald-500')}
-                {renderQuickStat('Завершено', totals.completed, 'text-blue-500')}
-                {renderQuickStat('High risk', totals.highRisk, 'text-amber-500')}
               </div>
             </div>
           </div>
-
-          {/* Form Modal */}
-          {showForm && (
-            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[70] flex items-start sm:items-center justify-center p-4 overflow-y-auto">
-              <div className={`${bgColor} rounded-2xl shadow-2xl border ${borderColor} max-w-3xl w-full max-h-[90vh] overflow-hidden`}>
-                <div className="flex flex-col h-full">
-                  <div className={`p-6 flex items-center justify-between sticky top-0 z-20 ${bgColor} border-b ${borderColor} shadow-sm`}>
-                    <h2 className={`text-2xl font-bold ${textColor}`}>{editingCall ? 'Редактировать сигнал' : 'Создать сигнал'}</h2>
-                    <button
-                      onClick={handleCancel}
-                      className={`p-2 rounded-xl ${theme === 'dark' ? 'hover:bg-gray-800' : 'hover:bg-gray-100'}`}
-                    >
-                      <X className={`w-5 h-5 ${subtleColor}`} />
-                    </button>
-                  </div>
-                  <div className="px-6 pb-6 pt-2 overflow-y-auto flex-1 max-h-[75vh]">
-                    <CallForm
-                      callToEdit={editingCall}
-                      onSuccess={handleSuccess}
-                      onCancel={handleCancel}
-                      initialCategory={formCategory}
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Delete Confirmation Modal */}
-          {showDeleteModal && (
-            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[70] flex items-start sm:items-center justify-center p-4 overflow-y-auto overscroll-contain">
-              <div className={`${bgColor} rounded-2xl shadow-2xl border ${borderColor} max-w-md w-full`}>
-                <div className="p-6 space-y-4">
-                  <div className="flex items-center gap-3">
-                    <AlertTriangle className="w-6 h-6 text-red-500" />
-                    <div>
-                      <h3 className={`text-xl font-bold ${textColor}`}>Удалить сигнал?</h3>
-                      <p className={subtleColor}>Это действие нельзя отменить</p>
-                    </div>
-                  </div>
-                  <div className="flex gap-3">
-                    <button
-                      onClick={() => { setShowDeleteModal(false); setDeleteCallId(null) }}
-                      className={`flex-1 px-4 py-3 rounded-xl border ${borderColor} ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}
-                    >
-                      Отмена
-                    </button>
-                    <button
-                      onClick={handleDeleteConfirm}
-                      className="flex-1 px-4 py-3 rounded-xl bg-red-600 text-white font-semibold hover:bg-red-700"
-                    >
-                      Удалить
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Cancel Confirmation Modal */}
-          {cancelCallId && (
-            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[70] flex items-start sm:items-center justify-center p-4 overflow-y-auto overscroll-contain">
-              <div className={`${bgColor} rounded-2xl shadow-2xl border ${borderColor} max-w-md w-full`}>
-                <div className="p-6 space-y-4">
-                  <div className="flex items-center gap-3">
-                    <AlertTriangle className="w-6 h-6 text-amber-500" />
-                    <div>
-                      <h3 className={`text-xl font-bold ${textColor}`}>Отменить сигнал?</h3>
-                      <p className={subtleColor}>Статус станет «Отменен», запись останется в списке.</p>
-                    </div>
-                  </div>
-                  <div className="flex gap-3">
-                    <button
-                      onClick={() => setCancelCallId(null)}
-                      className={`flex-1 px-4 py-3 rounded-xl border ${borderColor} ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}
-                    >
-                      Отмена
-                    </button>
-                    <button
-                      onClick={handleCancelConfirm}
-                      className="flex-1 px-4 py-3 rounded-xl bg-amber-500 text-white font-semibold hover:bg-amber-600"
-                    >
-                      Отменить
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Calls List */}
-          {!showForm && (
-            <>
-              {loading ? (
-                <div className={`${bgColor} rounded-2xl p-12 text-center ${borderColor} border shadow-xl`}>
-                  <div className="animate-spin rounded-full h-14 w-14 border-4 border-[#4E6E49] border-t-transparent mx-auto mb-4"></div>
-                  <p className={`${subtleColor} text-lg`}>Загрузка сигналов...</p>
-                </div>
-              ) : calls.length === 0 ? (
-                <div className={`${bgColor} rounded-[2rem] p-16 text-center ${borderColor} border-2 shadow-2xl backdrop-blur-sm relative overflow-hidden group`}>
-                  <div className="absolute inset-0 bg-gradient-to-br from-[#4E6E49]/5 via-transparent to-emerald-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <Sparkles className={`w-20 h-20 mx-auto mb-6 ${subtleColor} animate-pulse`} />
-                  <p className={`text-2xl font-black ${textColor} mb-2`}>Пока пусто</p>
-                  <p className={`${subtleColor} text-lg`}>Создайте первый сигнал в новой структуре</p>
-                </div>
-              ) : filteredCalls.length === 0 ? (
-                <div className={`${bgColor} rounded-2xl p-12 text-center ${borderColor} border shadow-xl`}>
-                  <Sparkles className={`w-16 h-16 mx-auto mb-4 ${subtleColor}`} />
-                  <p className={`text-xl font-bold ${textColor}`}>Нет совпадений</p>
-                  <p className={subtleColor}>Сигналы есть ({calls.length}), но фильтр ничего не нашел.</p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 px-4 py-2">
-                  {filteredCalls.map((call) => {
-                    const meta = CATEGORY_META[call.category]
-                    const statusMeta = statusLabels[call.status as StatusFilter] || statusLabels.active
-                    const riskLevel = getRiskLevel(call)
-                    const details = getDetails(call)
-                    const trader = TEAM_MEMBERS.find(t => t.id === call.userId)
-                    const keyCopyValue = details.ticker || details.pair || details.coin || getPrimaryTitle(call)
-                    const createdDate = new Date(call.createdAt).toLocaleDateString('ru-RU', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
-                    const tone = categoryTone[call.category]
-
-                    return (
-                      <div
-                        key={call.id}
-                        className={`rounded-3xl border-2 shadow-xl overflow-hidden transition-all hover:-translate-y-1 ${tone.border} ${tone.bg}`}
-                      >
-                        <div className={`px-5 py-4 flex flex-wrap items-center justify-between gap-3 border-b ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-white/70 bg-white/70'
-                          }`}>
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <span className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold border ${tone.border} ${tone.chipBg || ''} ${tone.text}`}>
-                              {meta.icon}
-                              {meta.label}
-                            </span>
-                            <span className={`px-3 py-1.5 rounded-full text-xs font-semibold ${statusMeta.className}`}>{statusMeta.label}</span>
-                            <span className={`px-3 py-1.5 rounded-full text-xs font-semibold ${riskBadges[riskLevel]}`}>Риск: {riskLevel}</span>
-                          </div>
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <div className={`px-3 py-1.5 rounded-xl text-xs font-semibold border ${theme === 'dark' ? 'bg-gray-800/70 text-gray-200 border-white/10' : 'bg-white text-gray-700 border-gray-200'
-                              }`}>
-                              <span className="opacity-70">Создано </span>{createdDate}
-                            </div>
-                            {trader && (
-                              <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-white/10 bg-black/5 dark:bg-white/5">
-                                <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[#4E6E49] to-emerald-600 text-white flex items-center justify-center text-sm font-bold">
-                                  {trader.name[0]}
-                                </div>
-                                <span className={`text-xs ${subtleColor}`}>{trader.name}</span>
-                              </div>
-                            )}
-                            <div className="flex items-center gap-1">
-                              <button
-                                onClick={() => handleEdit(call)}
-                                className={`p-2 rounded-lg ${theme === 'dark' ? 'hover:bg-gray-800' : 'hover:bg-gray-100'}`}
-                              >
-                                <Edit className="w-4 h-4" />
-                              </button>
-                              {call.status !== 'cancelled' && (
-                                <button
-                                  onClick={() => setCancelCallId(call.id)}
-                                  className={`p-2 rounded-lg ${theme === 'dark' ? 'hover:bg-gray-800' : 'hover:bg-gray-100'}`}
-                                >
-                                  <X className="w-4 h-4 text-amber-500" />
-                                </button>
-                              )}
-                              <button
-                                onClick={() => handleDeleteClick(call.id)}
-                                className={`p-2 rounded-lg ${theme === 'dark' ? 'hover:bg-gray-800' : 'hover:bg-gray-100'}`}
-                              >
-                                <Trash2 className="w-4 h-4 text-red-500" />
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="p-5 space-y-5">
-                          <div className="grid md:grid-cols-[1.15fr_auto] gap-4 items-start">
-                            <div className="space-y-1">
-                              <p className={`text-2xl font-bold ${textColor}`}>{getPrimaryTitle(call)}</p>
-                              <p className={`text-sm ${subtleColor}`}>{getSecondary(call)}</p>
-                            </div>
-                            <div className="flex flex-wrap gap-2 justify-end">
-                              <button
-                                onClick={() => copyValue(keyCopyValue)}
-                                className={`p-2 rounded-xl border ${borderColor} ${theme === 'dark' ? 'hover:bg-gray-800 bg-white/5' : 'hover:bg-gray-100 bg-white'} transition-colors`}
-                                title="Копировать"
-                              >
-                                {copiedValue === keyCopyValue ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
-                              </button>
-                            </div>
-                          </div>
-
-                          {renderCategoryMetrics(call)}
-
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              )}
-            </>
-          )}
         </div>
       </div>
-    </Layout>
+
+      {/* Category mini-cards (坐在灰色背景上) */}
+      <div className={`${sectionCardClass} shadow-2xl relative overflow-hidden p-6 sm:p-8`}>
+        <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
+        <div className="relative z-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {(Object.keys(CATEGORY_META) as CallCategory[]).map((cat) => {
+            const meta = CATEGORY_META[cat]
+            const stats = categoryStats[cat]
+            const tone = categoryTone[cat]
+            return (
+              <button
+                key={cat}
+                onClick={() => { setFormCategory(cat); setEditingCall(null); setShowForm(true) }}
+                className={`p-5 rounded-[1.5rem] border-2 ${tone.border} ${tone.bg} text-left shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 space-y-3 group/card relative overflow-hidden`}
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity" />
+                <div className="flex items-start justify-between gap-3 relative z-10">
+                  <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-bold ${tone.text} bg-white/10 border border-white/10 backdrop-blur-md`}>
+                    {meta.icon}
+                    <span>{meta.label}</span>
+                  </div>
+                  <span className={`px-2.5 py-1 rounded-lg text-[10px] font-bold border ${tone.border} ${tone.text} ${theme === 'dark' ? 'bg-black/20' : 'bg-white/50'} group-hover/card:bg-[#4E6E49] group-hover/card:text-white group-hover/card:border-transparent transition-all`}>
+                    Добавить
+                  </span>
+                </div>
+                <div className="pl-1 relative z-10">
+                  <p className={`text-3xl font-black ${textColor} leading-none mb-1 group-hover/card:scale-105 transition-transform origin-left`}>{stats?.total || 0}</p>
+                  <p className={`text-[10px] uppercase tracking-wider font-bold ${subtleColor} opacity-80`}>Всего сигналов • Активных {stats?.active || 0}</p>
+                </div>
+              </button>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* Filters + analytics */}
+      <div className={`${sectionCardClass} !p-0 shadow-2xl`}>
+        <div className="p-6 sm:p-8 space-y-8">
+          <div className="flex flex-col gap-3">
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="flex items-center gap-2 text-sm font-semibold">
+                <Filter className={`w-4 h-4 ${subtleColor}`} />
+                <span className={textColor}>Фильтры</span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {(Object.keys(statusLabels) as StatusFilter[]).map((status) => (
+                  <button
+                    key={status}
+                    onClick={() => setStatusFilter(status)}
+                    className={`px-3 py-1.5 rounded-xl text-sm font-semibold transition-all ${statusFilter === status ? pillActive : pillInactive
+                      }`}
+                  >
+                    {statusLabels[status].label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label className={`text-xs uppercase tracking-wider ${subtleColor} flex items-center gap-2`}>
+                <Search className="w-4 h-4" />
+                Поиск по всем сферам <span className="text-[11px] text-gray-500 dark:text-gray-400">{filteredCalls.length}/{calls.length}</span>
+              </label>
+              <input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="тикер, событие, сеть, причина..."
+                className={`w-full px-3 py-2 rounded-xl border ${borderColor} ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-50'} ${textColor} focus:outline-none focus:ring-2 focus:ring-[#4E6E49]/60`}
+              />
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              <span className={`text-xs ${subtleColor} uppercase tracking-wider`}>Сфера:</span>
+              <button
+                onClick={() => setCategoryFilter('all')}
+                className={`px-3 py-1.5 rounded-full text-sm font-semibold border ${categoryFilter === 'all' ? pillActive : pillInactive}`}
+              >
+                Все
+              </button>
+              {(Object.keys(CATEGORY_META) as CallCategory[]).map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setCategoryFilter(categoryFilter === cat ? 'all' : cat)}
+                  className={`px-3 py-1.5 rounded-full text-sm font-semibold border ${categoryFilter === cat ? pillActive : pillInactive}`}
+                >
+                  {CATEGORY_META[cat].label}
+                </button>
+              ))}
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              <span className={`text-xs ${subtleColor} uppercase tracking-wider`}>Риск:</span>
+              {(['all', 'low', 'medium', 'high', 'ultra'] as RiskFilter[]).map((risk) => (
+                <button
+                  key={risk}
+                  onClick={() => setRiskFilter(risk)}
+                  className={`px-3 py-1.5 rounded-full text-sm font-semibold border ${riskFilter === risk ? pillActive : pillInactive}`}
+                >
+                  {risk === 'all' ? 'Все' : risk}
+                </button>
+              ))}
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3">
+              <span className={`text-xs ${subtleColor} uppercase tracking-wider`}>Трейдер:</span>
+              <select
+                value={traderFilter}
+                onChange={(e) => setTraderFilter(e.target.value)}
+                className={`px-3 py-2 rounded-lg border ${borderColor} ${theme === 'dark' ? 'bg-gray-800 text-white' : 'bg-gray-50 text-gray-900'} text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50`}
+              >
+                <option value="all">Все трейдеры</option>
+                {TEAM_MEMBERS.map((t) => (
+                  <option key={t.id} value={t.id}>{t.name}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {renderQuickStat('Всего сигналов', totals.total, textColor)}
+              {renderQuickStat('Активных', totals.active, 'text-emerald-500')}
+              {renderQuickStat('Завершено', totals.completed, 'text-blue-500')}
+              {renderQuickStat('High risk', totals.highRisk, 'text-amber-500')}
+            </div>
+          </div>
+        </div>
+
+        {/* Form Modal */}
+        {showForm && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[70] flex items-start sm:items-center justify-center p-4 overflow-y-auto">
+            <div className={`${bgColor} rounded-2xl shadow-2xl border ${borderColor} max-w-3xl w-full max-h-[90vh] overflow-hidden`}>
+              <div className="flex flex-col h-full">
+                <div className={`p-6 flex items-center justify-between sticky top-0 z-20 ${bgColor} border-b ${borderColor} shadow-sm`}>
+                  <h2 className={`text-2xl font-bold ${textColor}`}>{editingCall ? 'Редактировать сигнал' : 'Создать сигнал'}</h2>
+                  <button
+                    onClick={handleCancel}
+                    className={`p-2 rounded-xl ${theme === 'dark' ? 'hover:bg-gray-800' : 'hover:bg-gray-100'}`}
+                  >
+                    <X className={`w-5 h-5 ${subtleColor}`} />
+                  </button>
+                </div>
+                <div className="px-6 pb-6 pt-2 overflow-y-auto flex-1 max-h-[75vh]">
+                  <CallForm
+                    callToEdit={editingCall}
+                    onSuccess={handleSuccess}
+                    onCancel={handleCancel}
+                    initialCategory={formCategory}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Delete Confirmation Modal */}
+        {showDeleteModal && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[70] flex items-start sm:items-center justify-center p-4 overflow-y-auto overscroll-contain">
+            <div className={`${bgColor} rounded-2xl shadow-2xl border ${borderColor} max-w-md w-full`}>
+              <div className="p-6 space-y-4">
+                <div className="flex items-center gap-3">
+                  <AlertTriangle className="w-6 h-6 text-red-500" />
+                  <div>
+                    <h3 className={`text-xl font-bold ${textColor}`}>Удалить сигнал?</h3>
+                    <p className={subtleColor}>Это действие нельзя отменить</p>
+                  </div>
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => { setShowDeleteModal(false); setDeleteCallId(null) }}
+                    className={`flex-1 px-4 py-3 rounded-xl border ${borderColor} ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}
+                  >
+                    Отмена
+                  </button>
+                  <button
+                    onClick={handleDeleteConfirm}
+                    className="flex-1 px-4 py-3 rounded-xl bg-red-600 text-white font-semibold hover:bg-red-700"
+                  >
+                    Удалить
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Cancel Confirmation Modal */}
+        {cancelCallId && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[70] flex items-start sm:items-center justify-center p-4 overflow-y-auto overscroll-contain">
+            <div className={`${bgColor} rounded-2xl shadow-2xl border ${borderColor} max-w-md w-full`}>
+              <div className="p-6 space-y-4">
+                <div className="flex items-center gap-3">
+                  <AlertTriangle className="w-6 h-6 text-amber-500" />
+                  <div>
+                    <h3 className={`text-xl font-bold ${textColor}`}>Отменить сигнал?</h3>
+                    <p className={subtleColor}>Статус станет «Отменен», запись останется в списке.</p>
+                  </div>
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setCancelCallId(null)}
+                    className={`flex-1 px-4 py-3 rounded-xl border ${borderColor} ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}
+                  >
+                    Отмена
+                  </button>
+                  <button
+                    onClick={handleCancelConfirm}
+                    className="flex-1 px-4 py-3 rounded-xl bg-amber-500 text-white font-semibold hover:bg-amber-600"
+                  >
+                    Отменить
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Calls List */}
+        {!showForm && (
+          <>
+            {loading ? (
+              <div className={`${bgColor} rounded-2xl p-12 text-center ${borderColor} border shadow-xl`}>
+                <div className="animate-spin rounded-full h-14 w-14 border-4 border-[#4E6E49] border-t-transparent mx-auto mb-4"></div>
+                <p className={`${subtleColor} text-lg`}>Загрузка сигналов...</p>
+              </div>
+            ) : calls.length === 0 ? (
+              <div className={`${bgColor} rounded-[2rem] p-16 text-center ${borderColor} border-2 shadow-2xl backdrop-blur-sm relative overflow-hidden group`}>
+                <div className="absolute inset-0 bg-gradient-to-br from-[#4E6E49]/5 via-transparent to-emerald-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <Sparkles className={`w-20 h-20 mx-auto mb-6 ${subtleColor} animate-pulse`} />
+                <p className={`text-2xl font-black ${textColor} mb-2`}>Пока пусто</p>
+                <p className={`${subtleColor} text-lg`}>Создайте первый сигнал в новой структуре</p>
+              </div>
+            ) : filteredCalls.length === 0 ? (
+              <div className={`${bgColor} rounded-2xl p-12 text-center ${borderColor} border shadow-xl`}>
+                <Sparkles className={`w-16 h-16 mx-auto mb-4 ${subtleColor}`} />
+                <p className={`text-xl font-bold ${textColor}`}>Нет совпадений</p>
+                <p className={subtleColor}>Сигналы есть ({calls.length}), но фильтр ничего не нашел.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 px-4 py-2">
+                {filteredCalls.map((call) => {
+                  const meta = CATEGORY_META[call.category]
+                  const statusMeta = statusLabels[call.status as StatusFilter] || statusLabels.active
+                  const riskLevel = getRiskLevel(call)
+                  const details = getDetails(call)
+                  const trader = TEAM_MEMBERS.find(t => t.id === call.userId)
+                  const keyCopyValue = details.ticker || details.pair || details.coin || getPrimaryTitle(call)
+                  const createdDate = new Date(call.createdAt).toLocaleDateString('ru-RU', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+                  const tone = categoryTone[call.category]
+
+                  return (
+                    <div
+                      key={call.id}
+                      className={`rounded-3xl border-2 shadow-xl overflow-hidden transition-all hover:-translate-y-1 ${tone.border} ${tone.bg}`}
+                    >
+                      <div className={`px-5 py-4 flex flex-wrap items-center justify-between gap-3 border-b ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-white/70 bg-white/70'
+                        }`}>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold border ${tone.border} ${tone.chipBg || ''} ${tone.text}`}>
+                            {meta.icon}
+                            {meta.label}
+                          </span>
+                          <span className={`px-3 py-1.5 rounded-full text-xs font-semibold ${statusMeta.className}`}>{statusMeta.label}</span>
+                          <span className={`px-3 py-1.5 rounded-full text-xs font-semibold ${riskBadges[riskLevel]}`}>Риск: {riskLevel}</span>
+                        </div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <div className={`px-3 py-1.5 rounded-xl text-xs font-semibold border ${theme === 'dark' ? 'bg-gray-800/70 text-gray-200 border-white/10' : 'bg-white text-gray-700 border-gray-200'
+                            }`}>
+                            <span className="opacity-70">Создано </span>{createdDate}
+                          </div>
+                          {trader && (
+                            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-white/10 bg-black/5 dark:bg-white/5">
+                              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[#4E6E49] to-emerald-600 text-white flex items-center justify-center text-sm font-bold">
+                                {trader.name[0]}
+                              </div>
+                              <span className={`text-xs ${subtleColor}`}>{trader.name}</span>
+                            </div>
+                          )}
+                          <div className="flex items-center gap-1">
+                            <button
+                              onClick={() => handleEdit(call)}
+                              className={`p-2 rounded-lg ${theme === 'dark' ? 'hover:bg-gray-800' : 'hover:bg-gray-100'}`}
+                            >
+                              <Edit className="w-4 h-4" />
+                            </button>
+                            {call.status !== 'cancelled' && (
+                              <button
+                                onClick={() => setCancelCallId(call.id)}
+                                className={`p-2 rounded-lg ${theme === 'dark' ? 'hover:bg-gray-800' : 'hover:bg-gray-100'}`}
+                              >
+                                <X className="w-4 h-4 text-amber-500" />
+                              </button>
+                            )}
+                            <button
+                              onClick={() => handleDeleteClick(call.id)}
+                              className={`p-2 rounded-lg ${theme === 'dark' ? 'hover:bg-gray-800' : 'hover:bg-gray-100'}`}
+                            >
+                              <Trash2 className="w-4 h-4 text-red-500" />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="p-5 space-y-5">
+                        <div className="grid md:grid-cols-[1.15fr_auto] gap-4 items-start">
+                          <div className="space-y-1">
+                            <p className={`text-2xl font-bold ${textColor}`}>{getPrimaryTitle(call)}</p>
+                            <p className={`text-sm ${subtleColor}`}>{getSecondary(call)}</p>
+                          </div>
+                          <div className="flex flex-wrap gap-2 justify-end">
+                            <button
+                              onClick={() => copyValue(keyCopyValue)}
+                              className={`p-2 rounded-xl border ${borderColor} ${theme === 'dark' ? 'hover:bg-gray-800 bg-white/5' : 'hover:bg-gray-100 bg-white'} transition-colors`}
+                              title="Копировать"
+                            >
+                              {copiedValue === keyCopyValue ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
+                            </button>
+                          </div>
+                        </div>
+
+                        {renderCategoryMetrics(call)}
+
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </div>
   )
 }

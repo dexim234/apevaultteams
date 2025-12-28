@@ -1,7 +1,7 @@
 // Main layout component with navigation and theme toggle
 import { Link, useLocation } from 'react-router-dom'
 import { useThemeStore } from '@/store/themeStore'
-import { useAdminStore } from '@/store/adminStore'
+import { useAdminStore, ADMIN_PASSWORD } from '@/store/adminStore'
 import { useAuthStore } from '@/store/authStore'
 import { useUserActivity } from '@/hooks/useUserActivity'
 import { getApprovalRequests, getTasks, getWorkSlots, checkUserAccess } from '@/services/firestoreService'
@@ -11,6 +11,7 @@ import {
   Sun,
   CheckCircle2,
   Settings,
+  Shield,
   Calendar,
   DollarSign,
   CheckSquare,
@@ -21,6 +22,8 @@ import {
   ArrowUpRight,
   Bell,
   AlertTriangle,
+  LogOut,
+  ZapOff,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import logo from '@/assets/logo.png'
@@ -28,8 +31,8 @@ import { useState, useEffect } from 'react'
 
 export const Layout = ({ children }: { children: React.ReactNode }) => {
   const { theme, toggleTheme } = useThemeStore()
-  const { isAdmin } = useAdminStore()
-  const { user } = useAuthStore()
+  const { isAdmin, activateAdmin, deactivateAdmin } = useAdminStore()
+  const { user, logout } = useAuthStore()
   const location = useLocation()
   const [showToolsMenu, setShowToolsMenu] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
@@ -376,20 +379,52 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
 
           </nav>
 
-          {/* User Profile */}
-          <Link
-            to="/profile"
-            className={`relative z-10 m-4 p-4 rounded-2xl flex items-center gap-3 transition-all group ${location.pathname === '/profile' ? 'bg-[#4E6E49]/10 border border-[#4E6E49]/30' : 'border border-gray-200/50 dark:border-white/5 hover:bg-gray-100/50 dark:hover:bg-white/5'}`}
-          >
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shadow-inner ${theme === 'dark' ? 'bg-emerald-500/20 text-[#4E6E49]' : 'bg-[#4E6E49]/10 text-[#4E6E49]'}`}>
-              {user?.avatar ? <img src={user.avatar} className="w-full h-full rounded-full object-cover" /> : getInitials(user?.name || 'User')}
+          {/* User Profile & Actions */}
+          <div className="relative z-10 m-4 space-y-2">
+            <Link
+              to="/profile"
+              className={`p-4 rounded-2xl flex items-center gap-3 transition-all group ${location.pathname === '/profile' ? 'bg-[#4E6E49]/10 border border-[#4E6E49]/30' : 'border border-gray-200/50 dark:border-white/5 hover:bg-gray-100/50 dark:hover:bg-white/5'}`}
+            >
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shadow-inner ${theme === 'dark' ? 'bg-emerald-500/20 text-[#4E6E49]' : 'bg-[#4E6E49]/10 text-[#4E6E49]'}`}>
+                {user?.avatar ? <img src={user.avatar} className="w-full h-full rounded-full object-cover" /> : getInitials(user?.name || 'User')}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-bold truncate dark:text-white">{user?.name || 'Administrator'}</p>
+                <p className="text-[10px] text-gray-500 font-medium truncate">{user?.login || 'admin@apevault.io'}</p>
+              </div>
+              <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-[#4E6E49] transition-colors" />
+            </Link>
+
+            <div className="flex gap-2">
+              <button
+                onClick={logout}
+                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-red-500/20 bg-red-500/5 text-red-500 hover:bg-red-500/10 transition-colors text-xs font-bold"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                <span>Выйти</span>
+              </button>
+
+              {user?.name === 'Артём' && !isAdmin && (
+                <button
+                  onClick={() => activateAdmin(ADMIN_PASSWORD)}
+                  className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-[#4E6E49]/20 bg-[#4E6E49]/5 text-[#4E6E49] hover:bg-[#4E6E49]/10 transition-colors text-xs font-bold"
+                >
+                  <Shield className="w-3.5 h-3.5" />
+                  <span>Админ</span>
+                </button>
+              )}
+
+              {isAdmin && (
+                <button
+                  onClick={deactivateAdmin}
+                  className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-amber-500/20 bg-amber-500/5 text-amber-500 hover:bg-amber-500/10 transition-colors text-xs font-bold"
+                >
+                  <ZapOff className="w-3.5 h-3.5" />
+                  <span>Стоп</span>
+                </button>
+              )}
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold truncate dark:text-white">{user?.name || 'Administrator'}</p>
-              <p className="text-[10px] text-gray-500 font-medium truncate">{user?.login || 'admin@apevault.io'}</p>
-            </div>
-            <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-[#4E6E49] transition-colors" />
-          </Link>
+          </div>
         </aside>
 
         {/* Main Content */}

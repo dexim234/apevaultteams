@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import { Layout } from '@/components/Layout'
 import { useThemeStore } from '@/store/themeStore'
 import { useAuthStore } from '@/store/authStore'
 import { getAiAlerts, addAiAlert, updateAiAlert, deleteAiAlert } from '@/services/firestoreService'
@@ -150,7 +149,7 @@ export const AiAoAlerts = () => {
     }
 
     return (
-        <Layout>
+        <>
             <div className="space-y-6">
                 {/* Header */}
                 <div className={`relative overflow-hidden rounded-3xl border ${cardBorder} ${cardShadow} ${cardBg}`}>
@@ -308,118 +307,120 @@ export const AiAoAlerts = () => {
             </div>
 
             {/* Modal */}
-            {showModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-                    <div className={`w-full max-w-lg rounded-3xl ${cardBg} ${cardBorder} border shadow-2xl overflow-hidden`}>
-                        <div className={`p-6 border-b ${theme === 'dark' ? 'border-white/10' : 'border-gray-100'} flex items-center justify-between`}>
-                            <h3 className={`text-xl font-bold ${headingColor}`}>
-                                {editingAlert ? 'Редактировать сигнал' : 'Новый сигнал'}
-                            </h3>
-                            <button onClick={() => setShowModal(false)} className={`p-2 rounded-lg hover:bg-white/10 ${subTextColor}`}>
-                                <X className="w-5 h-5" />
-                            </button>
+            {
+                showModal && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+                        <div className={`w-full max-w-lg rounded-3xl ${cardBg} ${cardBorder} border shadow-2xl overflow-hidden`}>
+                            <div className={`p-6 border-b ${theme === 'dark' ? 'border-white/10' : 'border-gray-100'} flex items-center justify-between`}>
+                                <h3 className={`text-xl font-bold ${headingColor}`}>
+                                    {editingAlert ? 'Редактировать сигнал' : 'Новый сигнал'}
+                                </h3>
+                                <button onClick={() => setShowModal(false)} className={`p-2 rounded-lg hover:bg-white/10 ${subTextColor}`}>
+                                    <X className="w-5 h-5" />
+                                </button>
+                            </div>
+
+                            <form onSubmit={handleSubmit} className="p-6 space-y-4">
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-1">
+                                        <label className={`text-xs font-semibold uppercase ${subTextColor}`}>Дата</label>
+                                        <input
+                                            type="date"
+                                            required
+                                            value={formData.signalDate}
+                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, signalDate: e.target.value })}
+                                            className={`w-full p-3 rounded-xl border outline-none transition-all ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white focus:border-[#4E6E49]' : 'bg-white border-gray-200 text-gray-900 focus:border-[#4E6E49]'}`}
+                                        />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <label className={`text-xs font-semibold uppercase ${subTextColor}`}>Время</label>
+                                        <input
+                                            type="time"
+                                            required
+                                            value={formData.signalTime}
+                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, signalTime: e.target.value })}
+                                            className={`w-full p-3 rounded-xl border outline-none transition-all ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white focus:border-[#4E6E49]' : 'bg-white border-gray-200 text-gray-900 focus:border-[#4E6E49]'}`}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="space-y-1">
+                                    <label className={`text-xs font-semibold uppercase ${subTextColor}`}>Адрес токена</label>
+                                    <input
+                                        type="text"
+                                        required
+                                        placeholder="Адрес контракта..."
+                                        value={formData.address || ''}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, address: e.target.value })}
+                                        className={`w-full p-3 rounded-xl border outline-none transition-all font-mono text-sm ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white focus:border-[#4E6E49]' : 'bg-white border-gray-200 text-gray-900 focus:border-[#4E6E49]'}`}
+                                    />
+                                </div>
+
+                                <div className="grid grid-cols-3 gap-4">
+                                    <div className="space-y-1">
+                                        <label className={`text-xs font-semibold uppercase ${subTextColor}`}>Market Cap</label>
+                                        <input
+                                            type="text"
+                                            placeholder="e.g. 300,77"
+                                            value={formData.marketCap || ''}
+                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, marketCap: e.target.value })}
+                                            className={`w-full p-3 rounded-xl border outline-none transition-all ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white focus:border-[#4E6E49]' : 'bg-white border-gray-200 text-gray-900 focus:border-[#4E6E49]'}`}
+                                        />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <label className={`text-xs font-semibold uppercase ${subTextColor}`}>Макс. Падение</label>
+                                        <input
+                                            type="text"
+                                            placeholder="e.g. -16"
+                                            value={formData.maxDrop || ''}
+                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, maxDrop: e.target.value })}
+                                            className={`w-full p-3 rounded-xl border outline-none transition-all ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white focus:border-[#4E6E49]' : 'bg-white border-gray-200 text-gray-900 focus:border-[#4E6E49]'}`}
+                                        />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <label className={`text-xs font-semibold uppercase ${subTextColor}`}>Макс. Профит</label>
+                                        <input
+                                            type="text"
+                                            placeholder="e.g. +28"
+                                            value={formData.maxProfit || ''}
+                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, maxProfit: e.target.value })}
+                                            className={`w-full p-3 rounded-xl border outline-none transition-all ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white focus:border-[#4E6E49]' : 'bg-white border-gray-200 text-gray-900 focus:border-[#4E6E49]'}`}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="space-y-1">
+                                    <label className={`text-xs font-semibold uppercase ${subTextColor}`}>Комментарий</label>
+                                    <input
+                                        type="text"
+                                        placeholder="Дополнительная информация..."
+                                        value={formData.comment || ''}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, comment: e.target.value })}
+                                        className={`w-full p-3 rounded-xl border outline-none transition-all ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white focus:border-[#4E6E49]' : 'bg-white border-gray-200 text-gray-900 focus:border-[#4E6E49]'}`}
+                                    />
+                                </div>
+
+                                <div className="pt-4 flex gap-3">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowModal(false)}
+                                        className={`flex-1 py-3 rounded-xl font-semibold transition-colors ${theme === 'dark' ? 'bg-white/5 hover:bg-white/10 text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-800'}`}
+                                    >
+                                        Отмена
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        className="flex-1 py-3 rounded-xl bg-[#4E6E49] hover:bg-[#3d5a39] text-white font-semibold transition-colors flex items-center justify-center gap-2"
+                                    >
+                                        <Save className="w-4 h-4" />
+                                        <span>Сохранить</span>
+                                    </button>
+                                </div>
+                            </form>
                         </div>
-
-                        <form onSubmit={handleSubmit} className="p-6 space-y-4">
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-1">
-                                    <label className={`text-xs font-semibold uppercase ${subTextColor}`}>Дата</label>
-                                    <input
-                                        type="date"
-                                        required
-                                        value={formData.signalDate}
-                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, signalDate: e.target.value })}
-                                        className={`w-full p-3 rounded-xl border outline-none transition-all ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white focus:border-[#4E6E49]' : 'bg-white border-gray-200 text-gray-900 focus:border-[#4E6E49]'}`}
-                                    />
-                                </div>
-                                <div className="space-y-1">
-                                    <label className={`text-xs font-semibold uppercase ${subTextColor}`}>Время</label>
-                                    <input
-                                        type="time"
-                                        required
-                                        value={formData.signalTime}
-                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, signalTime: e.target.value })}
-                                        className={`w-full p-3 rounded-xl border outline-none transition-all ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white focus:border-[#4E6E49]' : 'bg-white border-gray-200 text-gray-900 focus:border-[#4E6E49]'}`}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="space-y-1">
-                                <label className={`text-xs font-semibold uppercase ${subTextColor}`}>Адрес токена</label>
-                                <input
-                                    type="text"
-                                    required
-                                    placeholder="Адрес контракта..."
-                                    value={formData.address || ''}
-                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, address: e.target.value })}
-                                    className={`w-full p-3 rounded-xl border outline-none transition-all font-mono text-sm ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white focus:border-[#4E6E49]' : 'bg-white border-gray-200 text-gray-900 focus:border-[#4E6E49]'}`}
-                                />
-                            </div>
-
-                            <div className="grid grid-cols-3 gap-4">
-                                <div className="space-y-1">
-                                    <label className={`text-xs font-semibold uppercase ${subTextColor}`}>Market Cap</label>
-                                    <input
-                                        type="text"
-                                        placeholder="e.g. 300,77"
-                                        value={formData.marketCap || ''}
-                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, marketCap: e.target.value })}
-                                        className={`w-full p-3 rounded-xl border outline-none transition-all ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white focus:border-[#4E6E49]' : 'bg-white border-gray-200 text-gray-900 focus:border-[#4E6E49]'}`}
-                                    />
-                                </div>
-                                <div className="space-y-1">
-                                    <label className={`text-xs font-semibold uppercase ${subTextColor}`}>Макс. Падение</label>
-                                    <input
-                                        type="text"
-                                        placeholder="e.g. -16"
-                                        value={formData.maxDrop || ''}
-                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, maxDrop: e.target.value })}
-                                        className={`w-full p-3 rounded-xl border outline-none transition-all ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white focus:border-[#4E6E49]' : 'bg-white border-gray-200 text-gray-900 focus:border-[#4E6E49]'}`}
-                                    />
-                                </div>
-                                <div className="space-y-1">
-                                    <label className={`text-xs font-semibold uppercase ${subTextColor}`}>Макс. Профит</label>
-                                    <input
-                                        type="text"
-                                        placeholder="e.g. +28"
-                                        value={formData.maxProfit || ''}
-                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, maxProfit: e.target.value })}
-                                        className={`w-full p-3 rounded-xl border outline-none transition-all ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white focus:border-[#4E6E49]' : 'bg-white border-gray-200 text-gray-900 focus:border-[#4E6E49]'}`}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="space-y-1">
-                                <label className={`text-xs font-semibold uppercase ${subTextColor}`}>Комментарий</label>
-                                <input
-                                    type="text"
-                                    placeholder="Дополнительная информация..."
-                                    value={formData.comment || ''}
-                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, comment: e.target.value })}
-                                    className={`w-full p-3 rounded-xl border outline-none transition-all ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white focus:border-[#4E6E49]' : 'bg-white border-gray-200 text-gray-900 focus:border-[#4E6E49]'}`}
-                                />
-                            </div>
-
-                            <div className="pt-4 flex gap-3">
-                                <button
-                                    type="button"
-                                    onClick={() => setShowModal(false)}
-                                    className={`flex-1 py-3 rounded-xl font-semibold transition-colors ${theme === 'dark' ? 'bg-white/5 hover:bg-white/10 text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-800'}`}
-                                >
-                                    Отмена
-                                </button>
-                                <button
-                                    type="submit"
-                                    className="flex-1 py-3 rounded-xl bg-[#4E6E49] hover:bg-[#3d5a39] text-white font-semibold transition-colors flex items-center justify-center gap-2"
-                                >
-                                    <Save className="w-4 h-4" />
-                                    <span>Сохранить</span>
-                                </button>
-                            </div>
-                        </form>
                     </div>
-                </div>
-            )}
-        </Layout>
+                )
+            }
+        </>
     )
 }

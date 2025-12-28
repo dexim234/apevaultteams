@@ -1,6 +1,5 @@
 // Rating page
 import { useState, useEffect, useMemo } from 'react'
-import { Layout } from '@/components/Layout'
 import { useThemeStore } from '@/store/themeStore'
 import { useAuthStore } from '@/store/authStore'
 import { useAdminStore } from '@/store/adminStore'
@@ -120,7 +119,7 @@ export const Rating = () => {
         const slots = await getWorkSlots(member.id)
         const weekSlots = slots.filter(s => s.date >= weekStart && s.date <= weekEnd)
         const weeklyHours = weekSlots.reduce((sum, slot) => sum + calculateHours(slot.slots), 0)
-        
+
         // Для статистики используем общее количество из ratings
         const existingRatings = await getRatingData(member.id)
         const ratingData = existingRatings[0] || {
@@ -175,7 +174,7 @@ export const Rating = () => {
       // Load user activities
       const activities = await getLatestUserActivities()
       setUserActivities(activities)
-      
+
       // Load activities for last 24 hours
       const activitiesLast24h = await getUserActivitiesLast24Hours()
       setActivities24h(activitiesLast24h)
@@ -286,7 +285,7 @@ export const Rating = () => {
     // Use sync version for immediate display, will be updated when cache is populated
     return getUserNicknameSync(id) || '—'
   }
-  
+
   // Load custom nicknames on mount
   useEffect(() => {
     const loadCustomNicknames = async () => {
@@ -353,170 +352,254 @@ export const Rating = () => {
   }
 
   return (
-    <Layout>
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="relative overflow-hidden rounded-3xl border border-[#48a35e]/60 shadow-[0_24px_80px_rgba(0,0,0,0.45)] bg-[#10141c]">
-          <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute -left-16 -bottom-10 w-80 h-80 bg-emerald-500/18 blur-3xl"></div>
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.08),transparent_45%)]"></div>
-          </div>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="relative overflow-hidden rounded-3xl border border-[#48a35e]/60 shadow-[0_24px_80px_rgba(0,0,0,0.45)] bg-[#10141c]">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute -left-16 -bottom-10 w-80 h-80 bg-emerald-500/18 blur-3xl"></div>
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.08),transparent_45%)]"></div>
+        </div>
 
-          <div className="relative p-6 sm:p-8 space-y-6">
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-              <div className="space-y-3 max-w-3xl">
-                <div className="flex items-start gap-3">
-                  <div className="p-3 rounded-2xl bg-white/10 border border-white/20 text-white shadow-inner">
-                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" className="text-emerald-300">
-                      <path d="M4 13.5V20h4v-6.5H4Z" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M10 10v10h4V10h-4Z" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M16 4v16h4V4h-4Z" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M4 16.5 9.5 11l3 3 7-7" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  </div>
-                  <div className="space-y-2">
-                    <h1 className="text-3xl sm:text-4xl font-black text-white leading-tight">Рейтинг команды</h1>
-                    <p className="text-sm text-white/70">
-                      Данные за текущую неделю + последние 30 дней. В фокусе KPI команды, динамика и реферальная активность — как на дашборде задач.
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                      {['КПД недели','Рейтинг 30д','Рефералы','Сообщения'].map((chip, idx) => (
-                        <span
-                          key={chip}
-                          className={`px-4 py-1.5 rounded-full text-xs font-semibold border ${
-                            idx === 0
-                              ? 'bg-emerald-500 text-white border-emerald-300/60 shadow-md'
-                              : 'bg-white/10 text-white border-white/20'
+        <div className="relative p-6 sm:p-8 space-y-6">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <div className="space-y-3 max-w-3xl">
+              <div className="flex items-start gap-3">
+                <div className="p-3 rounded-2xl bg-white/10 border border-white/20 text-white shadow-inner">
+                  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" className="text-emerald-300">
+                    <path d="M4 13.5V20h4v-6.5H4Z" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M10 10v10h4V10h-4Z" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M16 4v16h4V4h-4Z" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M4 16.5 9.5 11l3 3 7-7" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </div>
+                <div className="space-y-2">
+                  <h1 className="text-3xl sm:text-4xl font-black text-white leading-tight">Рейтинг команды</h1>
+                  <p className="text-sm text-white/70">
+                    Данные за текущую неделю + последние 30 дней. В фокусе KPI команды, динамика и реферальная активность — как на дашборде задач.
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {['КПД недели', 'Рейтинг 30д', 'Рефералы', 'Сообщения'].map((chip, idx) => (
+                      <span
+                        key={chip}
+                        className={`px-4 py-1.5 rounded-full text-xs font-semibold border ${idx === 0
+                          ? 'bg-emerald-500 text-white border-emerald-300/60 shadow-md'
+                          : 'bg-white/10 text-white border-white/20'
                           }`}
-                        >
-                          {chip}
-                        </span>
-                      ))}
-                    </div>
+                      >
+                        {chip}
+                      </span>
+                    ))}
                   </div>
                 </div>
               </div>
-
-              <div className="flex flex-col items-start lg:items-end gap-2 text-white"></div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
-              {heroCards.map((card) => (
-                <div
-                  key={card.label}
-                  className={`relative overflow-hidden rounded-2xl border ${heroToneClass(card.tone)} p-4 backdrop-blur-sm`}
-                >
-                  <div className="absolute right-3 top-3 text-xl opacity-20">•</div>
-                  <div className={`text-xs uppercase tracking-[0.1em] font-semibold ${heroLabelColor}`}>{card.label}</div>
-                  <div className={`mt-2 text-2xl font-bold ${heroValueColor}`}>{card.value}</div>
-                  <div className={`text-sm ${heroLabelColor}`}>{card.meta}</div>
-                </div>
-              ))}
-            </div>
-
+            <div className="flex flex-col items-start lg:items-end gap-2 text-white"></div>
           </div>
-        </div>
 
-        {/* Как строим эффективность */}
-        <div className={`rounded-2xl p-6 sm:p-7 ${cardBg} ${cardShadow} border ${calmBorder}`}>
-          <div className="flex flex-col gap-2 mb-4">
-            <p className={`text-xs uppercase tracking-[0.12em] ${subTextColor}`}>Методика</p>
-            <h3 className={`text-2xl font-bold ${headingColor}`}>Как мы строим эффективность команды?</h3>
-            <p className={`text-sm ${subTextColor}`}>Четыре зоны, которые показывают, где сейчас участник и что делать дальше.</p>
-          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
-            {ratingBands.map((band) => (
+            {heroCards.map((card) => (
               <div
-                key={band.label}
-                className={`rounded-xl border ${band.bg} p-3 transition`}
+                key={card.label}
+                className={`relative overflow-hidden rounded-2xl border ${heroToneClass(card.tone)} p-4 backdrop-blur-sm`}
               >
-                <div className="flex items-center justify-between">
-                  <span className={`text-xs font-semibold ${subTextColor}`}>{band.label}</span>
-                  <span className="text-lg">•</span>
-                </div>
-                <p className={`text-base font-semibold ${band.tone}`}>{band.title}</p>
-                <p className={`text-sm ${subTextColor}`}>{band.desc}</p>
+                <div className="absolute right-3 top-3 text-xl opacity-20">•</div>
+                <div className={`text-xs uppercase tracking-[0.1em] font-semibold ${heroLabelColor}`}>{card.label}</div>
+                <div className={`mt-2 text-2xl font-bold ${heroValueColor}`}>{card.value}</div>
+                <div className={`text-sm ${heroLabelColor}`}>{card.meta}</div>
               </div>
             ))}
           </div>
-        </div>
 
-        {/* Рекомендации по участникам */}
-        <div className={`rounded-2xl p-6 sm:p-7 ${cardBg} ${cardShadow} border ${calmBorder}`}>
-          <div className="flex flex-col gap-2 mb-4">
-            <p className={`text-xs uppercase tracking-[0.12em] ${subTextColor}`}>Рекомендации</p>
-            <h3 className={`text-2xl font-bold ${headingColor}`}>Что улучшить каждому</h3>
-            <p className={`text-sm ${subTextColor}`}>Динамические подсказки на основе текущих метрик рейтинга.</p>
-          </div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3">
-            {sortedRatings.map((r) => {
-              const recs = getRecommendations(r)
-              const userName = getMemberNameById(r.userId)
-              const bandClass =
-                r.rating >= 80
-                  ? 'bg-emerald-500'
-                  : r.rating >= 60
+        </div>
+      </div>
+
+      {/* Как строим эффективность */}
+      <div className={`rounded-2xl p-6 sm:p-7 ${cardBg} ${cardShadow} border ${calmBorder}`}>
+        <div className="flex flex-col gap-2 mb-4">
+          <p className={`text-xs uppercase tracking-[0.12em] ${subTextColor}`}>Методика</p>
+          <h3 className={`text-2xl font-bold ${headingColor}`}>Как мы строим эффективность команды?</h3>
+          <p className={`text-sm ${subTextColor}`}>Четыре зоны, которые показывают, где сейчас участник и что делать дальше.</p>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+          {ratingBands.map((band) => (
+            <div
+              key={band.label}
+              className={`rounded-xl border ${band.bg} p-3 transition`}
+            >
+              <div className="flex items-center justify-between">
+                <span className={`text-xs font-semibold ${subTextColor}`}>{band.label}</span>
+                <span className="text-lg">•</span>
+              </div>
+              <p className={`text-base font-semibold ${band.tone}`}>{band.title}</p>
+              <p className={`text-sm ${subTextColor}`}>{band.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Рекомендации по участникам */}
+      <div className={`rounded-2xl p-6 sm:p-7 ${cardBg} ${cardShadow} border ${calmBorder}`}>
+        <div className="flex flex-col gap-2 mb-4">
+          <p className={`text-xs uppercase tracking-[0.12em] ${subTextColor}`}>Рекомендации</p>
+          <h3 className={`text-2xl font-bold ${headingColor}`}>Что улучшить каждому</h3>
+          <p className={`text-sm ${subTextColor}`}>Динамические подсказки на основе текущих метрик рейтинга.</p>
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3">
+          {sortedRatings.map((r) => {
+            const recs = getRecommendations(r)
+            const userName = getMemberNameById(r.userId)
+            const bandClass =
+              r.rating >= 80
+                ? 'bg-emerald-500'
+                : r.rating >= 60
                   ? 'bg-blue-500'
                   : r.rating >= 40
-                  ? 'bg-amber-500'
-                  : 'bg-rose-500'
-              const bandText =
-                r.rating >= 80 ? 'Эталон' : r.rating >= 60 ? 'Уверенно' : r.rating >= 40 ? 'В пути' : 'Зона роста'
+                    ? 'bg-amber-500'
+                    : 'bg-rose-500'
+            const bandText =
+              r.rating >= 80 ? 'Эталон' : r.rating >= 60 ? 'Уверенно' : r.rating >= 40 ? 'В пути' : 'Зона роста'
 
-              return (
-                <div key={r.userId} className="rounded-xl border border-white/10 bg-white/5 p-4 space-y-3">
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="min-w-0">
-                      <p className={`text-xs uppercase tracking-[0.12em] ${subTextColor}`}>{bandText}</p>
-                      <h4 className={`text-lg font-bold ${headingColor} truncate`}>{userName}</h4>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-2xl font-bold text-white">{r.rating.toFixed(1)}%</div>
-                    </div>
+            return (
+              <div key={r.userId} className="rounded-xl border border-white/10 bg-white/5 p-4 space-y-3">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="min-w-0">
+                    <p className={`text-xs uppercase tracking-[0.12em] ${subTextColor}`}>{bandText}</p>
+                    <h4 className={`text-lg font-bold ${headingColor} truncate`}>{userName}</h4>
                   </div>
-                  <div className="w-full bg-white/5 rounded-full h-3 overflow-hidden border border-white/10">
-                    <div
-                      className={`h-full ${bandClass}`}
-                      style={{ width: `${Math.min(r.rating, 100)}%` }}
-                    />
+                  <div className="text-right">
+                    <div className="text-2xl font-bold text-white">{r.rating.toFixed(1)}%</div>
                   </div>
-                  <ul className="space-y-1 text-sm text-white/80">
-                    {recs.map((tip, idx) => (
-                      <li key={idx} className="flex items-start gap-2">
-                        <span className="text-xs mt-0.5">•</span>
-                        <span>{tip}</span>
-                      </li>
-                    ))}
-                  </ul>
                 </div>
-              )
-            })}
-          </div>
+                <div className="w-full bg-white/5 rounded-full h-3 overflow-hidden border border-white/10">
+                  <div
+                    className={`h-full ${bandClass}`}
+                    style={{ width: `${Math.min(r.rating, 100)}%` }}
+                  />
+                </div>
+                <ul className="space-y-1 text-sm text-white/80">
+                  {recs.map((tip, idx) => (
+                    <li key={idx} className="flex items-start gap-2">
+                      <span className="text-xs mt-0.5">•</span>
+                      <span>{tip}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )
+          })}
         </div>
+      </div>
 
-        {/* Последняя активность на сайте */}
-        <div className={`rounded-2xl p-6 sm:p-7 ${cardBg} ${cardShadow} border ${calmBorder}`}>
-          <div className="flex flex-col gap-2 mb-4">
-            <p className={`text-xs uppercase tracking-[0.12em] ${subTextColor}`}>Активность</p>
-            <h3 className={`text-2xl font-bold ${headingColor}`}>Последняя активность на сайте</h3>
-            <p className={`text-sm ${subTextColor}`}>Информация о последнем посещении каждого участника.</p>
+      {/* Последняя активность на сайте */}
+      <div className={`rounded-2xl p-6 sm:p-7 ${cardBg} ${cardShadow} border ${calmBorder}`}>
+        <div className="flex flex-col gap-2 mb-4">
+          <p className={`text-xs uppercase tracking-[0.12em] ${subTextColor}`}>Активность</p>
+          <h3 className={`text-2xl font-bold ${headingColor}`}>Последняя активность на сайте</h3>
+          <p className={`text-sm ${subTextColor}`}>Информация о последнем посещении каждого участника.</p>
+        </div>
+        {userActivities.length > 0 ? (
+          <div className="overflow-auto rounded-xl border border-white/10 bg-white/5">
+            <table className="min-w-[800px] w-full text-sm text-white/90">
+              <thead className="bg-white/5 text-white/70 text-left">
+                <tr>
+                  <th className="py-3 px-4 font-semibold">Участник</th>
+                  <th className="py-3 px-4 font-semibold">Последний вход</th>
+                  <th className="py-3 px-4 font-semibold">Браузер</th>
+                  <th className="py-3 px-4 font-semibold">Время на сайте</th>
+                  <th className="py-3 px-4 font-semibold">Выход</th>
+                  <th className="py-3 px-4 font-semibold">Статус</th>
+                </tr>
+              </thead>
+              <tbody>
+                {TEAM_MEMBERS.map((member) => {
+                  const activity = userActivities.find((a) => a.userId === member.id)
+                  const formatSessionDuration = (seconds?: number): string => {
+                    if (!seconds) return '—'
+                    const hours = Math.floor(seconds / 3600)
+                    const minutes = Math.floor((seconds % 3600) / 60)
+                    const secs = seconds % 60
+                    if (hours > 0) {
+                      return `${hours}ч ${minutes}м ${secs}с`
+                    } else if (minutes > 0) {
+                      return `${minutes}м ${secs}с`
+                    } else {
+                      return `${secs}с`
+                    }
+                  }
+                  const formatDateTime = (isoString: string): string => {
+                    try {
+                      const date = new Date(isoString)
+                      return formatDate(date, 'dd.MM.yyyy HH:mm')
+                    } catch {
+                      return isoString
+                    }
+                  }
+
+                  return (
+                    <tr
+                      key={member.id}
+                      className="border-t border-white/10 hover:bg-white/5 transition-colors"
+                    >
+                      <td className="py-3 px-4 font-semibold text-white whitespace-nowrap">{getUserNicknameSync(member.id)}</td>
+                      <td className="py-3 px-4 text-white/80 whitespace-nowrap">
+                        {activity ? formatDateTime(activity.loginAt) : '—'}
+                      </td>
+                      <td className="py-3 px-4 text-white/80 whitespace-nowrap">
+                        {activity?.browser || '—'}
+                      </td>
+                      <td className="py-3 px-4 text-white/80 whitespace-nowrap">
+                        {activity ? formatSessionDuration(activity.sessionDuration) : '—'}
+                      </td>
+                      <td className="py-3 px-4 text-white/80 whitespace-nowrap">
+                        {activity?.logoutAt ? formatDateTime(activity.logoutAt) : activity?.isActive ? 'Активен' : '—'}
+                      </td>
+                      <td className="py-3 px-4 whitespace-nowrap">
+                        {activity?.isActive ? (
+                          <span className="px-2 py-1 rounded-lg text-xs font-semibold bg-emerald-500/20 text-emerald-200 border border-emerald-400/30">
+                            Онлайн
+                          </span>
+                        ) : (
+                          <span className="px-2 py-1 rounded-lg text-xs font-semibold bg-gray-500/20 text-gray-300 border border-gray-400/30">
+                            Офлайн
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
           </div>
-          {userActivities.length > 0 ? (
+        ) : (
+          <div className="rounded-xl border border-white/10 bg-white/5 p-4 text-white/70">
+            Данные об активности пока отсутствуют.
+          </div>
+        )}
+
+        {/* Статистика за последние 24 часа */}
+        <div className="mt-6">
+          <div className="flex flex-col gap-2 mb-4">
+            <p className={`text-xs uppercase tracking-[0.12em] ${subTextColor}`}>Статистика</p>
+            <h4 className={`text-xl font-bold ${headingColor}`}>Активность за последние 24 часа</h4>
+            <p className={`text-sm ${subTextColor}`}>Сводная информация о посещениях за сутки.</p>
+          </div>
+          {activities24h.length > 0 ? (
             <div className="overflow-auto rounded-xl border border-white/10 bg-white/5">
-              <table className="min-w-[800px] w-full text-sm text-white/90">
+              <table className="min-w-[700px] w-full text-sm text-white/90">
                 <thead className="bg-white/5 text-white/70 text-left">
                   <tr>
                     <th className="py-3 px-4 font-semibold">Участник</th>
+                    <th className="py-3 px-4 font-semibold">Входов</th>
+                    <th className="py-3 px-4 font-semibold">Общее время</th>
+                    <th className="py-3 px-4 font-semibold">Среднее время сессии</th>
                     <th className="py-3 px-4 font-semibold">Последний вход</th>
-                    <th className="py-3 px-4 font-semibold">Браузер</th>
-                    <th className="py-3 px-4 font-semibold">Время на сайте</th>
-                    <th className="py-3 px-4 font-semibold">Выход</th>
-                    <th className="py-3 px-4 font-semibold">Статус</th>
                   </tr>
                 </thead>
                 <tbody>
                   {TEAM_MEMBERS.map((member) => {
-                    const activity = userActivities.find((a) => a.userId === member.id)
+                    const memberActivities = activities24h.filter((a) => a.userId === member.id)
+
                     const formatSessionDuration = (seconds?: number): string => {
                       if (!seconds) return '—'
                       const hours = Math.floor(seconds / 3600)
@@ -530,6 +613,7 @@ export const Rating = () => {
                         return `${secs}с`
                       }
                     }
+
                     const formatDateTime = (isoString: string): string => {
                       try {
                         const date = new Date(isoString)
@@ -539,34 +623,37 @@ export const Rating = () => {
                       }
                     }
 
+                    // Calculate statistics
+                    const totalSessions = memberActivities.length
+                    const totalDuration = memberActivities.reduce((sum, a) => {
+                      return sum + (a.sessionDuration || 0)
+                    }, 0)
+                    const avgDuration = totalSessions > 0 ? Math.floor(totalDuration / totalSessions) : 0
+
+                    // Get latest activity
+                    const latestActivity = memberActivities.length > 0
+                      ? memberActivities.reduce((latest, current) => {
+                        return new Date(current.loginAt) > new Date(latest.loginAt) ? current : latest
+                      })
+                      : null
+
                     return (
                       <tr
                         key={member.id}
                         className="border-t border-white/10 hover:bg-white/5 transition-colors"
                       >
                         <td className="py-3 px-4 font-semibold text-white whitespace-nowrap">{getUserNicknameSync(member.id)}</td>
-                        <td className="py-3 px-4 text-white/80 whitespace-nowrap">
-                          {activity ? formatDateTime(activity.loginAt) : '—'}
+                        <td className="py-3 px-4 text-white/80 whitespace-nowrap text-center">
+                          {totalSessions > 0 ? totalSessions : '—'}
                         </td>
                         <td className="py-3 px-4 text-white/80 whitespace-nowrap">
-                          {activity?.browser || '—'}
+                          {totalDuration > 0 ? formatSessionDuration(totalDuration) : '—'}
                         </td>
                         <td className="py-3 px-4 text-white/80 whitespace-nowrap">
-                          {activity ? formatSessionDuration(activity.sessionDuration) : '—'}
+                          {avgDuration > 0 ? formatSessionDuration(avgDuration) : '—'}
                         </td>
                         <td className="py-3 px-4 text-white/80 whitespace-nowrap">
-                          {activity?.logoutAt ? formatDateTime(activity.logoutAt) : activity?.isActive ? 'Активен' : '—'}
-                        </td>
-                        <td className="py-3 px-4 whitespace-nowrap">
-                          {activity?.isActive ? (
-                            <span className="px-2 py-1 rounded-lg text-xs font-semibold bg-emerald-500/20 text-emerald-200 border border-emerald-400/30">
-                              Онлайн
-                            </span>
-                          ) : (
-                            <span className="px-2 py-1 rounded-lg text-xs font-semibold bg-gray-500/20 text-gray-300 border border-gray-400/30">
-                              Офлайн
-                            </span>
-                          )}
+                          {latestActivity ? formatDateTime(latestActivity.loginAt) : '—'}
                         </td>
                       </tr>
                     )
@@ -576,229 +663,139 @@ export const Rating = () => {
             </div>
           ) : (
             <div className="rounded-xl border border-white/10 bg-white/5 p-4 text-white/70">
-              Данные об активности пока отсутствуют.
-            </div>
-          )}
-
-          {/* Статистика за последние 24 часа */}
-          <div className="mt-6">
-            <div className="flex flex-col gap-2 mb-4">
-              <p className={`text-xs uppercase tracking-[0.12em] ${subTextColor}`}>Статистика</p>
-              <h4 className={`text-xl font-bold ${headingColor}`}>Активность за последние 24 часа</h4>
-              <p className={`text-sm ${subTextColor}`}>Сводная информация о посещениях за сутки.</p>
-            </div>
-            {activities24h.length > 0 ? (
-              <div className="overflow-auto rounded-xl border border-white/10 bg-white/5">
-                <table className="min-w-[700px] w-full text-sm text-white/90">
-                  <thead className="bg-white/5 text-white/70 text-left">
-                    <tr>
-                      <th className="py-3 px-4 font-semibold">Участник</th>
-                      <th className="py-3 px-4 font-semibold">Входов</th>
-                      <th className="py-3 px-4 font-semibold">Общее время</th>
-                      <th className="py-3 px-4 font-semibold">Среднее время сессии</th>
-                      <th className="py-3 px-4 font-semibold">Последний вход</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {TEAM_MEMBERS.map((member) => {
-                      const memberActivities = activities24h.filter((a) => a.userId === member.id)
-                      
-                      const formatSessionDuration = (seconds?: number): string => {
-                        if (!seconds) return '—'
-                        const hours = Math.floor(seconds / 3600)
-                        const minutes = Math.floor((seconds % 3600) / 60)
-                        const secs = seconds % 60
-                        if (hours > 0) {
-                          return `${hours}ч ${minutes}м ${secs}с`
-                        } else if (minutes > 0) {
-                          return `${minutes}м ${secs}с`
-                        } else {
-                          return `${secs}с`
-                        }
-                      }
-                      
-                      const formatDateTime = (isoString: string): string => {
-                        try {
-                          const date = new Date(isoString)
-                          return formatDate(date, 'dd.MM.yyyy HH:mm')
-                        } catch {
-                          return isoString
-                        }
-                      }
-
-                      // Calculate statistics
-                      const totalSessions = memberActivities.length
-                      const totalDuration = memberActivities.reduce((sum, a) => {
-                        return sum + (a.sessionDuration || 0)
-                      }, 0)
-                      const avgDuration = totalSessions > 0 ? Math.floor(totalDuration / totalSessions) : 0
-                      
-                      // Get latest activity
-                      const latestActivity = memberActivities.length > 0
-                        ? memberActivities.reduce((latest, current) => {
-                            return new Date(current.loginAt) > new Date(latest.loginAt) ? current : latest
-                          })
-                        : null
-
-                      return (
-                        <tr
-                          key={member.id}
-                          className="border-t border-white/10 hover:bg-white/5 transition-colors"
-                        >
-                          <td className="py-3 px-4 font-semibold text-white whitespace-nowrap">{getUserNicknameSync(member.id)}</td>
-                          <td className="py-3 px-4 text-white/80 whitespace-nowrap text-center">
-                            {totalSessions > 0 ? totalSessions : '—'}
-                          </td>
-                          <td className="py-3 px-4 text-white/80 whitespace-nowrap">
-                            {totalDuration > 0 ? formatSessionDuration(totalDuration) : '—'}
-                          </td>
-                          <td className="py-3 px-4 text-white/80 whitespace-nowrap">
-                            {avgDuration > 0 ? formatSessionDuration(avgDuration) : '—'}
-                          </td>
-                          <td className="py-3 px-4 text-white/80 whitespace-nowrap">
-                            {latestActivity ? formatDateTime(latestActivity.loginAt) : '—'}
-                          </td>
-                        </tr>
-                      )
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            ) : (
-              <div className="rounded-xl border border-white/10 bg-white/5 p-4 text-white/70">
-                За последние 24 часа активности не зафиксировано.
-              </div>
-            )}
-          </div>
-
-        </div>
-
-        {/* Referral stats */}
-        <div
-          id="rating-ref"
-          className={`rounded-2xl p-6 sm:p-7 ${cardBg} ${cardShadow} border ${calmBorder}`}
-        >
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
-            <div className="space-y-1">
-              <p className={`text-xs uppercase tracking-[0.12em] ${subTextColor}`}>Рефералы · 30 дней</p>
-              <h3 className={`text-2xl font-bold ${headingColor}`}>Привлеченные участники</h3>
-              <p className={`text-sm ${subTextColor}`}>Всего добавлено: <span className="font-semibold">{referrals.length}</span></p>
-            </div>
-            <button
-              onClick={handleAddReferral}
-              className="px-4 py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 font-semibold shadow-md w-full sm:w-auto border border-indigo-200/70 bg-indigo-50 text-indigo-900 hover:bg-indigo-100 dark:bg-indigo-500/15 dark:border-indigo-400/30 dark:text-indigo-50"
-            >
-              <span className="text-xl">➕</span>
-              <span>Добавить реферала</span>
-            </button>
-          </div>
-
-          {referrals.length ? (
-            <div className="overflow-auto rounded-xl border border-white/10 bg-white/5">
-              <table className="min-w-[820px] w-full text-sm text-white/90">
-                <thead className="bg-white/5 text-white/70 text-left">
-                  <tr>
-                    <th className="py-3 px-4 font-semibold">Кто привел</th>
-                    <th className="py-3 px-4 font-semibold">Код</th>
-                    <th className="py-3 px-4 font-semibold">Имя</th>
-                    <th className="py-3 px-4 font-semibold">Комментарий</th>
-                    <th className="py-3 px-4 font-semibold text-right">Действия</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {referrals.map((referral) => {
-                    const ownerName = getMemberNameById(referral.ownerId)
-                    const canManage = isAdmin || referral.ownerId === user?.id
-                    return (
-                      <tr
-                        key={referral.id}
-                        className="border-t border-white/10 hover:bg-white/5 transition-colors"
-                      >
-                        <td className="py-3 px-4 font-semibold text-white whitespace-nowrap">{ownerName}</td>
-                        <td className="py-3 px-4 text-white/80 whitespace-nowrap">{referral.referralId}</td>
-                        <td className="py-3 px-4 text-white/80">{referral.name}</td>
-                        <td className="py-3 px-4 text-white/70">{referral.comment || '—'}</td>
-                        <td className="py-3 px-4 text-right whitespace-nowrap flex items-center justify-end gap-2">
-                          <button
-                            onClick={() => canManage && handleEditReferral(referral)}
-                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold border border-white/20 bg-white/10 text-white transition ${!canManage ? 'opacity-40 cursor-not-allowed' : 'hover:bg-white/20'}`}
-                            disabled={!canManage}
-                          >
-                            Редактировать
-                          </button>
-                          <button
-                            onClick={() => canManage && handleDeleteReferral(referral)}
-                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold border border-rose-300/60 bg-rose-500/20 text-rose-50 transition ${!canManage ? 'opacity-40 cursor-not-allowed' : 'hover:bg-rose-500/30'}`}
-                            disabled={!canManage}
-                          >
-                            Удалить
-                          </button>
-                        </td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <div className="rounded-xl border border-white/10 bg-white/5 p-4 text-white/70">
-              Пока нет рефералов.
+              За последние 24 часа активности не зафиксировано.
             </div>
           )}
         </div>
 
-        {/* Rating cards section */}
-        <div
-          id="rating-method"
-          className={`rounded-2xl p-6 sm:p-7 ${cardBg} ${cardShadow} border ${calmBorder}`}
-        >
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
-            <div className="space-y-1">
-              <p className={`text-xs uppercase tracking-[0.12em] ${subTextColor}`}>Карточки участников</p>
-              <h3 className={`text-2xl font-bold ${headingColor}`}>Детальная статистика</h3>
-              
-            </div>
-            
+      </div>
+
+      {/* Referral stats */}
+      <div
+        id="rating-ref"
+        className={`rounded-2xl p-6 sm:p-7 ${cardBg} ${cardShadow} border ${calmBorder}`}
+      >
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
+          <div className="space-y-1">
+            <p className={`text-xs uppercase tracking-[0.12em] ${subTextColor}`}>Рефералы · 30 дней</p>
+            <h3 className={`text-2xl font-bold ${headingColor}`}>Привлеченные участники</h3>
+            <p className={`text-sm ${subTextColor}`}>Всего добавлено: <span className="font-semibold">{referrals.length}</span></p>
           </div>
+          <button
+            onClick={handleAddReferral}
+            className="px-4 py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 font-semibold shadow-md w-full sm:w-auto border border-indigo-200/70 bg-indigo-50 text-indigo-900 hover:bg-indigo-100 dark:bg-indigo-500/15 dark:border-indigo-400/30 dark:text-indigo-50"
+          >
+            <span className="text-xl">➕</span>
+            <span>Добавить реферала</span>
+          </button>
+        </div>
 
-          {loading ? (
-            <div className={`rounded-xl p-12 text-center ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-50'} border ${calmBorder}`}>
-              <div className="animate-spin rounded-full h-12 w-12 border-4 border-emerald-500 border-t-transparent mx-auto mb-4"></div>
-              <p className={`text-lg font-semibold ${headingColor}`}>Загрузка рейтинга...</p>
-              <p className={`text-sm ${subTextColor} mt-2`}>Подождите, собираем статистику</p>
-            </div>
-          ) : (
-            <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
-                {[
-                  { label: 'Топ-1', value: sortedRatings[0]?.rating ? `${sortedRatings[0].rating.toFixed(1)}%` : '—' },
-                  { label: 'Средний рейтинг', value: `${teamKPD.toFixed(1)}%` },
-                  { label: 'Медиана', value: `${ratingOverview.median.toFixed(1)}%` },
-                  { label: 'Участников', value: sortedRatings.length },
-                ].map((item) => (
-                  <div
-                    key={item.label}
-                    className={`rounded-xl border ${calmBorder} ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-50'} px-4 py-3`}
-                  >
-                    <p className={`text-[11px] uppercase tracking-wide ${subTextColor}`}>{item.label}</p>
-                    <p className={`text-2xl font-extrabold ${headingColor}`}>{item.value}</p>
-                  </div>
-                ))}
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-2 gap-6">
-                {sortedRatings.map((rating, index) => {
+        {referrals.length ? (
+          <div className="overflow-auto rounded-xl border border-white/10 bg-white/5">
+            <table className="min-w-[820px] w-full text-sm text-white/90">
+              <thead className="bg-white/5 text-white/70 text-left">
+                <tr>
+                  <th className="py-3 px-4 font-semibold">Кто привел</th>
+                  <th className="py-3 px-4 font-semibold">Код</th>
+                  <th className="py-3 px-4 font-semibold">Имя</th>
+                  <th className="py-3 px-4 font-semibold">Комментарий</th>
+                  <th className="py-3 px-4 font-semibold text-right">Действия</th>
+                </tr>
+              </thead>
+              <tbody>
+                {referrals.map((referral) => {
+                  const ownerName = getMemberNameById(referral.ownerId)
+                  const canManage = isAdmin || referral.ownerId === user?.id
                   return (
-                    <div key={rating.userId}>
-                      <RatingCard rating={rating} place={{ rank: index + 1 }} />
-                    </div>
+                    <tr
+                      key={referral.id}
+                      className="border-t border-white/10 hover:bg-white/5 transition-colors"
+                    >
+                      <td className="py-3 px-4 font-semibold text-white whitespace-nowrap">{ownerName}</td>
+                      <td className="py-3 px-4 text-white/80 whitespace-nowrap">{referral.referralId}</td>
+                      <td className="py-3 px-4 text-white/80">{referral.name}</td>
+                      <td className="py-3 px-4 text-white/70">{referral.comment || '—'}</td>
+                      <td className="py-3 px-4 text-right whitespace-nowrap flex items-center justify-end gap-2">
+                        <button
+                          onClick={() => canManage && handleEditReferral(referral)}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-semibold border border-white/20 bg-white/10 text-white transition ${!canManage ? 'opacity-40 cursor-not-allowed' : 'hover:bg-white/20'}`}
+                          disabled={!canManage}
+                        >
+                          Редактировать
+                        </button>
+                        <button
+                          onClick={() => canManage && handleDeleteReferral(referral)}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-semibold border border-rose-300/60 bg-rose-500/20 text-rose-50 transition ${!canManage ? 'opacity-40 cursor-not-allowed' : 'hover:bg-rose-500/30'}`}
+                          disabled={!canManage}
+                        >
+                          Удалить
+                        </button>
+                      </td>
+                    </tr>
                   )
                 })}
-              </div>
-            </>
-          )}
-        </div>
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="rounded-xl border border-white/10 bg-white/5 p-4 text-white/70">
+            Пока нет рефералов.
+          </div>
+        )}
       </div>
+
+      {/* Rating cards section */}
+      <div
+        id="rating-method"
+        className={`rounded-2xl p-6 sm:p-7 ${cardBg} ${cardShadow} border ${calmBorder}`}
+      >
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
+          <div className="space-y-1">
+            <p className={`text-xs uppercase tracking-[0.12em] ${subTextColor}`}>Карточки участников</p>
+            <h3 className={`text-2xl font-bold ${headingColor}`}>Детальная статистика</h3>
+
+          </div>
+
+        </div>
+
+        {loading ? (
+          <div className={`rounded-xl p-12 text-center ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-50'} border ${calmBorder}`}>
+            <div className="animate-spin rounded-full h-12 w-12 border-4 border-emerald-500 border-t-transparent mx-auto mb-4"></div>
+            <p className={`text-lg font-semibold ${headingColor}`}>Загрузка рейтинга...</p>
+            <p className={`text-sm ${subTextColor} mt-2`}>Подождите, собираем статистику</p>
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+              {[
+                { label: 'Топ-1', value: sortedRatings[0]?.rating ? `${sortedRatings[0].rating.toFixed(1)}%` : '—' },
+                { label: 'Средний рейтинг', value: `${teamKPD.toFixed(1)}%` },
+                { label: 'Медиана', value: `${ratingOverview.median.toFixed(1)}%` },
+                { label: 'Участников', value: sortedRatings.length },
+              ].map((item) => (
+                <div
+                  key={item.label}
+                  className={`rounded-xl border ${calmBorder} ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-50'} px-4 py-3`}
+                >
+                  <p className={`text-[11px] uppercase tracking-wide ${subTextColor}`}>{item.label}</p>
+                  <p className={`text-2xl font-extrabold ${headingColor}`}>{item.value}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-2 gap-6">
+              {sortedRatings.map((rating, index) => {
+                return (
+                  <div key={rating.userId}>
+                    <RatingCard rating={rating} place={{ rank: index + 1 }} />
+                  </div>
+                )
+              })}
+            </div>
+          </>
+        )}
+      </div>
+
       {showReferralForm && (
         <ReferralForm
           referral={activeReferral}
@@ -813,7 +810,7 @@ export const Rating = () => {
           }}
         />
       )}
-    </Layout>
+    </div>
   )
 }
 

@@ -1,5 +1,4 @@
 // FAQ page
-import { Layout } from '@/components/Layout'
 import { useThemeStore } from '@/store/themeStore'
 import {
   HelpCircle,
@@ -410,8 +409,8 @@ export const FAQ = () => {
   const cardBg = theme === 'dark' ? 'bg-[#1a1a1a]' : 'bg-white'
   const borderColor = theme === 'dark' ? 'border-gray-800' : 'border-gray-200'
 
-  const filteredFAQs = selectedCategory === 'all' 
-    ? faqData 
+  const filteredFAQs = selectedCategory === 'all'
+    ? faqData
     : faqData.filter(item => item.category === selectedCategory)
 
   const selectedCategoryInfo = categories.find(c => c.id === selectedCategory)
@@ -445,258 +444,245 @@ export const FAQ = () => {
   }, [selectedCategory])
 
   return (
-    <Layout>
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="section-card rounded-2xl p-5 sm:p-6 md:p-7 border border-white/60 dark:border-white/10 shadow-xl relative overflow-hidden mb-4 sm:mb-6">
-          {/* Decorative elements */}
-          <div className="absolute top-0 right-0 w-32 h-32 sm:w-64 sm:h-64 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-full blur-3xl -mr-16 sm:-mr-32 -mt-16 sm:-mt-32" />
-          <div className="absolute bottom-0 left-0 w-24 h-24 sm:w-48 sm:h-48 bg-gradient-to-tr from-[#4E6E49]/10 to-yellow-500/10 rounded-full blur-2xl -ml-12 sm:-ml-24 -mb-12 sm:-mb-24" />
-          
-          <div className="relative z-10 text-center space-y-3 sm:space-y-4">
-            <div className="flex flex-col items-center justify-center gap-3 sm:gap-4">
-              <h1
-                className={`text-2xl sm:text-3xl md:text-4xl font-extrabold ${headingColor} flex flex-wrap items-center justify-center gap-2 sm:gap-3`}
-              >
-                <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-transparent bg-clip-text">
-                  FAQ ApeVault Black Ops
-                </span>
-              </h1>
-            </div>
-            <p className={`text-sm sm:text-base font-medium ${subTextColor}`}>
-              Найдите ответы на популярные вопросы о работе системы
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="section-card rounded-2xl p-5 sm:p-6 md:p-7 border border-white/60 dark:border-white/10 shadow-xl relative overflow-hidden mb-4 sm:mb-6">
+        {/* Decorative elements */}
+        <div className="absolute top-0 right-0 w-32 h-32 sm:w-64 sm:h-64 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-full blur-3xl -mr-16 sm:-mr-32 -mt-16 sm:-mt-32" />
+        <div className="absolute bottom-0 left-0 w-24 h-24 sm:w-48 sm:h-48 bg-gradient-to-tr from-[#4E6E49]/10 to-yellow-500/10 rounded-full blur-2xl -ml-12 sm:-ml-24 -mb-12 sm:-mb-24" />
+
+        <div className="relative z-10 text-center space-y-3 sm:space-y-4">
+          <div className="flex flex-col items-center justify-center gap-3 sm:gap-4">
+            <h1
+              className={`text-2xl sm:text-3xl md:text-4xl font-extrabold ${headingColor} flex flex-wrap items-center justify-center gap-2 sm:gap-3`}
+            >
+              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-transparent bg-clip-text">
+                FAQ ApeVault Black Ops
+              </span>
+            </h1>
+          </div>
+          <p className={`text-sm sm:text-base font-medium ${subTextColor}`}>
+            Найдите ответы на популярные вопросы о работе системы
+          </p>
+        </div>
+      </div>
+
+      {/* Journey steps */}
+      <div className="section-card rounded-2xl p-5 sm:p-6 border border-white/60 dark:border-white/10 shadow-lg">
+        <div className="flex items-start sm:items-center justify-between gap-3 flex-wrap mb-4">
+          <div>
+            <h2 className={`text-xl sm:text-2xl font-bold ${headingColor}`}>Этапы работы в ApeVault</h2>
+            <p className={`text-sm ${subTextColor}`}>
+              Короткий маршрут от входа до уверенной работы, оформленный в карточках
             </p>
           </div>
+          <div className={`inline-flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold ${theme === 'dark'
+              ? 'bg-white/5 text-gray-200 border border-white/10'
+              : 'bg-blue-50 text-blue-700 border border-blue-100'
+            }`}>
+            <Sparkles className="w-4 h-4" />
+            <span>Практические шаги</span>
+          </div>
         </div>
 
-        {/* Journey steps */}
-        <div className="section-card rounded-2xl p-5 sm:p-6 border border-white/60 dark:border-white/10 shadow-lg">
-          <div className="flex items-start sm:items-center justify-between gap-3 flex-wrap mb-4">
-            <div>
-              <h2 className={`text-xl sm:text-2xl font-bold ${headingColor}`}>Этапы работы в ApeVault</h2>
-              <p className={`text-sm ${subTextColor}`}>
-                Короткий маршрут от входа до уверенной работы, оформленный в карточках
-              </p>
-            </div>
-            <div className={`inline-flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold ${
-              theme === 'dark'
-                ? 'bg-white/5 text-gray-200 border border-white/10'
-                : 'bg-blue-50 text-blue-700 border border-blue-100'
-            }`}>
-              <Sparkles className="w-4 h-4" />
-              <span>Практические шаги</span>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
-            {stageCards.map((stage, index) => (
-              <div
-                key={stage.title}
-                className={`relative overflow-hidden rounded-2xl border ${
-                  theme === 'dark'
-                    ? 'bg-[#0f1115] border-white/10 shadow-[0_12px_40px_-24px_rgba(0,0,0,0.8)]'
-                    : 'bg-white border-gray-100 shadow-[0_12px_32px_-20px_rgba(15,23,42,0.25)]'
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+          {stageCards.map((stage, index) => (
+            <div
+              key={stage.title}
+              className={`relative overflow-hidden rounded-2xl border ${theme === 'dark'
+                  ? 'bg-[#0f1115] border-white/10 shadow-[0_12px_40px_-24px_rgba(0,0,0,0.8)]'
+                  : 'bg-white border-gray-100 shadow-[0_12px_32px_-20px_rgba(15,23,42,0.25)]'
                 }`}
-              >
-                <div
-                  className={`absolute inset-0 bg-gradient-to-br ${
-                    theme === 'dark' ? stage.darkGradient : stage.lightGradient
+            >
+              <div
+                className={`absolute inset-0 bg-gradient-to-br ${theme === 'dark' ? stage.darkGradient : stage.lightGradient
                   }`}
-                />
-                <div className="relative z-10 flex flex-col gap-3 p-5">
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                      <span
-                        className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold ${
-                          theme === 'dark'
-                            ? 'bg-white/10 text-white border border-white/10'
-                            : 'bg-white/90 text-gray-900 border border-white shadow-sm'
+              />
+              <div className="relative z-10 flex flex-col gap-3 p-5">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <span
+                      className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold ${theme === 'dark'
+                          ? 'bg-white/10 text-white border border-white/10'
+                          : 'bg-white/90 text-gray-900 border border-white shadow-sm'
                         }`}
-                      >
-                        {String(index + 1).padStart(2, '0')}
-                      </span>
-                      <div className="flex items-center gap-2 text-xs sm:text-sm font-semibold">
-                        {stage.icon}
-                        <span className={headingColor}>{stage.title}</span>
-                      </div>
+                    >
+                      {String(index + 1).padStart(2, '0')}
+                    </span>
+                    <div className="flex items-center gap-2 text-xs sm:text-sm font-semibold">
+                      {stage.icon}
+                      <span className={headingColor}>{stage.title}</span>
                     </div>
                   </div>
-                  <p className={`text-sm leading-relaxed ${textColor}`}>
-                    {stage.description}
-                  </p>
-                  {stage.tags && stage.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-2">
-                      {stage.tags.map((tag) => (
-                        <span
-                          key={tag}
-                          className={`text-[11px] px-3 py-1 rounded-full font-semibold ${
-                            theme === 'dark'
-                              ? 'bg-white/10 text-white/90 border border-white/10'
-                              : 'bg-white/80 text-gray-800 border border-gray-100 shadow-sm'
-                          }`}
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  )}
                 </div>
+                <p className={`text-sm leading-relaxed ${textColor}`}>
+                  {stage.description}
+                </p>
+                {stage.tags && stage.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {stage.tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className={`text-[11px] px-3 py-1 rounded-full font-semibold ${theme === 'dark'
+                            ? 'bg-white/10 text-white/90 border border-white/10'
+                            : 'bg-white/80 text-gray-800 border border-gray-100 shadow-sm'
+                          }`}
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
+      </div>
 
-        {/* Category Selector */}
-        <div className="mb-6 section-card rounded-2xl p-4 sm:p-5 border border-white/60 dark:border-white/10 shadow">
-          <div className="flex flex-wrap gap-2 justify-center">
-            {categories.map((category) => (
-              <button
-                key={category.id}
-                onClick={() => {
-                  setSelectedCategory(category.id)
-                }}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
-                  selectedCategory === category.id
-                    ? theme === 'dark'
-                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/50 scale-105'
-                      : 'bg-blue-600 text-white shadow-lg scale-105'
-                    : theme === 'dark'
+      {/* Category Selector */}
+      <div className="mb-6 section-card rounded-2xl p-4 sm:p-5 border border-white/60 dark:border-white/10 shadow">
+        <div className="flex flex-wrap gap-2 justify-center">
+          {categories.map((category) => (
+            <button
+              key={category.id}
+              onClick={() => {
+                setSelectedCategory(category.id)
+              }}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all duration-200 ${selectedCategory === category.id
+                  ? theme === 'dark'
+                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/50 scale-105'
+                    : 'bg-blue-600 text-white shadow-lg scale-105'
+                  : theme === 'dark'
                     ? 'bg-[#1a1a1a] text-gray-300 border border-gray-800 hover:bg-gray-700 hover:border-gray-800'
                     : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:border-gray-400'
                 }`}
+            >
+              <span
+                className={selectedCategory === category.id
+                  ? 'text-white'
+                  : (theme === 'dark' ? category.darkColor : category.color)
+                }
               >
-                <span
-                  className={selectedCategory === category.id
-                    ? 'text-white'
-                    : (theme === 'dark' ? category.darkColor : category.color)
-                  }
-                >
-                  {category.icon}
-                </span>
-                <span>{category.name}</span>
-              </button>
-            ))}
+                {category.icon}
+              </span>
+              <span>{category.name}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Category Info */}
+      {selectedCategoryInfo && selectedCategory !== 'all' && (
+        <div className={`${cardBg} rounded-xl p-4 border-2 ${theme === 'dark'
+            ? 'border-blue-500/30 bg-blue-500/5'
+            : 'border-blue-200 bg-blue-50'
+          } mb-6`}>
+          <div className="flex items-center gap-3">
+            <span className={theme === 'dark' ? selectedCategoryInfo.darkColor : selectedCategoryInfo.color}>
+              {selectedCategoryInfo.icon}
+            </span>
+            <div>
+              <h3 className={`font-bold text-lg ${theme === 'dark' ? selectedCategoryInfo.darkColor : selectedCategoryInfo.color}`}>
+                {selectedCategoryInfo.name}
+              </h3>
+              <p className={`text-sm ${textColor}`}>
+                {filteredFAQs.length} {filteredFAQs.length === 1 ? 'вопрос' : filteredFAQs.length < 5 ? 'вопроса' : 'вопросов'}
+              </p>
+            </div>
           </div>
         </div>
+      )}
 
-        {/* Category Info */}
-        {selectedCategoryInfo && selectedCategory !== 'all' && (
-          <div className={`${cardBg} rounded-xl p-4 border-2 ${
-            theme === 'dark' 
-              ? 'border-blue-500/30 bg-blue-500/5' 
-              : 'border-blue-200 bg-blue-50'
-          } mb-6`}>
-            <div className="flex items-center gap-3">
-              <span className={theme === 'dark' ? selectedCategoryInfo.darkColor : selectedCategoryInfo.color}>
-                {selectedCategoryInfo.icon}
-              </span>
-              <div>
-                <h3 className={`font-bold text-lg ${theme === 'dark' ? selectedCategoryInfo.darkColor : selectedCategoryInfo.color}`}>
-                  {selectedCategoryInfo.name}
-                </h3>
-                <p className={`text-sm ${textColor}`}>
-                  {filteredFAQs.length} {filteredFAQs.length === 1 ? 'вопрос' : filteredFAQs.length < 5 ? 'вопроса' : 'вопросов'}
-                </p>
+      {/* FAQ Items */}
+      <div className="space-y-4">
+        {visibleCategories.map((category) => {
+          const items = groupedFAQs[category.id] || []
+          if (items.length === 0) return null
+          const badgeColor = theme === 'dark' ? category.darkColor : category.color
+
+          return (
+            <div
+              key={category.id}
+              className={`rounded-2xl border overflow-hidden ${theme === 'dark'
+                  ? 'bg-[#0f1115] border-white/10 shadow-[0_12px_40px_-24px_rgba(0,0,0,0.8)]'
+                  : 'bg-white border-gray-100 shadow-[0_12px_32px_-20px_rgba(15,23,42,0.25)]'
+                }`}
+            >
+              <div className={`flex items-center justify-between gap-3 px-4 sm:px-5 py-4 border-b ${theme === 'dark' ? 'border-white/10' : 'border-gray-100'}`}>
+                <div className="flex items-center gap-3">
+                  <span className={badgeColor}>{category.icon}</span>
+                  <div>
+                    <p className={`text-sm font-semibold ${headingColor}`}>{category.name}</p>
+                    <p className={`text-xs ${subTextColor}`}>{items.length} {items.length === 1 ? 'вопрос' : items.length < 5 ? 'вопроса' : 'вопросов'}</p>
+                  </div>
+                </div>
+                <span className={`text-[11px] px-2 py-1 rounded-lg font-semibold border ${theme === 'dark' ? 'border-white/10 bg-white/5 text-white' : 'border-gray-200 bg-gray-50 text-gray-700'
+                  }`}>
+                  Нажмите, чтобы раскрыть
+                </span>
+              </div>
+
+              <div className={`divide-y ${theme === 'dark' ? 'divide-white/10' : 'divide-gray-100'}`}>
+                {items.map((item) => {
+                  const itemId = `${category.id}-${item.question}`
+                  const isOpen = !!openItems[itemId]
+
+                  return (
+                    <div key={itemId} className="px-4 sm:px-5 py-3">
+                      <button
+                        type="button"
+                        onClick={() => toggleItem(itemId)}
+                        className="w-full flex items-start justify-between gap-3 text-left"
+                        aria-expanded={isOpen}
+                      >
+                        <span className={`font-semibold ${headingColor}`}>{item.question}</span>
+                        <ChevronDown
+                          className={`w-4 h-4 shrink-0 transition-transform ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                            } ${isOpen ? 'rotate-180' : ''}`}
+                        />
+                      </button>
+                      {isOpen && (
+                        <div
+                          className={`mt-3 rounded-xl border px-4 py-3 text-sm leading-relaxed ${theme === 'dark'
+                              ? 'bg-white/5 text-gray-200 border-white/10'
+                              : 'bg-blue-50/80 text-gray-800 border-blue-100'
+                            }`}
+                        >
+                          {formatAnswer(item.answer)}
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
               </div>
             </div>
+          )
+        })}
+
+        {visibleCategories.every((c) => (groupedFAQs[c.id] || []).length === 0) && (
+          <div className={`${cardBg} rounded-xl p-8 text-center border ${borderColor}`}>
+            <p className={textColor}>В этой категории пока нет вопросов</p>
           </div>
         )}
+      </div>
 
-        {/* FAQ Items */}
-        <div className="space-y-4">
-          {visibleCategories.map((category) => {
-            const items = groupedFAQs[category.id] || []
-            if (items.length === 0) return null
-            const badgeColor = theme === 'dark' ? category.darkColor : category.color
-
-            return (
-              <div
-                key={category.id}
-                className={`rounded-2xl border overflow-hidden ${
-                  theme === 'dark'
-                    ? 'bg-[#0f1115] border-white/10 shadow-[0_12px_40px_-24px_rgba(0,0,0,0.8)]'
-                    : 'bg-white border-gray-100 shadow-[0_12px_32px_-20px_rgba(15,23,42,0.25)]'
-                }`}
-              >
-                <div className={`flex items-center justify-between gap-3 px-4 sm:px-5 py-4 border-b ${theme === 'dark' ? 'border-white/10' : 'border-gray-100'}`}>
-                  <div className="flex items-center gap-3">
-                    <span className={badgeColor}>{category.icon}</span>
-                    <div>
-                      <p className={`text-sm font-semibold ${headingColor}`}>{category.name}</p>
-                      <p className={`text-xs ${subTextColor}`}>{items.length} {items.length === 1 ? 'вопрос' : items.length < 5 ? 'вопроса' : 'вопросов'}</p>
-                    </div>
-                  </div>
-                  <span className={`text-[11px] px-2 py-1 rounded-lg font-semibold border ${
-                    theme === 'dark' ? 'border-white/10 bg-white/5 text-white' : 'border-gray-200 bg-gray-50 text-gray-700'
-                  }`}>
-                    Нажмите, чтобы раскрыть
-                  </span>
-                </div>
-
-                <div className={`divide-y ${theme === 'dark' ? 'divide-white/10' : 'divide-gray-100'}`}>
-                  {items.map((item) => {
-                    const itemId = `${category.id}-${item.question}`
-                    const isOpen = !!openItems[itemId]
-
-                    return (
-                      <div key={itemId} className="px-4 sm:px-5 py-3">
-                        <button
-                          type="button"
-                          onClick={() => toggleItem(itemId)}
-                          className="w-full flex items-start justify-between gap-3 text-left"
-                          aria-expanded={isOpen}
-                        >
-                          <span className={`font-semibold ${headingColor}`}>{item.question}</span>
-                          <ChevronDown
-                            className={`w-4 h-4 shrink-0 transition-transform ${
-                              theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
-                            } ${isOpen ? 'rotate-180' : ''}`}
-                          />
-                        </button>
-                        {isOpen && (
-                          <div
-                            className={`mt-3 rounded-xl border px-4 py-3 text-sm leading-relaxed ${
-                              theme === 'dark'
-                                ? 'bg-white/5 text-gray-200 border-white/10'
-                                : 'bg-blue-50/80 text-gray-800 border-blue-100'
-                            }`}
-                          >
-                            {formatAnswer(item.answer)}
-                          </div>
-                        )}
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-            )
-          })}
-
-          {visibleCategories.every((c) => (groupedFAQs[c.id] || []).length === 0) && (
-            <div className={`${cardBg} rounded-xl p-8 text-center border ${borderColor}`}>
-              <p className={textColor}>В этой категории пока нет вопросов</p>
-            </div>
-          )}
-        </div>
-
-        {/* Additional help */}
-        <div className={`${cardBg} rounded-lg shadow-lg p-6 border ${borderColor}`}>
-          <h2 className={`text-xl font-semibold mb-4 ${headingColor}`}>Нужна дополнительная помощь?</h2>
-          <p className={`${textColor} mb-4`}>
-            Если вы не нашли ответ на свой вопрос, обратитесь к администратору или откройте страницу «Правила» через кнопку на входе или в ЛК.
-          </p>
-          <div className="flex flex-wrap gap-4">
-            <a href="/rules" className="inline-flex items-center px-4 py-2 bg-[#4E6E49] hover:bg-[#4E6E49] text-white rounded-lg transition-colors">
-              <BookOpen className="w-4 h-4 mr-2" />
-              Правила сообщества
-            </a>
-            <div className={`inline-flex items-center px-4 py-2 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'}`}>
-              <span className={textColor}>Администратор: <span className="font-semibold">@artyommedoed</span></span>
-            </div>
+      {/* Additional help */}
+      <div className={`${cardBg} rounded-lg shadow-lg p-6 border ${borderColor}`}>
+        <h2 className={`text-xl font-semibold mb-4 ${headingColor}`}>Нужна дополнительная помощь?</h2>
+        <p className={`${textColor} mb-4`}>
+          Если вы не нашли ответ на свой вопрос, обратитесь к администратору или откройте страницу «Правила» через кнопку на входе или в ЛК.
+        </p>
+        <div className="flex flex-wrap gap-4">
+          <a href="/rules" className="inline-flex items-center px-4 py-2 bg-[#4E6E49] hover:bg-[#4E6E49] text-white rounded-lg transition-colors">
+            <BookOpen className="w-4 h-4 mr-2" />
+            Правила сообщества
+          </a>
+          <div className={`inline-flex items-center px-4 py-2 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'}`}>
+            <span className={textColor}>Администратор: <span className="font-semibold">@artyommedoed</span></span>
           </div>
         </div>
       </div>
-    </Layout>
+    </div>
   )
 }
 
