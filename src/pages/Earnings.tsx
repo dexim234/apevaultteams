@@ -6,7 +6,7 @@ import { EarningsTable } from '@/components/Earnings/EarningsTable'
 import { EarningsList } from '@/components/Earnings/EarningsList'
 import { getEarnings } from '@/services/firestoreService'
 import { Earnings as EarningsType, EARNINGS_CATEGORY_META, EarningsCategory, TEAM_MEMBERS } from '@/types'
-import { Plus, DollarSign, TrendingUp, Sparkles, Wallet, PiggyBank, PieChart, Coins, BarChart3 } from 'lucide-react'
+import { Plus, DollarSign, TrendingUp, Sparkles, Wallet, PiggyBank, PieChart, Coins, BarChart3, Zap, ShieldCheck } from 'lucide-react'
 import { getWeekRange, formatDate } from '@/utils/dateUtils'
 import { getUserNicknameAsync } from '@/utils/userUtils'
 
@@ -140,7 +140,7 @@ export const Earnings = () => {
       count: items.length,
       topParticipants,
     }
-  })
+  }).filter(cat => cat.key !== 'other')
 
   const totalNet = categoryBreakdown.reduce((sum, cat) => sum + cat.net, 0)
   const categoryWithShares = categoryBreakdown.map(cat => ({
@@ -181,7 +181,7 @@ export const Earnings = () => {
             </div>
             <div>
               <h1 className={`text-2xl md:text-3xl font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                Финансы Команд
+                AVF Profit
               </h1>
               <p className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                 Мониторинг доходов и распределение пула
@@ -203,7 +203,7 @@ export const Earnings = () => {
             {
               label: 'НЕДЕЛЯ (ЧИСТЫМИ)',
               value: `${stats.weekNet.toLocaleString()} ₽`,
-              change: '+12%',
+              badgeIcon: <Zap className="w-4 h-4 text-emerald-500" />,
               changeType: 'positive',
               icon: <TrendingUp className="w-5 h-5 text-emerald-400" />,
               bgClass: 'bg-emerald-500/5',
@@ -212,7 +212,7 @@ export const Earnings = () => {
             {
               label: 'НЕДЕЛЯ (ПУЛ)',
               value: `${stats.weekPool.toLocaleString()} ₽`,
-              status: 'Стабильно',
+              badgeIcon: <ShieldCheck className="w-4 h-4 text-blue-400" />,
               icon: <PiggyBank className="w-5 h-5 text-blue-400" />,
               bgClass: 'bg-blue-500/5',
               borderClass: 'border-blue-500/10'
@@ -231,7 +231,9 @@ export const Earnings = () => {
               isCoins: true,
               icon: <Coins className="w-5 h-5 text-orange-400" />,
               bgClass: 'bg-orange-500/5',
-              borderClass: 'border-orange-500/10'
+              borderClass: 'border-orange-500/10',
+              change: undefined,
+              badgeIcon: undefined
             }
           ].map((item, idx) => (
             <div
@@ -250,10 +252,10 @@ export const Earnings = () => {
                     {item.change}
                   </span>
                 )}
-                {item.status && (
-                  <span className="px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 text-[10px] font-black">
-                    {item.status}
-                  </span>
+                {'badgeIcon' in item && item.badgeIcon && (
+                  <div className="p-1 bg-emerald-500/10 rounded-lg">
+                    {item.badgeIcon as React.ReactNode}
+                  </div>
                 )}
                 {item.isTrend && <TrendingUp className="w-4 h-4 text-purple-500/40" />}
                 {item.isCoins && <PiggyBank className="w-4 h-4 text-orange-500/40" />}
@@ -324,7 +326,6 @@ export const Earnings = () => {
               </div>
               <h3 className={`text-sm font-black uppercase tracking-widest ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Детализация дохода по сферам</h3>
             </div>
-            <button className="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-[10px] font-black uppercase tracking-widest text-gray-500 transition-colors">Экспорт CSV</button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -426,9 +427,6 @@ export const Earnings = () => {
       </div>
 
       <div className="pt-8 border-t border-white/5">
-        <h2 className={`text-xl font-black tracking-tight mb-8 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-          Рейтинг и Итоги Дохода
-        </h2>
 
         {loading ? (
           <div className={`rounded-2xl p-12 text-center border border-dashed ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-gray-50'
@@ -448,12 +446,6 @@ export const Earnings = () => {
                     <TrendingUp className="w-5 h-5 text-emerald-500" />
                   </div>
                   <h3 className={`text-lg font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Лидеры по доходу</h3>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-500 text-[10px] font-black uppercase tracking-widest">
-                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    В сети: {TEAM_MEMBERS.length} активных
-                  </div>
                 </div>
               </div>
 

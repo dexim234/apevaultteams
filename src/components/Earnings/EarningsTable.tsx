@@ -1,8 +1,8 @@
 // Earnings statistics table
 import { useThemeStore } from '@/store/themeStore'
-import { formatDate } from '@/utils/dateUtils'
+import { formatDate, getWeekRange } from '@/utils/dateUtils'
 import { getUserNicknameSync } from '@/utils/userUtils'
-import { Earnings, TEAM_MEMBERS } from '@/types'
+import { Earnings, TEAM_MEMBERS, EARNINGS_CATEGORY_META, EarningsCategory } from '@/types'
 
 interface EarningsTableProps {
   earnings: Earnings[]
@@ -12,10 +12,13 @@ export const EarningsTable = ({ earnings }: EarningsTableProps) => {
   const { theme } = useThemeStore()
   const POOL_RATE = 0.45
 
+  const weekRange = getWeekRange()
+  const weekStart = formatDate(weekRange.start, 'yyyy-MM-dd')
+  const weekEnd = formatDate(weekRange.end, 'yyyy-MM-dd')
+
   const monthStart = formatDate(new Date(new Date().getFullYear(), new Date().getMonth(), 1), 'yyyy-MM-dd')
   const monthEnd = formatDate(new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0), 'yyyy-MM-dd')
 
-  // Calculate statistics
   const getStats = (userId: string, startDate: string, endDate: string) => {
     const userEarnings = earnings.filter((e) => {
       const allParticipants = e.participants && e.participants.length > 0
@@ -37,15 +40,18 @@ export const EarningsTable = ({ earnings }: EarningsTableProps) => {
       return sum + (pool / participantCount)
     }, 0)
 
-    return { totalEarnings, totalPool, count: userEarnings.length }
+    const categories = Array.from(new Set(userEarnings.map(e => e.category))).filter(cat => cat !== 'other')
+
+    return { totalEarnings, totalPool, count: userEarnings.length, categories }
   }
 
   const sortedMembers = TEAM_MEMBERS.map((member) => {
-    const stats = getStats(member.id, monthStart, monthEnd)
-    return { ...member, ...stats }
+    const monthStats = getStats(member.id, monthStart, monthEnd)
+    const weekStats = getStats(member.id, weekStart, weekEnd)
+    return { ...member, ...monthStats, weeklyNet: weekStats.totalEarnings }
   }).sort((a, b) => b.totalEarnings - a.totalEarnings)
 
-  const maxEarnings = Math.max(...sortedMembers.map((m) => m.totalEarnings), 1)
+  const KPI_TARGET = 50000
 
   return (
     <div className={`overflow-hidden rounded-3xl border shadow-2xl ${theme === 'dark' ? 'bg-[#0b1015] border-white/5' : 'bg-white border-gray-100'}`}>
@@ -54,6 +60,7 @@ export const EarningsTable = ({ earnings }: EarningsTableProps) => {
           <tr className={theme === 'dark' ? 'bg-white/5' : 'bg-gray-50'}>
             <th className="px-6 py-5 text-[10px] font-black uppercase tracking-widest text-gray-500">Ранг</th>
             <th className="px-6 py-5 text-[10px] font-black uppercase tracking-widest text-gray-500">Участник</th>
+            <th className="px-6 py-5 text-[10px] font-black uppercase tracking-widest text-gray-500">Сферы</th>
             <th className="px-6 py-5 text-[10px] font-black uppercase tracking-widest text-gray-500 text-right">Сумма пула</th>
             <th className="px-6 py-5 text-[10px] font-black uppercase tracking-widest text-gray-500 text-right">Чистые средства</th>
             <th className="px-6 py-5 text-[10px] font-black uppercase tracking-widest text-gray-500 text-right">KPI</th>
@@ -61,7 +68,7 @@ export const EarningsTable = ({ earnings }: EarningsTableProps) => {
         </thead>
         <tbody className="divide-y divide-white/5">
           {sortedMembers.map((member, index) => {
-            const kpi = (member.totalEarnings / maxEarnings) * 100
+            const kpi = (member.weeklyNet / KPI_TARGET) * 100
             const rankColor = index === 0 ? 'text-amber-500' : index === 1 ? 'text-gray-400' : index === 2 ? 'text-orange-500' : 'text-gray-600'
             const avatar = member.avatar
 
@@ -93,6 +100,20 @@ export const EarningsTable = ({ earnings }: EarningsTableProps) => {
                     </div>
                   </div>
                 </td>
+                <td className="px-6 py-5">
+                  <div className="flex flex-wrap gap-1.5">
+                    {member.categories.length > 0 ? (
+                      member.categories.map(cat => (
+                        <span key={cat} className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-tight border ${theme === 'dark' ? 'bg-white/5 border-white/10 text-gray-400' : 'bg-gray-100 border-gray-200 text-gray-600'
+                          }`}>
+                          {EARNINGS_CATEGORY_META[cat as EarningsCategory]?.label || cat}
+                        </span>
+                      ))
+                    ) : (
+                      <span className="text-[10px] text-gray-500 font-bold uppercase">—</span>
+                    )}
+                  </div>
+                </td>
                 <td className="px-6 py-5 text-right">
                   <span className={`text-sm font-black ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                     {member.totalPool.toLocaleString()} ₽
@@ -105,10 +126,10 @@ export const EarningsTable = ({ earnings }: EarningsTableProps) => {
                 </td>
                 <td className="px-6 py-5 text-right w-48">
                   <div className="flex items-center justify-end gap-3">
-                    <div className="w-24 h-1.5 bg-white/5 rounded-full overflow-hidden">
+                    <div className={`w-24 h-1.5 rounded-full overflow-hidden ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-100'}`}>
                       <div
-                        className={`h-full rounded-full transition-all duration-1000 ${index === 0 ? 'bg-emerald-500' : index === 1 ? 'bg-purple-500' : 'bg-amber-500'}`}
-                        style={{ width: `${kpi}%` }}
+                        className={`h-full rounded-full transition-all duration-1000 ${theme === 'dark' ? 'bg-white' : 'bg-black'}`}
+                        style={{ width: `${Math.min(kpi, 100)}%` }}
                       />
                     </div>
                     <span className="text-[10px] font-black text-gray-500">{kpi.toFixed(0)}%</span>

@@ -28,6 +28,7 @@ import {
 import type { LucideIcon } from 'lucide-react'
 import logo from '@/assets/logo.png'
 import { useState, useEffect } from 'react'
+import { PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 
 export const Layout = ({ children }: { children: React.ReactNode }) => {
   const { theme, toggleTheme } = useThemeStore()
@@ -36,6 +37,10 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation()
   const [showToolsMenu, setShowToolsMenu] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    const saved = localStorage.getItem('sidebarCollapsed')
+    return saved === 'true'
+  })
   const [notifications, setNotifications] = useState<{ id: string; text: string; time: string; status: string; timestamp?: number }[]>([])
   const [accessibleFeatures, setAccessibleFeatures] = useState<Set<string>>(new Set())
 
@@ -277,6 +282,12 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
   }, [user, isAdmin])
 
 
+  const toggleCollapsed = () => {
+    const newState = !isCollapsed
+    setIsCollapsed(newState)
+    localStorage.setItem('sidebarCollapsed', String(newState))
+  }
+
   const getInitials = (name: string) => {
     return name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)
   }
@@ -292,11 +303,24 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
 
       <div className="flex flex-col lg:flex-row min-h-screen">
         {/* Desktop Sidebar (Left) */}
-        <aside className="hidden xl:flex w-72 h-screen fixed left-0 top-0 flex-col glass-panel border-r border-white/40 dark:border-white/10 z-50 overflow-hidden">
+        <aside className={`hidden xl:flex ${isCollapsed ? 'w-20' : 'w-72'} h-screen fixed left-0 top-0 flex-col glass-panel border-r border-white/40 dark:border-white/10 z-50 overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]`}>
           <div className="accent-dots" />
 
+          {/* Toggle Button */}
+          <button
+            onClick={toggleCollapsed}
+            className={`absolute top-6 -right-0 transition-all duration-500 z-50 ${isCollapsed ? 'right-1/2 translate-x-1/2' : 'right-4'
+              } p-2 rounded-xl bg-[#4E6E49]/10 hover:bg-[#4E6E49]/20 text-[#4E6E49] dark:text-gray-400 dark:hover:text-white border border-[#4E6E49]/20 dark:border-white/10 group`}
+          >
+            {isCollapsed ? (
+              <PanelLeftOpen className="w-5 h-5 transition-transform group-hover:scale-110" />
+            ) : (
+              <PanelLeftClose className="w-5 h-5 transition-transform group-hover:scale-110" />
+            )}
+          </button>
+
           {/* Logo & Branding */}
-          <div className="p-6 pb-2">
+          <div className={`p-6 pb-2 transition-all duration-500 ${isCollapsed ? 'opacity-0 scale-50 pointer-events-none' : 'opacity-100 scale-100'}`}>
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 flex items-center justify-center">
                 <img
@@ -312,14 +336,24 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
             </div>
           </div>
 
+          {isCollapsed && (
+            <div className="absolute top-20 left-0 right-0 flex justify-center py-4">
+              <img
+                src={logo}
+                alt="ApeVault"
+                className="w-8 h-8 object-contain opacity-50"
+              />
+            </div>
+          )}
+
           {/* Utility Buttons */}
-          <div className="relative z-10 px-6 pb-4 flex items-center gap-2">
-            <button onClick={toggleTheme} className="flex-1 flex items-center justify-center p-2 rounded-xl border border-gray-200 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors">
+          <div className={`relative z-10 px-6 pb-4 flex items-center gap-2 transition-all duration-500 ${isCollapsed ? 'flex-col px-4 items-center' : ''}`}>
+            <button onClick={toggleTheme} className="flex-1 flex items-center justify-center p-2 rounded-xl border border-gray-200 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors w-full">
               {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-300" /> : <Moon className="w-4 h-4 text-gray-700" />}
             </button>
             <button
               onClick={() => setShowNotifications(!showNotifications)}
-              className={`flex-1 flex items-center justify-center relative p-2 rounded-xl border border-gray-200 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors ${showNotifications ? 'bg-amber-500/10' : ''}`}
+              className={`flex-1 flex items-center justify-center relative p-2 rounded-xl border border-gray-200 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors w-full ${showNotifications ? 'bg-amber-500/10' : ''}`}
             >
               <Bell className="w-4 h-4" />
               {notifications.length > 0 && <span className="absolute top-2 right-[35%] w-2 h-2 bg-red-500 rounded-full" />}
@@ -344,19 +378,24 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
           <div className="h-px w-full bg-gradient-to-r from-transparent via-gray-200/50 dark:via-white/10 to-transparent my-2" />
 
           {/* Navigation */}
-          <nav className="relative z-10 flex-1 px-4 py-4 space-y-1 overflow-y-auto">
+          <nav className="relative z-10 flex-1 px-4 py-4 space-y-1 overflow-y-auto no-scrollbar">
             {/* Tools Dropdown */}
             <div className="space-y-1">
               <button
-                onClick={() => setShowToolsMenu(!showToolsMenu)}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${isToolsActive ? 'bg-[#4E6E49]/15 text-[#4E6E49]' : 'text-gray-500 hover:bg-gray-100/50 dark:hover:bg-white/5'}`}
+                onClick={() => !isCollapsed && setShowToolsMenu(!showToolsMenu)}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${isToolsActive ? 'bg-[#4E6E49]/15 text-[#4E6E49]' : 'text-gray-500 hover:bg-gray-100/50 dark:hover:bg-white/5'
+                  } ${isCollapsed ? 'justify-center px-0' : ''}`}
               >
                 <Settings className="w-4 h-4" />
-                <span className="font-bold flex-1 text-left">Tools</span>
-                <ChevronDown className={`w-4 h-4 transition-transform ${showToolsMenu ? 'rotate-180' : ''}`} />
+                {!isCollapsed && (
+                  <>
+                    <span className="font-bold flex-1 text-left">Tools</span>
+                    <ChevronDown className={`w-4 h-4 transition-transform ${showToolsMenu ? 'rotate-180' : ''}`} />
+                  </>
+                )}
               </button>
 
-              {showToolsMenu && (
+              {showToolsMenu && !isCollapsed && (
                 <div className="pl-11 pr-4 py-1 space-y-1">
                   {toolsSubItems.map((item) => (
                     <Link
@@ -376,62 +415,67 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${location.pathname === item.path ? 'bg-[#4E6E49] text-white shadow-lg shadow-[#4E6E49]/30' : 'text-gray-500 hover:bg-gray-100/50 dark:hover:bg-white/5 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}`}
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${location.pathname === item.path ? 'bg-[#4E6E49] text-white shadow-lg shadow-[#4E6E49]/30' : 'text-gray-500 hover:bg-gray-100/50 dark:hover:bg-white/5 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                  } ${isCollapsed ? 'justify-center px-0' : ''}`}
               >
                 <item.icon className="w-4 h-4" />
-                <span className="font-bold text-sm tracking-tight">{item.label}</span>
+                {!isCollapsed && <span className="font-bold text-sm tracking-tight">{item.label}</span>}
               </Link>
             ))}
 
           </nav>
 
           {/* User Profile & Actions */}
-          <div className="relative z-10 m-4 space-y-2">
+          <div className={`relative z-10 m-4 space-y-2 transition-all duration-500 ${isCollapsed ? 'm-2 space-y-4' : ''}`}>
             <Link
               to="/profile"
-              className={`p-4 rounded-2xl flex items-center gap-3 transition-all group ${location.pathname === '/profile' ? 'bg-[#4E6E49]/10 border border-[#4E6E49]/30' : 'border border-gray-200/50 dark:border-white/5 hover:bg-gray-100/50 dark:hover:bg-white/5'}`}
+              className={`p-4 rounded-2xl flex items-center gap-3 transition-all group ${location.pathname === '/profile' ? 'bg-[#4E6E49]/10 border border-[#4E6E49]/30' : 'border border-gray-200/50 dark:border-white/5 hover:bg-gray-100/50 dark:hover:bg-white/5'
+                } ${isCollapsed ? 'p-0 h-12 w-12 items-center justify-center mx-auto border-0' : ''}`}
             >
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shadow-inner ${theme === 'dark' ? 'bg-emerald-500/20 text-[#4E6E49]' : 'bg-[#4E6E49]/10 text-[#4E6E49]'}`}>
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shadow-inner shrink-0 ${theme === 'dark' ? 'bg-emerald-500/20 text-[#4E6E49]' : 'bg-[#4E6E49]/10 text-[#4E6E49]'}`}>
                 {user?.avatar ? <img src={user.avatar} className="w-full h-full rounded-full object-cover" /> : getInitials(user?.name || 'User')}
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-bold truncate dark:text-white">{user?.name || 'Administrator'}</p>
-                <p className="text-[10px] text-gray-500 font-medium truncate">{user?.login || 'admin@apevault.io'}</p>
-              </div>
-              <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-[#4E6E49] transition-colors" />
+              {!isCollapsed && (
+                <>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-bold truncate dark:text-white">{user?.name || 'Administrator'}</p>
+                    <p className="text-[10px] text-gray-500 font-medium truncate">{user?.login || 'admin@apevault.io'}</p>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-[#4E6E49] transition-colors" />
+                </>
+              )}
             </Link>
 
-            <div className="flex gap-2">
+            <div className={`flex gap-2 transition-all duration-500 ${isCollapsed ? 'flex-col gap-4 px-2' : ''}`}>
               <button
                 onClick={() => {
                   logout()
                   deactivateAdmin()
-                  // Using window.location.href to ensure a clean state and fix the "blank screen" issue
                   window.location.href = '/login'
                 }}
-                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-red-500/20 bg-red-500/5 text-red-500 hover:bg-red-500/10 transition-colors text-xs font-bold"
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-red-500/20 bg-red-500/5 text-red-500 hover:bg-red-500/10 transition-colors text-xs font-bold ${isCollapsed ? 'w-full px-0 border-0' : ''}`}
               >
                 <LogOut className="w-3.5 h-3.5" />
-                <span>Выйти</span>
+                {!isCollapsed && <span>Выйти</span>}
               </button>
 
               {user?.name === 'Артём' && !isAdmin && (
                 <button
                   onClick={() => activateAdmin(ADMIN_PASSWORD)}
-                  className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-[#4E6E49]/20 bg-[#4E6E49]/5 text-[#4E6E49] hover:bg-[#4E6E49]/10 transition-colors text-xs font-bold"
+                  className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-[#4E6E49]/20 bg-[#4E6E49]/5 text-[#4E6E49] hover:bg-[#4E6E49]/10 transition-colors text-xs font-bold ${isCollapsed ? 'border-0' : ''}`}
                 >
                   <Shield className="w-3.5 h-3.5" />
-                  <span>Админ</span>
+                  {!isCollapsed && <span>Админ</span>}
                 </button>
               )}
 
               {isAdmin && (
                 <button
                   onClick={deactivateAdmin}
-                  className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-amber-500/20 bg-amber-500/5 text-amber-500 hover:bg-amber-500/10 transition-colors text-xs font-bold"
+                  className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-amber-500/20 bg-amber-500/5 text-amber-500 hover:bg-amber-500/10 transition-colors text-xs font-bold ${isCollapsed ? 'border-0' : ''}`}
                 >
                   <ZapOff className="w-3.5 h-3.5" />
-                  <span>Стоп</span>
+                  {!isCollapsed && <span>Стоп</span>}
                 </button>
               )}
             </div>
@@ -439,7 +483,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
         </aside>
 
         {/* Main Content */}
-        <div className="flex-1 xl:pl-72 min-h-screen">
+        <div className={`flex-1 ${isCollapsed ? 'xl:pl-20' : 'xl:pl-72'} min-h-screen transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]`}>
           <main className="page-shell">
             {children}
           </main>
