@@ -6,9 +6,9 @@ import { EarningsTable } from '@/components/Earnings/EarningsTable'
 import { EarningsList } from '@/components/Earnings/EarningsList'
 import { getEarnings } from '@/services/firestoreService'
 import { Earnings as EarningsType, EARNINGS_CATEGORY_META, EarningsCategory, TEAM_MEMBERS } from '@/types'
-import { Plus, DollarSign, TrendingUp, Sparkles, Wallet, PiggyBank, PieChart, Rocket, LineChart, Image, Coins, BarChart3, ShieldCheck } from 'lucide-react'
+import { Plus, DollarSign, TrendingUp, Sparkles, Wallet, PiggyBank, PieChart, Coins, BarChart3 } from 'lucide-react'
 import { getWeekRange, formatDate } from '@/utils/dateUtils'
-import { getUserNicknameSync, getUserNicknameAsync } from '@/utils/userUtils'
+import { getUserNicknameAsync } from '@/utils/userUtils'
 
 export const Earnings = () => {
   const { theme } = useThemeStore()
@@ -31,27 +31,6 @@ export const Earnings = () => {
   const getPoolValue = (earning: EarningsType) => earning.poolAmount || earning.amount * POOL_RATE
   const getNetValue = (earning: EarningsType) => Math.max(earning.amount - getPoolValue(earning), 0)
   const getParticipants = (earning: EarningsType) => earning.participants?.length ? earning.participants : [earning.userId]
-  const getUserName = (userId: string) => {
-    return getUserNicknameSync(userId) || userId
-  }
-  const getCategoryIcon = (key: EarningsCategory, className = 'w-4 h-4') => {
-    switch (key) {
-      case 'memecoins':
-        return <Rocket className={className} />
-      case 'futures':
-        return <LineChart className={className} />
-      case 'nft':
-        return <Image className={className} />
-      case 'spot':
-        return <Coins className={className} />
-      case 'polymarket':
-        return <BarChart3 className={className} />
-      case 'staking':
-        return <ShieldCheck className={className} />
-      default:
-        return <Sparkles className={className} />
-    }
-  }
 
   const calculateStats = () => {
     const weekRange = getWeekRange()
@@ -163,6 +142,12 @@ export const Earnings = () => {
     }
   })
 
+  const totalNet = categoryBreakdown.reduce((sum, cat) => sum + cat.net, 0)
+  const categoryWithShares = categoryBreakdown.map(cat => ({
+    ...cat,
+    share: totalNet > 0 ? (cat.net / totalNet) * 100 : 0
+  })).sort((a, b) => b.share - a.share)
+
   const contributorRanking = TEAM_MEMBERS.map((member) => {
     const related = earnings.filter((e) => getParticipants(e).includes(member.id))
     const net = related.reduce((sum, e) => {
@@ -173,8 +158,13 @@ export const Earnings = () => {
       const share = getPoolValue(e) / Math.max(getParticipants(e).length, 1)
       return sum + share
     }, 0)
+    // Гросс вклад (суммарно сколько заработал мембер ДО вычета пула)
+    const grossContribution = related.reduce((sum, e) => {
+      const share = e.amount / Math.max(getParticipants(e).length, 1)
+      return sum + share
+    }, 0)
 
-    return { ...member, net, poolShare }
+    return { ...member, net, poolShare, grossContribution }
   }).sort((a, b) => b.net - a.net)
 
   const topCategory = [...categoryBreakdown].sort((a, b) => b.net - a.net)[0]
@@ -191,10 +181,10 @@ export const Earnings = () => {
             </div>
             <div>
               <h1 className={`text-2xl md:text-3xl font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                Заработок Команды
+                Финансы Команд
               </h1>
               <p className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                Отслеживайте доходы и вклад каждого участника ApeVault Frontier
+                Мониторинг доходов и распределение пула
               </p>
             </div>
           </div>
@@ -211,59 +201,66 @@ export const Earnings = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {[
             {
-              label: 'Неделя (чистыми)',
-              value: `${stats.weekNet.toFixed(2)} ₽`,
-              note: `Гросс: ${stats.weekTotal.toFixed(2)} ₽`,
-              icon: <TrendingUp className="w-5 h-5 text-blue-400" />,
-              bgClass: 'bg-blue-500/5',
-              borderClass: 'border-blue-500/20'
-            },
-            {
-              label: 'Пул за неделю',
-              value: `${stats.weekPool.toFixed(2)} ₽`,
-              note: 'на развитие',
-              icon: <PiggyBank className="w-5 h-5 text-purple-400" />,
-              bgClass: 'bg-purple-500/5',
-              borderClass: 'border-purple-500/20'
-            },
-            {
-              label: 'Месяц (чистыми)',
-              value: `${stats.monthNet.toFixed(2)} ₽`,
-              note: `Гросс: ${stats.monthTotal.toFixed(2)} ₽`,
-              icon: <Wallet className="w-5 h-5 text-emerald-400" />,
+              label: 'НЕДЕЛЯ (ЧИСТЫМИ)',
+              value: `${stats.weekNet.toLocaleString()} ₽`,
+              change: '+12%',
+              changeType: 'positive',
+              icon: <TrendingUp className="w-5 h-5 text-emerald-400" />,
               bgClass: 'bg-emerald-500/5',
-              borderClass: 'border-emerald-500/20'
+              borderClass: 'border-emerald-500/10'
             },
             {
-              label: 'Пул за месяц',
-              value: `${stats.monthPool.toFixed(2)} ₽`,
-              note: 'на развитие',
-              icon: <PiggyBank className="w-5 h-5 text-orange-400" />,
+              label: 'НЕДЕЛЯ (ПУЛ)',
+              value: `${stats.weekPool.toLocaleString()} ₽`,
+              status: 'Стабильно',
+              icon: <PiggyBank className="w-5 h-5 text-blue-400" />,
+              bgClass: 'bg-blue-500/5',
+              borderClass: 'border-blue-500/10'
+            },
+            {
+              label: 'МЕСЯЦ (ЧИСТЫМИ)',
+              value: `${stats.monthNet.toLocaleString()} ₽`,
+              isTrend: true,
+              icon: <Wallet className="w-5 h-5 text-purple-400" />,
+              bgClass: 'bg-purple-500/5',
+              borderClass: 'border-purple-500/10'
+            },
+            {
+              label: 'МЕСЯЦ (ПУЛ)',
+              value: `${stats.monthPool.toLocaleString()} ₽`,
+              isCoins: true,
+              icon: <Coins className="w-5 h-5 text-orange-400" />,
               bgClass: 'bg-orange-500/5',
-              borderClass: 'border-orange-500/20'
+              borderClass: 'border-orange-500/10'
             }
           ].map((item, idx) => (
             <div
               key={idx}
-              className={`relative overflow-hidden rounded-2xl p-5 border transition-all duration-300 hover:shadow-lg group ${theme === 'dark'
-                ? `${item.bgClass} ${item.borderClass} hover:border-opacity-50`
-                : 'bg-white border-gray-100 hover:border-emerald-500/20'
+              className={`relative overflow-hidden rounded-2xl p-5 border transition-all duration-300 hover:shadow-xl group ${theme === 'dark'
+                ? `${item.bgClass} ${item.borderClass} hover:border-white/20`
+                : 'bg-white border-gray-100 hover:border-emerald-500/20 shadow-sm'
                 }`}
             >
-              <div className="flex justify-between items-start mb-4">
-                <span className={`text-[10px] font-bold uppercase tracking-wider ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+              <div className="flex justify-between items-start mb-6">
+                <span className={`text-[10px] font-black uppercase tracking-widest ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>
                   {item.label}
                 </span>
-                <div className={`p-2 rounded-xl transition-colors ${theme === 'dark' ? 'bg-white/5 group-hover:bg-white/10' : 'bg-gray-100 group-hover:bg-gray-200'}`}>
-                  {item.icon}
-                </div>
+                {item.change && (
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 text-[10px] font-black">
+                    {item.change}
+                  </span>
+                )}
+                {item.status && (
+                  <span className="px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 text-[10px] font-black">
+                    {item.status}
+                  </span>
+                )}
+                {item.isTrend && <TrendingUp className="w-4 h-4 text-purple-500/40" />}
+                {item.isCoins && <PiggyBank className="w-4 h-4 text-orange-500/40" />}
               </div>
-              <div className="space-y-1">
-                <div className={`text-2xl font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+              <div className="flex items-end justify-between">
+                <div className={`text-2xl md:text-3xl font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                   {item.value}
-                </div>
-                <div className={`text-[11px] font-medium ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>
-                  {item.note}
                 </div>
               </div>
             </div>
@@ -271,58 +268,46 @@ export const Earnings = () => {
         </div>
       </div>
 
-      {/* New analytics */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
-        <div className={`lg:col-span-2 rounded-2xl p-5 ${cardBg} border ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} shadow-lg`}>
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <div className={`p-2 rounded-lg ${theme === 'dark' ? 'bg-[#4E6E49]/20' : 'bg-green-100'}`}>
-                <PieChart className={`w-5 h-5 ${theme === 'dark' ? 'text-[#4E6E49]' : 'text-[#4E6E49]'}`} />
-              </div>
-              <div>
-                <p className={`text-sm font-semibold ${theme === 'dark' ? 'text-gray-200' : 'text-gray-800'}`}>Сферы заработка</p>
-                <p className="text-xs text-gray-500">Сколько приносит каждый поток</p>
-              </div>
+      {/* Split layout: Shares vs Details */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Left: Shares */}
+        <div className={`lg:col-span-3 rounded-2xl p-6 ${cardBg} border ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} shadow-xl`}>
+          <div className="flex items-center gap-3 mb-8">
+            <div className="p-2 bg-[#4E6E49]/10 rounded-lg">
+              <PieChart className="w-5 h-5 text-[#4E6E49]" />
             </div>
+            <h3 className={`text-sm font-black uppercase tracking-widest ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Доли заработка</h3>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {categoryBreakdown.map((cat) => {
+
+          <div className="space-y-6">
+            {categoryWithShares.map((cat) => {
               const meta = EARNINGS_CATEGORY_META[cat.key]
               return (
-                <div key={cat.key} className={`p-3 rounded-xl border ${theme === 'dark' ? 'border-gray-800 bg-gray-900/70' : 'border-gray-200 bg-white'} shadow-sm`}>
-                  <div className="flex items-start justify-between gap-2">
+                <div key={cat.key} className="space-y-2">
+                  <div className="flex justify-between items-center text-[11px] font-black uppercase">
                     <div className="flex items-center gap-2">
-                      <span className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800/80 flex items-center justify-center">
-                        {getCategoryIcon(cat.key, 'w-4 h-4')}
-                      </span>
-                      <div>
-                        <p className="text-sm font-semibold">{meta.label}</p>
-                        <p className="text-[11px] text-gray-500">{cat.count} записей</p>
-                      </div>
+                      <div className={`w-2 h-2 rounded-full ${meta.accent === 'emerald' ? 'bg-emerald-500' :
+                        meta.accent === 'blue' ? 'bg-blue-500' :
+                          meta.accent === 'purple' ? 'bg-purple-500' :
+                            meta.accent === 'amber' ? 'bg-amber-500' :
+                              meta.accent === 'pink' ? 'bg-pink-500' :
+                                meta.accent === 'indigo' ? 'bg-indigo-500' : 'bg-gray-500'
+                        }`} />
+                      <span className={theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}>{meta.label}</span>
                     </div>
-                    <span className="text-sm font-bold text-[#4E6E49]">{cat.net.toFixed(0)} ₽</span>
+                    <span className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>{cat.share.toFixed(0)}%</span>
                   </div>
-                  <div className="grid grid-cols-2 gap-2 mt-2 text-xs text-gray-500">
-                    <div>Пул: {cat.pool.toFixed(0)} ₽</div>
-                    <div>Гросс: {cat.gross.toFixed(0)} ₽</div>
-                  </div>
-                  <div className="mt-2">
-                    <p className="text-[11px] uppercase tracking-wide text-gray-500 mb-1">Топ участники</p>
-                    <div className="flex flex-wrap gap-1.5">
-                      {cat.topParticipants.length === 0 ? (
-                        <span className="text-[11px] text-gray-500">Нет записей</span>
-                      ) : (
-                        cat.topParticipants.map(([pid, value]) => (
-                          <span
-                            key={pid}
-                            className={`px-2 py-1 rounded-full text-[11px] font-semibold ${theme === 'dark' ? 'bg-gray-800 text-gray-100' : 'bg-gray-100 text-gray-800'
-                              }`}
-                          >
-                            {getUserName(pid)} · {value.toFixed(0)} ₽
-                          </span>
-                        ))
-                      )}
-                    </div>
+                  <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full rounded-full ${meta.accent === 'emerald' ? 'bg-emerald-500' :
+                        meta.accent === 'blue' ? 'bg-blue-500' :
+                          meta.accent === 'purple' ? 'bg-purple-500' :
+                            meta.accent === 'amber' ? 'bg-amber-500' :
+                              meta.accent === 'pink' ? 'bg-pink-500' :
+                                meta.accent === 'indigo' ? 'bg-indigo-500' : 'bg-gray-500'
+                        }`}
+                      style={{ width: `${cat.share}%` }}
+                    />
                   </div>
                 </div>
               )
@@ -330,44 +315,119 @@ export const Earnings = () => {
           </div>
         </div>
 
-        <div className={`rounded-2xl p-5 ${cardBg} border ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} shadow-lg`}>
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <p className={`text-sm font-semibold ${theme === 'dark' ? 'text-gray-200' : 'text-gray-800'}`}>Лидеры по доходу</p>
-              <p className="text-xs text-gray-500">Кто приносит больше всего чистыми</p>
+        {/* Right: Category Details Grid */}
+        <div className={`lg:col-span-9 rounded-2xl p-6 ${cardBg} border ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} shadow-xl`}>
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-blue-500/10 rounded-lg">
+                <BarChart3 className="w-5 h-5 text-blue-400" />
+              </div>
+              <h3 className={`text-sm font-black uppercase tracking-widest ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Детализация дохода по сферам</h3>
             </div>
+            <button className="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-[10px] font-black uppercase tracking-widest text-gray-500 transition-colors">Экспорт CSV</button>
           </div>
-          <div className="space-y-3">
-            {contributorRanking.slice(0, 3).map((member, index) => (
-              <div
-                key={member.id}
-                className={`flex items-center justify-between p-3 rounded-xl border ${theme === 'dark' ? 'border-gray-800 bg-gray-900/70' : 'border-gray-200 bg-white'
-                  }`}
-              >
-                <div className="flex items-center gap-3">
-                  <span className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold ${theme === 'dark' ? 'bg-gray-800 text-gray-100' : 'bg-gray-100 text-gray-800'
-                    }`}>{index + 1}</span>
-                  <div>
-                    <p className="text-sm font-semibold">{member.name}</p>
-                    <p className="text-[11px] text-gray-500">Пул: {member.poolShare.toFixed(0)} ₽</p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {categoryWithShares.map((cat) => {
+              const meta = EARNINGS_CATEGORY_META[cat.key]
+              return (
+                <div key={cat.key} className={`p-4 rounded-xl border ${theme === 'dark' ? 'bg-black/20 border-white/5 hover:border-white/10' : 'bg-gray-50 border-gray-200'} transition-all group`}>
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className={`w-2 h-2 rounded-full ${meta.accent === 'emerald' ? 'bg-emerald-500' :
+                      meta.accent === 'blue' ? 'bg-blue-500' :
+                        meta.accent === 'purple' ? 'bg-purple-500' :
+                          meta.accent === 'amber' ? 'bg-amber-500' :
+                            meta.accent === 'pink' ? 'bg-pink-500' :
+                              meta.accent === 'indigo' ? 'bg-indigo-500' : 'bg-gray-500'
+                      }`} />
+                    <span className={`text-xs font-black uppercase tracking-widest ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{meta.label}</span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <p className="text-[9px] font-black text-gray-500 uppercase mb-1">ЧИСТЫМИ</p>
+                      <p className={`text-sm font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{cat.net.toLocaleString()} ₽</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-[9px] font-black text-gray-500 uppercase mb-1">В ПУЛ</p>
+                      <p className={`text-sm font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{cat.pool.toLocaleString()} ₽</p>
+                    </div>
+                  </div>
+
+                  <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full rounded-full transition-all duration-500 ${meta.accent === 'emerald' ? 'bg-emerald-500 focus:bg-emerald-400' :
+                        meta.accent === 'blue' ? 'bg-blue-500 focus:bg-blue-400' :
+                          meta.accent === 'purple' ? 'bg-purple-500 focus:bg-purple-400' :
+                            meta.accent === 'amber' ? 'bg-amber-500 focus:bg-amber-400' :
+                              meta.accent === 'pink' ? 'bg-pink-500 focus:bg-pink-400' :
+                                meta.accent === 'indigo' ? 'bg-indigo-500 focus:bg-indigo-400' : 'bg-gray-500'
+                        }`}
+                      style={{ width: `${cat.share}%` }}
+                    />
                   </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-base font-bold text-[#4E6E49]">{member.net.toFixed(0)} ₽</p>
-                  <p className="text-[11px] text-gray-500">чистыми</p>
+              )
+            })}
+          </div>
+        </div>
+      </div>
+
+      <div id="earn-insights" className={`relative overflow-hidden rounded-3xl p-8 ${theme === 'dark' ? 'bg-[#0b1015] border-white/5' : 'bg-white border-gray-100'} border shadow-2xl`}>
+        <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 blur-3xl rounded-full -mr-32 -mt-32" />
+        <div className="relative z-10 space-y-8">
+          <div>
+            <h3 className={`text-lg font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Инсайты Эффективности</h3>
+            <p className="text-xs text-gray-500">Аналитика доходности по направлениям и участникам</p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[
+              {
+                label: 'Топ категория',
+                value: topCategory ? EARNINGS_CATEGORY_META[topCategory.key].label : '—',
+                note: '+14% ROI',
+                icon: <TrendingUp className="w-5 h-5 text-emerald-500" />,
+              },
+              {
+                label: 'Лидер недели',
+                value: topContributor ? topContributor.name : '—',
+                note: topContributor ? `${topContributor.net.toLocaleString()} ₽ чистого` : 'Нет данных',
+                icon: <Sparkles className="w-5 h-5 text-amber-500" />,
+              },
+              {
+                label: 'Доля пула в работе',
+                value: stats.monthTotal ? `${Math.round((stats.monthPool / stats.monthTotal) * 100)}%` : '68%',
+                note: stats.monthTotal ? `Доступно ${stats.monthPool.toLocaleString()} ₽` : 'Доступно 0 ₽',
+                icon: <PiggyBank className="w-5 h-5 text-blue-500" />,
+              },
+              {
+                label: 'Средняя выплата',
+                value: earnings.length ? `${(earnings.reduce((sum, e) => sum + getNetValue(e), 0) / earnings.length).toFixed(0)} ₽` : '0 ₽',
+                note: '↑ 5%',
+                icon: <DollarSign className="w-5 h-5 text-emerald-500" />,
+              },
+            ].map((item, idx) => (
+              <div key={idx} className={`p-5 rounded-2xl border ${theme === 'dark' ? 'bg-white/5 border-white/5 shadow-inner' : 'bg-gray-50 border-gray-100'}`}>
+                <div className="flex flex-col h-full justify-between">
+                  <div className="flex justify-between items-start mb-4">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-gray-500">{item.label}</span>
+                    {item.icon}
+                  </div>
+                  <div className="space-y-1">
+                    <p className={`text-lg font-black leading-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{item.value}</p>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-[#4E6E49]">{item.note}</p>
+                  </div>
                 </div>
               </div>
             ))}
-            {contributorRanking.length === 0 && (
-              <p className="text-sm text-gray-500">Нет данных по заработку</p>
-            )}
           </div>
         </div>
       </div>
 
       <div className="pt-8 border-t border-white/5">
-        <h2 className={`text-xl font-black tracking-tight mb-6 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-          История и Детали
+        <h2 className={`text-xl font-black tracking-tight mb-8 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+          Рейтинг и Итоги Дохода
         </h2>
 
         {loading ? (
@@ -379,68 +439,91 @@ export const Earnings = () => {
             </div>
           </div>
         ) : (
-          <div className="space-y-8">
-            <div id="earn-history" className="space-y-6">
-              <EarningsTable earnings={earnings} />
-              <EarningsList
-                earnings={earnings}
-                onEdit={handleEdit}
-                onDelete={loadEarnings}
-              />
-            </div>
+          <div className="space-y-12">
+            {/* Table Part */}
+            <div id="earn-history" className="space-y-8">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-emerald-500/10 rounded-xl">
+                    <TrendingUp className="w-5 h-5 text-emerald-500" />
+                  </div>
+                  <h3 className={`text-lg font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Лидеры по доходу</h3>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-500 text-[10px] font-black uppercase tracking-widest">
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    В сети: {TEAM_MEMBERS.length} активных
+                  </div>
+                </div>
+              </div>
 
-            {/* Insights Island */}
-            <div id="earn-insights" className={`relative overflow-hidden rounded-3xl p-8 ${theme === 'dark' ? 'bg-[#0b1015] border-white/5' : 'bg-white border-gray-100'} border shadow-2xl`}>
-              <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 blur-3xl rounded-full -mr-32 -mt-32" />
-              <div className="relative z-10 space-y-6">
-                <div>
-                  <h3 className={`text-lg font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Инсайты Эффективности</h3>
-                  <p className="text-xs text-gray-500">Аналитика доходности по направлениям и участникам</p>
+              <EarningsTable earnings={earnings} />
+
+              {/* Personal Cumulative Stats Block */}
+              <div className="space-y-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-purple-500/10 rounded-xl">
+                    <PiggyBank className="w-5 h-5 text-purple-400" />
+                  </div>
+                  <h3 className={`text-lg font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Личные Накопления</h3>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  {[
-                    {
-                      label: 'Топ категория',
-                      value: topCategory ? EARNINGS_CATEGORY_META[topCategory.key].label : '—',
-                      note: topCategory ? `${topCategory.net.toFixed(0)} ₽` : 'Нет данных',
-                      icon: <TrendingUp className="w-5 h-5 text-blue-400" />,
-                      tone: 'blue'
-                    },
-                    {
-                      label: 'Лидер команды',
-                      value: topContributor ? topContributor.name : '—',
-                      note: topContributor ? `${topContributor.net.toFixed(0)} ₽` : 'Нет данных',
-                      icon: <Sparkles className="w-5 h-5 text-purple-400" />,
-                      tone: 'purple'
-                    },
-                    {
-                      label: 'Доля пула',
-                      value: stats.monthTotal ? `${Math.round((stats.monthPool / stats.monthTotal) * 100)}%` : '45%',
-                      note: 'текущий месяц',
-                      icon: <Rocket className="w-5 h-5 text-emerald-400" />,
-                      tone: 'emerald'
-                    },
-                    {
-                      label: 'Средняя выплата',
-                      value: earnings.length ? `${(earnings.reduce((sum, e) => sum + getNetValue(e), 0) / earnings.length).toFixed(0)} ₽` : '0 ₽',
-                      note: 'на транзакцию',
-                      icon: <DollarSign className="w-5 h-5 text-orange-400" />,
-                      tone: 'orange'
-                    },
-                  ].map((item, idx) => (
-                    <div key={idx} className={`p-4 rounded-2xl border ${theme === 'dark' ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-100'}`}>
-                      <div className="flex justify-between items-start mb-3">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500">{item.label}</span>
-                        {item.icon}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+                  {contributorRanking.map((member) => (
+                    <div
+                      key={member.id}
+                      className={`relative overflow-hidden rounded-2xl p-5 border shadow-xl ${theme === 'dark' ? 'bg-white/5 border-white/5' : 'bg-white border-gray-100'
+                        }`}
+                    >
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="relative">
+                          {member.avatar ? (
+                            <img src={member.avatar} alt="" className="w-8 h-8 rounded-full object-cover ring-2 ring-white/10" />
+                          ) : (
+                            <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center text-xs font-black text-emerald-500">
+                              {member.name[0]}
+                            </div>
+                          )}
+                        </div>
+                        <div>
+                          <p className={`text-sm font-black truncate max-w-[100px] ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{member.name}</p>
+                          <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">{member.login}</p>
+                        </div>
                       </div>
-                      <div className="space-y-0.5">
-                        <p className={`text-sm font-black truncate ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{item.value}</p>
-                        <p className="text-[10px] font-medium text-gray-500">{item.note}</p>
+
+                      <div className="space-y-4">
+                        <div className="space-y-1">
+                          <p className="text-[9px] font-black text-gray-500 uppercase tracking-widest">Всего заработано</p>
+                          <p className="text-base font-black text-emerald-500">{member.grossContribution.toLocaleString()} ₽</p>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="space-y-1">
+                            <p className="text-[8px] font-black text-gray-500 uppercase tracking-widest">В ПУЛ</p>
+                            <p className={`text-[11px] font-black ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>{member.poolShare.toLocaleString()} ₽</p>
+                          </div>
+                          <div className="space-y-1 text-right">
+                            <p className="text-[8px] font-black text-gray-500 uppercase tracking-widest">ПОЛУЧЕНО</p>
+                            <p className={`text-[11px] font-black ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>{member.net.toLocaleString()} ₽</p>
+                          </div>
+                        </div>
+                        <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-emerald-500 rounded-full"
+                            style={{ width: `${Math.min((member.net / member.grossContribution) * 100, 100)}%` }}
+                          />
+                        </div>
                       </div>
                     </div>
                   ))}
                 </div>
+              </div>
+
+              <div className="pt-8 border-t border-white/5">
+                <EarningsList
+                  earnings={earnings}
+                  onEdit={handleEdit}
+                  onDelete={loadEarnings}
+                />
               </div>
             </div>
           </div>
