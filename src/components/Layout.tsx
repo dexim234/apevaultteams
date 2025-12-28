@@ -16,6 +16,7 @@ import {
   CheckSquare,
   TrendingUp,
   ChevronDown,
+  ChevronRight,
   Info,
   ArrowUpRight,
   Bell,
@@ -286,9 +287,9 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
         <div className="floating-grid" />
       </div>
 
-      <div className="flex flex-col lg:flex-row-reverse min-h-screen">
-        {/* Desktop Sidebar (Right) */}
-        <aside className="hidden lg:flex w-72 h-screen fixed right-0 top-0 flex-col glass-panel border-l border-white/40 dark:border-white/10 z-50 overflow-hidden">
+      <div className="flex flex-col lg:flex-row min-h-screen">
+        {/* Desktop Sidebar (Left) */}
+        <aside className="hidden lg:flex w-72 h-screen fixed left-0 top-0 flex-col glass-panel border-r border-white/40 dark:border-white/10 z-50 overflow-hidden">
           <div className="accent-dots" />
 
           {/* Logo & Branding */}
@@ -301,6 +302,35 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
               <p className={`text-sm font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>FRONTIER</p>
             </div>
           </div>
+
+          {/* Utility Buttons */}
+          <div className="relative z-10 px-6 pb-4 flex items-center gap-2">
+            <button onClick={toggleTheme} className="flex-1 flex items-center justify-center p-2 rounded-xl border border-gray-200 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors">
+              {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-300" /> : <Moon className="w-4 h-4 text-gray-700" />}
+            </button>
+            <button
+              onClick={() => setShowNotifications(!showNotifications)}
+              className={`flex-1 flex items-center justify-center relative p-2 rounded-xl border border-gray-200 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors ${showNotifications ? 'bg-amber-500/10' : ''}`}
+            >
+              <Bell className="w-4 h-4" />
+              {notifications.length > 0 && <span className="absolute top-2 right-[35%] w-2 h-2 bg-red-500 rounded-full" />}
+            </button>
+          </div>
+
+          {showNotifications && (
+            <div className="mx-4 mb-4 p-3 glass-panel rounded-xl border border-white/20 shadow-xl max-h-60 overflow-y-auto space-y-2 relative z-20">
+              {notifications.length === 0 ? (
+                <p className="text-[10px] text-gray-500">Нет уведомлений</p>
+              ) : (
+                notifications.map(n => (
+                  <div key={n.id} className="text-[10px] p-2 rounded-lg bg-black/5 dark:bg-white/5">
+                    <p className="font-bold">{n.text}</p>
+                    <p className="opacity-60">{n.time}</p>
+                  </div>
+                ))
+              )}
+            </div>
+          )}
 
           <div className="h-px w-full bg-gradient-to-r from-transparent via-gray-200/50 dark:via-white/10 to-transparent my-2" />
 
@@ -344,41 +374,12 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
               </Link>
             ))}
 
-            <div className="pt-4 space-y-4">
-              <div className="flex items-center justify-between px-4">
-                <button onClick={toggleTheme} className="p-2 rounded-xl border border-gray-200 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors">
-                  {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-300" /> : <Moon className="w-4 h-4 text-gray-700" />}
-                </button>
-                <button
-                  onClick={() => setShowNotifications(!showNotifications)}
-                  className={`relative p-2 rounded-xl border border-gray-200 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors ${showNotifications ? 'bg-amber-500/10' : ''}`}
-                >
-                  <Bell className="w-4 h-4" />
-                  {notifications.length > 0 && <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full" />}
-                </button>
-              </div>
-
-              {showNotifications && (
-                <div className="mx-2 p-3 glass-panel rounded-xl border border-white/20 shadow-xl max-h-60 overflow-y-auto space-y-2">
-                  {notifications.length === 0 ? (
-                    <p className="text-[10px] text-gray-500">Нет уведомлений</p>
-                  ) : (
-                    notifications.map(n => (
-                      <div key={n.id} className="text-[10px] p-2 rounded-lg bg-black/5 dark:bg-white/5">
-                        <p className="font-bold">{n.text}</p>
-                        <p className="opacity-60">{n.time}</p>
-                      </div>
-                    ))
-                  )}
-                </div>
-              )}
-            </div>
           </nav>
 
           {/* User Profile */}
           <Link
             to="/profile"
-            className={`relative z-10 m-4 p-4 rounded-2xl flex items-center gap-3 transition-all ${location.pathname === '/profile' ? 'bg-[#4E6E49]/10 border border-[#4E6E49]/30' : 'border border-gray-200/50 dark:border-white/5 hover:bg-gray-100/50 dark:hover:bg-white/5'}`}
+            className={`relative z-10 m-4 p-4 rounded-2xl flex items-center gap-3 transition-all group ${location.pathname === '/profile' ? 'bg-[#4E6E49]/10 border border-[#4E6E49]/30' : 'border border-gray-200/50 dark:border-white/5 hover:bg-gray-100/50 dark:hover:bg-white/5'}`}
           >
             <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shadow-inner ${theme === 'dark' ? 'bg-emerald-500/20 text-[#4E6E49]' : 'bg-[#4E6E49]/10 text-[#4E6E49]'}`}>
               {user?.avatar ? <img src={user.avatar} className="w-full h-full rounded-full object-cover" /> : getInitials(user?.name || 'User')}
@@ -387,11 +388,12 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
               <p className="text-sm font-bold truncate dark:text-white">{user?.name || 'Administrator'}</p>
               <p className="text-[10px] text-gray-500 font-medium truncate">{user?.login || 'admin@apevault.io'}</p>
             </div>
+            <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-[#4E6E49] transition-colors" />
           </Link>
         </aside>
 
         {/* Main Content */}
-        <div className="flex-1 lg:pr-72 min-h-screen">
+        <div className="flex-1 lg:pl-72 min-h-screen">
           <main className="page-shell">
             {children}
           </main>
