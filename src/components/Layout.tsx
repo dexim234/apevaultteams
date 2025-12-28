@@ -24,6 +24,7 @@ import {
   AlertTriangle,
   LogOut,
   ZapOff,
+  Radio,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import logo from '@/assets/logo.png'
@@ -79,7 +80,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
   }, [user, isAdmin])
 
   const funcsSubItems: { path: string; label: string; icon: LucideIcon; feature?: string }[] = [
-    { path: '/call', label: 'AVF HUB', icon: Calendar, feature: 'slots' },
+    { path: '/call', label: 'AVF HUB', icon: Radio, feature: 'slots' },
     { path: '/management', label: 'AVF Schedule', icon: Calendar, feature: 'slots' },
     { path: '/tasks', label: 'AVF Tasks', icon: CheckSquare, feature: 'tasks' },
     { path: '/earnings', label: 'AVF Profit', icon: DollarSign, feature: 'earnings' },
@@ -320,7 +321,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
           </button>
 
           {/* Logo & Branding */}
-          <div className={`p-6 pb-2 transition-all duration-500 ${isCollapsed ? 'opacity-0 scale-50 pointer-events-none' : 'opacity-100 scale-100'}`}>
+          <div className={`p-6 pb-2 transition-all duration-500 origin-left overflow-hidden ${isCollapsed ? 'opacity-0 scale-90 w-0 px-0 translate-x-[-100%]' : 'opacity-100 scale-100'}`}>
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 flex items-center justify-center">
                 <img
@@ -329,22 +330,13 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                   className="w-9 h-9 object-contain filter drop-shadow-[0_0_8px_rgba(78,110,73,0.3)]"
                 />
               </div>
-              <div className="flex flex-col">
-                <span className="text-sm font-black tracking-widest text-[#4E6E49] dark:text-white uppercase">ApeVault</span>
-                <span className="text-[10px] font-bold text-gray-400 -mt-1 uppercase tracking-tighter">Frontier</span>
+              <div className="flex flex-col whitespace-nowrap">
+                <span className="text-sm font-black tracking-widest text-[#4E6E49] dark:text-white uppercase transition-opacity duration-300">ApeVault</span>
+                <span className="text-[10px] font-bold text-gray-400 -mt-1 uppercase tracking-tighter transition-opacity duration-300">Frontier</span>
               </div>
             </div>
           </div>
 
-          {isCollapsed && (
-            <div className="absolute top-20 left-0 right-0 flex justify-center py-4">
-              <img
-                src={logo}
-                alt="ApeVault"
-                className="w-8 h-8 object-contain opacity-50"
-              />
-            </div>
-          )}
 
           {/* Utility Buttons */}
           <div className={`relative z-10 px-6 pb-4 flex items-center gap-2 transition-all duration-500 ${isCollapsed ? 'flex-col px-4 items-center' : ''}`}>
@@ -375,18 +367,18 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
             </div>
           )}
 
-          <div className="h-px w-full bg-gradient-to-r from-transparent via-gray-200/50 dark:via-white/10 to-transparent my-2" />
+          <div className={`h-px w-full bg-gradient-to-r from-transparent via-gray-200/50 dark:via-white/10 to-transparent my-2 transition-opacity duration-500 ${isCollapsed ? 'opacity-0' : 'opacity-100'}`} />
 
           {/* Navigation */}
           <nav className="relative z-10 flex-1 px-4 py-4 space-y-1 overflow-y-auto no-scrollbar">
             {/* Tools Dropdown */}
-            <div className="space-y-1">
+            <div className="space-y-1 relative group/tools">
               <button
                 onClick={() => !isCollapsed && setShowToolsMenu(!showToolsMenu)}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${isToolsActive ? 'bg-[#4E6E49]/15 text-[#4E6E49]' : 'text-gray-500 hover:bg-gray-100/50 dark:hover:bg-white/5'
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${isToolsActive ? 'bg-[#4E6E49]/15 text-[#4E6E49]' : 'text-gray-500 hover:bg-gray-100/50 dark:hover:bg-white/5'
                   } ${isCollapsed ? 'justify-center px-0' : ''}`}
               >
-                <Settings className="w-4 h-4" />
+                <Settings className={`w-4 h-4 transition-transform duration-500 ${isCollapsed ? 'group-hover/tools:rotate-90' : ''}`} />
                 {!isCollapsed && (
                   <>
                     <span className="font-bold flex-1 text-left">Tools</span>
@@ -395,8 +387,29 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                 )}
               </button>
 
+              {/* Collapsed Hover Menu */}
+              {isCollapsed && (
+                <div className="fixed left-20 top-auto invisible group-hover/tools:visible opacity-0 group-hover/tools:opacity-100 transition-all duration-300 translate-x-1 group-hover/tools:translate-x-0 z-[60]">
+                  <div className="ml-2 glass-panel border border-white/40 dark:border-white/10 rounded-2xl p-2 min-w-[180px] shadow-2xl">
+                    <div className="px-3 py-2 mb-1 border-b border-white/10">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-[#4E6E49]">Инструменты</p>
+                    </div>
+                    {toolsSubItems.map((item) => (
+                      <Link
+                        key={item.path}
+                        to={item.path}
+                        className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold transition-all ${location.pathname === item.path ? 'bg-[#4E6E49] text-white' : 'text-gray-500 hover:bg-[#4E6E49]/10 hover:text-[#4E6E49]'}`}
+                      >
+                        <item.icon className="w-3.5 h-3.5" />
+                        <span>{item.label}</span>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {showToolsMenu && !isCollapsed && (
-                <div className="pl-11 pr-4 py-1 space-y-1">
+                <div className="pl-11 pr-4 py-1 space-y-1 animate-in fade-in slide-in-from-top-1 duration-300">
                   {toolsSubItems.map((item) => (
                     <Link
                       key={item.path}
@@ -415,7 +428,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${location.pathname === item.path ? 'bg-[#4E6E49] text-white shadow-lg shadow-[#4E6E49]/30' : 'text-gray-500 hover:bg-gray-100/50 dark:hover:bg-white/5 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${location.pathname === item.path ? 'bg-[#4E6E49] text-white shadow-lg shadow-[#4E6E49]/30' : 'text-gray-500 hover:bg-gray-100/50 dark:hover:bg-white/5 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                   } ${isCollapsed ? 'justify-center px-0' : ''}`}
               >
                 <item.icon className="w-4 h-4" />
