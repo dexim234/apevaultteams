@@ -296,13 +296,19 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
           <div className="accent-dots" />
 
           {/* Logo & Branding */}
-          <div className="relative z-10 p-6 flex items-center gap-3">
-            <div className="relative w-10 h-10 rounded-xl bg-white/80 dark:bg-white/5 border border-white/50 dark:border-white/10 shadow-lg overflow-hidden flex items-center justify-center">
-              <img src={logo} alt="Logo" className="w-8 h-8 object-contain" />
-            </div>
-            <div>
-              <p className={`text-[10px] uppercase tracking-[0.2em] font-bold ${theme === 'dark' ? 'text-[#4E6E49]' : 'text-[#4E6E49]'}`}>ApeVault</p>
-              <p className={`text-sm font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>FRONTIER</p>
+          <div className="p-6 pb-2">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 flex items-center justify-center">
+                <img
+                  src={logo}
+                  alt="ApeVault"
+                  className="w-9 h-9 object-contain filter drop-shadow-[0_0_8px_rgba(78,110,73,0.3)]"
+                />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-sm font-black tracking-widest text-[#4E6E49] dark:text-white uppercase">ApeVault</span>
+                <span className="text-[10px] font-bold text-gray-400 -mt-1 uppercase tracking-tighter">Frontier</span>
+              </div>
             </div>
           </div>
 

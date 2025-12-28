@@ -420,40 +420,40 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
 
   const headingColor = theme === 'dark' ? 'text-white' : 'text-gray-900'
   const statusTone = {
-    dayoff: 'bg-amber-50 text-amber-900 border border-amber-200 shadow-inner dark:bg-amber-900/25 dark:text-amber-50 dark:border-amber-700',
-    sick: 'bg-orange-50 text-orange-900 border border-orange-200 shadow-inner dark:bg-orange-900/25 dark:text-orange-50 dark:border-orange-700',
-    vacation: 'bg-sky-50 text-sky-900 border border-sky-200 shadow-inner dark:bg-sky-900/25 dark:text-sky-50 dark:border-sky-700',
-    absence: 'bg-red-50 text-red-900 border border-red-200 shadow-inner dark:bg-red-900/25 dark:text-red-50 dark:border-red-700',
+    dayoff: 'bg-amber-500/10 text-amber-500 border border-amber-500/20',
+    sick: 'bg-orange-500/10 text-orange-500 border border-orange-500/20',
+    vacation: 'bg-sky-500/10 text-sky-500 border border-sky-500/20',
+    absence: 'bg-rose-500/10 text-rose-500 border border-rose-500/20',
   } as const
 
   return (
-    <div className={`rounded-lg ${theme === 'dark' ? 'bg-[#1a1a1a]' : 'bg-white'} shadow-md overflow-hidden`}>
+    <div className={`rounded-2xl ${theme === 'dark' ? 'bg-transparent' : 'bg-white'} overflow-visible`}>
       {/* Week navigation */}
       <div
-        className={`p-3 sm:p-4 border-b ${theme === 'dark' ? 'border-gray-800' : 'border-gray-200'} flex flex-col gap-2 sm:gap-3 sm:flex-row sm:items-center sm:justify-between`}
+        className={`p-3 sm:p-4 border-b ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} flex flex-col gap-2 sm:gap-3 sm:flex-row sm:items-center sm:justify-between`}
       >
         <button
           onClick={() => navigateWeek('prev')}
-          className={`w-full sm:w-auto px-3 sm:px-4 py-2 text-xs sm:text-sm md:text-base rounded-lg transition-colors touch-manipulation active:scale-95 flex items-center justify-center gap-2 whitespace-nowrap ${theme === 'dark'
-              ? 'border border-gray-700 bg-gray-900/60 hover:border-[#4E6E49]/50 hover:bg-gray-900'
-              : 'border border-gray-200 bg-white hover:border-[#4E6E49]/40 hover:bg-gray-50'
+          className={`px-4 py-2 text-sm font-bold rounded-xl transition-all flex items-center gap-2 hover:scale-105 active:scale-95 ${theme === 'dark'
+            ? 'bg-[#151a21] text-gray-300 hover:text-white hover:bg-[#1f2937]'
+            : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
             }`}
         >
-          <span>←</span>
-          <span>Предыдущая неделя</span>
+          <ChevronDown className="w-4 h-4 rotate-90" />
+          <span>Пред. неделя</span>
         </button>
-        <span className={`${headingColor} font-semibold text-center text-xs sm:text-sm md:text-base whitespace-nowrap`}>
-          {formatDate(weekDays[0], 'dd.MM.yyyy')} - {formatDate(weekDays[6], 'dd.MM.yyyy')}
+        <span className={`${headingColor} font-black text-lg tracking-tight whitespace-nowrap`}>
+          {formatDate(weekDays[0], 'd MMMM')} — {formatDate(weekDays[6], 'd MMMM yyyy')}
         </span>
         <button
           onClick={() => navigateWeek('next')}
-          className={`w-full sm:w-auto px-3 sm:px-4 py-2 text-xs sm:text-sm md:text-base rounded-lg transition-colors touch-manipulation active:scale-95 flex items-center justify-center gap-2 whitespace-nowrap ${theme === 'dark'
-              ? 'border border-gray-700 bg-gray-900/60 hover:border-[#4E6E49]/50 hover:bg-gray-900'
-              : 'border border-gray-200 bg-white hover:border-[#4E6E49]/40 hover:bg-gray-50'
+          className={`px-4 py-2 text-sm font-bold rounded-xl transition-all flex items-center gap-2 hover:scale-105 active:scale-95 ${theme === 'dark'
+            ? 'bg-[#151a21] text-gray-300 hover:text-white hover:bg-[#1f2937]'
+            : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
             }`}
         >
-          <span>Следующая неделя</span>
-          <span>→</span>
+          <span>След. неделя</span>
+          <ChevronDown className="w-4 h-4 -rotate-90" />
         </button>
       </div>
 
@@ -465,10 +465,10 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
           const dayStatuses = getStatusesForDay(dateStr)
           const isToday = isSameDate(day, today)
           const dayCardBase = 'relative rounded-xl p-4 sm:p-5 border transition-all duration-300'
-          const dayCardTone = theme === 'dark' ? 'bg-gray-800/70 border-gray-700 shadow-md' : 'bg-gray-50 border-gray-200 shadow-sm'
+          const dayCardTone = theme === 'dark' ? 'bg-[#0b1015] border-white/5 shadow-md' : 'bg-gray-50 border-gray-200 shadow-sm'
           const dayCardHighlight = theme === 'dark'
-            ? 'border-emerald-500/70 bg-gradient-to-br from-emerald-900/30 via-gray-800 to-gray-900/80 ring-2 ring-emerald-400/40 shadow-[0_20px_40px_-24px_rgba(52,211,153,0.8)]'
-            : 'border-emerald-300 bg-gradient-to-br from-emerald-50 via-white to-green-50 ring-2 ring-emerald-200/70 shadow-[0_20px_40px_-24px_rgba(52,211,153,0.6)]'
+            ? 'border-emerald-500/50 bg-emerald-500/5 ring-1 ring-emerald-500/20'
+            : 'border-emerald-300 bg-emerald-50 ring-2 ring-emerald-200/70'
 
           return (
             <div
@@ -553,8 +553,8 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
                     <div
                       key={slot.id}
                       className={`group relative space-y-2 sm:space-y-3 p-3 sm:p-4 ${slotBg} rounded-lg sm:rounded-xl shadow-xl border-2 transition-all duration-300 hover:shadow-2xl active:scale-[0.98] sm:hover:scale-[1.03] mb-2 sm:mb-3 ${isUpcoming
-                          ? 'hover:border-emerald-200/80 ring-2 ring-emerald-200/40 hover:ring-4 hover:ring-emerald-200/60'
-                          : 'hover:border-slate-200/80 ring-2 ring-slate-200/40 hover:ring-4 hover:ring-slate-200/60'
+                        ? 'hover:border-emerald-200/80 ring-2 ring-emerald-200/40 hover:ring-4 hover:ring-emerald-200/60'
+                        : 'hover:border-slate-200/80 ring-2 ring-slate-200/40 hover:ring-4 hover:ring-slate-200/60'
                         }`}
                     >
                       <div className="flex items-center justify-between border-b border-white/20 pb-2 sm:pb-3">
@@ -565,8 +565,8 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
                                 src={slotUser.avatar}
                                 alt={displayName}
                                 className={`w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 lg:w-11 lg:h-11 rounded-full object-cover border-2 shadow-xl transition-all duration-300 group-hover/avatar:scale-110 group-hover/avatar:shadow-2xl ${isUpcoming
-                                    ? 'border-white/50 ring-2 ring-white/40 ring-offset-2 ring-offset-emerald-400/30 group-hover/avatar:ring-4 group-hover/avatar:ring-white/60'
-                                    : 'border-white/40 ring-2 ring-white/30 ring-offset-2 ring-offset-slate-400/30 group-hover/avatar:ring-4 group-hover/avatar:ring-white/50'
+                                  ? 'border-white/50 ring-2 ring-white/40 ring-offset-2 ring-offset-emerald-400/30 group-hover/avatar:ring-4 group-hover/avatar:ring-white/60'
+                                  : 'border-white/40 ring-2 ring-white/30 ring-offset-2 ring-offset-slate-400/30 group-hover/avatar:ring-4 group-hover/avatar:ring-white/50'
                                   }`}
                                 onError={(e) => {
                                   const target = e.target as HTMLImageElement
@@ -578,8 +578,8 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
                             ) : null}
                             <div
                               className={`w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 lg:w-11 lg:h-11 rounded-full flex items-center justify-center font-bold text-xs sm:text-sm transition-all duration-300 shadow-xl group-hover/avatar:scale-110 group-hover/avatar:shadow-2xl ${isUpcoming
-                                  ? 'bg-white/25 backdrop-blur-md border-2 border-white/40 ring-2 ring-white/30 group-hover/avatar:ring-4 group-hover/avatar:ring-white/60'
-                                  : 'bg-white/15 backdrop-blur-md border-2 border-white/30 ring-2 ring-white/20 group-hover/avatar:ring-4 group-hover/avatar:ring-white/50'
+                                ? 'bg-white/25 backdrop-blur-md border-2 border-white/40 ring-2 ring-white/30 group-hover/avatar:ring-4 group-hover/avatar:ring-white/60'
+                                : 'bg-white/15 backdrop-blur-md border-2 border-white/30 ring-2 ring-white/20 group-hover/avatar:ring-4 group-hover/avatar:ring-white/50'
                                 } ${slotUser?.avatar ? 'absolute inset-0 hidden' : ''}`}
                             >
                               {displayName.charAt(0).toUpperCase()}
@@ -630,8 +630,8 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
                           <div key={slotIdx} className="space-y-1.5">
                             {/* Main slot time */}
                             <div className={`bg-white/25 backdrop-blur-md rounded-md sm:rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 border-2 transition-all duration-300 hover:scale-105 hover:shadow-xl ${isUpcoming
-                                ? 'border-white/40 ring-2 ring-white/20 hover:border-white/60 hover:ring-4 hover:ring-white/40'
-                                : 'border-white/30 ring-2 ring-white/10 hover:border-white/50 hover:ring-4 hover:ring-white/30'
+                              ? 'border-white/40 ring-2 ring-white/20 hover:border-white/60 hover:ring-4 hover:ring-white/40'
+                              : 'border-white/30 ring-2 ring-white/10 hover:border-white/50 hover:ring-4 hover:ring-white/30'
                               }`}>
                               <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
                                 <SlotIcon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 text-white flex-shrink-0 ${isUpcoming ? 'animate-pulse' : ''}`} />
@@ -648,11 +648,10 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
                               <div className="flex justify-center">
                                 <button
                                   onClick={() => toggleBreaksVisibility(slot.id)}
-                                  className={`p-1 rounded-md transition-all duration-200 hover:scale-110 ${
-                                    breaksExpanded[slot.id]
+                                  className={`p-1 rounded-md transition-all duration-200 hover:scale-110 ${breaksExpanded[slot.id]
                                       ? 'text-white hover:text-white/80'
                                       : 'text-white/70 hover:text-white'
-                                  }`}
+                                    }`}
                                   title={breaksExpanded[slot.id] ? 'Скрыть перерывы' : 'Показать перерывы'}
                                 >
                                   {breaksExpanded[slot.id] ? (
@@ -669,8 +668,8 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
                                 <div className={`text-[10px] ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} font-medium text-center sm:text-left`}>Перерывы:</div>
                                 {s.breaks.map((breakItem, breakIdx) => (
                                   <div key={breakIdx} className={`${theme === 'dark' ? 'bg-gray-700/95' : 'bg-white'} ${theme === 'dark' ? 'text-gray-200' : 'text-gray-900'} border-2 ${theme === 'dark' ? 'border-orange-500/60' : 'border-orange-300'} rounded-md sm:rounded-lg px-2 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-xs font-semibold shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl ${theme === 'dark'
-                                      ? 'hover:border-orange-400/80 hover:shadow-orange-500/30 ring-2 ring-orange-500/20 hover:ring-4 hover:ring-orange-400/40'
-                                      : 'hover:border-orange-400 hover:shadow-orange-400/30 ring-2 ring-orange-300/20 hover:ring-4 hover:ring-orange-300/40'
+                                    ? 'hover:border-orange-400/80 hover:shadow-orange-500/30 ring-2 ring-orange-500/20 hover:ring-4 hover:ring-orange-400/40'
+                                    : 'hover:border-orange-400 hover:shadow-orange-400/30 ring-2 ring-orange-300/20 hover:ring-4 hover:ring-orange-300/40'
                                     } w-full`}>
                                     <span className="flex items-center gap-1 sm:gap-1.5 justify-center flex-wrap w-full">
                                       <span className={`w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full ${theme === 'dark' ? 'bg-orange-400' : 'bg-orange-500'} animate-pulse flex-shrink-0`}></span>

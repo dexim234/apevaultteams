@@ -189,8 +189,12 @@ export const Login = () => {
         </div>
 
         <div className="relative z-10 flex flex-col items-center text-center max-w-md">
-          <div className="w-24 h-24 sm:w-32 sm:h-32 mb-8 p-4 rounded-3xl bg-emerald-500/10 border border-emerald-500/20 backdrop-blur-xl flex items-center justify-center animate-pulse-subtle">
-            <img src={logo} alt="ApeVault" className="w-20 h-20 sm:w-24 sm:h-24 object-contain" />
+          <div className="w-24 h-24 sm:w-32 sm:h-32 mb-8 flex items-center justify-center animate-pulse-subtle">
+            <img
+              src={logo}
+              alt="ApeVault"
+              className="w-20 h-20 sm:w-24 sm:h-24 object-contain filter drop-shadow-[0_0_15px_rgba(16,185,129,0.4)]"
+            />
           </div>
 
           <h1 className="text-4xl lg:text-5xl font-black text-white mb-6 tracking-tight">
