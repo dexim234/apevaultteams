@@ -4,6 +4,7 @@ import { useThemeStore } from '@/store/themeStore'
 import { useAdminStore } from '@/store/adminStore'
 import { ManagementTable } from '@/components/Management/ManagementTable'
 import { ManagementWeekView } from '@/components/Management/ManagementWeekView'
+import { MemberSelector } from '@/components/Management/MemberSelector'
 import { SlotForm } from '@/components/Management/SlotForm'
 import { DayStatusForm } from '@/components/Management/DayStatusForm'
 import {
@@ -529,44 +530,31 @@ export const Management = () => {
             </button>
           </div>
 
-          {/* Right: Search/Filter */}
-          <div className="flex items-center gap-2 w-full lg:w-auto">
-            <div className="relative w-full lg:w-64">
-              <Users className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
-              <select
-                value={selectedUserId || ''}
-                onChange={(e) => setSelectedUserId(e.target.value || null)}
-                className={`w-full pl-10 pr-4 py-2.5 rounded-xl text-sm font-semibold appearance-none outline-none transition-all border ${theme === 'dark'
-                  ? 'bg-[#151a21] border-white/5 text-gray-300 focus:border-emerald-500/50'
-                  : 'bg-gray-50 border-gray-200 text-gray-700 focus:border-emerald-500'
-                  }`}
-              >
-                <option value="">Все участники...</option>
-                {TEAM_MEMBERS.map(m => (
-                  <option key={m.id} value={m.id}>{nicknameMap[m.id] || m.name}</option>
-                ))}
-              </select>
-            </div>
-            {/* Admin Actions Dropdown Trigger (Simplified for now) */}
-            {isAdmin && (
-              <div className="flex gap-1">
-                {[
-                  { icon: <Shield className="w-4 h-4" />, action: handleManageRestrictions, title: "Ограничения" },
-                  { icon: <Shield className="w-4 h-4" />, action: handleManageConflicts, title: "Конфликты" },
-                  { icon: <ShieldX className="w-4 h-4" />, action: handleManageAccessBlocks, title: "Блокировки" }
-                ].map((btn, i) => (
-                  <button
-                    key={i}
-                    onClick={btn.action}
-                    title={btn.title}
-                    className={`p-2.5 rounded-xl border ${theme === 'dark' ? 'border-white/10 bg-white/5 text-gray-400 hover:text-white' : 'border-gray-200 text-gray-500'}`}
-                  >
-                    {btn.icon}
-                  </button>
-                ))}
-              </div>
-            )}
+          <div className="flex items-center gap-2 w-full lg:w-72">
+            <MemberSelector
+              selectedUserId={selectedUserId}
+              onSelect={setSelectedUserId}
+            />
           </div>
+          {/* Admin Actions Dropdown Trigger (Simplified for now) */}
+          {isAdmin && (
+            <div className="flex gap-1">
+              {[
+                { icon: <Shield className="w-4 h-4" />, action: handleManageRestrictions, title: "Ограничения" },
+                { icon: <Shield className="w-4 h-4" />, action: handleManageConflicts, title: "Конфликты" },
+                { icon: <ShieldX className="w-4 h-4" />, action: handleManageAccessBlocks, title: "Блокировки" }
+              ].map((btn, i) => (
+                <button
+                  key={i}
+                  onClick={btn.action}
+                  title={btn.title}
+                  className={`p-2.5 rounded-xl border ${theme === 'dark' ? 'border-white/10 bg-white/5 text-gray-400 hover:text-white' : 'border-gray-200 text-gray-500'}`}
+                >
+                  {btn.icon}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
@@ -647,7 +635,7 @@ export const Management = () => {
           <AccessBlocksForm onClose={() => setShowAccessBlocksForm(false)} />
         )
       }
-    </div >
+    </div>
   )
 }
 

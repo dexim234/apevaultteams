@@ -25,8 +25,8 @@ export const EarningsTable = ({ earnings }: EarningsTableProps) => {
   const getStats = (userId: string, startDate: string, endDate: string) => {
     const userEarnings = earnings.filter((e) => {
       // Проверяем, является ли пользователь участником (в userId или в participants)
-      const allParticipants = e.participants && e.participants.length > 0 
-        ? [...e.participants, e.userId] 
+      const allParticipants = e.participants && e.participants.length > 0
+        ? [...e.participants, e.userId]
         : [e.userId]
       return allParticipants.includes(userId) && e.date >= startDate && e.date <= endDate
     })
@@ -69,91 +69,102 @@ export const EarningsTable = ({ earnings }: EarningsTableProps) => {
   }, 0)
 
   return (
-    <div className={`rounded-2xl ${theme === 'dark' ? 'bg-[#1a1a1a]' : 'bg-white'} shadow-lg border-2 ${
-      theme === 'dark' ? 'border-gray-800' : 'border-gray-200'
-    } overflow-hidden`}>
-      <div className="p-6">
-        <div className="flex items-center gap-3 mb-6">
-          <div className={`p-2 rounded-lg ${
-            theme === 'dark' ? 'bg-blue-500/20' : 'bg-blue-100'
-          }`}>
-            <TrendingUp className={`w-5 h-5 ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`} />
-          </div>
-          <h3 className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Статистика заработка</h3>
+    <div className={`rounded-3xl overflow-hidden border shadow-2xl ${theme === 'dark' ? 'bg-[#0b1015] border-white/5' : 'bg-white border-gray-100'
+      }`}>
+      <div className="p-6 border-b border-white/5 flex items-center gap-3">
+        <div className="p-2 bg-blue-500/10 rounded-xl">
+          <TrendingUp className="w-5 h-5 text-blue-400" />
         </div>
+        <h3 className={`text-lg font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+          Аналитика выплат
+        </h3>
+      </div>
 
+      <div className="p-6 space-y-8">
         {/* Weekly stats */}
-        <div className="mb-6">
-          <h4 className={`text-lg font-semibold mb-4 px-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>За неделю</h4>
-          <div className="overflow-x-auto rounded-xl border-2 border-gray-800/50 dark:border-gray-800">
-            <table className="w-full">
+        <div>
+          <h4 className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-4 px-2">Еженедельный отчет</h4>
+          <div className="overflow-hidden rounded-2xl border border-white/5 bg-white/5">
+            <table className="w-full text-left border-collapse">
               <thead>
-                <tr className={`${theme === 'dark' ? 'bg-gray-700/50' : 'bg-gray-100'}`}>
-                  <th className={`px-4 py-3 text-left text-sm font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Участник</th>
-                  <th className={`px-4 py-3 text-right text-sm font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Чистыми</th>
-                  <th className={`px-4 py-3 text-right text-sm font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Пул 45%</th>
+                <tr className={theme === 'dark' ? 'bg-white/5' : 'bg-gray-50'}>
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-wider text-gray-500">Участник</th>
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-wider text-gray-500 text-right">Чистыми</th>
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-wider text-gray-500 text-right">Пул 45%</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-white/5">
                 {TEAM_MEMBERS.map((member) => {
                   const stats = getStats(member.id, weekStart, weekEnd)
                   return (
-                    <tr 
-                      key={member.id} 
-                      className={`border-b border-gray-800/30 dark:border-gray-800 transition-colors ${
-                        theme === 'dark' ? 'hover:bg-gray-700/30' : 'hover:bg-gray-50'
-                      }`}
+                    <tr
+                      key={member.id}
+                      className={`group transition-colors ${theme === 'dark' ? 'hover:bg-white/[0.02]' : 'hover:bg-gray-50'}`}
                     >
-                      <td className={`px-4 py-3 font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{getUserNicknameSync(member.id)}</td>
-                      <td className={`px-4 py-3 text-right font-semibold ${theme === 'dark' ? 'text-[#4E6E49]' : 'text-[#4E6E49]'}`}>{stats.totalEarnings.toFixed(2)} ₽</td>
-                      <td className={`px-4 py-3 text-right font-semibold ${theme === 'dark' ? 'text-purple-400' : 'text-purple-600'}`}>{stats.totalPool.toFixed(2)} ₽</td>
+                      <td className="px-6 py-4">
+                        <span className={`text-sm font-bold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-900'}`}>{getUserNicknameSync(member.id)}</span>
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <span className="text-sm font-black text-emerald-500">{stats.totalEarnings.toFixed(0)} ₽</span>
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <span className="text-sm font-bold text-purple-400 opacity-60 group-hover:opacity-100 transition-opacity">{stats.totalPool.toFixed(0)} ₽</span>
+                      </td>
                     </tr>
                   )
                 })}
-                <tr className={`${theme === 'dark' ? 'bg-gray-700/70' : 'bg-gray-100'} font-bold border-t-2 border-gray-800/50 dark:border-gray-800`}>
-                  <td className={`px-4 py-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Итого команды</td>
-                  <td className={`px-4 py-3 text-right ${theme === 'dark' ? 'text-[#4E6E49]' : 'text-[#4E6E49]'}`}>{teamWeekEarnings.toFixed(2)} ₽</td>
-                  <td className={`px-4 py-3 text-right ${theme === 'dark' ? 'text-purple-400' : 'text-purple-600'}`}>{teamWeekPool.toFixed(2)} ₽</td>
-                </tr>
               </tbody>
+              <tfoot>
+                <tr className={theme === 'dark' ? 'bg-white/10' : 'bg-gray-100'}>
+                  <td className="px-6 py-4 text-sm font-black text-white">Итого</td>
+                  <td className="px-6 py-4 text-right text-sm font-black text-emerald-500">{teamWeekEarnings.toFixed(0)} ₽</td>
+                  <td className="px-6 py-4 text-right text-sm font-black text-purple-400">{teamWeekPool.toFixed(0)} ₽</td>
+                </tr>
+              </tfoot>
             </table>
           </div>
         </div>
 
         {/* Monthly stats */}
         <div>
-          <h4 className={`text-lg font-semibold mb-4 px-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>За месяц</h4>
-          <div className="overflow-x-auto rounded-xl border-2 border-gray-800/50 dark:border-gray-800">
-            <table className="w-full">
+          <h4 className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-4 px-2">Ежемесячный отчет</h4>
+          <div className="overflow-hidden rounded-2xl border border-white/5 bg-white/5">
+            <table className="w-full text-left border-collapse">
               <thead>
-                <tr className={`${theme === 'dark' ? 'bg-gray-700/50' : 'bg-gray-100'}`}>
-                  <th className={`px-4 py-3 text-left text-sm font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Участник</th>
-                  <th className={`px-4 py-3 text-right text-sm font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Чистыми</th>
-                  <th className={`px-4 py-3 text-right text-sm font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Пул 45%</th>
+                <tr className={theme === 'dark' ? 'bg-white/5' : 'bg-gray-50'}>
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-wider text-gray-500">Участник</th>
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-wider text-gray-500 text-right">Чистыми</th>
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-wider text-gray-500 text-right">Пул 45%</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-white/5">
                 {TEAM_MEMBERS.map((member) => {
                   const stats = getStats(member.id, monthStart, monthEnd)
                   return (
-                    <tr 
-                      key={member.id} 
-                      className={`border-b border-gray-800/30 dark:border-gray-800 transition-colors ${
-                        theme === 'dark' ? 'hover:bg-gray-700/30' : 'hover:bg-gray-50'
-                      }`}
+                    <tr
+                      key={member.id}
+                      className={`group transition-colors ${theme === 'dark' ? 'hover:bg-white/[0.02]' : 'hover:bg-gray-50'}`}
                     >
-                      <td className={`px-4 py-3 font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{getUserNicknameSync(member.id)}</td>
-                      <td className={`px-4 py-3 text-right font-semibold ${theme === 'dark' ? 'text-[#4E6E49]' : 'text-[#4E6E49]'}`}>{stats.totalEarnings.toFixed(2)} ₽</td>
-                      <td className={`px-4 py-3 text-right font-semibold ${theme === 'dark' ? 'text-purple-400' : 'text-purple-600'}`}>{stats.totalPool.toFixed(2)} ₽</td>
+                      <td className="px-6 py-4">
+                        <span className={`text-sm font-bold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-900'}`}>{getUserNicknameSync(member.id)}</span>
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <span className="text-sm font-black text-emerald-500">{stats.totalEarnings.toFixed(0)} ₽</span>
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <span className="text-sm font-bold text-purple-400 opacity-60 group-hover:opacity-100 transition-opacity">{stats.totalPool.toFixed(0)} ₽</span>
+                      </td>
                     </tr>
                   )
                 })}
-                <tr className={`${theme === 'dark' ? 'bg-gray-700/70' : 'bg-gray-100'} font-bold border-t-2 border-gray-800/50 dark:border-gray-800`}>
-                  <td className={`px-4 py-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Итого команды</td>
-                  <td className={`px-4 py-3 text-right ${theme === 'dark' ? 'text-[#4E6E49]' : 'text-[#4E6E49]'}`}>{teamMonthEarnings.toFixed(2)} ₽</td>
-                  <td className={`px-4 py-3 text-right ${theme === 'dark' ? 'text-purple-400' : 'text-purple-600'}`}>{teamMonthPool.toFixed(2)} ₽</td>
-                </tr>
               </tbody>
+              <tfoot>
+                <tr className={theme === 'dark' ? 'bg-white/10' : 'bg-gray-100'}>
+                  <td className="px-6 py-4 text-sm font-black text-white">Итого</td>
+                  <td className="px-6 py-4 text-right text-sm font-black text-emerald-500">{teamMonthEarnings.toFixed(0)} ₽</td>
+                  <td className="px-6 py-4 text-right text-sm font-black text-purple-400">{teamMonthPool.toFixed(0)} ₽</td>
+                </tr>
+              </tfoot>
             </table>
           </div>
         </div>

@@ -7,7 +7,7 @@ import { deleteEarnings, addApprovalRequest } from '@/services/firestoreService'
 import { Earnings, EARNINGS_CATEGORY_META, EarningsCategory } from '@/types'
 import { formatDate } from '@/utils/dateUtils'
 import { getUserNicknameSync } from '@/utils/userUtils'
-import { Edit2, Trash2, Rocket, LineChart, Image, Coins, BarChart3, ShieldCheck, Sparkles, Wallet2 } from 'lucide-react'
+import { Edit2, Trash2, Rocket, LineChart, Image, Coins, BarChart3, ShieldCheck, Sparkles } from 'lucide-react'
 
 interface EarningsListProps {
   earnings: Earnings[]
@@ -97,11 +97,10 @@ export const EarningsList = ({ earnings, onEdit, onDelete }: EarningsListProps) 
 
   if (sortedEarnings.length === 0) {
     return (
-      <div className={`rounded-2xl p-8 text-center border-2 ${
-        theme === 'dark' 
-          ? 'bg-[#1a1a1a] border-gray-800' 
-          : 'bg-white border-gray-200'
-      } shadow-md`}>
+      <div className={`rounded-2xl p-8 text-center border-2 ${theme === 'dark'
+        ? 'bg-[#1a1a1a] border-gray-800'
+        : 'bg-white border-gray-200'
+        } shadow-md`}>
         <p className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} text-lg`}>
           Пока нет записей о заработке
         </p>
@@ -113,125 +112,116 @@ export const EarningsList = ({ earnings, onEdit, onDelete }: EarningsListProps) 
   }
 
   return (
-    <div className={`rounded-2xl ${theme === 'dark' ? 'bg-[#1a1a1a]' : 'bg-white'} shadow-lg border-2 ${
-      theme === 'dark' ? 'border-gray-800' : 'border-gray-200'
-    } overflow-hidden`}>
-      <div className="p-6">
-        <div className="flex items-center gap-3 mb-6">
-          <div className={`p-2 rounded-lg ${
-            theme === 'dark' ? 'bg-blue-500/20' : 'bg-blue-100'
-          }`}>
-            <Edit2 className={`w-5 h-5 ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`} />
+    <div className={`rounded-3xl overflow-hidden border shadow-2xl ${theme === 'dark' ? 'bg-[#0b1015] border-white/5' : 'bg-white border-gray-100'
+      }`}>
+      <div className="p-6 border-b border-white/5 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-blue-500/10 rounded-xl">
+            <Edit2 className="w-5 h-5 text-blue-400" />
           </div>
-          <h3 className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-            Все записи о заработке
+          <h3 className={`text-lg font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+            История выплат
           </h3>
         </div>
-        <div className="overflow-x-auto rounded-xl border-2 border-gray-800/50 dark:border-gray-800">
-          <table className="w-full">
-            <thead>
-              <tr className={`${theme === 'dark' ? 'bg-gray-700/50' : 'bg-gray-100'}`}>
-                <th className={`px-4 py-3 text-left text-sm font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Дата</th>
-                <th className={`px-4 py-3 text-left text-sm font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Сфера</th>
-                <th className={`px-4 py-3 text-left text-sm font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Участники</th>
-                <th className={`px-4 py-3 text-right text-sm font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Чистыми</th>
-                <th className={`px-4 py-3 text-right text-sm font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Пул 45%</th>
-                <th className={`px-4 py-3 text-center text-sm font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Действия</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sortedEarnings.map((earning) => {
-                const participants = getParticipants(earning)
-                const categoryMeta = getCategoryMeta(earning.category)
-                const netAmount = calcNet(earning)
-                const shareAmount = calcShare(earning)
-                const canEdit = canEditOrDelete(earning)
-                return (
-                  <tr
-                    key={earning.id}
-                    className={`border-b border-gray-800/30 dark:border-gray-800 transition-colors ${
-                      theme === 'dark' ? 'hover:bg-gray-700/30' : 'hover:bg-gray-50'
-                    }`}
-                  >
-                    <td className={`px-4 py-3 font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                      {formatDate(new Date(earning.date + 'T00:00:00'), 'dd.MM.yyyy')}
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className={`inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-semibold ${
-                        theme === 'dark' ? 'bg-gray-800 text-gray-100' : 'bg-gray-100 text-gray-900'
-                      }`}>
-                        {getCategoryIcon(earning.category, 'w-4 h-4')}
+      </div>
+
+      <div className="overflow-x-auto">
+        <table className="w-full text-left border-collapse">
+          <thead>
+            <tr className={theme === 'dark' ? 'bg-white/5' : 'bg-gray-50'}>
+              <th className="px-6 py-4 text-[10px] font-black uppercase tracking-wider text-gray-500 whitespace-nowrap">Дата</th>
+              <th className="px-6 py-4 text-[10px] font-black uppercase tracking-wider text-gray-500">Сфера</th>
+              <th className="px-6 py-4 text-[10px] font-black uppercase tracking-wider text-gray-500">Команда</th>
+              <th className="px-6 py-4 text-[10px] font-black uppercase tracking-wider text-gray-500 text-right">Выплата</th>
+              <th className="px-6 py-4 text-[10px] font-black uppercase tracking-wider text-gray-500 text-right">В Пул</th>
+              <th className="px-6 py-4 text-[10px] font-black uppercase tracking-wider text-gray-500 text-center">Действия</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-white/5">
+            {sortedEarnings.map((earning) => {
+              const participants = getParticipants(earning)
+              const categoryMeta = getCategoryMeta(earning.category)
+              const netAmount = calcNet(earning)
+              const shareAmount = calcShare(earning)
+              const canEdit = canEditOrDelete(earning)
+              return (
+                <tr
+                  key={earning.id}
+                  className={`group/row transition-colors ${theme === 'dark' ? 'hover:bg-white/[0.02]' : 'hover:bg-gray-50'}`}
+                >
+                  <td className="px-6 py-5 whitespace-nowrap">
+                    <span className={`text-[12px] font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                      {formatDate(new Date(earning.date + 'T00:00:00'), 'dd.MM')}
+                    </span>
+                  </td>
+                  <td className="px-6 py-5">
+                    <div className="flex items-center gap-2">
+                      <div className="p-1.5 bg-white/5 rounded-lg">
+                        {getCategoryIcon(earning.category, 'w-3.5 h-3.5 text-gray-400')}
+                      </div>
+                      <span className={`text-xs font-bold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-900'}`}>
                         {categoryMeta.label}
                       </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex flex-wrap gap-2">
-                        {participants.map((pid) => (
-                          <span
-                            key={pid}
-                            className={`px-2.5 py-1 rounded-full text-xs font-semibold border ${
-                              theme === 'dark'
-                                ? 'border-gray-800 bg-gray-800/70 text-gray-100'
-                                : 'border-gray-200 bg-white text-gray-800'
+                    </div>
+                  </td>
+                  <td className="px-6 py-5">
+                    <div className="flex flex-wrap gap-1.5 max-w-[200px]">
+                      {participants.map((pid) => (
+                        <span
+                          key={pid}
+                          className={`px-2 py-0.5 rounded-md text-[10px] font-black tracking-tight border ${theme === 'dark'
+                            ? 'border-white/5 bg-white/5 text-gray-400'
+                            : 'border-gray-100 bg-gray-50 text-gray-600'
                             }`}
-                          >
-                            {getUserName(pid)}
-                          </span>
-                        ))}
-                      </div>
-                    </td>
-                    <td className={`px-4 py-3 text-right font-semibold ${theme === 'dark' ? 'text-[#4E6E49]' : 'text-[#4E6E49]'}`}>
-                      <div>{netAmount.toFixed(2)} ₽</div>
-                      <div className="text-xs text-gray-500">по {shareAmount.toFixed(2)} ₽</div>
-                      {earning.extraWalletsAmount ? (
-                        <div className="text-[11px] text-gray-500 flex items-center gap-1 mt-1">
-                          <Wallet2 className="w-3 h-3" />
-                          {earning.extraWalletsCount || 0} / {earning.extraWalletsAmount.toFixed(0)} ₽
-                        </div>
-                      ) : null}
-                    </td>
-                    <td className={`px-4 py-3 text-right font-semibold ${theme === 'dark' ? 'text-purple-400' : 'text-purple-600'}`}>
-                      {calcPool(earning).toFixed(2)} ₽
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      {canEdit ? (
-                        <div className="flex items-center justify-center gap-2">
-                          <button
-                            onClick={() => onEdit(earning)}
-                            className={`p-2 rounded-lg transition-colors ${
-                              theme === 'dark'
-                                ? 'hover:bg-gray-600 text-blue-400'
-                                : 'hover:bg-gray-200 text-blue-600'
-                            }`}
-                            title="Редактировать"
-                          >
-                            <Edit2 className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(earning)}
-                            disabled={deletingId === earning.id}
-                            className={`p-2 rounded-lg transition-colors ${
-                              theme === 'dark'
-                                ? 'hover:bg-gray-600 text-red-400'
-                                : 'hover:bg-gray-200 text-red-600'
-                            } disabled:opacity-50 disabled:cursor-not-allowed`}
-                            title="Удалить"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      ) : (
-                        <span className={`text-sm ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>
-                          —
+                        >
+                          {getUserName(pid)}
+                        </span>
+                      ))}
+                    </div>
+                  </td>
+                  <td className="px-6 py-5 text-right">
+                    <div className="flex flex-col items-end">
+                      <span className="text-sm font-black text-emerald-500">
+                        {netAmount.toFixed(0)} ₽
+                      </span>
+                      {participants.length > 1 && (
+                        <span className="text-[10px] font-medium text-gray-500">
+                          по {shareAmount.toFixed(0)} ₽
                         </span>
                       )}
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
-        </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-5 text-right">
+                    <span className="text-sm font-bold text-purple-400 opacity-60">
+                      {calcPool(earning).toFixed(0)} ₽
+                    </span>
+                  </td>
+                  <td className="px-6 py-5 text-center">
+                    {canEdit ? (
+                      <div className="flex items-center justify-center gap-2 opacity-0 group-hover/row:opacity-100 transition-opacity duration-200">
+                        <button
+                          onClick={() => onEdit(earning)}
+                          className={`p-2 rounded-xl border border-blue-500/20 bg-blue-500/5 text-blue-400 hover:bg-blue-500/20 transition-all`}
+                        >
+                          <Edit2 className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(earning)}
+                          disabled={deletingId === earning.id}
+                          className={`p-2 rounded-xl border border-rose-500/20 bg-rose-500/5 text-rose-500 hover:bg-rose-500/20 transition-all disabled:opacity-50`}
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ) : (
+                      <span className="text-gray-700 text-xs">—</span>
+                    )}
+                  </td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
       </div>
     </div>
   )
