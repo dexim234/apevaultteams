@@ -4,7 +4,17 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
 import { useThemeStore } from '@/store/themeStore'
 import { useAdminStore } from '@/store/adminStore'
-import { Moon, Sun, Shield, User, Users, Download, Send } from 'lucide-react'
+import {
+  Moon,
+  Sun,
+  Shield,
+  User,
+  Users,
+  Eye,
+  EyeOff,
+  Lock,
+  BookOpen
+} from 'lucide-react'
 import logo from '../assets/logo.png'
 
 // Declare Telegram WebApp types
@@ -34,6 +44,8 @@ export const Login = () => {
   const [userType, setUserType] = useState<UserType>('member')
   const [login, setLogin] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [rememberMe, setRememberMe] = useState(false)
   const [error, setError] = useState('')
   const { login: loginUser, user, isAuthenticated } = useAuthStore()
   const { theme, toggleTheme } = useThemeStore()
@@ -48,27 +60,21 @@ export const Login = () => {
 
   // Check for Telegram Mini App authentication
   useEffect(() => {
-    // Check if already authenticated
     if (isAuthenticated && user) {
       navigate('/management')
       return
     }
 
-    // Check if we're in Telegram Mini App
     if (window.Telegram?.WebApp) {
       window.Telegram.WebApp.ready()
       window.Telegram.WebApp.expand()
 
-      // Try to get initData from URL params first (for deep links)
       const initDataFromUrl = searchParams.get('tgWebAppData')
       const initData = initDataFromUrl || window.Telegram.WebApp.initData
-
-      // Also check for login/password in URL params (from bot)
       const loginFromUrl = searchParams.get('login')
       const passwordFromUrl = searchParams.get('password')
 
       if (loginFromUrl && passwordFromUrl) {
-        // Auto-login with credentials from bot
         const success = loginUser(loginFromUrl, passwordFromUrl)
         if (success) {
           navigate('/management')
@@ -78,25 +84,19 @@ export const Login = () => {
 
       if (initData) {
         try {
-          // Parse initData to extract user info
-          // Format: user=%7B%22id%22%3A123456789%2C...%7D
           const params = new URLSearchParams(initData)
           const userParam = params.get('user')
 
           if (userParam) {
             const userData = JSON.parse(decodeURIComponent(userParam))
             const telegramUserId = userData.id
-
-            // Store telegram user ID for later use
             sessionStorage.setItem('telegram_user_id', String(telegramUserId))
 
-            // Try to get saved credentials from localStorage (from previous session)
             const savedAuth = localStorage.getItem('apevault-auth')
             if (savedAuth) {
               try {
                 const parsed = JSON.parse(savedAuth)
                 if (parsed.state?.user) {
-                  // Auto-login with saved credentials
                   const savedUser = parsed.state.user
                   const success = loginUser(savedUser.login, savedUser.password)
                   if (success) {
@@ -108,20 +108,15 @@ export const Login = () => {
                 console.error('Error parsing saved auth:', err)
               }
             }
-
-            console.log('Telegram Mini App detected, user ID:', telegramUserId)
-            // User needs to login manually or bot should pass credentials
           }
         } catch (err) {
           console.error('Error parsing Telegram initData:', err)
         }
       }
 
-      // Also try initDataUnsafe for simpler access
       const unsafeUser = window.Telegram.WebApp.initDataUnsafe?.user
       if (unsafeUser) {
         sessionStorage.setItem('telegram_user_id', String(unsafeUser.id))
-        console.log('Telegram user detected:', unsafeUser.first_name)
       }
     }
   }, [searchParams, isAuthenticated, user, navigate, loginUser])
@@ -136,16 +131,13 @@ export const Login = () => {
     }
 
     if (userType === 'admin') {
-      // Admin login - only password needed
       const adminSuccess = activateAdmin(password)
       if (adminSuccess) {
-        // Admin login successful - no need to set user, just navigate
         navigate('/management')
       } else {
         setError('Неверный пароль администратора')
       }
     } else {
-      // Member login - login and password needed
       if (!login) {
         setError('Пожалуйста, введите логин')
         return
@@ -159,183 +151,220 @@ export const Login = () => {
     }
   }
 
-  const handleThemeToggle = () => {
-    toggleTheme()
-  }
-
   return (
-    <div className={`min-h-screen relative overflow-hidden ${theme === 'dark' ? 'bg-[#0b0f17]' : 'bg-gradient-to-br from-slate-50 via-white to-slate-100'}`}>
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute -top-24 -left-24 w-[620px] h-[620px] bg-gradient-to-br from-[#4E6E49]/35 via-emerald-400/22 to-transparent blur-[110px]" />
-        <div className="absolute top-[-120px] right-[-180px] w-[780px] h-[780px] bg-gradient-to-bl from-blue-500/24 via-purple-500/22 to-transparent blur-[140px]" />
-        <div className="absolute bottom-[-200px] right-[-80px] w-[620px] h-[620px] bg-gradient-to-tr from-amber-400/18 via-[#4E6E49]/18 to-transparent blur-[120px]" />
-        <div className="floating-grid opacity-75 dark:opacity-45" />
+    <div className={`min-h-screen flex flex-col xl:flex-row ${theme === 'dark' ? 'bg-[#0b0f17]' : 'bg-white'}`}>
+      {/* Left Branding Section */}
+      <div className="hidden xl:flex flex-1 relative bg-[#0b0f17] items-center justify-center p-12 overflow-hidden">
+        {/* Background Gradients */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute -top-24 -left-24 w-[620px] h-[620px] bg-gradient-to-br from-[#4E6E49]/35 via-emerald-400/22 to-transparent blur-[110px]" />
+          <div className="absolute top-[-120px] right-[-180px] w-[780px] h-[780px] bg-gradient-to-bl from-blue-500/24 via-purple-500/22 to-transparent blur-[140px]" />
+          <div className="floating-grid opacity-30" />
+        </div>
+
+        <div className="relative z-10 flex flex-col items-center text-center max-w-md">
+          <div className="w-24 h-24 sm:w-32 sm:h-32 mb-8 p-4 rounded-3xl bg-emerald-500/10 border border-emerald-500/20 backdrop-blur-xl flex items-center justify-center animate-pulse-subtle">
+            <img src={logo} alt="ApeVault" className="w-20 h-20 sm:w-24 sm:h-24 object-contain" />
+          </div>
+
+          <h1 className="text-4xl lg:text-5xl font-black text-white mb-6 tracking-tight">
+            ApeVault <span className="text-emerald-500">Frontier</span>
+          </h1>
+
+          <p className="text-lg text-gray-400 font-medium leading-relaxed">
+            Единая командная панель для управления ресурсами, аналитикой и оперативного взаимодействия.
+          </p>
+
+          <div className="mt-20 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            System Secure
+          </div>
+        </div>
       </div>
 
-      <div className="relative z-10 max-w-6xl mx-auto px-4 lg:px-6 min-h-screen flex items-center justify-center py-10">
-        <div className="glass-panel rounded-[28px] p-4 sm:p-6 md:p-8 border border-white/70 dark:border-white/10 shadow-2xl overflow-hidden w-full">
-          <div className="accent-dots" />
-          <div className="relative z-10 grid md:grid-cols-[1.05fr_0.95fr] gap-6 lg:gap-8 items-stretch">
-            <div className="flex flex-col items-center text-center gap-6 py-10 relative">
-              <div className="p-4 rounded-2xl bg-white/80 dark:bg-white/5 border border-white/50 dark:border-white/10 shadow-lg backdrop-blur-sm">
-                <img src={logo} alt="ApeVault Logo" className="w-16 h-16 object-contain" />
-              </div>
-              <div className="space-y-1">
-                <p className={`text-xs uppercase tracking-[0.16em] ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>ApeVault Black Ops</p>
-                <h1 className={`text-3xl lg:text-4xl font-extrabold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Командная панель</h1>
-              </div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-r from-[#4E6E49]/15 to-emerald-500/10 text-[#4E6E49] text-xs font-semibold">
-                <Shield className="w-4 h-4" />
-                Защищенный доступ
-              </div>
+      {/* Right Form Section */}
+      <div className={`flex-1 flex flex-col min-h-screen relative p-6 sm:p-12 lg:p-20 ${theme === 'dark' ? 'bg-[#0b0f17]' : 'bg-white'}`}>
+        {/* Mobile Header */}
+        <div className="xl:hidden flex items-center justify-between mb-12">
+          <div className="flex items-center gap-3">
+            <img src={logo} alt="Logo" className="w-10 h-10 object-contain" />
+            <span className={`font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>ApeVault</span>
+          </div>
+          <button onClick={toggleTheme} className="p-2 rounded-xl bg-gray-100 dark:bg-white/5 text-gray-700 dark:text-amber-300">
+            {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+          </button>
+        </div>
 
-              <div className="w-full mt-6 flex flex-col sm:flex-row gap-3">
-                <a
-                  href="/rules.pdf"
-                  download
-                  className="flex-1 inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-bold rounded-xl bg-gradient-to-r from-[#4E6E49] to-emerald-600 text-white shadow-lg hover:shadow-[#4E6E49]/20 hover:-translate-y-0.5 transition-all"
-                >
-                  <Download className="w-4 h-4" />
-                  Скачать правила
-                </a>
-                <a
-                  href="https://t.me/artyommedoed"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`flex-1 inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-bold rounded-xl border transition-all hover:-translate-y-0.5 ${theme === 'dark'
-                    ? 'border-white/10 bg-white/5 text-white hover:bg-white/10'
-                    : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
-                    }`}
-                >
-                  <Send className="w-4 h-4" />
-                  Админ (TG)
-                </a>
-              </div>
-            </div>
+        {/* Desktop Theme Toggle */}
+        <div className="hidden xl:flex justify-end absolute top-8 right-8">
+          <button
+            onClick={toggleTheme}
+            className={`p-3 rounded-full shadow-lg transition-all border ${theme === 'dark'
+              ? 'bg-white/5 border-white/10 text-amber-300 hover:bg-white/10'
+              : 'bg-white border-gray-100 text-gray-700 hover:bg-gray-50'
+              }`}
+          >
+            {theme === 'dark' ? <Sun className="w-6 h-6" /> : <Moon className="w-6 h-6" />}
+          </button>
+        </div>
 
-            <div className="section-card rounded-2xl p-6 lg:p-7 border border-white/60 dark:border-white/10 shadow-xl">
-              <div className="flex items-center justify-between mb-6">
-                <div>
-                  <p className={`text-xs uppercase tracking-[0.12em] ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Доступ</p>
-                  <h2 className={`text-2xl font-extrabold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Вход в систему</h2>
-                </div>
-                <button
-                  onClick={handleThemeToggle}
-                  className="nav-chip px-3 py-2"
-                  data-active="false"
-                  aria-label="Toggle theme"
-                >
-                  {theme === 'dark' ? <Sun className="w-5 h-5 text-amber-300" /> : <Moon className="w-5 h-5 text-gray-700" />}
-                </button>
-              </div>
+        <div className="flex-1 flex flex-col justify-center max-w-md mx-auto w-full">
+          <div className="mb-10 text-center xl:text-left">
+            <h2 className={`text-4xl font-extrabold mb-3 tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+              Добро пожаловать
+            </h2>
+            <p className={`text-gray-500 dark:text-gray-400 font-medium`}>
+              Введите данные для входа в <span className="text-emerald-500 font-bold">ApeVault</span>
+            </p>
+          </div>
 
-              <form onSubmit={handleSubmit} className="space-y-5">
-                <div>
-                  <label className={`block text-sm font-semibold mb-3 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                    Тип пользователя
-                  </label>
-                  <div className="grid grid-cols-2 gap-3">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setUserType('member')
-                        setLogin('')
-                        setPassword('')
-                        setError('')
-                      }}
-                      className="pill justify-center"
-                      data-active={userType === 'member'}
-                    >
-                      <Users className="w-5 h-5" />
-                      <span>Участник</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setUserType('admin')
-                        setLogin('')
-                        setPassword('')
-                        setError('')
-                      }}
-                      className="pill justify-center"
-                      data-active={userType === 'admin'}
-                    >
-                      <Shield className="w-5 h-5" />
-                      <span>Админ</span>
-                    </button>
+          {/* User Type Toggle */}
+          <div className="flex p-1 bg-gray-100 dark:bg-white/5 rounded-2xl mb-8">
+            <button
+              onClick={() => setUserType('member')}
+              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all ${userType === 'member'
+                ? 'bg-white dark:bg-[#4E6E49] text-[#4E6E49] dark:text-white shadow-sm'
+                : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
+                }`}
+            >
+              <Users className="w-4 h-4" />
+              <span>Участник</span>
+            </button>
+            <button
+              onClick={() => setUserType('admin')}
+              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all ${userType === 'admin'
+                ? 'bg-white dark:bg-[#4E6E49] text-[#4E6E49] dark:text-white shadow-sm'
+                : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
+                }`}
+            >
+              <Shield className="w-4 h-4" />
+              <span>Админ</span>
+            </button>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {userType === 'member' && (
+              <div className="space-y-2">
+                <label className={`text-sm font-bold block ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                  Логин / Email
+                </label>
+                <div className="relative group">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-emerald-500 transition-colors">
+                    <User className="w-5 h-5" />
                   </div>
-                </div>
-
-                {userType === 'member' && (
-                  <div>
-                    <label htmlFor="login" className={`block text-sm font-semibold mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                      <User className="w-4 h-4 inline mr-2" />
-                      Логин
-                    </label>
-                    <div className="flex items-center gap-2">
-                      <input
-                        id="login"
-                        type="text"
-                        value={login}
-                        onChange={(e) => setLogin(e.target.value)}
-                        className={`w-full px-4 py-3 rounded-xl border transition-all ${theme === 'dark'
-                          ? 'bg-white/5 border-white/10 text-white placeholder-gray-500 focus:border-[#4E6E49]'
-                          : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400 focus:border-[#4E6E49]'
-                          } focus:outline-none focus:ring-4 focus:ring-[#4E6E49]/20`}
-                        placeholder="Введите ваш логин"
-                        autoComplete="username"
-                      />
-                    </div>
-                  </div>
-                )}
-
-                <div>
-                  <label htmlFor="password" className={`block text-sm font-semibold mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                    <Shield className="w-4 h-4 inline mr-2" />
-                    Пароль
-                  </label>
                   <input
-                    id="password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className={`w-full px-4 py-3 rounded-xl border transition-all ${theme === 'dark'
-                      ? 'bg-white/5 border-white/10 text-white placeholder-gray-500 focus:border-[#4E6E49]'
-                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400 focus:border-[#4E6E49]'
-                      } focus:outline-none focus:ring-4 focus:ring-[#4E6E49]/20`}
-                    placeholder={userType === 'admin' ? 'Введите пароль администратора' : 'Введите ваш пароль'}
-                    autoComplete={userType === 'admin' ? 'off' : 'current-password'}
+                    type="text"
+                    value={login}
+                    onChange={(e) => setLogin(e.target.value)}
+                    placeholder="agent@apevault.io"
+                    className={`w-full pl-12 pr-4 py-4 rounded-2xl border transition-all focus:outline-none focus:ring-4 focus:ring-emerald-500/10 ${theme === 'dark'
+                      ? 'bg-white/5 border-white/10 text-white placeholder-gray-600 focus:border-emerald-500'
+                      : 'bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500'
+                      }`}
                   />
-                  {userType === 'admin' && (
-                    <p className={`mt-2 text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                      Для входа в режим администратора требуется специальный пароль
-                    </p>
-                  )}
-                </div>
-
-                {error && (
-                  <div className={`p-4 rounded-xl border ${theme === 'dark'
-                    ? 'bg-red-500/15 border-red-500/40 text-red-300'
-                    : 'bg-red-50 border-red-300 text-red-700'
-                    } text-sm font-semibold animate-shake`}>
-                    {error}
-                  </div>
-                )}
-
-                <button
-                  type="submit"
-                  className="w-full py-3 px-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all bg-gradient-to-r from-[#4E6E49] to-[#4E6E49] text-white"
-                >
-                  Войти в систему
-                </button>
-              </form>
-
-              <div className={`mt-6 pt-6 border-t ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} flex items-center justify-between gap-3 flex-wrap`}>
-                <div className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                  Защищенная система для команды ApeVault
                 </div>
               </div>
+            )}
+
+            <div className="space-y-2">
+              <label className={`text-sm font-bold block ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                Пароль
+              </label>
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-emerald-500 transition-colors">
+                  <Lock className="w-5 h-5" />
+                </div>
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className={`w-full pl-12 pr-12 py-4 rounded-2xl border transition-all focus:outline-none focus:ring-4 focus:ring-emerald-500/10 ${theme === 'dark'
+                    ? 'bg-white/5 border-white/10 text-white placeholder-gray-600 focus:border-emerald-500'
+                    : 'bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500'
+                    }`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-emerald-500 transition-colors"
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
             </div>
+
+            <div className="flex items-center justify-between">
+              <label className="flex items-center gap-3 cursor-pointer group">
+                <div className="relative">
+                  <input
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    className="sr-only"
+                  />
+                  <div className={`w-5 h-5 rounded border transition-all flex items-center justify-center ${rememberMe
+                    ? 'bg-emerald-500 border-emerald-500'
+                    : 'border-gray-300 dark:border-white/20'
+                    }`}>
+                    {rememberMe && <div className="w-2.5 h-2.5 bg-white rounded-sm" />}
+                  </div>
+                </div>
+                <span className={`text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Запомнить меня</span>
+              </label>
+              <button type="button" className="text-sm font-bold text-emerald-500 hover:text-emerald-600">
+                Забыли пароль?
+              </button>
+            </div>
+
+            {error && (
+              <div className="p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-500 text-sm font-bold animate-shake">
+                {error}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              className="w-full py-4 px-6 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-black text-lg transition-all shadow-lg shadow-emerald-500/20 hover:scale-[1.02] active:scale-[0.98]"
+            >
+              Войти в Систему
+            </button>
+          </form>
+
+          <div className="mt-12 pt-8 border-t border-gray-100 dark:border-white/5">
+            <div className="grid grid-cols-2 gap-4">
+              <a
+                href="https://t.me/artyommedoed"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`flex items-center justify-center gap-2 py-3 px-4 rounded-2xl border transition-all font-bold text-sm ${theme === 'dark'
+                  ? 'border-white/10 bg-white/5 text-white hover:bg-white/10'
+                  : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50 shadow-sm'
+                  }`}
+              >
+                <Shield className="w-4 h-4 text-emerald-500" />
+                <span>Связаться с Админом</span>
+              </a>
+              <a
+                href="/rules.pdf"
+                download
+                className={`flex items-center justify-center gap-2 py-3 px-4 rounded-2xl border transition-all font-bold text-sm ${theme === 'dark'
+                  ? 'border-white/10 bg-white/5 text-white hover:bg-white/10'
+                  : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50 shadow-sm'
+                  }`}
+              >
+                <BookOpen className="w-4 h-4 text-emerald-500" />
+                <span>Правила Команды</span>
+              </a>
+            </div>
+          </div>
+
+          <div className="mt-12 text-center text-[10px] font-bold text-gray-500 dark:text-gray-600 uppercase tracking-widest">
+            <p>© 2023 ApeVault Frontier. Protected Area.</p>
+            <p className="mt-2 flex items-center justify-center gap-2">
+              <Shield className="w-3 h-3" />
+              Access Logged: <span className="text-emerald-500/60 font-mono">IP 192.168.x.x</span>
+            </p>
           </div>
         </div>
       </div>

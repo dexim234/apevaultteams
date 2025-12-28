@@ -292,7 +292,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
 
       <div className="flex flex-col lg:flex-row min-h-screen">
         {/* Desktop Sidebar (Left) */}
-        <aside className="hidden lg:flex w-72 h-screen fixed left-0 top-0 flex-col glass-panel border-r border-white/40 dark:border-white/10 z-50 overflow-hidden">
+        <aside className="hidden xl:flex w-72 h-screen fixed left-0 top-0 flex-col glass-panel border-r border-white/40 dark:border-white/10 z-50 overflow-hidden">
           <div className="accent-dots" />
 
           {/* Logo & Branding */}
@@ -428,14 +428,14 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
         </aside>
 
         {/* Main Content */}
-        <div className="flex-1 lg:pl-72 min-h-screen">
+        <div className="flex-1 xl:pl-72 min-h-screen">
           <main className="page-shell">
             {children}
           </main>
         </div>
 
         {/* Mobile Navbar */}
-        <nav className="lg:hidden fixed bottom-4 left-0 right-0 px-3 z-50">
+        <nav className="xl:hidden fixed bottom-4 left-0 right-0 px-3 z-50">
           <div className="max-w-5xl mx-auto">
             <div className="glass-panel rounded-2xl shadow-2xl border border-white/60 dark:border-white/10 overflow-hidden">
               <div className="flex divide-x divide-white/40 dark:divide-white/5 w-full overflow-x-auto no-scrollbar">
