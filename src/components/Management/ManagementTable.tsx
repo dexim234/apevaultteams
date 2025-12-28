@@ -471,23 +471,23 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
           <table className="w-full border-collapse">
             <thead className="sticky top-0 z-30">
               <tr className={`${theme === 'dark' ? 'bg-[#0b1015]' : 'bg-white'}`}>
-                <th className={`p-4 text-left text-xs font-bold uppercase tracking-wider ${subTextColor} sticky left-0 z-30 ${theme === 'dark' ? 'bg-[#0b1015]' : 'bg-white'
+                <th className={`p-3 text-left text-[10px] font-bold uppercase tracking-wider ${subTextColor} sticky left-0 z-30 ${theme === 'dark' ? 'bg-[#0b1015]' : 'bg-white'
                   }`}>Участник</th>
                 {weekDays.map((day) => {
                   const isToday = formatDate(day, 'yyyy-MM-dd') === todayStr
                   return (
-                    <th key={day.toISOString()} className="p-2 min-w-[120px]">
-                      <div className={`mx-auto w-full p-2 rounded-xl border transition-colors ${isToday
+                    <th key={day.toISOString()} className="p-1 min-w-[100px] lg:min-w-[120px]">
+                      <div className={`mx-auto w-full p-1.5 rounded-xl border transition-colors ${isToday
                         ? 'bg-emerald-500/10 border-emerald-500/50 text-emerald-500'
                         : theme === 'dark' ? 'bg-[#151a21] border-white/5 text-gray-400' : 'bg-gray-50 border-gray-100 text-gray-500'
                         }`}>
-                        <div className="text-[10px] uppercase font-bold opacity-70 mb-0.5">{formatDate(day, 'EEE')}</div>
-                        <div className="text-sm font-black">{formatDate(day, 'dd.MM')}</div>
+                        <div className="text-[9px] uppercase font-bold opacity-70 mb-0.5">{formatDate(day, 'EEE')}</div>
+                        <div className="text-xs font-black">{formatDate(day, 'dd.MM')}</div>
                       </div>
                     </th>
                   )
                 })}
-                <th className={`p-4 text-center text-xs font-bold uppercase tracking-wider ${subTextColor}`}>Итоги</th>
+                <th className={`p-3 text-center text-[10px] font-bold uppercase tracking-wider ${subTextColor} min-w-[110px]`}>Итоги</th>
               </tr>
             </thead>
             <tbody className={`divide-y ${theme === 'dark' ? 'divide-white/5' : 'divide-gray-100'}`}>
@@ -503,14 +503,14 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
                     key={user.id}
                     className={`${rowBg} hover:bg-emerald-500/5 transition-colors group`}
                   >
-                    <td className={`p-4 sticky left-0 z-20 ${rowBg} group-hover:bg-[#1a2029] transition-colors`}>
-                      <div className="flex items-center gap-3">
+                    <td className={`p-2 sticky left-0 z-20 ${rowBg} group-hover:bg-[#1a2029] transition-colors align-middle`}>
+                      <div className="flex items-center gap-2">
                         <div className="relative">
                           {user.avatar ? (
                             <img
                               src={user.avatar}
                               alt={getDisplayName(user.id)}
-                              className="w-10 h-10 rounded-full object-cover border-2 border-emerald-500/20"
+                              className="w-8 h-8 rounded-full object-cover border border-emerald-500/20 shadow-sm"
                               onError={(e) => {
                                 const target = e.target as HTMLImageElement
                                 target.style.display = 'none'
@@ -520,21 +520,20 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
                             />
                           ) : null}
                           <div
-                            className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${theme === 'dark'
+                            className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs ${theme === 'dark'
                               ? 'bg-[#1f2937] text-gray-300'
                               : 'bg-gray-200 text-gray-600'
                               } ${user.avatar ? 'absolute inset-0 hidden' : ''}`}
                           >
                             <UserNickname userId={user.id} formatter={(n: string) => n.charAt(0).toUpperCase()} />
                           </div>
-                          {/* Online status indicator placeholder */}
-                          <div className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-emerald-500 border-2 border-[#0b1015]"></div>
+                          <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-[#0b1015]"></div>
                         </div>
                         <div>
-                          <div className={`font-bold text-sm ${headingColor}`}>
+                          <div className={`font-bold text-[13px] leading-tight ${headingColor}`}>
                             <UserNickname userId={user.id} />
                           </div>
-                          <div className="text-[10px] text-gray-500 font-medium uppercase tracking-wide">
+                          <div className="text-[9px] text-gray-500 font-medium uppercase tracking-tight">
                             Member
                           </div>
                         </div>
@@ -546,37 +545,36 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
                       const status = getStatusForDay(user.id, dateStr)
 
                       return (
-                        <td key={dateStr} className="p-2 align-top">
+                        <td key={dateStr} className="p-1.5 align-middle">
                           {slot ? (
-                            <div className="flex flex-col items-center gap-2">
+                            <div className="flex flex-col items-center gap-1.5">
                               {slot.slots.map((s: any, slotIdx: number) => {
                                 const slotId = `${slot.id}-${slotIdx}`
                                 const isExpanded = breaksExpanded[slotId]
 
                                 return (
-                                  <div key={slotIdx} className="w-full flex flex-col items-center gap-2">
-                                    <div className={`w-full max-w-[140px] rounded-2xl p-3 text-xs font-bold transition-all relative overflow-hidden group/slot shadow-lg ${theme === 'dark' ? 'bg-[#1a1f26] border border-white/5 text-gray-200' : 'bg-gray-100 text-gray-700'
+                                  <div key={slotIdx} className="w-full flex flex-col items-center gap-1.5">
+                                    <div className={`w-full max-w-[120px] rounded-xl p-2 text-[10px] font-bold transition-all relative overflow-hidden group/slot shadow-md ${theme === 'dark' ? 'bg-[#1a1f26] border border-white/5 text-gray-200' : 'bg-gray-100 text-gray-700'
                                       }`}>
-                                      <div className="flex flex-col items-center gap-2">
-                                        <div className="flex items-center gap-1.5 opacity-80">
-                                          <Clock className="w-3.5 h-3.5" />
+                                      <div className="flex flex-col items-center gap-1.5">
+                                        <div className="flex items-center gap-1 opacity-80">
+                                          <Clock className="w-3 h-3" />
                                           <span className="whitespace-nowrap tracking-tight">{s.start} - {s.end}</span>
                                         </div>
                                         <button
                                           onClick={() => toggleBreaksVisibility(slotId)}
-                                          className="p-1 hover:bg-white/10 rounded-lg transition-colors"
+                                          className="p-0.5 hover:bg-white/10 rounded-md transition-colors"
                                         >
-                                          {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                                          {isExpanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
                                         </button>
                                       </div>
 
                                       {/* Breaks details if expanded */}
                                       {isExpanded && s.breaks && s.breaks.length > 0 && (
-                                        <div className="mt-2 pt-2 border-t border-white/10 space-y-1 w-full">
+                                        <div className="mt-1.5 pt-1.5 border-t border-white/10 space-y-0.5 w-full text-center">
                                           {s.breaks.map((br: any, bIdx: number) => (
-                                            <div key={bIdx} className="flex justify-between text-[10px] opacity-70">
-                                              <span>Перерыв:</span>
-                                              <span>{br.start}-{br.end}</span>
+                                            <div key={bIdx} className="text-[9px] opacity-70 font-medium">
+                                              {br.start} - {br.end}
                                             </div>
                                           ))}
                                         </div>
@@ -584,18 +582,18 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
                                     </div>
 
                                     {/* Action buttons below the pill */}
-                                    <div className="flex items-center gap-3">
+                                    <div className="flex items-center gap-2">
                                       <button
                                         onClick={() => onEditSlot(slot)}
                                         className={`transition-all hover:scale-110 ${theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-500'}`}
                                       >
-                                        <Edit className="w-4 h-4" />
+                                        <Edit className="w-3.5 h-3.5" />
                                       </button>
                                       <button
                                         onClick={() => handleDeleteSlot(slot)}
                                         className={`transition-all hover:scale-110 ${theme === 'dark' ? 'text-rose-500 hover:text-rose-400' : 'text-rose-600 hover:text-rose-500'}`}
                                       >
-                                        <Trash2 className="w-4 h-4" />
+                                        <Trash2 className="w-3.5 h-3.5" />
                                       </button>
                                     </div>
                                   </div>
@@ -603,46 +601,46 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
                               })}
                             </div>
                           ) : status ? (
-                            <div className="flex flex-col items-center gap-2">
-                              <div className={`w-full max-w-[140px] rounded-xl p-2.5 text-[11px] font-black text-center border shadow-md ${theme === 'dark' ? 'bg-[#2A3441]/40' : 'bg-white'} ${statusTone[status.type as keyof typeof statusTone]}`}>
+                            <div className="flex flex-col items-center gap-1.5">
+                              <div className={`w-full max-w-[120px] rounded-lg p-2 text-[10px] font-black text-center border shadow-sm ${theme === 'dark' ? 'bg-[#2A3441]/40' : 'bg-white'} ${statusTone[status.type as keyof typeof statusTone]}`}>
                                 {status.type === 'dayoff' ? 'Выходной' : status.type === 'sick' ? 'Больничный' : status.type === 'vacation' ? 'Отпуск' : 'Прогул'}
                               </div>
-                              <div className="flex items-center gap-3">
+                              <div className="flex items-center gap-2">
                                 <button
                                   onClick={() => onEditStatus(status)}
                                   className={`transition-all hover:scale-110 ${theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-500'}`}
                                 >
-                                  <Edit className="w-4 h-4" />
+                                  <Edit className="w-3.5 h-3.5" />
                                 </button>
                                 <button
                                   onClick={() => handleDeleteStatus(status, dateStr)}
                                   className={`transition-all hover:scale-110 ${theme === 'dark' ? 'text-rose-500 hover:text-rose-400' : 'text-rose-600 hover:text-rose-500'}`}
                                 >
-                                  <Trash2 className="w-4 h-4" />
+                                  <Trash2 className="w-3.5 h-3.5" />
                                 </button>
                               </div>
                             </div>
                           ) : (
-                            <div className="h-10 w-full max-w-[140px] mx-auto rounded-xl border border-dashed border-gray-700/20 dark:border-white/5 opacity-30"></div>
+                            <div className="h-8 w-full max-w-[120px] mx-auto rounded-lg border border-dashed border-gray-700/20 dark:border-white/5 opacity-20"></div>
                           )}
                         </td>
                       )
                     })}
-                    <td className="p-4 align-top">
-                      <div className="space-y-1.5 py-4 min-w-[140px]">
-                        <div className={`text-sm font-medium ${headingColor}`}>
+                    <td className="p-2 align-middle">
+                      <div className="space-y-1 py-1 min-w-[110px] text-left ml-2">
+                        <div className={`text-[12px] font-medium leading-tight ${headingColor}`}>
                           Часов: {stats.totalHours.toFixed(1)}
                         </div>
-                        <div className={`text-sm font-medium ${headingColor}`}>
+                        <div className={`text-[12px] font-medium leading-tight ${headingColor}`}>
                           Выходных: {stats.daysOff}
                         </div>
-                        <div className={`text-sm font-medium ${headingColor}`}>
+                        <div className={`text-[12px] font-medium leading-tight ${headingColor}`}>
                           Больничных: {stats.sickDays}
                         </div>
-                        <div className={`text-sm font-medium ${headingColor}`}>
+                        <div className={`text-[12px] font-medium leading-tight ${headingColor}`}>
                           Отпусков: {stats.vacationDays}
                         </div>
-                        <div className={`text-sm font-medium ${headingColor}`}>
+                        <div className={`text-[12px] font-medium leading-tight ${headingColor}`}>
                           Прогулов: {stats.absenceDays}
                         </div>
                       </div>

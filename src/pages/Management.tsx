@@ -547,15 +547,13 @@ export const Management = () => {
               <UserX className="w-4 h-4" />
               <span className="hidden sm:inline">Отсутствие</span>
             </button>
-            {isAdmin && (
-              <button
-                onClick={handleDeleteSlots}
-                className="p-2.5 rounded-xl border border-rose-500/20 bg-rose-500/10 text-rose-500 hover:bg-rose-500/20 transition-all"
-                title="Очистить"
-              >
-                <Trash2 className="w-5 h-5" />
-              </button>
-            )}
+            <button
+              onClick={handleDeleteSlots}
+              className="p-2.5 rounded-xl border border-rose-500/20 bg-rose-500/10 text-rose-500 hover:bg-rose-500/20 transition-all"
+              title="Очистить"
+            >
+              <Trash2 className="w-5 h-5" />
+            </button>
           </div>
 
           {/* Right: Search/Filter */}
