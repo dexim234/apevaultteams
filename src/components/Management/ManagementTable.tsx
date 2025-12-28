@@ -601,11 +601,11 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
                               })}
                             </div>
                           ) : status ? (
-                            <div className="flex flex-col items-center gap-1.5">
+                            <div className="flex flex-col items-center gap-1.5 group/status">
                               <div className={`w-full max-w-[120px] rounded-lg p-2 text-[10px] font-black text-center border shadow-sm ${theme === 'dark' ? 'bg-[#2A3441]/40' : 'bg-white'} ${statusTone[status.type as keyof typeof statusTone]}`}>
                                 {status.type === 'dayoff' ? 'Выходной' : status.type === 'sick' ? 'Больничный' : status.type === 'vacation' ? 'Отпуск' : 'Прогул'}
                               </div>
-                              <div className="flex items-center gap-2">
+                              <div className="flex items-center gap-2 opacity-0 group-hover/status:opacity-100 transition-opacity duration-200">
                                 <button
                                   onClick={() => onEditStatus(status)}
                                   className={`transition-all hover:scale-110 ${theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-500'}`}

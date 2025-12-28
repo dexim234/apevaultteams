@@ -37,7 +37,7 @@ export type SlotFilter = 'all' | 'upcoming' | 'completed'
 export const Management = () => {
   const { theme } = useThemeStore()
   const { isAdmin } = useAdminStore()
-  const [viewMode, setViewMode] = useState<ViewMode>('week')
+  const [viewMode, setViewMode] = useState<ViewMode>('table') // Default to table
   const [slotFilter] = useState<SlotFilter>('all')
   const [showSlotForm, setShowSlotForm] = useState(false)
   const [showDeleteSlotsForm, setShowDeleteSlotsForm] = useState(false)
@@ -334,50 +334,7 @@ export const Management = () => {
     setRefreshKey((key) => key + 1)
   }
 
-  const headingColor = theme === 'dark' ? 'text-white' : 'text-gray-900'
-  const softTextColor = theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-  const statToneMap: Record<string, { bg: string; text: string; border: string }> = {
-    emerald: {
-      bg: theme === 'dark' ? 'bg-emerald-500/10' : 'bg-emerald-50',
-      text: theme === 'dark' ? 'text-emerald-100' : 'text-emerald-800',
-      border: theme === 'dark' ? 'border-emerald-500/30' : 'border-emerald-200',
-    },
-    purple: {
-      bg: theme === 'dark' ? 'bg-purple-500/10' : 'bg-purple-50',
-      text: theme === 'dark' ? 'text-purple-100' : 'text-purple-800',
-      border: theme === 'dark' ? 'border-purple-500/30' : 'border-purple-200',
-    },
-    amber: {
-      bg: theme === 'dark' ? 'bg-amber-500/10' : 'bg-amber-50',
-      text: theme === 'dark' ? 'text-amber-100' : 'text-amber-800',
-      border: theme === 'dark' ? 'border-amber-500/30' : 'border-amber-200',
-    },
-    slate: {
-      bg: theme === 'dark' ? 'bg-gray-500/10' : 'bg-gray-50',
-      text: theme === 'dark' ? 'text-gray-100' : 'text-gray-800',
-      border: theme === 'dark' ? 'border-gray-500/30' : 'border-gray-200',
-    },
-    blue: {
-      bg: theme === 'dark' ? 'bg-blue-500/10' : 'bg-blue-50',
-      text: theme === 'dark' ? 'text-blue-100' : 'text-blue-800',
-      border: theme === 'dark' ? 'border-blue-500/30' : 'border-blue-200',
-    },
-    green: {
-      bg: theme === 'dark' ? 'bg-green-500/10' : 'bg-green-50',
-      text: theme === 'dark' ? 'text-green-100' : 'text-green-800',
-      border: theme === 'dark' ? 'border-green-500/30' : 'border-green-200',
-    },
-    sky: {
-      bg: theme === 'dark' ? 'bg-sky-500/10' : 'bg-sky-50',
-      text: theme === 'dark' ? 'text-sky-100' : 'text-sky-800',
-      border: theme === 'dark' ? 'border-sky-500/30' : 'border-sky-200',
-    },
-    pink: {
-      bg: theme === 'dark' ? 'bg-pink-500/10' : 'bg-pink-50',
-      text: theme === 'dark' ? 'text-pink-100' : 'text-pink-800',
-      border: theme === 'dark' ? 'border-pink-500/30' : 'border-pink-200',
-    },
-  }
+
 
   const handleViewModeChange = (mode: ViewMode) => {
     setViewMode(mode)
@@ -388,57 +345,64 @@ export const Management = () => {
       label: 'Сколько ещё добавить слотов',
       value: `${Math.max(stats.recommendedDay, 0)} в день`,
       note: `Неделя: ${Math.max(stats.recommendedWeek, 0)} до цели 15`,
-      icon: <ArrowUpRight className="w-4 h-4" />,
+      icon: <ArrowUpRight className="w-5 h-5 text-emerald-400" />,
       tone: 'emerald',
+      bgClass: 'bg-emerald-500/5',
+      borderClass: 'border-emerald-500/20'
     },
     {
       label: 'Активные члены',
       value: stats.activeMembers,
       note: 'за неделю',
-      icon: <Users className="w-4 h-4" />,
+      icon: <Users className="w-5 h-5 text-purple-400" />,
       tone: 'purple',
-    },
-    {
-      label: 'Самый активный член недели',
-      value: stats.mostActive || 'Нет данных',
-      note: 'по слотам',
-      icon: <Activity className="w-4 h-4" />,
-      tone: 'amber',
-    },
-    {
-      label: 'Самые неактивные члены недели',
-      value: stats.leastActive.length ? stats.leastActive.join(', ') : 'Нет данных',
-      note: 'минимум слотов',
-      icon: <ArrowDownRight className="w-4 h-4" />,
-      tone: 'slate',
-    },
-    {
-      label: 'Осталось слотов на неделе',
-      value: stats.remainingSlots,
-      note: 'предстоящие',
-      icon: <Hourglass className="w-4 h-4" />,
-      tone: 'blue',
+      bgClass: 'bg-purple-500/5',
+      borderClass: 'border-purple-500/20'
     },
     {
       label: 'Завершено слотов на неделе',
       value: stats.completedSlots,
       note: 'факт',
-      icon: <CalendarCheck className="w-4 h-4" />,
-      tone: 'green',
+      icon: <CalendarCheck className="w-5 h-5 text-emerald-400" />,
+      tone: 'emerald',
+      bgClass: 'bg-emerald-500/5',
+      borderClass: 'border-emerald-500/20'
     },
     {
       label: 'Таймер ближайшего слота',
       value: timerLabels.nextStart,
       note: 'до старта',
-      icon: <Timer className="w-4 h-4" />,
+      icon: <Timer className="w-5 h-5 text-sky-400" />,
       tone: 'sky',
+      bgClass: 'bg-sky-500/5',
+      borderClass: 'border-sky-500/20'
     },
     {
       label: 'До окончания активного слота',
       value: timerLabels.activeRemaining,
       note: 'если слот идёт',
-      icon: <Clock className="w-4 h-4" />,
+      icon: <Clock className="w-5 h-5 text-pink-400" />,
       tone: 'pink',
+      bgClass: 'bg-pink-500/5',
+      borderClass: 'border-pink-500/20'
+    },
+    {
+      label: 'Самый активный член недели',
+      value: stats.mostActive || 'Нет данных',
+      note: 'по слотам',
+      icon: <Activity className="w-5 h-5 text-amber-400" />,
+      tone: 'amber',
+      bgClass: 'bg-amber-500/5',
+      borderClass: 'border-amber-500/20'
+    },
+    {
+      label: 'Самые неактивные члены недели',
+      value: stats.leastActive.length ? stats.leastActive.join(', ') : 'Нет данных',
+      note: 'минимум слотов',
+      icon: <ArrowDownRight className="w-5 h-5 text-slate-400" />,
+      tone: 'slate',
+      bgClass: 'bg-slate-500/5',
+      borderClass: 'border-slate-500/20'
     },
   ]
 
@@ -466,31 +430,31 @@ export const Management = () => {
         {/* Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {statCards.map((item, idx) => {
-            const tone = statToneMap[item.tone]
             return (
               <div
                 key={idx}
-                className={`relative overflow-hidden rounded-2xl p-5 border transition-all duration-300 hover:shadow-lg ${theme === 'dark'
-                  ? 'bg-[#0b1015] border-white/5 hover:border-white/10'
+                className={`relative overflow-hidden rounded-2xl p-5 border transition-all duration-300 hover:shadow-lg group ${theme === 'dark'
+                  // @ts-ignore
+                  ? `${item.bgClass} ${item.borderClass} hover:border-opacity-50`
                   : 'bg-white border-gray-100 hover:border-emerald-500/20'
                   }`}
               >
                 <div className="flex justify-between items-start mb-4">
-                  <span className={`text-[10px] font-bold uppercase tracking-wider ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>
+                  <span className={`text-[10px] font-bold uppercase tracking-wider ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                     {item.label}
                   </span>
-                  <div className={`p-1.5 rounded-lg ${tone.bg} ${tone.text}`}>
+                  <div className={`p-2 rounded-xl transition-colors ${theme === 'dark' ? 'bg-white/5 group-hover:bg-white/10' : 'bg-gray-100 group-hover:bg-gray-200'}`}>
                     {item.icon}
                   </div>
                 </div>
-                <div className="flex items-baseline gap-2 mb-1">
-                  <span className={`text-2xl font-black ${headingColor}`}>
+                <div className="space-y-1">
+                  <div className={`text-2xl font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                     {item.value}
-                  </span>
+                  </div>
+                  <div className={`text-[11px] font-medium ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>
+                    {item.note}
+                  </div>
                 </div>
-                <p className={`text-xs font-medium ${softTextColor}`}>
-                  {item.note}
-                </p>
               </div>
             )
           })}
