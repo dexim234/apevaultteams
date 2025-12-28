@@ -4,7 +4,7 @@ import { useThemeStore } from '@/store/themeStore'
 import { useAuthStore } from '@/store/authStore'
 import { useAdminStore } from '@/store/adminStore'
 import { getWorkSlots, getDayStatuses, addApprovalRequest, deleteWorkSlot, updateDayStatus, addDayStatus, deleteDayStatus } from '@/services/firestoreService'
-import { formatDate, calculateHours, getWeekDays, getMoscowTime } from '@/utils/dateUtils'
+import { formatDate, calculateHours, getWeekDays, getMoscowTime, countDaysInPeriod, getWeekRange } from '@/utils/dateUtils'
 import { getUserNicknameSync } from '@/utils/userUtils'
 import { UserNickname } from '@/components/UserNickname'
 import { WorkSlot, DayStatus } from '@/types'
@@ -379,15 +379,32 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
     }) || null
   }
 
+  /* import { formatDate, calculateHours, getWeekDays, getMoscowTime, countDaysInPeriod, getWeekRange } from '@/utils/dateUtils' */ // Assuming these are imported, if not I will add them in a separate chunk.
+
   const getUserStats = (userId: string) => {
+    const { start: weekStart, end: weekEnd } = getWeekRange(selectedWeek)
+    const weekStartStr = formatDate(weekStart, 'yyyy-MM-dd')
+    const weekEndStr = formatDate(weekEnd, 'yyyy-MM-dd')
+
     const userSlots = slots.filter((s: any) => s.userId === userId)
-    const totalHours = userSlots.reduce((sum, slot) => sum + calculateHours(slot.slots), 0)
+    // Filter slots to current week only
+    const weekSlots = userSlots.filter((s: any) => s.date >= weekStartStr && s.date <= weekEndStr)
+    const totalHours = weekSlots.reduce((sum: number, slot: any) => sum + calculateHours(slot.slots), 0)
 
     const userStatuses = statuses.filter((s) => s.userId === userId)
-    const daysOff = userStatuses.filter((s) => s.type === 'dayoff').length
-    const sickDays = userStatuses.filter((s) => s.type === 'sick').length
-    const vacationDays = userStatuses.filter((s) => s.type === 'vacation').length
-    const absenceDays = userStatuses.filter((s) => s.type === 'absence').length
+
+    const countStatusDays = (type: string) => {
+      return userStatuses
+        .filter((s) => s.type === type)
+        .reduce((sum, s) => {
+          return sum + countDaysInPeriod(s.date, s.endDate, weekStartStr, weekEndStr)
+        }, 0)
+    }
+
+    const daysOff = countStatusDays('dayoff')
+    const sickDays = countStatusDays('sick')
+    const vacationDays = countStatusDays('vacation')
+    const absenceDays = countStatusDays('absence')
 
     return { totalHours, daysOff, sickDays, vacationDays, absenceDays }
   }
@@ -553,20 +570,22 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
                                 const isExpanded = breaksExpanded[slotId]
 
                                 return (
-                                  <div key={slotIdx} className="w-full flex flex-col items-center gap-1.5">
-                                    <div className={`w-full max-w-[120px] rounded-xl p-2 text-[10px] font-bold transition-all relative overflow-hidden group/slot shadow-md ${theme === 'dark' ? 'bg-[#1a1f26] border border-white/5 text-gray-200' : 'bg-gray-100 text-gray-700'
+                                  <div key={slotIdx} className="w-full flex flex-col items-center gap-1.5 group/timecard">
+                                    <div className={`w-full max-w-[120px] rounded-xl p-2 text-[10px] font-bold transition-all relative overflow-hidden shadow-md ${theme === 'dark' ? 'bg-[#1a1f26] border border-white/5 text-gray-200' : 'bg-gray-100 text-gray-700'
                                       }`}>
                                       <div className="flex flex-col items-center gap-1.5">
                                         <div className="flex items-center gap-1 opacity-80">
                                           <Clock className="w-3 h-3" />
                                           <span className="whitespace-nowrap tracking-tight">{s.start} - {s.end}</span>
                                         </div>
-                                        <button
-                                          onClick={() => toggleBreaksVisibility(slotId)}
-                                          className="p-0.5 hover:bg-white/10 rounded-md transition-colors"
-                                        >
-                                          {isExpanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-                                        </button>
+                                        {s.breaks && s.breaks.length > 0 && (
+                                          <button
+                                            onClick={() => toggleBreaksVisibility(slotId)}
+                                            className="p-0.5 hover:bg-white/10 rounded-md transition-colors"
+                                          >
+                                            {isExpanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                                          </button>
+                                        )}
                                       </div>
 
                                       {/* Breaks details if expanded */}
@@ -582,7 +601,7 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
                                     </div>
 
                                     {/* Action buttons below the pill */}
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex items-center gap-2 opacity-0 group-hover/timecard:opacity-100 transition-opacity duration-200">
                                       <button
                                         onClick={() => onEditSlot(slot)}
                                         className={`transition-all hover:scale-110 ${theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-500'}`}
@@ -627,7 +646,7 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
                       )
                     })}
                     <td className="p-2 align-middle">
-                      <div className="space-y-1 py-1 min-w-[110px] text-left ml-2">
+                      <div className="space-y-1 py-1 min-w-[110px] text-center ml-2">
                         <div className={`text-[12px] font-medium leading-tight ${headingColor}`}>
                           Часов: {stats.totalHours.toFixed(1)}
                         </div>

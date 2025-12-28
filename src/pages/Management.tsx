@@ -21,6 +21,7 @@ import {
   Shield,
   UserX,
   ShieldX,
+  Hourglass,
 } from 'lucide-react'
 import { TEAM_MEMBERS } from '@/types'
 import { DeleteSlotsForm } from '@/components/Management/DeleteSlotsForm'
@@ -348,6 +349,15 @@ export const Management = () => {
       tone: 'emerald',
       bgClass: 'bg-emerald-500/5',
       borderClass: 'border-emerald-500/20'
+    },
+    {
+      label: 'Сколько осталось слотов',
+      value: stats.remainingSlots,
+      note: 'предстоящие',
+      icon: <Hourglass className="w-5 h-5 text-blue-400" />,
+      tone: 'blue',
+      bgClass: 'bg-blue-500/5',
+      borderClass: 'border-blue-500/20'
     },
     {
       label: 'Активные члены',
