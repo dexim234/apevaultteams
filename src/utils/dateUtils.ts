@@ -25,8 +25,8 @@ export const getWeekDays = (date: Date = new Date()): Date[] => {
   return eachDayOfInterval({ start, end })
 }
 
-export const getLastNDaysRange = (days: number) => {
-  const now = new Date()
+export const getLastNDaysRange = (days: number, date?: Date) => {
+  const now = date || new Date()
   const start = new Date(now)
   start.setHours(0, 0, 0, 0)
   start.setDate(start.getDate() - (days - 1))
@@ -206,4 +206,3 @@ export const countDaysInPeriod = (
   
   return diffDays
 }
-

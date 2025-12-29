@@ -14,7 +14,7 @@ import {
   DocumentSnapshot,
 } from 'firebase/firestore'
 import { db } from '@/firebase/config' // Keep original path for db
-import { WorkSlot, DayStatus, Earnings, RatingData, Referral, Call, Task, TaskStatus, Note, TaskPriority, StageAssignee, ApprovalRequest, ApprovalStatus, UserActivity, UserNickname, Restriction, RestrictionType, UserConflict, AccessBlock, AiAlert, User } from '@/types' // Add User to existing types
+import { WorkSlot, DayStatus, Earnings, RatingData, Referral, Call, Task, TaskStatus, Note, TaskPriority, StageAssignee, ApprovalRequest, ApprovalStatus, UserActivity, UserNickname, Restriction, RestrictionType, UserConflict, AccessBlock, AiAlert, User, TeamRatingHistory } from '@/types' // Add User to existing types
 import { clearNicknameCache, getUserNicknameAsync } from '@/utils/userUtils'
 import { formatDate } from '@/utils/dateUtils'
 

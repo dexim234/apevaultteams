@@ -23,7 +23,6 @@ import {
   formatDate,
   calculateHours,
   countDaysInPeriod,
-  getMoscowTime,
 } from '@/utils/dateUtils'
 import { calculateRating, getRatingBreakdown } from '@/utils/ratingUtils'
 import {
@@ -47,11 +46,9 @@ import {
   TrendingUp,
   Sparkles,
   Trophy,
-  ShieldCheck,
   UserPlus,
   Info,
 } from 'lucide-react'
-import Avatar from '@/components/Avatar'
 import { RatingChart } from '@/components/Rating/RatingChart'
 import { Link } from 'react-router-dom'
 
@@ -82,11 +79,11 @@ export const Rating = () => {
     try {
       let mainRange
       if (periodType === 'week') {
-        mainRange = getWeekRange(currentPeriodStart)
+        mainRange = getWeekRange()
       } else if (periodType === 'month') {
-        mainRange = getLastNDaysRange(30, currentPeriodStart) // Use a common function for this
+        mainRange = getLastNDaysRange(30) // Use a common function for this
       } else {
-        mainRange = getLastNDaysRange(90, currentPeriodStart)
+        mainRange = getLastNDaysRange(90)
       }
 
       const periodStart = formatDate(mainRange.start, 'yyyy-MM-dd')
@@ -94,7 +91,7 @@ export const Rating = () => {
       const periodIsoStart = mainRange.start.toISOString()
       const periodIsoEnd = mainRange.end.toISOString()
 
-      const ninetyDayRange = getLastNDaysRange(90, currentPeriodStart)
+      const ninetyDayRange = getLastNDaysRange(90)
       const ninetyDayStart = formatDate(ninetyDayRange.start, 'yyyy-MM-dd')
       const ninetyDayEnd = formatDate(ninetyDayRange.end, 'yyyy-MM-dd')
 
@@ -527,7 +524,7 @@ export const Rating = () => {
       end.setDate(start.getDate() + 6)
       return `${formatDate(start, 'dd MMM')} — ${formatDate(end, 'dd MMM')}`
     } else if (periodType === 'month') {
-      end = getLastNDaysRange(30, currentPeriodStart).end // Assumes getLastNDaysRange correctly adjusts end date from start
+      end = getLastNDaysRange(30).end
       return `${formatDate(start, 'dd MMM')} — ${formatDate(end, 'dd MMM')}`
     } else { // 3 months
       end.setMonth(start.getMonth() + 3)
@@ -535,22 +532,6 @@ export const Rating = () => {
       return `${formatDate(start, 'dd MMM')} — ${formatDate(end, 'dd MMM')}`
     }
   }
-
-  const isCurrentPeriod = useMemo(() => {
-    const today = getMoscowTime()
-    if (periodType === 'week') {
-      const currentWeekRange = getWeekRange()
-      return formatDate(currentPeriodStart, 'yyyy-MM-dd') === formatDate(currentWeekRange.start, 'yyyy-MM-dd')
-    } else if (periodType === 'month') {
-      return currentPeriodStart.getMonth() === today.getMonth() && currentPeriodStart.getFullYear() === today.getFullYear()
-    } else { // 3 months
-      // For 3 months, it's harder to define "current" accurately without more context.
-      // For simplicity, let's consider it "current" if it includes the current month.
-      const threeMonthsAgo = new Date(today)
-      threeMonthsAgo.setMonth(today.getMonth() - 2) // Start of the 3-month period including today
-      return currentPeriodStart <= today && currentPeriodStart >= threeMonthsAgo
-    }
-  }, [currentPeriodStart, periodType])
 
   const themeClasses = {
     text: theme === 'dark' ? 'text-white' : 'text-gray-900',

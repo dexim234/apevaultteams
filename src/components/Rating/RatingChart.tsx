@@ -9,6 +9,7 @@ import {
   Title,
   Tooltip,
   Legend,
+  ChartOptions,
 } from 'chart.js'
 import { formatDate } from '@/utils/dateUtils'
 import { TeamRatingHistory } from '@/types'
@@ -48,7 +49,7 @@ export const RatingChart: React.FC<RatingChartProps> = ({ history, theme }) => {
     }
   }, [history, theme])
 
-  const chartOptions = useMemo(() => ({
+  const chartOptions: ChartOptions<'line'> = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
@@ -56,7 +57,7 @@ export const RatingChart: React.FC<RatingChartProps> = ({ history, theme }) => {
         display: false,
       },
       tooltip: {
-        mode: 'index' as const,
+        mode: 'index',
         intersect: false,
         backgroundColor: theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.7)',
         titleColor: theme === 'dark' ? '#fff' : '#fff',
@@ -69,11 +70,9 @@ export const RatingChart: React.FC<RatingChartProps> = ({ history, theme }) => {
     },
     scales: {
       x: {
+        type: 'category',
         display: true,
-        grid: {
-          // color: theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
-          drawBorder: false,
-        },
+        grid: {},
         ticks: {
           color: theme === 'dark' ? '#cbd5e1' : '#4b5563',
           autoSkip: true,
@@ -82,19 +81,22 @@ export const RatingChart: React.FC<RatingChartProps> = ({ history, theme }) => {
         }
       },
       y: {
+        type: 'linear',
         display: true,
+        min: 0,
+        max: 100,
         grid: {
           color: theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
         },
         ticks: {
           color: theme === 'dark' ? '#cbd5e1' : '#4b5563',
-          callback: function (value: string | number) {
+          callback: function (value) {
             return `${value}%`
           }
         }
       },
     },
-  }), [theme])
+  }
 
   return (
     <div className="h-full w-full">
