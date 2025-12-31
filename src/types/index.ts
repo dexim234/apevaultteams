@@ -133,6 +133,7 @@ export interface RatingData {
 
 export interface TeamRatingHistory {
   date: string
+  averageRating: number
   ratings: {
     userId: string
     rating: number
