@@ -131,6 +131,16 @@ export interface RatingData {
   lastUpdated: string
 }
 
+export interface TeamRatingHistory {
+  date: string
+  ratings: {
+    userId: string
+    rating: number
+    earnings: number
+    poolAmount: number
+  }[]
+}
+
 // Referral types
 export interface Referral {
   id: string
