@@ -3,7 +3,7 @@ import { useThemeStore } from '@/store/themeStore'
 import { useAuthStore } from '@/store/authStore'
 import { getTriggerAlerts, addTriggerAlert, updateTriggerAlert, deleteTriggerAlert } from '@/services/firestoreService'
 import { TriggerAlert, TriggerStrategy } from '@/types'
-import { Plus, Edit, Trash2, Save, X, Copy, Check, Terminal, Table, Filter, ArrowUp, ArrowDown, RotateCcw, ChevronDown, TrendingUp } from 'lucide-react'
+import { Plus, Edit, Trash2, Save, X, Copy, Check, Zap, Table, Filter, ArrowUp, ArrowDown, RotateCcw, ChevronDown, TrendingUp } from 'lucide-react'
 
 type SortField = 'date' | 'drop' | 'profit'
 type SortOrder = 'asc' | 'desc'
@@ -374,7 +374,7 @@ export const SignalsTriggerBot = () => {
                     <div className="relative p-6 sm:p-8 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-6">
                         <div className="flex items-center gap-4">
                             <div className={`p-3 rounded-2xl ${theme === 'dark' ? 'bg-white/10 border-white/20' : 'bg-amber-500/10 border-amber-500/30'} shadow-inner`}>
-                                <Terminal className={`w-8 h-8 ${theme === 'dark' ? 'text-white' : 'text-amber-500'}`} />
+                                <Zap className={`w-8 h-8 ${theme === 'dark' ? 'text-white' : 'text-amber-500'}`} />
                             </div>
                             <div className="flex flex-col">
                                 <h1 className={`text-3xl font-black ${headingColor}`}>Signals Trigger Bot</h1>
@@ -699,7 +699,7 @@ export const SignalsTriggerBot = () => {
                                                                     onClick={() => handleDelete(alert.id)}
                                                                     className="p-2 rounded-lg hover:bg-red-500/10 text-red-500 transition-colors"
                                                                 >
-                                                                    <Trash2 className="w-4 h-4" />
+                                                                    <Trash2 size={16} />
                                                                 </button>
                                                             </div>
                                                         </td>
@@ -771,7 +771,7 @@ export const SignalsTriggerBot = () => {
                                                         onClick={() => handleDelete(alert.id)}
                                                         className="p-2 rounded-lg hover:bg-red-500/10 text-red-500 transition-colors"
                                                     >
-                                                        <Trash2 className="w-4 h-4" />
+                                                        <Trash2 size={16} />
                                                     </button>
                                                 </div>
                                             </td>
@@ -810,7 +810,7 @@ export const SignalsTriggerBot = () => {
                                     maxProfit: '',
                                     comment: ''
                                 })
-                            }} className={`p-2 rounded-lg hover:bg-white/10 ${subTextColor}`}>
+                            }} className={`p-2 rounded-lg hover:bg-white/10 transition-colors ${subTextColor}`}>
                                 <X className="w-5 h-5" />
                             </button>
                         </div>
@@ -900,7 +900,7 @@ export const SignalsTriggerBot = () => {
                                             placeholder="Дополнительная информация..."
                                             value={formData.comment || ''}
                                             onChange={(e) => setFormData({ ...formData, comment: e.target.value })}
-                                            className={`w-full p-3 rounded-xl border outline-none transition-all ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white focus-border-amber-500' : 'bg-white border-gray-200 text-gray-900 focus-border-amber-500'}`}
+                                            className={`w-full p-2 rounded-xl border outline-none transition-all font-mono text-sm ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white' : 'bg-white border-gray-200 text-gray-900'}`}
                                         />
                                     </div>
 
@@ -944,6 +944,17 @@ export const SignalsTriggerBot = () => {
                                                 value={formData.strategy}
                                                 onChange={(strategy) => setFormData({ ...formData, strategy })}
                                                 theme={theme}
+                                            />
+                                        </div>
+
+                                        <div className="space-y-1">
+                                            <label className={`text-xs font-semibold uppercase ${subTextColor}`}>Адрес токена</label>
+                                            <input
+                                                type="text"
+                                                placeholder="Адрес контракта..."
+                                                value={formData.address || ''}
+                                                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                                                className={`w-full p-2 rounded-lg border outline-none transition-all font-mono text-sm ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white' : 'bg-white border-gray-200 text-gray-900'}`}
                                             />
                                         </div>
 
