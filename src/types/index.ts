@@ -472,6 +472,11 @@ export interface AiAlert {
 // Signals Trigger Bot types (independent from AiAlert)
 export type TriggerStrategy = 'Фиба' | 'Market Entry'
 
+export interface TriggerProfit {
+  strategy: TriggerStrategy
+  value: string // e.g. "+28" or "X3"
+}
+
 export interface TriggerAlert {
   id: string
   signalDate: string // YYYY-MM-DD
@@ -479,9 +484,11 @@ export interface TriggerAlert {
   marketCap?: string
   address: string
   strategies: TriggerStrategy[] // Multiple strategies
-  maxDrop?: string // e.g. "-16"
-  maxProfit?: string // e.g. "+28" or "X3"
+  maxDropFromSignal?: string // e.g. "-16"
+  maxDropFromLevel07?: string // e.g. "-5"
+  profits?: TriggerProfit[] // Multiple profits (one per strategy)
   comment?: string
+  screenshot?: string // URL to screenshot
   isScam?: boolean // Mark signal as scam
   createdAt: string
   createdBy: string

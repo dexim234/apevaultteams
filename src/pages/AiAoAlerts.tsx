@@ -802,13 +802,15 @@ export const AiAoAlerts = () => {
                             <div className="flex-1 overflow-y-auto p-6 space-y-6">
                                 {/* Common Date */}
                                 <div className="space-y-1">
-                                    <label className={`text-xs font-semibold uppercase ${subTextColor}`}>Дата для всех сигналов</label>
+                                    <label className={`text-xs font-semibold uppercase ${subTextColor}`}>Дата</label>
                                     <input
                                         type="date"
-                                        disabled={!!editingAlert}
-                                        value={commonDate || formData.signalDate || ''}
-                                        onChange={(e) => setCommonDate(e.target.value)}
-                                        className={`w-full p-3 rounded-xl border outline-none transition-all ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white focus:border-[#4E6E49]' : 'bg-white border-gray-200 text-gray-900 focus:border-[#4E6E49]'} ${editingAlert ? 'opacity-50' : ''}`}
+                                        value={editingAlert?.signalDate || commonDate || formData.signalDate || ''}
+                                        onChange={(e) => {
+                                            setCommonDate(e.target.value)
+                                            setFormData({ ...formData, signalDate: e.target.value })
+                                        }}
+                                        className={`w-full p-3 rounded-xl border outline-none transition-all ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white focus:border-[#4E6E49]' : 'bg-white border-gray-200 text-gray-900 focus-border-[#4E6E49]'}`}
                                     />
                                 </div>
 

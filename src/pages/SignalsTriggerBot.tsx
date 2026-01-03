@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useMemo } from 'react'
+, пimport React, { useState, useEffect, useMemo, useRef } from 'react'
 import { useThemeStore } from '@/store/themeStore'
 import { useAuthStore } from '@/store/authStore'
 import { getTriggerAlerts, addTriggerAlert, updateTriggerAlert, deleteTriggerAlert } from '@/services/firestoreService'
-import { TriggerAlert, TriggerStrategy } from '@/types'
-import { Plus, Edit, Trash2, Save, X, Copy, Check, Zap, Table, Filter, ArrowUp, ArrowDown, RotateCcw, ChevronDown, TrendingUp } from 'lucide-react'
+import { TriggerAlert, TriggerStrategy, TriggerProfit } from '@/types'
+import { Plus, Edit, Trash2, Save, X, Copy, Check, Zap, Table, Filter, ArrowUp, ArrowDown, RotateCcw, ChevronDown, TrendingUp, Image, XCircle } from 'lucide-react'
 
 type SortField = 'date' | 'drop' | 'profit'
 type SortOrder = 'asc' | 'desc'
@@ -45,11 +45,21 @@ export const SignalsTriggerBot = () => {
         marketCap: '',
         address: '',
         strategies: [],
-        maxDrop: '',
-        maxProfit: '',
+        maxDropFromSignal: '',
+        maxDropFromLevel07: '',
+        profits: [],
         comment: '',
         isScam: false
     })
+
+    // Screenshot preview state
+    const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null)
+    const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false)
+    const [selectedPhotoUrl, setSelectedPhotoUrl] = useState<string | null>(null)
+    const fileInputRef = useRef<HTMLInputElement>(null)
+
+    // Multiple profits input state
+    const [profitsInput, setProfitsInput] = useState<{ strategy: TriggerStrategy; value: string }[]>([])
 
     // Common date for all alerts in batch mode
     const [commonDate, setCommonDate] = useState<string>(formData.signalDate || '')
@@ -91,9 +101,11 @@ export const SignalsTriggerBot = () => {
             marketCap: formData.marketCap,
             address: formData.address,
             ...(!formData.isScam && { strategies: formData.strategies }),
-            maxDrop: formData.maxDrop,
-            maxProfit: formData.maxProfit,
+            maxDropFromSignal: formData.maxDropFromSignal,
+            maxDropFromLevel07: formData.maxDropFromLevel07,
+            profits: profitsInput.length > 0 ? profitsInput : undefined,
             comment: formData.comment,
+            screenshot: screenshotPreview || undefined,
             isScam: formData.isScam || false
         }
 
@@ -104,11 +116,16 @@ export const SignalsTriggerBot = () => {
             signalTime: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }),
             marketCap: '',
             address: '',
-            strategies: [],
-            maxDrop: '',
-            maxProfit: '',
+            strategies: formData.strategies,
+            maxDropFromSignal: '',
+            maxDropFromLevel07: '',
+            profits: [],
             comment: ''
         })
+
+        // Reset screenshot and profits
+        setScreenshotPreview(null)
+        setProfitsInput([])
     }
 
     // Remove alert from list
@@ -158,11 +175,14 @@ export const SignalsTriggerBot = () => {
                 marketCap: '',
                 address: '',
                 strategies: [],
-                maxDrop: '',
-                maxProfit: '',
+                maxDropFromSignal: '',
+                maxDropFromLevel07: '',
+                profits: [],
                 comment: '',
                 isScam: false
             })
+            setScreenshotPreview(null)
+            setProfitsInput([])
             setShowModal(false)
             await loadAlerts()
         } catch (error: any) {
@@ -174,12 +194,17 @@ export const SignalsTriggerBot = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         try {
+            const alertData = {
+                ...formData,
+                signalDate: commonDate,
+                profits: profitsInput.length > 0 ? profitsInput : (formData.profits || []),
+                screenshot: screenshotPreview || formData.screenshot
+            }
             if (editingAlert) {
-                await updateTriggerAlert(editingAlert.id, { ...formData, signalDate: commonDate } as TriggerAlert)
+                await updateTriggerAlert(editingAlert.id, alertData as TriggerAlert)
             } else {
                 await addTriggerAlert({
-                    ...formData as TriggerAlert,
-                    signalDate: commonDate,
+                    ...alertData as TriggerAlert,
                     createdAt: new Date().toISOString(),
                     createdBy: user?.id || 'admin'
                 })
@@ -193,11 +218,14 @@ export const SignalsTriggerBot = () => {
                 marketCap: '',
                 address: '',
                 strategies: [],
-                maxDrop: '',
-                maxProfit: '',
+                maxDropFromSignal: '',
+                maxDropFromLevel07: '',
+                profits: [],
                 comment: '',
                 isScam: false
             })
+            setScreenshotPreview(null)
+            setProfitsInput([])
             await loadAlerts()
         } catch (error: any) {
             console.error('Error saving alert:', error)
@@ -227,7 +255,8 @@ export const SignalsTriggerBot = () => {
             <th>Стратегии</th>
             <th>Market Cap</th>
             <th>Адрес</th>
-            <th>Макс. Падение</th>
+            <th>Макс. Падение от сигнала</th>
+            <th>Макс. Падение от 0.7</th>
             <th>Макс. Профит</th>
             <th>Комментарий</th>
           </tr>
@@ -240,7 +269,8 @@ export const SignalsTriggerBot = () => {
               <td>${a.strategies?.join(', ') || '-'}</td>
               <td>${a.marketCap || '-'}</td>
               <td>${a.address}</td>
-              <td>${a.maxDrop || '-'}</td>
+              <td>${a.maxDropFromSignal || '-'}</td>
+              <td>${a.maxDropFromLevel07 || '-'}</td>
               <td>${a.maxProfit || '-'}</td>
               <td>${a.comment || ''}</td>
             </tr>
@@ -301,17 +331,17 @@ export const SignalsTriggerBot = () => {
             result = result.filter(a => a.signalDate <= dateTo)
         }
 
-        // Filter by max drop range
+        // Filter by max drop range (maxDropFromSignal)
         if (minDrop) {
             const minVal = parseFloat(minDrop)
             if (!isNaN(minVal)) {
-                result = result.filter(a => parseValue(a.maxDrop) >= minVal)
+                result = result.filter(a => parseValue(a.maxDropFromSignal) >= minVal)
             }
         }
         if (maxDrop) {
             const maxVal = parseFloat(maxDrop)
             if (!isNaN(maxVal)) {
-                result = result.filter(a => parseValue(a.maxDrop) <= maxVal)
+                result = result.filter(a => parseValue(a.maxDropFromSignal) <= maxVal)
             }
         }
 
@@ -337,7 +367,7 @@ export const SignalsTriggerBot = () => {
                     comparison = a.signalDate.localeCompare(b.signalDate)
                     break
                 case 'drop':
-                    comparison = parseValue(a.maxDrop) - parseValue(b.maxDrop)
+                    comparison = parseValue(a.maxDropFromSignal) - parseValue(b.maxDropFromSignal)
                     break
                 case 'profit':
                     comparison = parseValue(a.maxProfit) - parseValue(b.maxProfit)
@@ -390,6 +420,68 @@ export const SignalsTriggerBot = () => {
             case 'Фиба': return 'bg-purple-500/20 text-purple-400'
             case 'Market Entry': return 'bg-green-500/20 text-green-400'
         }
+    }
+
+    // Handle screenshot selection
+    const handleScreenshotChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (file) {
+            if (file.size > 5 * 1024 * 1024) {
+                alert('Файл слишком большой. Максимальный размер 5MB')
+                return
+            }
+            const reader = new FileReader()
+            reader.onloadend = () => {
+                setScreenshotPreview(reader.result as string)
+            }
+            reader.readAsDataURL(file)
+        }
+    }
+
+    // Remove screenshot
+    const removeScreenshot = () => {
+        setScreenshotPreview(null)
+        if (fileInputRef.current) {
+            fileInputRef.current.value = ''
+        }
+    }
+
+    // Open photo modal
+    const openPhotoModal = (url: string) => {
+        setSelectedPhotoUrl(url)
+        setIsPhotoModalOpen(true)
+    }
+
+    // Add profit entry
+    const addProfitEntry = () => {
+        if (formData.strategies && formData.strategies.length > 0) {
+            const availableStrategy = formData.strategies.find(
+                s => !profitsInput.some(p => p.strategy === s)
+            )
+            if (availableStrategy) {
+                setProfitsInput([...profitsInput, { strategy: availableStrategy, value: '' }])
+            } else {
+                alert('Все стратегии уже имеют профит')
+            }
+        }
+    }
+
+    // Update profit value
+    const updateProfitValue = (strategy: TriggerStrategy, value: string) => {
+        setProfitsInput(prev => prev.map(p => 
+            p.strategy === strategy ? { ...p, value } : p
+        ))
+    }
+
+    // Remove profit entry
+    const removeProfitEntry = (strategy: TriggerStrategy) => {
+        setProfitsInput(prev => prev.filter(p => p.strategy !== strategy))
+    }
+
+    // Get profit display text
+    const getProfitDisplay = (profits: TriggerProfit[] | undefined) => {
+        if (!profits || profits.length === 0) return '-'
+        return profits.map(p => `${p.strategy}: ${p.value || '-'}`).join(', ')
     }
 
     return (
@@ -460,7 +552,8 @@ export const SignalsTriggerBot = () => {
                                         marketCap: '',
                                         address: '',
                                         strategies: [],
-                                        maxDrop: '',
+                                        maxDropFromSignal: '',
+                                        maxDropFromLevel07: '',
                                         maxProfit: '',
                                         comment: ''
                                     })
@@ -523,6 +616,7 @@ export const SignalsTriggerBot = () => {
                             {/* Drop Filters */}
                             <div className="space-y-3">
                                 <h4 className={`text-xs font-semibold uppercase ${subTextColor}`}>Макс. Падение (%)</h4>
+                                <h4 className={`text-xs font-semibold uppercase ${subTextColor}`}>Макс. падение от сигнала (%)</h4>
                                 <div className="grid grid-cols-2 gap-2">
                                     <div>
                                         <label className={`text-xs ${subTextColor}`}>Мин.</label>
@@ -615,20 +709,22 @@ export const SignalsTriggerBot = () => {
                                     <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>Стратегии</th>
                                     <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>Market Cap</th>
                                     <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>Адрес</th>
-                                    <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>Макс. Падение</th>
+                                    <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>Макс. падение от сигнала</th>
+                                    <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>Макс. падение от 0.7</th>
                                     <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>Макс. Профит</th>
                                     <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>Комментарий</th>
+                                    <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>📷</th>
                                     <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>Действия</th>
                                 </tr>
                             </thead>
                             <tbody className={`divide-y ${theme === 'dark' ? 'divide-white/5' : 'divide-gray-100'}`}>
                                 {loading ? (
                                     <tr>
-                                        <td colSpan={9} className="p-8 text-center text-gray-500">Загрузка...</td>
+                                        <td colSpan={12} className="p-8 text-center text-gray-500">Загрузка...</td>
                                     </tr>
                                 ) : filteredAlerts.length === 0 ? (
                                     <tr>
-                                        <td colSpan={9} className="p-8 text-center text-gray-500">
+                                        <td colSpan={12} className="p-8 text-center text-gray-500">
                                             {hasActiveFilters ? 'Нет сигналов по выбранным фильтрам' : 'Нет сигналов'}
                                         </td>
                                     </tr>
@@ -652,7 +748,7 @@ export const SignalsTriggerBot = () => {
                                             if (dateIndex > 0) {
                                                 rows.push(
                                                     <tr key={`separator-${dateKey}`}>
-                                                        <td colSpan={9} className="py-2">
+                                                        <td colSpan={12} className="py-2">
                                                             <div className={`h-px ${theme === 'dark' ? 'bg-white/10' : 'bg-gray-200'}`}></div>
                                                         </td>
                                                     </tr>
@@ -661,7 +757,7 @@ export const SignalsTriggerBot = () => {
 
                                             rows.push(
                                                 <tr key={`header-${dateKey}`} className={`${theme === 'dark' ? 'bg-white/5' : 'bg-gray-50'}`}>
-                                                    <td colSpan={9} className="p-3 px-4">
+                                                    <td colSpan={12} className="p-3 px-4">
                                                         <span className={`text-sm font-semibold ${subTextColor}`}>
                                                             {formatDateForDisplay(dateKey)}
                                                         </span>
@@ -714,19 +810,37 @@ export const SignalsTriggerBot = () => {
                                                             </div>
                                                         </td>
                                                         <td className="p-4 whitespace-nowrap">
-                                                            <span className={`font-mono ${alert.maxDrop && alert.maxDrop.startsWith('-') ? 'text-red-500' : headingColor}`}>
-                                                                {alert.maxDrop || '-'}
+                                                            <span className={`font-mono ${alert.maxDropFromSignal && alert.maxDropFromSignal.startsWith('-') ? 'text-red-500' : headingColor}`}>
+                                                                {alert.maxDropFromSignal || '-'}
                                                             </span>
                                                         </td>
                                                         <td className="p-4 whitespace-nowrap">
-                                                            <span className="font-mono text-green-500 font-bold">
-                                                                {alert.maxProfit || '-'}
+                                                            <span className={`font-mono ${alert.maxDropFromLevel07 && alert.maxDropFromLevel07.startsWith('-') ? 'text-red-500' : headingColor}`}>
+                                                                {alert.maxDropFromLevel07 || '-'}
+                                                            </span>
+                                                        </td>
+                                                        <td className="p-4 whitespace-nowrap">
+                                                            <span className="font-mono text-green-500 font-bold text-sm">
+                                                                {getProfitDisplay(alert.profits)}
                                                             </span>
                                                         </td>
                                                         <td className="p-4 max-w-[250px]">
                                                             <div className={`text-sm ${headingColor} break-words whitespace-pre-wrap`}>
                                                                 {alert.comment || '-'}
                                                             </div>
+                                                        </td>
+                                                        <td className="p-4 whitespace-nowrap">
+                                                            {alert.screenshot ? (
+                                                                <button
+                                                                    onClick={() => openPhotoModal(alert.screenshot!)}
+                                                                    className="p-2 rounded-lg hover:bg-amber-500/20 text-amber-500 transition-colors"
+                                                                    title="Просмотр фото"
+                                                                >
+                                                                    <Image className="w-4 h-4" />
+                                                                </button>
+                                                            ) : (
+                                                                <span className={`text-xs ${subTextColor}`}>—</span>
+                                                            )}
                                                         </td>
                                                         <td className="p-4 whitespace-nowrap">
                                                             <div className="flex items-center gap-1">
@@ -796,19 +910,37 @@ export const SignalsTriggerBot = () => {
                                                 </div>
                                             </td>
                                             <td className="p-4 whitespace-nowrap">
-                                                <span className={`font-mono ${alert.maxDrop && alert.maxDrop.startsWith('-') ? 'text-red-500' : headingColor}`}>
-                                                    {alert.maxDrop || '-'}
+                                                <span className={`font-mono ${alert.maxDropFromSignal && alert.maxDropFromSignal.startsWith('-') ? 'text-red-500' : headingColor}`}>
+                                                    {alert.maxDropFromSignal || '-'}
                                                 </span>
                                             </td>
                                             <td className="p-4 whitespace-nowrap">
-                                                <span className="font-mono text-green-500 font-bold">
-                                                    {alert.maxProfit || '-'}
+                                                <span className={`font-mono ${alert.maxDropFromLevel07 && alert.maxDropFromLevel07.startsWith('-') ? 'text-red-500' : headingColor}`}>
+                                                    {alert.maxDropFromLevel07 || '-'}
+                                                </span>
+                                            </td>
+                                            <td className="p-4 whitespace-nowrap">
+                                                <span className="font-mono text-green-500 font-bold text-sm">
+                                                    {getProfitDisplay(alert.profits)}
                                                 </span>
                                             </td>
                                             <td className="p-4 max-w-[250px]">
                                                 <div className={`text-sm ${headingColor} break-words whitespace-pre-wrap`}>
                                                     {alert.comment || ''}
                                                 </div>
+                                            </td>
+                                            <td className="p-4 whitespace-nowrap">
+                                                {alert.screenshot ? (
+                                                    <button
+                                                        onClick={() => openPhotoModal(alert.screenshot!)}
+                                                        className="p-2 rounded-lg hover:bg-amber-500/20 text-amber-500 transition-colors"
+                                                        title="Просмотр фото"
+                                                    >
+                                                        <Image className="w-4 h-4" />
+                                                    </button>
+                                                ) : (
+                                                    <span className={`text-xs ${subTextColor}`}>—</span>
+                                                )}
                                             </td>
                                             <td className="p-4 whitespace-nowrap">
                                                 <div className="flex items-center gap-1">
@@ -857,7 +989,8 @@ export const SignalsTriggerBot = () => {
                                     marketCap: '',
                                     address: '',
                                     strategies: [],
-                                    maxDrop: '',
+                                    maxDropFromSignal: '',
+                                    maxDropFromLevel07: '',
                                     maxProfit: '',
                                     comment: ''
                                 })
@@ -925,22 +1058,22 @@ export const SignalsTriggerBot = () => {
                                             />
                                         </div>
                                         <div className="space-y-1">
-                                            <label className={`text-xs ${subTextColor}`}>Макс. Падение</label>
+                                            <label className={`text-xs ${subTextColor}`}>Макс. падение от сигнала</label>
                                             <input
                                                 type="text"
                                                 placeholder="e.g. -16"
-                                                value={formData.maxDrop || ''}
-                                                onChange={(e) => setFormData({ ...formData, maxDrop: e.target.value })}
+                                                value={formData.maxDropFromSignal || ''}
+                                                onChange={(e) => setFormData({ ...formData, maxDropFromSignal: e.target.value })}
                                                 className={`w-full p-2 rounded-lg border text-sm outline-none mt-1 ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white' : 'bg-white border-gray-200 text-gray-900'}`}
                                             />
                                         </div>
                                         <div className="space-y-1">
-                                            <label className={`text-xs ${subTextColor}`}>Макс. Профит</label>
+                                            <label className={`text-xs ${subTextColor}`}>Макс. падение от 0.7</label>
                                             <input
                                                 type="text"
-                                                placeholder="e.g. +28"
-                                                value={formData.maxProfit || ''}
-                                                onChange={(e) => setFormData({ ...formData, maxProfit: e.target.value })}
+                                                placeholder="e.g. -5"
+                                                value={formData.maxDropFromLevel07 || ''}
+                                                onChange={(e) => setFormData({ ...formData, maxDropFromLevel07: e.target.value })}
                                                 className={`w-full p-2 rounded-lg border text-sm outline-none mt-1 ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white' : 'bg-white border-gray-200 text-gray-900'}`}
                                             />
                                         </div>
@@ -955,6 +1088,89 @@ export const SignalsTriggerBot = () => {
                                             onChange={(e) => setFormData({ ...formData, comment: e.target.value })}
                                             className={`w-full p-2 rounded-xl border outline-none transition-all font-mono text-sm ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white' : 'bg-white border-gray-200 text-gray-900'}`}
                                         />
+                                    </div>
+
+                                    {/* Multiple Profits Input */}
+                                    {formData.strategies && formData.strategies.length > 0 && !formData.isScam && (
+                                        <div className="space-y-2">
+                                            <div className="flex items-center justify-between">
+                                                <label className={`text-xs font-semibold uppercase ${subTextColor}`}>Профиты по стратегиям</label>
+                                                <button
+                                                    type="button"
+                                                    onClick={addProfitEntry}
+                                                    className="text-xs text-amber-500 hover:text-amber-400 transition-colors flex items-center gap-1"
+                                                >
+                                                    <Plus className="w-3 h-3" />
+                                                    Добавить
+                                                </button>
+                                            </div>
+
+                                            {profitsInput.length > 0 ? (
+                                                <div className="space-y-2">
+                                                    {profitsInput.map((profit, idx) => (
+                                                        <div key={idx} className={`flex items-center gap-2 p-2 rounded-lg ${theme === 'dark' ? 'bg-black/30' : 'bg-gray-100'}`}>
+                                                            <span className={`text-xs font-medium w-24 ${subTextColor}`}>
+                                                                {profit.strategy}
+                                                            </span>
+                                                            <input
+                                                                type="text"
+                                                                placeholder="+28 или X3"
+                                                                value={profit.value}
+                                                                onChange={(e) => updateProfitValue(profit.strategy, e.target.value)}
+                                                                className={`flex-1 p-1.5 rounded border text-sm outline-none ${theme === 'dark' ? 'bg-[#1a1f26] border-white/10 text-white' : 'bg-white border-gray-200 text-gray-900'}`}
+                                                            />
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => removeProfitEntry(profit.strategy)}
+                                                                className="p-1 rounded hover:bg-red-500/20 text-red-500 transition-colors"
+                                                            >
+                                                                <XCircle className="w-4 h-4" />
+                                                            </button>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            ) : (
+                                                <p className={`text-xs ${subTextColor}`}>Выберите стратегии и добавьте профиты</p>
+                                            )}
+                                        </div>
+                                    )}
+
+                                    {/* Screenshot Upload */}
+                                    <div className="space-y-2">
+                                        <label className={`text-xs font-semibold uppercase ${subTextColor}`}>Скриншот</label>
+                                        <div className={`flex items-center gap-3 ${theme === 'dark' ? 'bg-black/30' : 'bg-gray-100'} p-3 rounded-xl border border-dashed ${theme === 'dark' ? 'border-white/10' : 'border-gray-300'}`}>
+                                            {screenshotPreview ? (
+                                                <div className="relative">
+                                                    <img 
+                                                        src={screenshotPreview} 
+                                                        alt="Preview" 
+                                                        className="w-16 h-16 object-cover rounded-lg"
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        onClick={removeScreenshot}
+                                                        className="absolute -top-2 -right-2 p-0.5 rounded-full bg-red-500 text-white hover:bg-red-600 transition-colors"
+                                                    >
+                                                        <XCircle className="w-4 h-4" />
+                                                    </button>
+                                                </div>
+                                            ) : (
+                                                <label className="flex items-center gap-2 cursor-pointer text-amber-500 hover:text-amber-400 transition-colors">
+                                                    <Image className="w-5 h-5" />
+                                                    <span className="text-sm">Загрузить фото</span>
+                                                    <input
+                                                        ref={fileInputRef}
+                                                        type="file"
+                                                        accept="image/*"
+                                                        onChange={handleScreenshotChange}
+                                                        className="hidden"
+                                                    />
+                                                </label>
+                                            )}
+                                            {!screenshotPreview && (
+                                                <span className={`text-xs ${subTextColor}`}>Макс. 5MB</span>
+                                            )}
+                                        </div>
                                     </div>
 
                                     {/* Is Scam checkbox */}
@@ -1038,22 +1254,22 @@ export const SignalsTriggerBot = () => {
                                                 />
                                             </div>
                                             <div className="space-y-1">
-                                                <label className={`text-xs ${subTextColor}`}>Макс. Падение</label>
+                                                <label className={`text-xs ${subTextColor}`}>Макс. падение от сигнала</label>
                                                 <input
                                                     type="text"
                                                     placeholder="e.g. -16"
-                                                    value={formData.maxDrop || ''}
-                                                    onChange={(e) => setFormData({ ...formData, maxDrop: e.target.value })}
+                                                    value={formData.maxDropFromSignal || ''}
+                                                    onChange={(e) => setFormData({ ...formData, maxDropFromSignal: e.target.value })}
                                                     className={`w-full p-2 rounded-lg border text-sm outline-none mt-1 ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white' : 'bg-white border-gray-200 text-gray-900'}`}
                                                 />
                                             </div>
                                             <div className="space-y-1">
-                                                <label className={`text-xs ${subTextColor}`}>Макс. Профит</label>
+                                                <label className={`text-xs ${subTextColor}`}>Макс. падение от 0.7</label>
                                                 <input
                                                     type="text"
-                                                    placeholder="e.g. +28"
-                                                    value={formData.maxProfit || ''}
-                                                    onChange={(e) => setFormData({ ...formData, maxProfit: e.target.value })}
+                                                    placeholder="e.g. -5"
+                                                    value={formData.maxDropFromLevel07 || ''}
+                                                    onChange={(e) => setFormData({ ...formData, maxDropFromLevel07: e.target.value })}
                                                     className={`w-full p-2 rounded-lg border text-sm outline-none mt-1 ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white' : 'bg-white border-gray-200 text-gray-900'}`}
                                                 />
                                             </div>
@@ -1068,6 +1284,89 @@ export const SignalsTriggerBot = () => {
                                                 onChange={(e) => setFormData({ ...formData, comment: e.target.value })}
                                                 className={`w-full p-2 rounded-xl border outline-none transition-all font-mono text-sm ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white' : 'bg-white border-gray-200 text-gray-900'}`}
                                             />
+                                        </div>
+
+                                        {/* Multiple Profits Input */}
+                                        {formData.strategies && formData.strategies.length > 0 && !formData.isScam && (
+                                            <div className="space-y-2">
+                                                <div className="flex items-center justify-between">
+                                                    <label className={`text-xs font-semibold uppercase ${subTextColor}`}>Профиты по стратегиям</label>
+                                                    <button
+                                                        type="button"
+                                                        onClick={addProfitEntry}
+                                                        className="text-xs text-amber-500 hover:text-amber-400 transition-colors flex items-center gap-1"
+                                                    >
+                                                        <Plus className="w-3 h-3" />
+                                                        Добавить
+                                                    </button>
+                                                </div>
+                                                
+                                                {profitsInput.length > 0 ? (
+                                                    <div className="space-y-2">
+                                                        {profitsInput.map((profit, idx) => (
+                                                            <div key={idx} className={`flex items-center gap-2 p-2 rounded-lg ${theme === 'dark' ? 'bg-black/30' : 'bg-gray-100'}`}>
+                                                                <span className={`text-xs font-medium w-24 ${subTextColor}`}>
+                                                                    {profit.strategy}
+                                                                </span>
+                                                                <input
+                                                                    type="text"
+                                                                    placeholder="+28 или X3"
+                                                                    value={profit.value}
+                                                                    onChange={(e) => updateProfitValue(profit.strategy, e.target.value)}
+                                                                    className={`flex-1 p-1.5 rounded border text-sm outline-none ${theme === 'dark' ? 'bg-[#1a1f26] border-white/10 text-white' : 'bg-white border-gray-200 text-gray-900'}`}
+                                                                />
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => removeProfitEntry(profit.strategy)}
+                                                                    className="p-1 rounded hover:bg-red-500/20 text-red-500 transition-colors"
+                                                                >
+                                                                    <XCircle className="w-4 h-4" />
+                                                                </button>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                ) : (
+                                                    <p className={`text-xs ${subTextColor}`}>Выберите стратегии и добавьте профиты для каждой</p>
+                                                )}
+                                            </div>
+                                        )}
+
+                                        {/* Screenshot Upload */}
+                                        <div className="space-y-2">
+                                            <label className={`text-xs font-semibold uppercase ${subTextColor}`}>Скриншот</label>
+                                            <div className={`flex items-center gap-3 ${theme === 'dark' ? 'bg-black/30' : 'bg-gray-100'} p-3 rounded-xl border border-dashed ${theme === 'dark' ? 'border-white/10' : 'border-gray-300'}`}>
+                                                {screenshotPreview ? (
+                                                    <div className="relative">
+                                                        <img 
+                                                            src={screenshotPreview} 
+                                                            alt="Preview" 
+                                                            className="w-16 h-16 object-cover rounded-lg"
+                                                        />
+                                                        <button
+                                                            type="button"
+                                                            onClick={removeScreenshot}
+                                                            className="absolute -top-2 -right-2 p-0.5 rounded-full bg-red-500 text-white hover:bg-red-600 transition-colors"
+                                                        >
+                                                            <XCircle className="w-4 h-4" />
+                                                        </button>
+                                                    </div>
+                                                ) : (
+                                                    <label className="flex items-center gap-2 cursor-pointer text-amber-500 hover:text-amber-400 transition-colors">
+                                                        <Image className="w-5 h-5" />
+                                                        <span className="text-sm">Загрузить фото</span>
+                                                        <input
+                                                            ref={fileInputRef}
+                                                            type="file"
+                                                            accept="image/*"
+                                                            onChange={handleScreenshotChange}
+                                                            className="hidden"
+                                                        />
+                                                    </label>
+                                                )}
+                                                {!screenshotPreview && (
+                                                    <span className={`text-xs ${subTextColor}`}>Макс. 5MB</span>
+                                                )}
+                                            </div>
                                         </div>
 
                                         {/* Is Scam checkbox */}
@@ -1118,13 +1417,13 @@ export const SignalsTriggerBot = () => {
                                                         className={`flex items-center justify-between p-3 rounded-xl ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-50'}`}
                                                     >
                                                         <div className="flex items-center gap-3 overflow-hidden">
-                                                            <div className={`w-2 h-2 rounded-full flex-shrink-0 ${alert.maxDrop?.startsWith('-') ? 'bg-red-500' : 'bg-green-500'}`}></div>
+                                                            <div className={`w-2 h-2 rounded-full flex-shrink-0 ${alert.maxDropFromSignal?.startsWith('-') ? 'bg-red-500' : 'bg-green-500'}`}></div>
                                                             <div className="flex flex-col min-w-0">
                                                                 <span className={`text-xs font-medium truncate ${headingColor}`}>
                                                                     {truncateAddress(alert.address || '')}
                                                                 </span>
                                                                 <span className={`text-[10px] ${subTextColor}`}>
-                                                                    {alert.signalTime} • {alert.strategies?.join(', ') || '-'} • {alert.maxDrop || '-'} / {alert.maxProfit || '-'}
+                                                                    {alert.signalTime} • {alert.strategies?.join(', ') || '-'} • {alert.maxDropFromSignal || '-'} / {alert.maxDropFromLevel07 || '-'} / {alert.maxProfit || '-'}
                                                                 </span>
                                                             </div>
                                                         </div>
