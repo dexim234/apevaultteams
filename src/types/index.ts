@@ -478,7 +478,7 @@ export interface TriggerAlert {
   signalTime: string // HH:mm
   marketCap?: string
   address: string
-  strategy?: TriggerStrategy
+  strategies: TriggerStrategy[] // Multiple strategies
   maxDrop?: string // e.g. "-16"
   maxProfit?: string // e.g. "+28" or "X3"
   comment?: string

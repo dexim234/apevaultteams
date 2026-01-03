@@ -40,7 +40,7 @@ export const SignalsTriggerBot = () => {
         signalTime: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }),
         marketCap: '',
         address: '',
-        strategy: 'Фиба',
+        strategies: [],
         maxDrop: '',
         maxProfit: '',
         comment: ''
@@ -74,12 +74,17 @@ export const SignalsTriggerBot = () => {
             return
         }
         
+        if (!formData.strategies || formData.strategies.length === 0) {
+            alert('Выберите хотя бы одну стратегию')
+            return
+        }
+
         const newAlert: Partial<TriggerAlert> = {
             signalDate: commonDate,
             signalTime: formData.signalTime,
             marketCap: formData.marketCap,
             address: formData.address,
-            strategy: formData.strategy,
+            strategies: formData.strategies,
             maxDrop: formData.maxDrop,
             maxProfit: formData.maxProfit,
             comment: formData.comment
@@ -87,12 +92,12 @@ export const SignalsTriggerBot = () => {
         
         setAlertsToAdd([...alertsToAdd, newAlert])
         
-        // Reset form fields except date (which is now common) and strategy
+        // Reset form fields except date (which is now common) and strategies
         setFormData({
             signalTime: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }),
             marketCap: '',
             address: '',
-            strategy: formData.strategy,
+            strategies: [],
             maxDrop: '',
             maxProfit: '',
             comment: ''
@@ -128,7 +133,7 @@ export const SignalsTriggerBot = () => {
                 signalTime: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }),
                 marketCap: '',
                 address: '',
-                strategy: 'Фиба',
+                strategies: [],
                 maxDrop: '',
                 maxProfit: '',
                 comment: ''
@@ -162,7 +167,7 @@ export const SignalsTriggerBot = () => {
                 signalTime: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }),
                 marketCap: '',
                 address: '',
-                strategy: 'Фиба',
+                strategies: [],
                 maxDrop: '',
                 maxProfit: '',
                 comment: ''
@@ -193,7 +198,7 @@ export const SignalsTriggerBot = () => {
           <tr>
             <th>Дата</th>
             <th>Время</th>
-            <th>Стратегия</th>
+            <th>Стратегии</th>
             <th>Market Cap</th>
             <th>Адрес</th>
             <th>Макс. Падение</th>
@@ -206,7 +211,7 @@ export const SignalsTriggerBot = () => {
             <tr>
               <td>${formatDateForDisplay(a.signalDate)}</td>
               <td>${a.signalTime}</td>
-              <td>${a.strategy || '-'}</td>
+              <td>${a.strategies?.join(', ') || '-'}</td>
               <td>${a.marketCap || '-'}</td>
               <td>${a.address}</td>
               <td>${a.maxDrop || '-'}</td>
@@ -352,13 +357,22 @@ export const SignalsTriggerBot = () => {
         setShowModal(true)
     }
 
-    // Получение цвета для стратегии
+    // Получение цвета для стратегии (только для таблицы)
     const getStrategyColor = (strategy?: TriggerStrategy) => {
         switch (strategy) {
             case 'Фиба': return 'bg-purple-500/20 text-purple-400'
             case 'Market Entry': return 'bg-green-500/20 text-green-400'
             default: return 'bg-gray-500/20 text-gray-400'
         }
+    }
+
+    // Форматирование стратегий для отображения в таблице
+    const formatStrategiesForDisplay = (strategies?: TriggerStrategy[]) => {
+        if (!strategies || strategies.length === 0) return '-'
+        return strategies.map(s => {
+            const colorClass = getStrategyColor(s)
+            return `<span class="${colorClass} px-2 py-0.5 rounded text-xs">${s}</span>`
+        }).join(' ')
     }
 
     return (
@@ -412,7 +426,7 @@ export const SignalsTriggerBot = () => {
                             {hasActiveFilters && (
                                 <button
                                     onClick={resetFilters}
-                                    className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 border ${theme === 'dark' ? 'bg-white/5 border-white/10 hover:bg-white/10' : 'bg-gray-100 border-gray-200 hover:bg-gray-100 text-gray-700'}`}
+                                    className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 border ${theme === 'dark' ? 'bg-white/5 border-white/10 hover:bg-white/10 text-gray-300' : 'bg-gray-100 border-gray-200 hover:bg-gray-100 text-gray-700'}`}
                                 >
                                     <RotateCcw className="w-4 h-4" />
                                     <span>Сброс</span>
@@ -428,7 +442,7 @@ export const SignalsTriggerBot = () => {
                                         signalTime: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }),
                                         marketCap: '',
                                         address: '',
-                                        strategy: 'Фиба',
+                                        strategies: [],
                                         maxDrop: '',
                                         maxProfit: '',
                                         comment: ''
@@ -558,7 +572,7 @@ export const SignalsTriggerBot = () => {
                                     </select>
                                     <button
                                         onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-                                        className={`w-full p-2 rounded-lg border text-sm flex items-center justify-center gap-2 transition-all ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white hover:border-amber-500/30' : 'bg-white border-gray-200 text-gray-900 hover:bg-gray-100'}`}
+                                        className={`w-full p-2 rounded-lg border text-sm flex items-center justify-center gap-2 transition-all ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white hover:bg-white/10' : 'bg-white border-gray-200 text-gray-900 hover:bg-gray-100'}`}
                                     >
                                         {sortOrder === 'asc' ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />}
                                         <span>{sortOrder === 'asc' ? 'По возрастанию' : 'По убыванию'}</span>
@@ -581,7 +595,7 @@ export const SignalsTriggerBot = () => {
                                 <tr className={`border-b ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-gray-50'}`}>
                                     <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>Дата</th>
                                     <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>Время</th>
-                                    <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>Стратегия</th>
+                                    <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>Стратегии</th>
                                     <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>Market Cap</th>
                                     <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>Адрес</th>
                                     <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>Макс. Падение</th>
@@ -648,10 +662,14 @@ export const SignalsTriggerBot = () => {
                                                             <div className={`font-mono ${headingColor}`}>{alert.signalTime}</div>
                                                         </td>
                                                         <td className="p-4 whitespace-nowrap">
-                                                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold ${getStrategyColor(alert.strategy)}`}>
-                                                                <TrendingUp className="w-3 h-3" />
-                                                                {alert.strategy || '-'}
-                                                            </span>
+                                                            <div className="flex flex-wrap gap-1">
+                                                                {alert.strategies?.map((strategy) => (
+                                                                    <span key={strategy} className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold ${getStrategyColor(strategy)}`}>
+                                                                        <TrendingUp className="w-3 h-3" />
+                                                                        {strategy}
+                                                                    </span>
+                                                                )) || '-'}
+                                                            </div>
                                                         </td>
                                                         <td className="p-4 whitespace-nowrap">
                                                             <div className={`font-mono ${headingColor}`}>{alert.marketCap || '-'}</div>
@@ -699,7 +717,7 @@ export const SignalsTriggerBot = () => {
                                                                     onClick={() => handleDelete(alert.id)}
                                                                     className="p-2 rounded-lg hover:bg-red-500/10 text-red-500 transition-colors"
                                                                 >
-                                                                    <Trash2 size={16} />
+                                                                    <Trash2 className="w-4 h-4" />
                                                                 </button>
                                                             </div>
                                                         </td>
@@ -720,10 +738,14 @@ export const SignalsTriggerBot = () => {
                                                 <div className={`font-mono ${headingColor}`}>{alert.signalTime}</div>
                                             </td>
                                             <td className="p-4 whitespace-nowrap">
-                                                <span className={`inline-flex items-center gap-3.5 px-2.5 py-1 rounded-lg text-xs font-semibold ${getStrategyColor(alert.strategy)}`}>
-                                                    <TrendingUp className="w-3 h-3" />
-                                                    {alert.strategy || '-'}
-                                                </span>
+                                                <div className="flex flex-wrap gap-1">
+                                                    {alert.strategies?.map((strategy) => (
+                                                        <span key={strategy} className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold ${getStrategyColor(strategy)}`}>
+                                                            <TrendingUp className="w-3 h-3" />
+                                                            {strategy}
+                                                        </span>
+                                                    )) || '-'}
+                                                </div>
                                             </td>
                                             <td className="p-4 whitespace-nowrap">
                                                 <div className={`font-mono ${headingColor}`}>{alert.marketCap || '-'}</div>
@@ -771,7 +793,7 @@ export const SignalsTriggerBot = () => {
                                                         onClick={() => handleDelete(alert.id)}
                                                         className="p-2 rounded-lg hover:bg-red-500/10 text-red-500 transition-colors"
                                                     >
-                                                        <Trash2 size={16} />
+                                                        <Trash2 className="w-4 h-4" />
                                                     </button>
                                                 </div>
                                             </td>
@@ -805,7 +827,7 @@ export const SignalsTriggerBot = () => {
                                     signalTime: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }),
                                     marketCap: '',
                                     address: '',
-                                    strategy: 'Фиба',
+                                    strategies: [],
                                     maxDrop: '',
                                     maxProfit: '',
                                     comment: ''
@@ -841,9 +863,9 @@ export const SignalsTriggerBot = () => {
                                                 className={`w-full p-3 rounded-xl border outline-none transition-all ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white focus:border-amber-500' : 'bg-white border-gray-200 text-gray-900 focus-border-amber-500'}`}
                                             />
                                         </div>
-                                        <StrategySelector
-                                            value={formData.strategy}
-                                            onChange={(strategy) => setFormData({ ...formData, strategy })}
+                                        <MultiStrategySelector
+                                            value={formData.strategies || []}
+                                            onChange={(strategies) => setFormData({ ...formData, strategies })}
                                             theme={theme}
                                         />
                                     </div>
@@ -940,15 +962,15 @@ export const SignalsTriggerBot = () => {
                                                     className={`w-full p-2 rounded-lg border outline-none transition-all ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white' : 'bg-white border-gray-200 text-gray-900'}`}
                                                 />
                                             </div>
-                                            <StrategySelector
-                                                value={formData.strategy}
-                                                onChange={(strategy) => setFormData({ ...formData, strategy })}
+                                            <MultiStrategySelector
+                                                value={formData.strategies || []}
+                                                onChange={(strategies) => setFormData({ ...formData, strategies })}
                                                 theme={theme}
                                             />
                                         </div>
 
                                         <div className="space-y-1">
-                                            <label className={`text-xs font-semibold uppercase ${subTextColor}`}>Адрес токена</label>
+                                            <label className={`text-xs ${subTextColor}`}>Адрес токена</label>
                                             <input
                                                 type="text"
                                                 placeholder="Адрес контракта..."
@@ -960,7 +982,7 @@ export const SignalsTriggerBot = () => {
 
                                         <div className="grid grid-cols-3 gap-4">
                                             <div className="space-y-1">
-                                                <label className={`text-xs font-semibold uppercase ${subTextColor}`}>Market Cap</label>
+                                                <label className={`text-xs ${subTextColor}`}>Market Cap</label>
                                                 <input
                                                     type="text"
                                                     placeholder="e.g. 300,77"
@@ -970,7 +992,7 @@ export const SignalsTriggerBot = () => {
                                                 />
                                             </div>
                                             <div className="space-y-1">
-                                                <label className={`text-xs font-semibold uppercase ${subTextColor}`}>Макс. Падение</label>
+                                                <label className={`text-xs ${subTextColor}`}>Макс. Падение</label>
                                                 <input
                                                     type="text"
                                                     placeholder="e.g. -16"
@@ -980,7 +1002,7 @@ export const SignalsTriggerBot = () => {
                                                 />
                                             </div>
                                             <div className="space-y-1">
-                                                <label className={`text-xs font-semibold uppercase ${subTextColor}`}>Макс. Профит</label>
+                                                <label className={`text-xs ${subTextColor}`}>Макс. Профит</label>
                                                 <input
                                                     type="text"
                                                     placeholder="e.g. +28"
@@ -1041,7 +1063,7 @@ export const SignalsTriggerBot = () => {
                                                                     {truncateAddress(alert.address || '')}
                                                                 </span>
                                                                 <span className={`text-[10px] ${subTextColor}`}>
-                                                                    {alert.signalTime} • {alert.strategy} • {alert.maxDrop || '-'} / {alert.maxProfit || '-'}
+                                                                    {alert.signalTime} • {alert.strategies?.join(', ') || '-'} • {alert.maxDrop || '-'} / {alert.maxProfit || '-'}
                                                                 </span>
                                                             </div>
                                                         </div>
@@ -1076,30 +1098,25 @@ export const SignalsTriggerBot = () => {
     )
 }
 
-// Компонент выбора стратегии (стиль как MemberSelector)
-interface StrategySelectorProps {
-    value: TriggerStrategy | undefined
-    onChange: (strategy: TriggerStrategy) => void
+// Мультиселект стратегий (без цветовой подсветки в селекторе)
+interface MultiStrategySelectorProps {
+    value: TriggerStrategy[]
+    onChange: (strategies: TriggerStrategy[]) => void
     theme: string
 }
 
-const StrategySelector: React.FC<StrategySelectorProps> = ({ value, onChange, theme }) => {
+const MultiStrategySelector: React.FC<MultiStrategySelectorProps> = ({ value, onChange, theme }) => {
     const [isOpen, setIsOpen] = React.useState(false)
     const containerRef = React.useRef<HTMLDivElement>(null)
 
     const subTextColor = theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+    const headingColor = theme === 'dark' ? 'text-white' : 'text-gray-900'
 
-    const getStrategyColor = (strategy: TriggerStrategy) => {
-        switch (strategy) {
-            case 'Фиба': return 'bg-purple-500/20 text-purple-400'
-            case 'Market Entry': return 'bg-green-500/20 text-green-400'
-        }
-    }
-
-    const getStrategyIcon = (strategy: TriggerStrategy) => {
-        switch (strategy) {
-            case 'Фиба': return <TrendingUp className="w-4 h-4" />
-            case 'Market Entry': return <TrendingUp className="w-4 h-4" />
+    const toggleStrategy = (strategy: TriggerStrategy) => {
+        if (value.includes(strategy)) {
+            onChange(value.filter(s => s !== strategy))
+        } else {
+            onChange([...value, strategy])
         }
     }
 
@@ -1113,26 +1130,21 @@ const StrategySelector: React.FC<StrategySelectorProps> = ({ value, onChange, th
         return () => document.removeEventListener('mousedown', handleClickOutside)
     }, [])
 
-    const selectedStrategy = value || 'Фиба'
+    const selectedText = value.length === 0 ? 'Выберите стратегии' : value.join(', ')
 
     return (
         <div className="relative w-full" ref={containerRef}>
-            <label className={`text-xs font-semibold uppercase ${subTextColor}`}>Стратегия</label>
+            <label className={`text-xs font-semibold uppercase ${subTextColor}`}>Стратегии</label>
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 className={`w-full flex items-center justify-between gap-3 px-4 py-2.5 rounded-xl border transition-all mt-1 ${theme === 'dark'
                         ? 'bg-[#151a21] border-white/5 text-gray-300 hover:border-amber-500/30'
                         : 'bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100'}`}
             >
-                <div className="flex items-center gap-2.5 overflow-hidden">
-                    <span className={getStrategyColor(selectedStrategy)}>
-                        {getStrategyIcon(selectedStrategy)}
-                    </span>
-                    <span className={`text-sm font-bold ${getStrategyColor(selectedStrategy)}`}>
-                        {selectedStrategy}
-                    </span>
-                </div>
-                <ChevronDown size={16} className={`text-gray-500 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+                <span className={`text-sm truncate ${value.length === 0 ? subTextColor : headingColor}`}>
+                    {selectedText}
+                </span>
+                <ChevronDown size={16} className={`text-gray-500 transition-transform ${isOpen ? 'rotate-180' : ''} flex-shrink-0`} />
             </button>
 
             {isOpen && (
@@ -1142,20 +1154,17 @@ const StrategySelector: React.FC<StrategySelectorProps> = ({ value, onChange, th
                         {STRATEGIES.map((strategy) => (
                             <button
                                 key={strategy}
-                                onClick={() => {
-                                    onChange(strategy)
-                                    setIsOpen(false)
-                                }}
-                                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-left ${value === strategy
+                                onClick={() => toggleStrategy(strategy)}
+                                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-left ${value.includes(strategy)
                                         ? theme === 'dark' ? 'bg-amber-500/10 text-amber-400' : 'bg-amber-50 text-amber-600'
                                         : theme === 'dark' ? 'hover:bg-white/5 text-gray-300' : 'hover:bg-gray-50 text-gray-700'
                                     }`}
                             >
                                 <span className="text-lg">{getStrategyIcon(strategy)}</span>
-                                <span className={`text-sm font-bold ${value === strategy ? '' : getStrategyColor(strategy)}`}>
+                                <span className={`text-sm font-medium ${value === strategy ? '' : getStrategyColor(strategy)}`}>
                                     {strategy}
                                 </span>
-                                {value === strategy && (
+                                {value.includes(strategy) && (
                                     <Check size={16} className={`ml-auto ${theme === 'dark' ? 'text-amber-400' : 'text-amber-500'}`} />
                                 )}
                             </button>
