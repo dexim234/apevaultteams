@@ -9,7 +9,7 @@ type SortField = 'date' | 'drop' | 'profit'
 type SortOrder = 'asc' | 'desc'
 
 // Стратегии для выбора
-const STRATEGIES: TriggerStrategy[] = ['Фиба', 'Флип', 'Market Entry']
+const STRATEGIES: TriggerStrategy[] = ['Фиба', 'Market Entry']
 
 export const SignalsTriggerBot = () => {
     const { theme } = useThemeStore()
@@ -356,7 +356,6 @@ export const SignalsTriggerBot = () => {
     const getStrategyColor = (strategy?: TriggerStrategy) => {
         switch (strategy) {
             case 'Фиба': return 'bg-purple-500/20 text-purple-400'
-            case 'Флип': return 'bg-blue-500/20 text-blue-400'
             case 'Market Entry': return 'bg-green-500/20 text-green-400'
             default: return 'bg-gray-500/20 text-gray-400'
         }
@@ -413,7 +412,7 @@ export const SignalsTriggerBot = () => {
                             {hasActiveFilters && (
                                 <button
                                     onClick={resetFilters}
-                                    className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 border ${theme === 'dark' ? 'bg-white/5 border-white/10 hover:bg-white/10 text-gray-300' : 'bg-gray-100 border-gray-200 hover:bg-gray-100 text-gray-700'}`}
+                                    className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 border ${theme === 'dark' ? 'bg-white/5 border-white/10 hover:bg-white/10' : 'bg-gray-100 border-gray-200 hover:bg-gray-100 text-gray-700'}`}
                                 >
                                     <RotateCcw className="w-4 h-4" />
                                     <span>Сброс</span>
@@ -551,7 +550,7 @@ export const SignalsTriggerBot = () => {
                                     <select
                                         value={sortBy}
                                         onChange={(e) => setSortBy(e.target.value as SortField)}
-                                        className={`w-full p-2 rounded-lg border text-sm outline-none ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white' : 'bg-white border-gray-200 text-gray-900'}`}
+                                        className={`w-full p-2 rounded-lg border outline-none transition-all ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white' : 'bg-white border-gray-200 text-gray-900'}`}
                                     >
                                         <option value="date">По дате</option>
                                         <option value="drop">По падению</option>
@@ -559,7 +558,7 @@ export const SignalsTriggerBot = () => {
                                     </select>
                                     <button
                                         onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-                                        className={`w-full p-2 rounded-lg border text-sm flex items-center justify-center gap-2 transition-all ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white hover:bg-white/10' : 'bg-white border-gray-200 text-gray-900 hover:bg-gray-100'}`}
+                                        className={`w-full p-2 rounded-lg border text-sm flex items-center justify-center gap-2 transition-all ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white hover:border-amber-500/30' : 'bg-white border-gray-200 text-gray-900 hover:bg-gray-100'}`}
                                     >
                                         {sortOrder === 'asc' ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />}
                                         <span>{sortOrder === 'asc' ? 'По возрастанию' : 'По убыванию'}</span>
@@ -850,7 +849,7 @@ export const SignalsTriggerBot = () => {
                                     </div>
 
                                     <div className="space-y-1">
-                                        <label className={`text-xs font-semibold uppercase ${subTextColor}`}>Адрес токена</label>
+                                        <label className={`text-xs ${subTextColor}`}>Адрес токена</label>
                                         <input
                                             type="text"
                                             required
@@ -982,7 +981,7 @@ export const SignalsTriggerBot = () => {
                                         </div>
 
                                         <div className="space-y-1">
-                                            <label className={`text-xs font-semibold uppercase ${subTextColor}`}>Комментарий</label>
+                                            <label className={`text-xs ${subTextColor}`}>Комментарий</label>
                                             <input
                                                 type="text"
                                                 placeholder="Дополнительная информация..."
@@ -1082,16 +1081,14 @@ const StrategySelector: React.FC<StrategySelectorProps> = ({ value, onChange, th
     const getStrategyColor = (strategy: TriggerStrategy) => {
         switch (strategy) {
             case 'Фиба': return 'bg-purple-500/20 text-purple-400'
-            case 'Флип': return 'bg-blue-500/20 text-blue-400'
             case 'Market Entry': return 'bg-green-500/20 text-green-400'
         }
     }
 
     const getStrategyIcon = (strategy: TriggerStrategy) => {
         switch (strategy) {
-            case 'Фиба': return '📊'
-            case 'Флип': return '🔄'
-            case 'Market Entry': return '🎯'
+            case 'Фиба': return <TrendingUp className="w-4 h-4" />
+            case 'Market Entry': return <TrendingUp className="w-4 h-4" />
         }
     }
 
@@ -1117,7 +1114,9 @@ const StrategySelector: React.FC<StrategySelectorProps> = ({ value, onChange, th
                         : 'bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100'}`}
             >
                 <div className="flex items-center gap-2.5 overflow-hidden">
-                    <span className="text-lg">{getStrategyIcon(selectedStrategy)}</span>
+                    <span className={getStrategyColor(selectedStrategy)}>
+                        {getStrategyIcon(selectedStrategy)}
+                    </span>
                     <span className={`text-sm font-bold ${getStrategyColor(selectedStrategy)}`}>
                         {selectedStrategy}
                     </span>

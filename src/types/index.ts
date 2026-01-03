@@ -470,7 +470,7 @@ export interface AiAlert {
 }
 
 // Signals Trigger Bot types (independent from AiAlert)
-export type TriggerStrategy = 'Фиба' | 'Флип' | 'Market Entry'
+export type TriggerStrategy = 'Фиба' | 'Market Entry'
 
 export interface TriggerAlert {
   id: string
