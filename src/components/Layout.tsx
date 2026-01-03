@@ -86,14 +86,16 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
     { path: '/tasks', label: 'AVF Tasks', icon: CheckSquare, feature: 'tasks' },
     { path: '/earnings', label: 'AVF Profit', icon: DollarSign, feature: 'earnings' },
     { path: '/rating', label: 'AVF Score', icon: TrendingUp, feature: 'rating' },
-  ]
-
-  const infoSubItems: { path: string; label: string; icon: LucideIcon; feature?: string }[] = [
     { path: '/about', label: 'AVF INFO', icon: Info, feature: 'profile' },
     ...(isAdmin ? [{ path: '/approvals', label: 'AVF Check', icon: CheckCircle2, feature: 'admin' }] : []),
   ]
 
-  // Filter accessible items
+  // Mobile Function submenu (without AVF INFO)
+  const mobileFuncSubItems = funcsSubItems.filter(item => 
+    item.path !== '/about' && item.path !== '/approvals'
+  )
+
+  // Filter accessible items for desktop sidebar
   const accessibleFuncsSubItems = funcsSubItems.filter(item =>
     !item.feature || accessibleFeatures.has(item.feature) || isAdmin
   )
@@ -581,7 +583,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
             <>
               <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[-1]" onClick={() => setShowFuncsMenu(false)} />
               <div className="absolute bottom-20 left-4 right-4 glass-panel rounded-2xl border border-white/40 dark:border-white/10 overflow-hidden animate-fade-in">
-                {accessibleFuncsSubItems.map(item => (
+                {mobileFuncSubItems.map(item => (
                   <Link
                     key={item.path}
                     to={item.path}
