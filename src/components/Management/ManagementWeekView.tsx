@@ -643,18 +643,16 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
                               ? 'border-white/40 ring-2 ring-white/20 hover:border-white/60 hover:ring-4 hover:ring-white/40'
                               : 'border-white/30 ring-2 ring-white/10 hover:border-white/50 hover:ring-4 hover:ring-white/30'
                               }`}>
-                              <div className="flex flex-col items-center gap-1 w-full text-center">
-                                <div className="flex items-center gap-1.5 sm:gap-2 justify-center">
-                                  <SlotIcon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 text-white flex-shrink-0 ${isUpcoming ? 'animate-pulse' : ''}`} />
-                                  <span className="text-white font-bold text-xs sm:text-sm whitespace-nowrap">{s.start} - {s.end}</span>
-                                  {s.endDate && (
-                                    <span className="text-white/80 font-medium text-[10px] sm:text-xs whitespace-nowrap">
-                                      (до {formatDate(new Date(s.endDate), 'dd.MM')})
-                                    </span>
-                                  )}
-                                </div>
+                              <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                                <SlotIcon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 text-white flex-shrink-0 ${isUpcoming ? 'animate-pulse' : ''}`} />
+                                <span className="text-white font-bold text-xs sm:text-sm whitespace-nowrap">{s.start} - {s.end}</span>
+                                {s.endDate && (
+                                  <span className="text-white/80 font-medium text-[10px] sm:text-xs whitespace-nowrap">
+                                    (до {formatDate(new Date(s.endDate), 'dd.MM')})
+                                  </span>
+                                )}
                                 {slot.category && (
-                                  <span className={`text-[10px] px-1.5 py-0.5 rounded-full border font-medium whitespace-nowrap max-w-full truncate ${SLOT_CATEGORY_COLORS[slot.category as SlotCategory]?.bg || 'bg-white/20'
+                                  <span className={`text-[10px] px-1.5 py-0.5 rounded-full border font-medium whitespace-nowrap ${SLOT_CATEGORY_COLORS[slot.category as SlotCategory]?.bg || 'bg-white/20'
                                     } ${SLOT_CATEGORY_COLORS[slot.category as SlotCategory]?.text || 'text-white'} ${SLOT_CATEGORY_COLORS[slot.category as SlotCategory]?.border || 'border-white/30'
                                     }`}>
                                     {SLOT_CATEGORY_META[slot.category as SlotCategory]?.label || slot.category}

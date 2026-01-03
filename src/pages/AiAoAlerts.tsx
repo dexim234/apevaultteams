@@ -18,6 +18,8 @@ export const AiAoAlerts = () => {
     const [editingAlert, setEditingAlert] = useState<AiAlert | null>(null)
     const [copyingId, setCopyingId] = useState<string | null>(null)
     const [isCopyingTable, setIsCopyingTable] = useState(false)
+    const [showSuccess, setShowSuccess] = useState(false)
+    const [successCount, setSuccessCount] = useState(0)
 
     // Filter states
     const [showFilters, setShowFilters] = useState(false)
@@ -100,6 +102,14 @@ export const AiAoAlerts = () => {
             )
             await Promise.all(promises)
             
+            // Show success animation
+            setSuccessCount(alertsToAdd.length)
+            setShowSuccess(true)
+            setTimeout(() => {
+                setShowSuccess(false)
+                setSuccessCount(0)
+            }, 2500)
+
             // Reset
             setAlertsToAdd([])
             setFormData({
@@ -1034,5 +1044,27 @@ export const AiAoAlerts = () => {
                 )
             }
         </>
-    )
-}
+
+        {/* Success Modal */}
+        {showSuccess && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+                <div className={`w-full max-w-sm rounded-3xl ${cardBg} ${cardBorder} border shadow-2xl p-8 flex flex-col items-center text-center animate-in zoom-in-95 duration-300`}>
+                    <div className="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center mb-4">
+                        <Check className="w-8 h-8 text-green-500" />
+                    </div>
+                    <h3 className={`text-2xl font-bold ${headingColor} mb-2`}>
+                        Успешно!
+                    </h3>
+                    <p className={`${subTextColor}`}>
+                        {successCount} сигнал{successCount === 1 ? '' : successCount >= 2 && successCount <= 4 ? 'а' : 'ов'} добавлен{successCount === 1 ? '' : 'о'}
+                    </p>
+                    <div className={`mt-6 px-4 py-2 rounded-full ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-100'}`}>
+                        <span className={`text-sm font-semibold ${theme === 'dark' ? 'text-[#4E6E49]' : 'text-[#4E6E49]'}`}>
+                            AI Agent AO
+                        </span>
+                    </div>
+                </div>
+            </div>
+        )}
+    </>
+)}

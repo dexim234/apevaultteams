@@ -21,6 +21,8 @@ export const SignalsTriggerBot = () => {
     const [editingAlert, setEditingAlert] = useState<TriggerAlert | null>(null)
     const [copyingId, setCopyingId] = useState<string | null>(null)
     const [isCopyingTable, setIsCopyingTable] = useState(false)
+    const [showSuccess, setShowSuccess] = useState(false)
+    const [successCount, setSuccessCount] = useState(0)
 
     // Filter states
     const [showFilters, setShowFilters] = useState(false)
@@ -75,7 +77,8 @@ export const SignalsTriggerBot = () => {
             return
         }
 
-        if (!formData.strategies || formData.strategies.length === 0) {
+        // Require strategies only if not marked as scam
+        if (!formData.isScam && (!formData.strategies || formData.strategies.length === 0)) {
             alert('Выберите хотя бы одну стратегию')
             return
         }
@@ -85,16 +88,16 @@ export const SignalsTriggerBot = () => {
             signalTime: formData.signalTime,
             marketCap: formData.marketCap,
             address: formData.address,
-            strategies: formData.strategies,
+            ...(!formData.isScam && { strategies: formData.strategies }),
             maxDrop: formData.maxDrop,
             maxProfit: formData.maxProfit,
             comment: formData.comment,
-            isScam: formData.isScam
+            isScam: formData.isScam || false
         }
 
         setAlertsToAdd([...alertsToAdd, newAlert])
 
-        // Reset form fields except date (which is now common) and strategies
+        // Reset form fields except date (which is now common), strategies, and isScam
         setFormData({
             signalTime: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }),
             marketCap: '',
@@ -128,6 +131,14 @@ export const SignalsTriggerBot = () => {
                 })
             )
             await Promise.all(promises)
+
+            // Show success animation
+            setSuccessCount(alertsToAdd.length)
+            setShowSuccess(true)
+            setTimeout(() => {
+                setShowSuccess(false)
+                setSuccessCount(0)
+            }, 2500)
 
             // Reset
             setAlertsToAdd([])
@@ -440,8 +451,7 @@ export const SignalsTriggerBot = () => {
                                         strategies: [],
                                         maxDrop: '',
                                         maxProfit: '',
-                                        comment: '',
-                                        isScam: false
+                                        comment: ''
                                     })
                                     setShowModal(true)
                                 }}
@@ -650,7 +660,7 @@ export const SignalsTriggerBot = () => {
 
                                             dateAlerts.forEach((alert: TriggerAlert) => {
                                                 rows.push(
-                                                    <tr key={alert.id} className={`${alert.isScam ? (theme === 'dark' ? 'bg-red-900/20 hover:bg-red-900/30' : 'bg-red-50 hover:bg-red-100') : (theme === 'dark' ? 'hover:bg-white/5' : 'hover:bg-gray-50')} transition-colors`}>
+                                                    <tr key={alert.id} className={`${theme === 'dark' ? 'hover:bg-white/5' : 'hover:bg-gray-50'} transition-colors`}>
                                                         <td className="p-4 whitespace-nowrap">
                                                             <div className={`font-mono font-medium ${headingColor}`}>{formatDateForDisplay(alert.signalDate)}</div>
                                                         </td>
@@ -726,7 +736,7 @@ export const SignalsTriggerBot = () => {
                                     })()
                                 ) : (
                                     filteredAlerts.map((alert: TriggerAlert) => (
-                                        <tr key={alert.id} className={`${alert.isScam ? (theme === 'dark' ? 'bg-red-900/20 hover:bg-red-900/30' : 'bg-red-50 hover:bg-red-100') : (theme === 'dark' ? 'hover:bg-white/5' : 'hover:bg-gray-50')} transition-colors`}>
+                                        <tr key={alert.id} className={`${theme === 'dark' ? 'hover:bg-white/5' : 'hover:bg-gray-50'} transition-colors`}>
                                             <td className="p-4 whitespace-nowrap">
                                                 <div className={`font-mono font-medium ${headingColor}`}>{formatDateForDisplay(alert.signalDate)}</div>
                                             </td>
@@ -826,8 +836,7 @@ export const SignalsTriggerBot = () => {
                                     strategies: [],
                                     maxDrop: '',
                                     maxProfit: '',
-                                    comment: '',
-                                    isScam: false
+                                    comment: ''
                                 })
                             }} className={`p-2 rounded-lg hover:bg-white/10 transition-colors ${subTextColor}`}>
                                 <X className="w-5 h-5" />
@@ -923,15 +932,18 @@ export const SignalsTriggerBot = () => {
                                         />
                                     </div>
 
-                                    <div className="space-y-1">
-                                        <label className={`flex items-center gap-2 cursor-pointer ${subTextColor}`}>
-                                            <input
-                                                type="checkbox"
-                                                checked={formData.isScam || false}
-                                                onChange={(e) => setFormData({ ...formData, isScam: e.target.checked })}
-                                                className="w-4 h-4 rounded border-gray-300 text-red-500 focus:ring-red-500"
-                                            />
-                                            <span className="text-sm">Это СКАМ</span>
+                                    {/* Is Scam checkbox */}
+                                    <div className="flex items-center gap-3 p-3 rounded-xl bg-red-500/10 border border-red-500/20">
+                                        <input
+                                            type="checkbox"
+                                            id="isScamEdit"
+                                            checked={formData.isScam || false}
+                                            onChange={(e) => setFormData({ ...formData, isScam: e.target.checked })}
+                                            className={`w-5 h-5 rounded border-2 ${theme === 'dark' ? 'border-gray-700 bg-gray-800' : 'border-gray-300 bg-white'} cursor-pointer accent-red-500`}
+                                        />
+                                        <label htmlFor="isScamEdit" className="cursor-pointer">
+                                            <span className={`text-sm font-semibold ${theme === 'dark' ? 'text-red-400' : 'text-red-600'}`}>Это скам</span>
+                                            <p className={`text-xs ${subTextColor} mt-0.5`}>При отметке выбор стратегии необязателен</p>
                                         </label>
                                     </div>
 
@@ -1033,15 +1045,18 @@ export const SignalsTriggerBot = () => {
                                             />
                                         </div>
 
-                                        <div className="space-y-1">
-                                            <label className={`flex items-center gap-2 cursor-pointer ${subTextColor}`}>
-                                                <input
-                                                    type="checkbox"
-                                                    checked={formData.isScam || false}
-                                                    onChange={(e) => setFormData({ ...formData, isScam: e.target.checked })}
-                                                    className="w-4 h-4 rounded border-gray-300 text-red-500 focus:ring-red-500"
-                                                />
-                                                <span className="text-sm">Это СКАМ</span>
+                                        {/* Is Scam checkbox */}
+                                        <div className="flex items-center gap-3 p-3 rounded-xl bg-red-500/10 border border-red-500/20">
+                                            <input
+                                                type="checkbox"
+                                                id="isScam"
+                                                checked={formData.isScam || false}
+                                                onChange={(e) => setFormData({ ...formData, isScam: e.target.checked })}
+                                                className={`w-5 h-5 rounded border-2 ${theme === 'dark' ? 'border-gray-700 bg-gray-800' : 'border-gray-300 bg-white'} cursor-pointer accent-red-500`}
+                                            />
+                                            <label htmlFor="isScam" className="cursor-pointer">
+                                                <span className={`text-sm font-semibold ${theme === 'dark' ? 'text-red-400' : 'text-red-600'}`}>Это скам</span>
+                                                <p className={`text-xs ${subTextColor} mt-0.5`}>При отметке выбор стратегии необязателен</p>
                                             </label>
                                         </div>
 
@@ -1075,7 +1090,7 @@ export const SignalsTriggerBot = () => {
                                                 {alertsToAdd.map((alert, index) => (
                                                     <div
                                                         key={index}
-                                                        className={`flex items-center justify-between p-3 rounded-xl ${alert.isScam ? (theme === 'dark' ? 'bg-red-900/20' : 'bg-red-50') : (theme === 'dark' ? 'bg-white/5' : 'bg-gray-50')}`}
+                                                        className={`flex items-center justify-between p-3 rounded-xl ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-50'}`}
                                                     >
                                                         <div className="flex items-center gap-3 overflow-hidden">
                                                             <div className={`w-2 h-2 rounded-full flex-shrink-0 ${alert.maxDrop?.startsWith('-') ? 'bg-red-500' : 'bg-green-500'}`}></div>
@@ -1116,7 +1131,29 @@ export const SignalsTriggerBot = () => {
                 </div>
             )}
         </>
-    )
+
+        {/* Success Modal */}
+        {showSuccess && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+                <div className={`w-full max-w-sm rounded-3xl ${cardBg} ${cardBorder} border shadow-2xl p-8 flex flex-col items-center text-center animate-in zoom-in-95 duration-300`}>
+                    <div className="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center mb-4">
+                        <Check className="w-8 h-8 text-green-500" />
+                    </div>
+                    <h3 className={`text-2xl font-bold ${headingColor} mb-2`}>
+                        Успешно!
+                    </h3>
+                    <p className={`${subTextColor}`}>
+                        {successCount} сигнал{successCount === 1 ? '' : successCount >= 2 && successCount <= 4 ? 'а' : 'ов'} добавлен{successCount === 1 ? '' : 'о'}
+                    </p>
+                    <div className={`mt-6 px-4 py-2 rounded-full ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-100'}`}>
+                        <span className={`text-sm font-semibold ${theme === 'dark' ? 'text-amber-400' : 'text-amber-600'}`}>
+                            Signals Trigger Bot
+                        </span>
+                    </div>
+                </div>
+            </div>
+        )}
+    </>
 }
 
 // Мультиселект стратегий (без цветовой подсветки в селекторе)
