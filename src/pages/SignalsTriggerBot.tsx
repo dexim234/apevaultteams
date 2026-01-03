@@ -404,7 +404,7 @@ export const SignalsTriggerBot = () => {
 
                             <button
                                 onClick={() => setShowFilters(!showFilters)}
-                                className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 border ${showFilters ? 'bg-amber-500 border-amber-500 text-white' : theme === 'dark' ? 'bg-white/5 border-white/10 hover:bg-white/10 text-gray-300' : 'bg-gray-100 border-gray-200 hover:bg-gray-200 text-gray-700'}`}
+                                className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 border ${showFilters ? 'bg-amber-500 border-amber-500 text-white' : theme === 'dark' ? 'bg-white/5 border-white/10 hover:bg-white/10 text-gray-300' : 'bg-gray-100 border-gray-200 hover:bg-gray-100 text-gray-700'}`}
                             >
                                 <Filter className="w-4 h-4" />
                                 <span>Фильтры</span>
@@ -721,7 +721,7 @@ export const SignalsTriggerBot = () => {
                                                 <div className={`font-mono ${headingColor}`}>{alert.signalTime}</div>
                                             </td>
                                             <td className="p-4 whitespace-nowrap">
-                                                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold ${getStrategyColor(alert.strategy)}`}>
+                                                <span className={`inline-flex items-center gap-3.5 px-2.5 py-1 rounded-lg text-xs font-semibold ${getStrategyColor(alert.strategy)}`}>
                                                     <TrendingUp className="w-3 h-3" />
                                                     {alert.strategy || '-'}
                                                 </span>
@@ -863,7 +863,7 @@ export const SignalsTriggerBot = () => {
 
                                     <div className="grid grid-cols-3 gap-4">
                                         <div className="space-y-1">
-                                            <label className={`text-xs font-semibold uppercase ${subTextColor}`}>Market Cap</label>
+                                            <label className={`text-xs ${subTextColor}`}>Market Cap</label>
                                             <input
                                                 type="text"
                                                 placeholder="e.g. 300,77"
@@ -873,7 +873,7 @@ export const SignalsTriggerBot = () => {
                                             />
                                         </div>
                                         <div className="space-y-1">
-                                            <label className={`text-xs font-semibold uppercase ${subTextColor}`}>Макс. Падение</label>
+                                            <label className={`text-xs ${subTextColor}`}>Макс. Падение</label>
                                             <input
                                                 type="text"
                                                 placeholder="e.g. -16"
@@ -883,7 +883,7 @@ export const SignalsTriggerBot = () => {
                                             />
                                         </div>
                                         <div className="space-y-1">
-                                            <label className={`text-xs font-semibold uppercase ${subTextColor}`}>Макс. Профит</label>
+                                            <label className={`text-xs ${subTextColor}`}>Макс. Профит</label>
                                             <input
                                                 type="text"
                                                 placeholder="e.g. +28"
@@ -895,7 +895,7 @@ export const SignalsTriggerBot = () => {
                                     </div>
 
                                     <div className="space-y-1">
-                                        <label className={`text-xs font-semibold uppercase ${subTextColor}`}>Комментарий</label>
+                                        <label className={`text-xs ${subTextColor}`}>Комментарий</label>
                                         <input
                                             type="text"
                                             placeholder="Дополнительная информация..."
@@ -1076,6 +1076,8 @@ interface StrategySelectorProps {
 const StrategySelector: React.FC<StrategySelectorProps> = ({ value, onChange, theme }) => {
     const [isOpen, setIsOpen] = React.useState(false)
     const containerRef = React.useRef<HTMLDivElement>(null)
+
+    const subTextColor = theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
 
     const getStrategyColor = (strategy: TriggerStrategy) => {
         switch (strategy) {
