@@ -515,43 +515,43 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
         <nav className="xl:hidden fixed bottom-4 left-0 right-0 px-3 z-50">
           <div className="max-w-5xl mx-auto">
             <div className="glass-panel rounded-2xl shadow-2xl border border-white/60 dark:border-white/10 overflow-hidden">
-              <div className="flex divide-x divide-white/40 dark:divide-white/5 w-full overflow-x-auto no-scrollbar">
+              <div className="flex divide-x divide-white/40 dark:divide-white/5 w-full">
                 {/* Tools Button with submenu */}
                 <button
                   onClick={() => setShowToolsMenu(!showToolsMenu)}
-                  className={`flex-none w-20 flex flex-col items-center justify-center gap-1 py-3 ${isToolsActive ? 'text-[#4E6E49]' : 'text-gray-400'}`}
+                  className={`flex-1 min-w-0 flex flex-col items-center justify-center gap-1 py-3 ${isToolsActive ? 'text-[#4E6E49]' : 'text-gray-400'}`}
                 >
                   <Settings className="w-5 h-5" />
-                  <span className="text-[10px] font-bold">Tools</span>
+                  <span className="text-[10px] font-bold truncate px-1">Tools</span>
                 </button>
 
                 {/* Function Button with submenu */}
                 <button
                   onClick={() => setShowFuncsMenu(true)}
-                  className={`flex-none w-20 flex flex-col items-center justify-center gap-1 py-3 ${location.pathname.startsWith('/call') || location.pathname.startsWith('/management') || location.pathname.startsWith('/tasks') || location.pathname.startsWith('/earnings') || location.pathname.startsWith('/rating') ? 'text-[#4E6E49]' : 'text-gray-400'}`}
+                  className={`flex-1 min-w-0 flex flex-col items-center justify-center gap-1 py-3 ${location.pathname.startsWith('/call') || location.pathname.startsWith('/management') || location.pathname.startsWith('/tasks') || location.pathname.startsWith('/earnings') || location.pathname.startsWith('/rating') ? 'text-[#4E6E49]' : 'text-gray-400'}`}
                 >
                   <Radio className="w-5 h-5" />
-                  <span className="text-[10px] font-bold">Function</span>
+                  <span className="text-[10px] font-bold truncate px-1">Function</span>
                 </button>
 
                 {/* AVF INFO */}
                 <Link
                   to="/about"
-                  className={`flex-none w-20 flex flex-col items-center justify-center gap-1 py-3 ${location.pathname === '/about' ? 'text-[#4E6E49]' : 'text-gray-400'}`}
+                  className={`flex-1 min-w-0 flex flex-col items-center justify-center gap-1 py-3 ${location.pathname === '/about' ? 'text-[#4E6E49]' : 'text-gray-400'}`}
                 >
                   <Info className="w-5 h-5" />
-                  <span className="text-[10px] font-bold">AVF INFO</span>
+                  <span className="text-[10px] font-bold truncate px-1">AVF INFO</span>
                 </Link>
 
                 {/* Profile */}
                 <Link
                   to="/profile"
-                  className={`flex-none w-20 flex flex-col items-center justify-center gap-1 py-3 ${location.pathname === '/profile' ? 'text-[#4E6E49]' : 'text-gray-400'}`}
+                  className={`flex-1 min-w-0 flex flex-col items-center justify-center gap-1 py-3 ${location.pathname === '/profile' ? 'text-[#4E6E49]' : 'text-gray-400'}`}
                 >
                   <div className="w-8 h-8 rounded-full bg-[#4E6E49]/10 flex items-center justify-center text-[10px] font-bold">
                     {getInitials(user?.name || 'AU')}
                   </div>
-                  <span className="text-[10px] font-bold">Profile</span>
+                  <span className="text-[10px] font-bold truncate px-1">Profile</span>
                 </Link>
               </div>
             </div>
