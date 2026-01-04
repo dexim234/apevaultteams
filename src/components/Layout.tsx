@@ -486,28 +486,28 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                   {!isCollapsed && <span>Выйти</span>}
                 </button>
 
-              {user?.name === 'Артём' && !isAdmin && (
-                <button
-                  onClick={() => activateAdmin(ADMIN_PASSWORD)}
-                  className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-[#4E6E49]/20 bg-[#4E6E49]/5 text-[#4E6E49] hover:bg-[#4E6E49]/10 transition-colors text-xs font-bold ${isCollapsed ? 'border-0' : ''}`}
-                >
-                  <Shield className="w-3.5 h-3.5" />
-                  {!isCollapsed && <span>Админ</span>}
-                </button>
-              )}
+                {user?.name === 'Артём' && !isAdmin && (
+                  <button
+                    onClick={() => activateAdmin(ADMIN_PASSWORD)}
+                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-[#4E6E49]/20 bg-[#4E6E49]/5 text-[#4E6E49] hover:bg-[#4E6E49]/10 transition-colors text-xs font-bold ${isCollapsed ? 'border-0' : ''}`}
+                  >
+                    <Shield className="w-3.5 h-3.5" />
+                    {!isCollapsed && <span>Админ</span>}
+                  </button>
+                )}
 
-              {isAdmin && (
-                <button
-                  onClick={deactivateAdmin}
-                  className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-amber-500/20 bg-amber-500/5 text-amber-500 hover:bg-amber-500/10 transition-colors text-xs font-bold ${isCollapsed ? 'border-0' : ''}`}
-                >
-                  <ZapOff className="w-3.5 h-3.5" />
-                  {!isCollapsed && <span>Стоп</span>}
-                </button>
-              )}
+                {isAdmin && (
+                  <button
+                    onClick={deactivateAdmin}
+                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-amber-500/20 bg-amber-500/5 text-amber-500 hover:bg-amber-500/10 transition-colors text-xs font-bold ${isCollapsed ? 'border-0' : ''}`}
+                  >
+                    <ZapOff className="w-3.5 h-3.5" />
+                    {!isCollapsed && <span>Стоп</span>}
+                  </button>
+                )}
+              </div>
             </div>
           </div>
-        </aside>
 
         <div className={`flex-1 ${isCollapsed ? 'xl:pl-20' : 'xl:pl-72'} min-h-screen transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]`}>
           <main className="page-shell">
