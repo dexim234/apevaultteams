@@ -787,12 +787,15 @@ export const SignalsTriggerBot = () => {
                                                         </td>
                                                         <td className="p-2 sm:p-3 text-center">
                                                             <div className="flex items-center justify-center gap-1">
-                                                                <div
-                                                                    className={`font-mono text-[10px] sm:text-sm ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}
+                                                                <a
+                                                                    href={`https://gmgn.ai/sol/token/${alert.address}`}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className={`font-mono text-[10px] sm:text-sm ${theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-500'} cursor-pointer`}
                                                                     title={alert.address}
                                                                 >
                                                                     {truncateAddress(alert.address)}
-                                                                </div>
+                                                                </a>
                                                                 <button
                                                                     onClick={() => handleCopy(alert.address, alert.id)}
                                                                     className={`p-1 rounded hover:bg-white/10 transition-colors ${subTextColor}`}
@@ -889,12 +892,15 @@ export const SignalsTriggerBot = () => {
                                             </td>
                                             <td className="p-2 sm:p-3 text-center">
                                                 <div className="flex items-center justify-center gap-1">
-                                                    <div
-                                                        className={`font-mono text-[10px] sm:text-sm ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}
+                                                    <a
+                                                        href={`https://gmgn.ai/sol/token/${alert.address}`}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className={`font-mono text-[10px] sm:text-sm ${theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-500'} cursor-pointer`}
                                                         title={alert.address}
                                                     >
                                                         {truncateAddress(alert.address)}
-                                                    </div>
+                                                    </a>
                                                     <button
                                                         onClick={() => handleCopy(alert.address, alert.id)}
                                                         className={`p-1 rounded hover:bg-white/10 transition-colors ${subTextColor}`}
