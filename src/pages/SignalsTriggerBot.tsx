@@ -816,8 +816,8 @@ export const SignalsTriggerBot = () => {
                                                                 {getProfitDisplay(alert.profits)}
                                                             </span>
                                                         </td>
-                                                        <td className="p-2 sm:p-3 max-w-[120px] sm:max-w-[200px] text-center">
-                                                            <div className={`text-[10px] sm:text-sm ${headingColor} break-words whitespace-pre-wrap line-clamp-2 sm:line-clamp-3`}>
+                                                        <td className="p-2 sm:p-3 text-center">
+                                                            <div className={`text-[10px] sm:text-sm ${headingColor} break-words whitespace-pre-wrap max-w-[250px] sm:max-w-[350px]`}>
                                                                 {alert.comment || '-'}
                                                             </div>
                                                         </td>
@@ -918,8 +918,8 @@ export const SignalsTriggerBot = () => {
                                                     {getProfitDisplay(alert.profits)}
                                                 </span>
                                             </td>
-                                            <td className="p-2 sm:p-3 max-w-[120px] sm:max-w-[200px] text-center">
-                                                <div className={`text-[10px] sm:text-sm ${headingColor} break-words whitespace-pre-wrap line-clamp-2 sm:line-clamp-3`}>
+                                            <td className="p-2 sm:p-3 text-center">
+                                                <div className={`text-[10px] sm:text-sm ${headingColor} break-words whitespace-pre-wrap max-w-[250px] sm:max-w-[350px]`}>
                                                     {alert.comment || '-'}
                                                 </div>
                                             </td>
