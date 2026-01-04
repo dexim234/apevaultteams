@@ -248,14 +248,14 @@ export const SignalsTriggerBot = () => {
         <thead>
           <tr>
             <th>Дата</th>
-            <th>Время</th>
-            <th>Стратегии</th>
-            <th>Market Cap</th>
+            <th>Time</th>
+            <th>Strategy</th>
+            <th>MC</th>
             <th>Адрес</th>
-            <th>Макс. Падение от сигнала</th>
-            <th>Макс. Падение от 0.7</th>
-            <th>Макс. Профит</th>
-            <th>Комментарий</th>
+            <th>↓</th>
+            <th>↓ 0,7</th>
+            <th>Профит</th>
+            <th>коммент</th>
           </tr>
         </thead>
         <tbody>
@@ -694,17 +694,16 @@ export const SignalsTriggerBot = () => {
                         <table className="w-full min-w-[1400px] text-left border-collapse">
                             <thead>
                                 <tr className={`border-b ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-gray-50'}`}>
-                                    <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>Дата</th>
-                                    <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>Время</th>
-                                    <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>Стратегии</th>
-                                    <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>Market Cap</th>
+                                    <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>Time</th>
+                                    <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>Strategy</th>
+                                    <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>MC</th>
                                     <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>Адрес</th>
-                                    <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>Макс. падение от сигнала</th>
-                                    <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>Макс. падение от 0.7</th>
-                                    <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>Макс. Профит</th>
-                                    <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>Комментарий</th>
+                                    <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>↓</th>
+                                    <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>↓ 0,7</th>
+                                    <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>Профит</th>
+                                    <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>коммент</th>
                                     <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>📷</th>
-                                    <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>Действия</th>
+                                    <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>✐</th>
                                 </tr>
                             </thead>
                             <tbody className={`divide-y ${theme === 'dark' ? 'divide-white/5' : 'divide-gray-100'}`}>
@@ -1537,70 +1536,4 @@ export const SignalsTriggerBot = () => {
     )
 }
 
-// Мультиселект стратегий (без цветовой подсветки в селекторе)
-interface MultiStrategySelectorProps {
-    value: TriggerStrategy[]
-    onChange: (strategies: TriggerStrategy[]) => void
-    theme?: string
-}
-
-const MultiStrategySelector: React.FC<MultiStrategySelectorProps> = ({ value, onChange, theme }) => {
-    const [isOpen, setIsOpen] = useState(false)
-    const containerRef = useRef<HTMLDivElement>(null)
-
-    const strategies: TriggerStrategy[] = ['Фиба', 'Market Entry']
-
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-                setIsOpen(false)
-            }
-        }
-        document.addEventListener('mousedown', handleClickOutside)
-        return () => document.removeEventListener('mousedown', handleClickOutside)
-    }, [])
-
-    const toggleStrategy = (strategy: TriggerStrategy) => {
-        if (value.includes(strategy)) {
-            onChange(value.filter(s => s !== strategy))
-        } else {
-            onChange([...value, strategy])
-        }
-    }
-
-    return (
-        <div className="space-y-1 relative" ref={containerRef}>
-            <label className={`text-xs font-semibold uppercase ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Стратегии</label>
-            <button
-                type="button"
-                onClick={() => setIsOpen(!isOpen)}
-                className={`w-full p-2.5 rounded-lg border text-sm outline-none transition-all flex items-center justify-between ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white hover:bg-black/50' : 'bg-white border-gray-200 text-gray-900 hover:bg-gray-50'}`}
-            >
-                <span className="truncate">
-                    {value.length > 0 ? value.join(', ') : 'Выберите стратегии...'}
-                </span>
-                <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-            </button>
-
-            {isOpen && (
-                <div className={`absolute z-50 w-full mt-1 py-1 rounded-lg border shadow-lg ${theme === 'dark' ? 'bg-[#1a1f26] border-white/10' : 'bg-white border-gray-200'}`}>
-                    {strategies.map(strategy => (
-                        <button
-                            key={strategy}
-                            type="button"
-                            onClick={() => toggleStrategy(strategy)}
-                            className={`w-full px-3 py-2 text-sm text-left transition-colors flex items-center gap-2 ${value.includes(strategy) ? (theme === 'dark' ? 'bg-white/10 text-white' : 'bg-gray-100 text-gray-900') : (theme === 'dark' ? 'text-gray-300 hover:bg-white/5' : 'text-gray-700 hover:bg-gray-50')}`}
-                        >
-                            <div className={`w-4 h-4 rounded border flex items-center justify-center ${value.includes(strategy) ? 'bg-amber-500 border-amber-500' : 'border-gray-400'}`}>
-                                {value.includes(strategy) && <Check className="w-3 h-3 text-white" />}
-                            </div>
-                            {strategy}
-                        </button>
-                    ))}
-                </div>
-            )}
-        </div>
-    )
-}
-
-export default SignalsTriggerBot
+// Мультиселект стратеги
