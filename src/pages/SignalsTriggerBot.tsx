@@ -3,7 +3,7 @@ import { useThemeStore } from '@/store/themeStore'
 import { useAuthStore } from '@/store/authStore'
 import { getTriggerAlerts, addTriggerAlert, updateTriggerAlert, deleteTriggerAlert } from '@/services/firestoreService'
 import { TriggerAlert, TriggerStrategy, TriggerProfit } from '@/types'
-import { Zap, Table, Filter, ArrowUp, ArrowDown, RotateCcw, TrendingUp, Image, XCircle } from 'lucide-react'
+import { Plus, Edit, Trash2, Save, X, Copy, Check, Zap, Table, Filter, ArrowUp, ArrowDown, RotateCcw, TrendingUp, Image, XCircle } from 'lucide-react'
 
 // Стратегии для выбора
 const STRATEGIES: TriggerStrategy[] = ['Фиба', 'Market Entry']
