@@ -72,7 +72,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
 
         for (const feature of features) {
           try {
-            const accessResult = await checkUserAccess(effectiveUserId, feature)
+            const accessResult = await checkUserAccess(effectiveUserId || '', feature)
             if (accessResult.hasAccess) {
               accessible.add(feature)
             }
