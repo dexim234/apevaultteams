@@ -690,21 +690,21 @@ export const SignalsTriggerBot = () => {
 
                 {/* Table */}
                 <div className={`relative overflow-hidden rounded-3xl border ${cardBorder} ${cardShadow} ${cardBg}`}>
-                    <div className="overflow-x-auto max-w-full">
-                        <table className="w-full min-w-[1400px] text-left border-collapse">
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse">
                             <thead>
                                 <tr className={`border-b ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-gray-50'}`}>
-                                    <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>Дата</th>
-                                    <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>Время</th>
-                                    <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>Стратегии</th>
-                                    <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>Market Cap</th>
-                                    <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>Адрес</th>
-                                    <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>Макс. падение от сигнала</th>
-                                    <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>Макс. падение от 0.7</th>
-                                    <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>Макс. Профит</th>
-                                    <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>Комментарий</th>
-                                    <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>📷</th>
-                                    <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>Действия</th>
+                                    <th className={`p-2 sm:p-3 text-[10px] sm:text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>Дата</th>
+                                    <th className={`p-2 sm:p-3 text-[10px] sm:text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>Время</th>
+                                    <th className={`p-2 sm:p-3 text-[10px] sm:text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>Стратегии</th>
+                                    <th className={`p-2 sm:p-3 text-[10px] sm:text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>MC</th>
+                                    <th className={`p-2 sm:p-3 text-[10px] sm:text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>Адрес</th>
+                                    <th className={`p-2 sm:p-3 text-[10px] sm:text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>Drop</th>
+                                    <th className={`p-2 sm:p-3 text-[10px] sm:text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>Drop 0.7</th>
+                                    <th className={`p-2 sm:p-3 text-[10px] sm:text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>Профит</th>
+                                    <th className={`p-2 sm:p-3 text-[10px] sm:text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>Комментарий</th>
+                                    <th className={`p-2 sm:p-3 text-[10px] sm:text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>📷</th>
+                                    <th className={`p-2 sm:p-3 text-[10px] sm:text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>⚙</th>
                                 </tr>
                             </thead>
                             <tbody className={`divide-y ${theme === 'dark' ? 'divide-white/5' : 'divide-gray-100'}`}>
@@ -738,7 +738,7 @@ export const SignalsTriggerBot = () => {
                                             if (dateIndex > 0) {
                                                 rows.push(
                                                     <tr key={`separator-${dateKey}`}>
-                                                        <td colSpan={12} className="py-2">
+                                                        <td colSpan={12} className="py-1">
                                                             <div className={`h-px ${theme === 'dark' ? 'bg-white/10' : 'bg-gray-200'}`}></div>
                                                         </td>
                                                     </tr>
@@ -747,8 +747,8 @@ export const SignalsTriggerBot = () => {
 
                                             rows.push(
                                                 <tr key={`header-${dateKey}`} className={`${theme === 'dark' ? 'bg-white/5' : 'bg-gray-50'}`}>
-                                                    <td colSpan={12} className="p-3 px-4">
-                                                        <span className={`text-sm font-semibold ${subTextColor}`}>
+                                                    <td colSpan={12} className="p-2 px-3">
+                                                        <span className={`text-xs sm:text-sm font-semibold ${subTextColor}`}>
                                                             {formatDateForDisplay(dateKey)}
                                                         </span>
                                                     </td>
@@ -758,68 +758,66 @@ export const SignalsTriggerBot = () => {
                                             dateAlerts.forEach((alert: TriggerAlert) => {
                                                 rows.push(
                                                     <tr key={alert.id} className={`${theme === 'dark' ? 'hover:bg-white/5' : 'hover:bg-gray-50'} transition-colors ${alert.isScam ? 'bg-red-500/10' : ''}`}>
-                                                        <td className="p-4 whitespace-nowrap">
-                                                            <div className={`font-mono font-medium ${headingColor}`}>{formatDateForDisplay(alert.signalDate)}</div>
+                                                        <td className="p-2 sm:p-3 whitespace-nowrap">
+                                                            <div className={`font-mono font-medium text-xs sm:text-sm ${headingColor}`}>{formatDateForDisplay(alert.signalDate)}</div>
                                                         </td>
-                                                        <td className="p-4 whitespace-nowrap">
-                                                            <div className={`font-mono ${headingColor}`}>{alert.signalTime}</div>
+                                                        <td className="p-2 sm:p-3 whitespace-nowrap">
+                                                            <div className={`font-mono text-xs sm:text-sm ${headingColor}`}>{alert.signalTime}</div>
                                                         </td>
-                                                        <td className="p-4 whitespace-nowrap">
+                                                        <td className="p-2 sm:p-3 whitespace-nowrap">
                                                             {alert.isScam ? (
-                                                                <div className="flex flex-col gap-0.5">
-                                                                    <span className="text-red-500 font-bold text-sm">СКАМ-МОНЕТА</span>
-                                                                </div>
+                                                                <span className="text-red-500 font-bold text-[10px] sm:text-xs">СКАМ</span>
                                                             ) : (
-                                                                <div className="flex flex-wrap gap-1">
+                                                                <div className="flex flex-wrap gap-0.5">
                                                                     {alert.strategies?.map((strategy) => (
-                                                                        <span key={strategy} className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold ${getStrategyColor(strategy)}`}>
-                                                                            <TrendingUp className="w-3 h-3" />
-                                                                            {strategy}
+                                                                        <span key={strategy} className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] sm:text-xs font-semibold ${getStrategyColor(strategy)}`}>
+                                                                            <TrendingUp className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+                                                                            <span className="hidden xs:inline">{strategy}</span>
                                                                         </span>
                                                                     )) || '-'}
                                                                 </div>
                                                             )}
                                                         </td>
-                                                        <td className="p-4 whitespace-nowrap">
-                                                            <div className={`font-mono ${headingColor}`}>{alert.marketCap || '-'}</div>
+                                                        <td className="p-2 sm:p-3 whitespace-nowrap">
+                                                            <div className={`font-mono text-xs sm:text-sm ${headingColor}`}>{alert.marketCap || '-'}</div>
                                                         </td>
-                                                        <td className="p-4">
-                                                            <div className="flex items-center gap-2">
+                                                        <td className="p-2 sm:p-3">
+                                                            <div className="flex items-center gap-1">
                                                                 <div
-                                                                    className={`font-mono text-sm ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}
+                                                                    className={`font-mono text-[10px] sm:text-sm ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}
                                                                     title={alert.address}
                                                                 >
                                                                     {truncateAddress(alert.address)}
                                                                 </div>
                                                                 <button
                                                                     onClick={() => handleCopy(alert.address, alert.id)}
-                                                                    className={`p-1.5 rounded-lg hover:bg-white/10 transition-colors ${subTextColor}`}
+                                                                    className={`p-1 rounded hover:bg-white/10 transition-colors ${subTextColor}`}
                                                                 >
-                                                                    {copyingId === alert.id ? <Check className="w-3 h-3 text-green-500" /> : <Copy className="w-4 h-4" />}
+                                                                    {copyingId === alert.id ? <Check className="w-3 h-3 text-green-500" /> : <Copy className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
                                                                 </button>
                                                             </div>
                                                         </td>
-                                                        <td className="p-4 whitespace-nowrap">
-                                                            <span className={`font-mono ${alert.maxDropFromSignal && alert.maxDropFromSignal.startsWith('-') ? 'text-red-500' : headingColor}`}>
+                                                        <td className="p-2 sm:p-3 whitespace-nowrap">
+                                                            <span className={`font-mono text-xs sm:text-sm ${alert.maxDropFromSignal && alert.maxDropFromSignal.startsWith('-') ? 'text-red-500' : headingColor}`}>
                                                                 {alert.maxDropFromSignal || '-'}
                                                             </span>
                                                         </td>
-                                                        <td className="p-4 whitespace-nowrap">
-                                                            <span className={`font-mono ${alert.maxDropFromLevel07 && alert.maxDropFromLevel07.startsWith('-') ? 'text-red-500' : headingColor}`}>
+                                                        <td className="p-2 sm:p-3 whitespace-nowrap">
+                                                            <span className={`font-mono text-xs sm:text-sm ${alert.maxDropFromLevel07 && alert.maxDropFromLevel07.startsWith('-') ? 'text-red-500' : headingColor}`}>
                                                                 {alert.maxDropFromLevel07 || '-'}
                                                             </span>
                                                         </td>
-                                                        <td className="p-4 whitespace-nowrap">
-                                                            <span className="font-mono text-green-500 font-bold text-sm">
+                                                        <td className="p-2 sm:p-3 whitespace-nowrap">
+                                                            <span className="font-mono text-xs sm:text-sm text-green-500 font-bold">
                                                                 {getProfitDisplay(alert.profits)}
                                                             </span>
                                                         </td>
-                                                        <td className="p-4 max-w-[250px]">
-                                                            <div className={`text-sm ${headingColor} break-words whitespace-pre-wrap`}>
+                                                        <td className="p-2 sm:p-3 max-w-[120px] sm:max-w-[200px]">
+                                                            <div className={`text-[10px] sm:text-sm ${headingColor} break-words whitespace-pre-wrap line-clamp-2 sm:line-clamp-3`}>
                                                                 {alert.comment || '-'}
                                                             </div>
                                                         </td>
-                                                        <td className="p-4 whitespace-nowrap">
+                                                        <td className="p-2 sm:p-3 whitespace-nowrap">
                                                             {alert.screenshot ? (
                                                                 <button
                                                                     onClick={() => setPreviewImage(alert.screenshot || null)}
@@ -832,19 +830,19 @@ export const SignalsTriggerBot = () => {
                                                                 <span className={`text-xs ${subTextColor}`}>—</span>
                                                             )}
                                                         </td>
-                                                        <td className="p-4 whitespace-nowrap">
-                                                            <div className="flex items-center gap-1">
+                                                        <td className="p-2 sm:p-3 whitespace-nowrap">
+                                                            <div className="flex items-center gap-0.5 sm:gap-1">
                                                                 <button
                                                                     onClick={() => handleEdit(alert)}
-                                                                    className={`p-2 rounded-lg hover:bg-white/10 transition-colors ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}
+                                                                    className={`p-1 sm:p-2 rounded-lg hover:bg-white/10 transition-colors ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}
                                                                 >
-                                                                    <Edit className="w-4 h-4" />
+                                                                    <Edit className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                                                                 </button>
                                                                 <button
                                                                     onClick={() => handleDelete(alert.id)}
-                                                                    className="p-2 rounded-lg hover:bg-red-500/10 text-red-500 transition-colors"
+                                                                    className="p-1 sm:p-2 rounded-lg hover:bg-red-500/10 text-red-500 transition-colors"
                                                                 >
-                                                                    <Trash2 size={16} className="w-4 h-4" />
+                                                                    <Trash2 size={16} className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                                                                 </button>
                                                             </div>
                                                         </td>
@@ -858,68 +856,66 @@ export const SignalsTriggerBot = () => {
                                 ) : (
                                     filteredAlerts.map((alert: TriggerAlert) => (
                                         <tr key={alert.id} className={`${theme === 'dark' ? 'hover:bg-white/5' : 'hover:bg-gray-50'} transition-colors ${alert.isScam ? 'bg-red-500/10' : ''}`}>
-                                            <td className="p-4 whitespace-nowrap">
-                                                <div className={`font-mono font-medium ${headingColor}`}>{formatDateForDisplay(alert.signalDate)}</div>
+                                            <td className="p-2 sm:p-3 whitespace-nowrap">
+                                                <div className={`font-mono font-medium text-xs sm:text-sm ${headingColor}`}>{formatDateForDisplay(alert.signalDate)}</div>
                                             </td>
-                                            <td className="p-4 whitespace-nowrap">
-                                                <div className={`font-mono ${headingColor}`}>{alert.signalTime}</div>
+                                            <td className="p-2 sm:p-3 whitespace-nowrap">
+                                                <div className={`font-mono text-xs sm:text-sm ${headingColor}`}>{alert.signalTime}</div>
                                             </td>
-                                            <td className="p-4 whitespace-nowrap">
+                                            <td className="p-2 sm:p-3 whitespace-nowrap">
                                                 {alert.isScam ? (
-                                                    <div className="flex flex-col gap-0.5">
-                                                        <span className="text-red-500 font-bold text-sm">СКАМ-МОНЕТА</span>
-                                                    </div>
+                                                    <span className="text-red-500 font-bold text-[10px] sm:text-xs">СКАМ</span>
                                                 ) : (
-                                                    <div className="flex flex-wrap gap-1">
+                                                    <div className="flex flex-wrap gap-0.5">
                                                         {alert.strategies?.map((strategy) => (
-                                                            <span key={strategy} className={`inline-flex items-center gap-3 px-2.5 py-1 rounded-lg text-xs font-semibold ${getStrategyColor(strategy)}`}>
-                                                                <TrendingUp className="w-3 h-3" />
-                                                                {strategy}
+                                                            <span key={strategy} className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] sm:text-xs font-semibold ${getStrategyColor(strategy)}`}>
+                                                                <TrendingUp className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+                                                                <span className="hidden xs:inline">{strategy}</span>
                                                             </span>
                                                         )) || '-'}
                                                     </div>
                                                 )}
                                             </td>
-                                            <td className="p-4 whitespace-nowrap">
-                                                <div className={`font-mono ${headingColor}`}>{alert.marketCap || '-'}</div>
+                                            <td className="p-2 sm:p-3 whitespace-nowrap">
+                                                <div className={`font-mono text-xs sm:text-sm ${headingColor}`}>{alert.marketCap || '-'}</div>
                                             </td>
-                                            <td className="p-4">
-                                                <div className="flex items-center gap-2">
+                                            <td className="p-2 sm:p-3">
+                                                <div className="flex items-center gap-1">
                                                     <div
-                                                        className={`font-mono text-sm ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}
+                                                        className={`font-mono text-[10px] sm:text-sm ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}
                                                         title={alert.address}
                                                     >
                                                         {truncateAddress(alert.address)}
                                                     </div>
                                                     <button
                                                         onClick={() => handleCopy(alert.address, alert.id)}
-                                                        className={`p-1.5 rounded-lg hover:bg-white/10 transition-colors ${subTextColor}`}
+                                                        className={`p-1 rounded hover:bg-white/10 transition-colors ${subTextColor}`}
                                                     >
-                                                        {copyingId === alert.id ? <Check className="w-3 h-3 text-green-500" /> : <Copy className="w-4 h-4" />}
+                                                        {copyingId === alert.id ? <Check className="w-3 h-3 text-green-500" /> : <Copy className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
                                                     </button>
                                                 </div>
                                             </td>
-                                            <td className="p-4 whitespace-nowrap">
-                                                <span className={`font-mono ${alert.maxDropFromSignal && alert.maxDropFromSignal.startsWith('-') ? 'text-red-500' : headingColor}`}>
+                                            <td className="p-2 sm:p-3 whitespace-nowrap">
+                                                <span className={`font-mono text-xs sm:text-sm ${alert.maxDropFromSignal && alert.maxDropFromSignal.startsWith('-') ? 'text-red-500' : headingColor}`}>
                                                     {alert.maxDropFromSignal || '-'}
                                                 </span>
                                             </td>
-                                            <td className="p-4 whitespace-nowrap">
-                                                <span className={`font-mono ${alert.maxDropFromLevel07 && alert.maxDropFromLevel07.startsWith('-') ? 'text-red-500' : headingColor}`}>
+                                            <td className="p-2 sm:p-3 whitespace-nowrap">
+                                                <span className={`font-mono text-xs sm:text-sm ${alert.maxDropFromLevel07 && alert.maxDropFromLevel07.startsWith('-') ? 'text-red-500' : headingColor}`}>
                                                     {alert.maxDropFromLevel07 || '-'}
                                                 </span>
                                             </td>
-                                            <td className="p-4 whitespace-nowrap">
-                                                <span className="font-mono text-green-500 font-bold text-sm">
+                                            <td className="p-2 sm:p-3 whitespace-nowrap">
+                                                <span className="font-mono text-xs sm:text-sm text-green-500 font-bold">
                                                     {getProfitDisplay(alert.profits)}
                                                 </span>
                                             </td>
-                                            <td className="p-4 max-w-[250px]">
-                                                <div className={`text-sm ${headingColor} break-words whitespace-pre-wrap`}>
-                                                    {alert.comment || ''}
+                                            <td className="p-2 sm:p-3 max-w-[120px] sm:max-w-[200px]">
+                                                <div className={`text-[10px] sm:text-sm ${headingColor} break-words whitespace-pre-wrap line-clamp-2 sm:line-clamp-3`}>
+                                                    {alert.comment || '-'}
                                                 </div>
                                             </td>
-                                            <td className="p-4 whitespace-nowrap">
+                                            <td className="p-2 sm:p-3 whitespace-nowrap">
                                                 {alert.screenshot ? (
                                                     <button
                                                         onClick={() => setPreviewImage(alert.screenshot || null)}
@@ -932,19 +928,19 @@ export const SignalsTriggerBot = () => {
                                                     <span className={`text-xs ${subTextColor}`}>—</span>
                                                 )}
                                             </td>
-                                            <td className="p-4 whitespace-nowrap">
-                                                <div className="flex items-center gap-1">
+                                            <td className="p-2 sm:p-3 whitespace-nowrap">
+                                                <div className="flex items-center gap-0.5 sm:gap-1">
                                                     <button
                                                         onClick={() => handleEdit(alert)}
-                                                        className={`p-2 rounded-lg hover:bg-white/10 transition-colors ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}
+                                                        className={`p-1 sm:p-2 rounded-lg hover:bg-white/10 transition-colors ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}
                                                     >
-                                                        <Edit className="w-4 h-4" />
+                                                        <Edit className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                                                     </button>
                                                     <button
                                                         onClick={() => handleDelete(alert.id)}
-                                                        className="p-2 rounded-lg hover:bg-red-500/10 text-red-500 transition-colors"
+                                                        className="p-1 sm:p-2 rounded-lg hover:bg-red-500/10 text-red-500 transition-colors"
                                                     >
-                                                        <Trash2 size={16} className="w-4 h-4" />
+                                                        <Trash2 size={16} className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                                                     </button>
                                                 </div>
                                             </td>
