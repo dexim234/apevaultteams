@@ -1621,6 +1621,11 @@ export const checkUserAccess = async (userId: string, feature: string): Promise<
         return { hasAccess: false, reason: block.reason, expiresAt: block.expiresAt }
       }
 
+      // Check for 'about' feature
+      if (feature === 'about' && block.blockFeatures.includes('about' as any)) {
+        return { hasAccess: false, reason: block.reason, expiresAt: block.expiresAt }
+      }
+
       // Check for tool sub-features
       const toolSubFeatures = ['tools_meme_evaluation', 'tools_ai_ao_alerts', 'tools_signals_trigger_bot']
       if (toolSubFeatures.includes(feature) && block.blockFeatures.includes('tools' as any)) {
@@ -1664,6 +1669,11 @@ export const checkUserAccess = async (userId: string, feature: string): Promise<
 
       // Check for 'avf_hub' feature
       if (feature === 'avf_hub' && block.blockFeatures.includes('avf_hub' as any)) {
+        return { hasAccess: false, reason: block.reason, expiresAt: block.expiresAt }
+      }
+
+      // Check for 'about' feature
+      if (feature === 'about' && block.blockFeatures.includes('about' as any)) {
         return { hasAccess: false, reason: block.reason, expiresAt: block.expiresAt }
       }
 

@@ -451,6 +451,7 @@ export type AccessFeature =
   | 'tools_ai_ao_alerts' // block AI-AO Alerts in Tools
   | 'tools_signals_trigger_bot' // block Signals Trigger Bot in Tools
   | 'avf_hub' // block AVF HUB section
+  | 'about' // block About section (AVF INFO)
   | 'slots' // block slot management
   | 'earnings' // block earnings
   | 'tasks' // block tasks

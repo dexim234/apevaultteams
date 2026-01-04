@@ -32,6 +32,7 @@ import {
 import type { LucideIcon } from 'lucide-react'
 import logo from '@/assets/logo.png'
 import { useState, useEffect } from 'react'
+import { UserSwitcher } from '@/components/UserSwitcher'
 
 export const Layout = ({ children }: { children: React.ReactNode }) => {
   const { theme, toggleTheme } = useThemeStore()
@@ -62,7 +63,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
           return
         }
 
-        const features = ['slots', 'earnings', 'tasks', 'rating', 'profile', 'tools', 'tools_meme_evaluation', 'tools_ai_ao_alerts', 'tools_signals_trigger_bot', 'call']
+        const features = ['slots', 'earnings', 'tasks', 'rating', 'profile', 'about', 'tools', 'tools_meme_evaluation', 'tools_ai_ao_alerts', 'tools_signals_trigger_bot', 'avf_hub']
         const accessible = new Set<string>()
 
         for (const feature of features) {
@@ -91,12 +92,13 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
     { path: '/tasks', label: 'AVF Tasks', icon: CheckSquare, feature: 'tasks' },
     { path: '/earnings', label: 'AVF Profit', icon: DollarSign, feature: 'earnings' },
     { path: '/rating', label: 'AVF Score', icon: TrendingUp, feature: 'rating' },
-    { path: '/about', label: 'AVF INFO', icon: Info, feature: 'profile' },
+    { path: '/about', label: 'AVF INFO', icon: Info, feature: 'about' },
     ...(isAdmin ? [{ path: '/approvals', label: 'AVF Check', icon: CheckCircle2, feature: 'admin' }] : []),
   ]
 
   const mobileFuncSubItems = funcsSubItems.filter(item => 
-    item.path !== '/about' && item.path !== '/approvals'
+    item.path !== '/about' && item.path !== '/approvals' &&
+    (!item.feature || accessibleFeatures.has(item.feature) || isAdmin)
   )
 
   const accessibleFuncsSubItems = funcsSubItems.filter(item =>
@@ -348,6 +350,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                 {notifications.length > 0 && <span className="absolute top-2 right-[35%] w-2 h-2 bg-red-500 rounded-full" />}
               </button>
             )}
+            {!isCollapsed && <UserSwitcher />}
           </div>
 
           {showNotifications && (
