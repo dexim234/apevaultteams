@@ -100,10 +100,6 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
     (!item.feature || accessibleFeatures.has(item.feature) || isAdmin)
   )
 
-  const accessibleFuncsSubItems = funcsSubItems.filter(item =>
-    !item.feature || accessibleFeatures.has(item.feature) || isAdmin
-  )
-
   const toolsSubItems: { path: string; label: string; icon: LucideIcon; feature: string }[] = [
     { path: '/meme-evaluation', label: 'Оценка мема', icon: TrendingUp, feature: 'tools_meme_evaluation' },
     { path: '/ai-ao-alerts', label: 'ИИ - АО Alerts', icon: AlertTriangle, feature: 'tools_ai_ao_alerts' },
