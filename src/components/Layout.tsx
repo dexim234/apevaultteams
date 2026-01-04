@@ -471,41 +471,39 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
               )}
             </Link>
 
-            {!isCollapsed && (
-              <div className={`flex gap-2 transition-all duration-500 ${isCollapsed ? 'flex-col gap-4 px-2' : ''}`}>
+            <div className={`flex gap-2 transition-all duration-500 ${isCollapsed ? 'flex-col gap-4 px-2' : 'flex-col gap-4 px-2'}`}>
+              <button
+                onClick={() => {
+                  logout()
+                  deactivateAdmin()
+                  window.location.href = '/login'
+                }}
+                className={`flex items-center justify-center gap-2 py-2.5 rounded-xl border border-red-500/20 bg-red-500/5 text-red-500 hover:bg-red-500/10 transition-colors text-xs font-bold ${isCollapsed ? 'w-10 h-10 px-0 border-0' : 'w-full'}`}
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                {!isCollapsed && <span>Выйти</span>}
+              </button>
+
+              {user?.name === 'Артём' && !isAdmin && (
                 <button
-                  onClick={() => {
-                    logout()
-                    deactivateAdmin()
-                    window.location.href = '/login'
-                  }}
-                  className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-red-500/20 bg-red-500/5 text-red-500 hover:bg-red-500/10 transition-colors text-xs font-bold ${isCollapsed ? 'w-full px-0 border-0' : ''}`}
+                  onClick={() => activateAdmin(ADMIN_PASSWORD)}
+                  className={`flex items-center justify-center gap-2 py-2.5 rounded-xl border border-[#4E6E49]/20 bg-[#4E6E49]/5 text-[#4E6E49] hover:bg-[#4E6E49]/10 transition-colors text-xs font-bold ${isCollapsed ? 'w-10 h-10 px-0 border-0' : 'w-full'}`}
                 >
-                  <LogOut className="w-3.5 h-3.5" />
-                  {!isCollapsed && <span>Выйти</span>}
+                  <Shield className="w-3.5 h-3.5" />
+                  {!isCollapsed && <span>Админ</span>}
                 </button>
+              )}
 
-                {user?.name === 'Артём' && !isAdmin && (
-                  <button
-                    onClick={() => activateAdmin(ADMIN_PASSWORD)}
-                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-[#4E6E49]/20 bg-[#4E6E49]/5 text-[#4E6E49] hover:bg-[#4E6E49]/10 transition-colors text-xs font-bold ${isCollapsed ? 'border-0' : ''}`}
-                  >
-                    <Shield className="w-3.5 h-3.5" />
-                    {!isCollapsed && <span>Админ</span>}
-                  </button>
-                )}
-
-                {isAdmin && (
-                  <button
-                    onClick={deactivateAdmin}
-                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-amber-500/20 bg-amber-500/5 text-amber-500 hover:bg-amber-500/10 transition-colors text-xs font-bold ${isCollapsed ? 'border-0' : ''}`}
-                  >
-                    <ZapOff className="w-3.5 h-3.5" />
-                    {!isCollapsed && <span>Стоп</span>}
-                  </button>
-                )}
-              </div>
-            )}
+              {isAdmin && (
+                <button
+                  onClick={deactivateAdmin}
+                  className={`flex items-center justify-center gap-2 py-2.5 rounded-xl border border-amber-500/20 bg-amber-500/5 text-amber-500 hover:bg-amber-500/10 transition-colors text-xs font-bold ${isCollapsed ? 'w-10 h-10 px-0 border-0' : 'w-full'}`}
+                >
+                  <ZapOff className="w-3.5 h-3.5" />
+                  {!isCollapsed && <span>Стоп</span>}
+                </button>
+              )}
+            </div>
           </div>
         </aside>
 
