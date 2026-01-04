@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import { useThemeStore } from '@/store/themeStore'
 import { useAuthStore } from '@/store/authStore'
 import { useAdminStore } from '@/store/adminStore'
-import { getAccessBlocks, addAccessBlock, updateAccessBlock, deleteAccessBlock } from '@/services/firestoreService'
+import { getAllAccessBlocks, addAccessBlock, updateAccessBlock, deleteAccessBlock } from '@/services/firestoreService'
 import { useScrollLock } from '@/hooks/useScrollLock'
 import { AccessBlock, AccessFeature, TEAM_MEMBERS } from '@/types'
 import { X, Plus, Trash2, Edit, Save, Shield, ShieldX, Clock, AlertCircle } from 'lucide-react'
@@ -51,7 +51,8 @@ export const AccessBlocksForm = ({ onClose }: AccessBlocksFormProps) => {
 
   const loadBlocks = async () => {
     try {
-      const data = await getAccessBlocks()
+      // Get all active blocks for admin panel (both general and user-specific)
+      const data = await getAllAccessBlocks(true)
       setBlocks(data)
     } catch (error) {
       console.error('Error loading blocks:', error)

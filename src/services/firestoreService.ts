@@ -1540,6 +1540,33 @@ export const getAccessBlocks = async (userId?: string, isActive?: boolean): Prom
   return results
 }
 
+// Get ALL access blocks (for admin panel - shows both general and user-specific)
+export const getAllAccessBlocks = async (isActive?: boolean): Promise<AccessBlock[]> => {
+  const blocksRef = collection(db, 'accessBlocks')
+  let q: ReturnType<typeof query>
+
+  if (isActive !== undefined) {
+    q = query(blocksRef, where('isActive', '==', isActive))
+  } else {
+    q = query(blocksRef)
+  }
+
+  const snapshot: any = await getDocs(q)
+  return snapshot.docs.map((doc: any) => {
+    const data = doc.data() as any
+    return {
+      id: doc.id,
+      userId: data?.userId,
+      reason: data?.reason || '',
+      createdBy: data?.createdBy || '',
+      createdAt: data?.createdAt || '',
+      expiresAt: data?.expiresAt,
+      isActive: data?.isActive ?? true,
+      blockFeatures: data?.blockFeatures || []
+    } as AccessBlock
+  })
+}
+
 export const addAccessBlock = async (block: Omit<AccessBlock, 'id'>) => {
   const blocksRef = collection(db, 'accessBlocks')
   const result = await addDoc(blocksRef, block)
