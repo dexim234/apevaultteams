@@ -1503,18 +1503,16 @@ export const getAccessBlocks = async (userId?: string, isActive?: boolean): Prom
   const blocksRef = collection(db, 'accessBlocks')
   let q: ReturnType<typeof query>
 
-  if (userId && isActive !== undefined) {
-    q = query(blocksRef, where('isActive', '==', isActive), where('userId', '==', userId))
-  } else if (userId) {
-    q = query(blocksRef, where('userId', '==', userId))
-  } else if (isActive !== undefined) {
+  // First get all active blocks, then filter in memory for null userId
+  // This is because Firestore doesn't support filtering by null values easily
+  if (isActive !== undefined) {
     q = query(blocksRef, where('isActive', '==', isActive))
   } else {
     q = query(blocksRef)
   }
 
   const snapshot: any = await getDocs(q)
-  return snapshot.docs.map((doc: any) => {
+  let results = snapshot.docs.map((doc: any) => {
     const data = doc.data() as any
     return {
       id: doc.id,
@@ -1527,6 +1525,17 @@ export const getAccessBlocks = async (userId?: string, isActive?: boolean): Prom
       blockFeatures: data?.blockFeatures || []
     } as AccessBlock
   })
+
+  // Filter in memory based on userId
+  if (userId !== undefined && userId !== null) {
+    // Return only blocks for this specific user
+    results = results.filter((block: AccessBlock) => block.userId === userId)
+  } else {
+    // Return only general blocks (no userId)
+    results = results.filter((block: AccessBlock) => !block.userId)
+  }
+
+  return results
 }
 
 export const addAccessBlock = async (block: Omit<AccessBlock, 'id'>) => {
