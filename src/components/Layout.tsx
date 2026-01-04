@@ -32,7 +32,6 @@ import {
 import type { LucideIcon } from 'lucide-react'
 import logo from '@/assets/logo.png'
 import { useState, useEffect } from 'react'
-import { UserSwitcher } from '@/components/UserSwitcher'
 
 export const Layout = ({ children }: { children: React.ReactNode }) => {
   const { theme, toggleTheme } = useThemeStore()
@@ -506,8 +505,9 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                   </button>
                 )}
               </div>
-            </div>
+            )}
           </div>
+        </aside>
 
         <div className={`flex-1 ${isCollapsed ? 'xl:pl-20' : 'xl:pl-72'} min-h-screen transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]`}>
           <main className="page-shell">
