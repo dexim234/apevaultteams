@@ -567,7 +567,7 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
                         : 'hover:border-slate-200/80 ring-2 ring-slate-200/40 hover:ring-4 hover:ring-slate-200/60'
                         }`}
                     >
-                      <div className="flex items-center justify-between border-b border-white/20 pb-2 sm:pb-3">
+                      <div className="flex items-center justify-center sm:justify-start border-b border-white/20 pb-2 sm:pb-3">
                         <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
                           <div className="relative flex-shrink-0 group/avatar">
                             {slotUser?.avatar ? (
@@ -594,10 +594,8 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
                             >
                               {displayName.charAt(0).toUpperCase()}
                             </div>
-                            <div className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 sm:w-3 sm:h-3 md:w-3.5 md:h-3.5 rounded-full border border-white sm:border-2 shadow-lg animate-pulse opacity-0 group-hover/avatar:opacity-100 transition-opacity duration-300 ${isUpcoming ? 'bg-emerald-300' : 'bg-slate-400'
-                              }`}></div>
                           </div>
-                          <span className="text-white font-bold text-sm sm:text-base group-hover:scale-105 transition-transform duration-300 truncate">{displayName}</span>
+                          <span className="text-white font-bold text-sm sm:text-base group-hover:scale-105 transition-transform duration-300 truncate text-center sm:text-left w-full sm:w-auto">{displayName}</span>
                         </div>
                         <div className="flex gap-2">
                           {(isAdmin || user?.id === slot.userId) ? (

@@ -450,6 +450,7 @@ export type AccessFeature =
   | 'tools_meme_evaluation' // block Meme Evaluation in Tools
   | 'tools_ai_ao_alerts' // block AI-AO Alerts in Tools
   | 'tools_signals_trigger_bot' // block Signals Trigger Bot in Tools
+  | 'avf_hub' // block AVF HUB section
   | 'slots' // block slot management
   | 'earnings' // block earnings
   | 'tasks' // block tasks

@@ -18,6 +18,7 @@ const ACCESS_FEATURES: { value: AccessFeature; label: string; description: strin
   { value: 'tools_meme_evaluation', label: 'Tools → Meme Evaluation', description: 'Заблокировать просмотр оценки мемов' },
   { value: 'tools_ai_ao_alerts', label: 'Tools → AI-AO Alerts', description: 'Заблокировать AI - AO Alerts' },
   { value: 'tools_signals_trigger_bot', label: 'Tools → Signals Trigger Bot', description: 'Заблокировать Signals Trigger Bot' },
+  { value: 'avf_hub', label: 'AVF HUB', description: 'Блокировать доступ к разделу AVF HUB' },
   { value: 'slots', label: 'Управление слотами', description: 'Блокировать создание/редактирование слотов' },
   { value: 'earnings', label: 'Доходы', description: 'Блокировать добавление доходов' },
   { value: 'tasks', label: 'Задачи', description: 'Блокировать управление задачами' },

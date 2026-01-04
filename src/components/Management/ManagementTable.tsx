@@ -554,7 +554,6 @@ export const ManagementTable = ({ selectedUserId, slotFilter, onEditSlot, onEdit
                           >
                             <UserNickname userId={user.id} formatter={(n: string) => n.charAt(0).toUpperCase()} />
                           </div>
-                          <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-[#0b1015]"></div>
                         </div>
                         <div>
                           <div className={`font-bold text-[13px] leading-tight ${headingColor}`}>

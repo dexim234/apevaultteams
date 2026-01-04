@@ -92,7 +92,6 @@ export const EarningsTable = ({ earnings }: EarningsTableProps) => {
                           {member.name[0]}
                         </div>
                       )}
-                      <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-emerald-500 border-2 border-[#0b1015] rounded-full" />
                     </div>
                     <div>
                       <p className={`text-sm font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{getUserNicknameSync(member.id)}</p>
