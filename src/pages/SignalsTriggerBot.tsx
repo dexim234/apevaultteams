@@ -982,9 +982,10 @@ export const SignalsTriggerBot = () => {
                                     strategies: [],
                                     maxDropFromSignal: '',
                                     maxDropFromLevel07: '',
-                                    comment: ''
+                                    comment: '',
+                                    isScam: false
                                 })
-                            }} className={`p-2 rounded-lg hover:bg-white/10 transition-colors ${subTextColor}`}>
+                            })} className={`p-2 rounded-lg hover:bg-white/10 transition-colors ${subTextColor}`}>
                                 <X className="w-5 h-5" />
                             </button>
                         </div>
