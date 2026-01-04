@@ -518,7 +518,7 @@ export const SignalsTriggerBot = () => {
                                     <>
                                         <Check className="w-4 h-4 text-green-500" />
                                         <span>Таблица скопирована</span>
-                                    }
+                                    </>
                                 ) : (
                                     <>
                                         <Table className="w-4 h-4" />
@@ -1524,4 +1524,7 @@ export const SignalsTriggerBot = () => {
                     </div>
                 </div>
             )}
+        </div>
         </>
+    )
+}
