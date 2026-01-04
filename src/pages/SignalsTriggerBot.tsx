@@ -1509,5 +1509,19 @@ export const SignalsTriggerBot = () => {
                     className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200"
                     onClick={() => setPreviewImage(null)}
                 >
-                    <button
-                        className
+                    <div className="relative max-w-4xl max-h-[90vh] rounded-2xl overflow-hidden" onClick={e => e.stopPropagation()}>
+                        <button
+                            onClick={() => setPreviewImage(null)}
+                            className="absolute top-4 right-4 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors z-10"
+                        >
+                            <X className="w-5 h-5" />
+                        </button>
+                        <img 
+                            src={previewImage} 
+                            alt="Preview" 
+                            className="max-w-full max-h-[85vh] object-contain rounded-2xl"
+                        />
+                    </div>
+                </div>
+            )}
+        </>
