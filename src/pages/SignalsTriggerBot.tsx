@@ -34,6 +34,8 @@ export const SignalsTriggerBot = () => {
     const [maxDrop, setMaxDrop] = useState('')
     const [minProfit, setMinProfit] = useState('')
     const [maxProfit, setMaxProfit] = useState('')
+    const [strategyFilter, setStrategyFilter] = useState<'all' | 'Фиба' | 'Market Entry'>('all')
+    const [showScamOnly, setShowScamOnly] = useState(false)
     const [sortBy, setSortBy] = useState<SortField>('date')
     const [sortOrder, setSortOrder] = useState<SortOrder>('desc')
 
@@ -328,6 +330,16 @@ export const SignalsTriggerBot = () => {
             result = result.filter(a => a.signalDate <= dateTo)
         }
 
+        // Filter by scam only
+        if (showScamOnly) {
+            result = result.filter(a => a.isScam === true)
+        }
+
+        // Filter by strategy (only for non-scam alerts)
+        if (strategyFilter !== 'all') {
+            result = result.filter(a => a.isScam || (a.strategies && a.strategies.includes(strategyFilter)))
+        }
+
         // Filter by max drop range (maxDropFromSignal)
         if (minDrop) {
             const minVal = parseFloat(minDrop)
@@ -374,7 +386,7 @@ export const SignalsTriggerBot = () => {
         })
 
         return result
-    }, [alerts, specificDate, dateFrom, dateTo, minDrop, maxDrop, minProfit, maxProfit, sortBy, sortOrder])
+    }, [alerts, specificDate, dateFrom, dateTo, minDrop, maxDrop, minProfit, maxProfit, strategyFilter, showScamOnly, sortBy, sortOrder])
 
     // Reset all filters
     const resetFilters = () => {
@@ -385,14 +397,16 @@ export const SignalsTriggerBot = () => {
         setMaxDrop('')
         setMinProfit('')
         setMaxProfit('')
+        setStrategyFilter('all')
+        setShowScamOnly(false)
         setSortBy('date')
         setSortOrder('desc')
     }
 
     // Check if any filter is active
     const hasActiveFilters = useMemo(() => {
-        return specificDate || dateFrom || dateTo || minDrop || maxDrop || minProfit || maxProfit || sortBy !== 'date' || sortOrder !== 'desc'
-    }, [specificDate, dateFrom, dateTo, minDrop, maxDrop, minProfit, maxProfit, sortBy, sortOrder])
+        return specificDate || dateFrom || dateTo || minDrop || maxDrop || minProfit || maxProfit || strategyFilter !== 'all' || showScamOnly || sortBy !== 'date' || sortOrder !== 'desc'
+    }, [specificDate, dateFrom, dateTo, minDrop, maxDrop, minProfit, maxProfit, strategyFilter, showScamOnly, sortBy, sortOrder])
 
     const handleDelete = async (id: string) => {
         if (!confirm('Удалить алерт?')) return
@@ -605,7 +619,6 @@ export const SignalsTriggerBot = () => {
 
                             {/* Drop Filters */}
                             <div className="space-y-3">
-                                <h4 className={`text-xs font-semibold uppercase ${subTextColor}`}>Макс. Падение (%)</h4>
                                 <h4 className={`text-xs font-semibold uppercase ${subTextColor}`}>Макс. падение от сигнала (%)</h4>
                                 <div className="grid grid-cols-2 gap-2">
                                     <div>
@@ -628,6 +641,34 @@ export const SignalsTriggerBot = () => {
                                             className={`w-full p-2 rounded-lg border text-sm outline-none mt-1 ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white' : 'bg-white border-gray-200 text-gray-900'}`}
                                         />
                                     </div>
+                                </div>
+                            </div>
+
+                            {/* Strategy & Scam Filters */}
+                            <div className="space-y-3">
+                                <h4 className={`text-xs font-semibold uppercase ${subTextColor}`}>Стратегия и скам</h4>
+                                <div className="space-y-2">
+                                    <div>
+                                        <label className={`text-xs ${subTextColor}`}>Стратегия</label>
+                                        <select
+                                            value={strategyFilter}
+                                            onChange={(e) => setStrategyFilter(e.target.value as 'all' | 'Фиба' | 'Market Entry')}
+                                            className={`w-full p-2 rounded-lg border text-sm outline-none mt-1 ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white' : 'bg-white border-gray-200 text-gray-900'}`}
+                                        >
+                                            <option value="all">Все</option>
+                                            <option value="Фиба">Фиба</option>
+                                            <option value="Market Entry">Market Entry</option>
+                                        </select>
+                                    </div>
+                                    <label className="flex items-center gap-2 cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            checked={showScamOnly}
+                                            onChange={(e) => setShowScamOnly(e.target.checked)}
+                                            className="rounded border-gray-300 text-red-500 focus:ring-red-500"
+                                        />
+                                        <span className={`text-sm ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Только скам</span>
+                                    </label>
                                 </div>
                             </div>
 

@@ -1527,11 +1527,13 @@ export const getAccessBlocks = async (userId?: string, isActive?: boolean): Prom
   })
 
   // Filter in memory based on userId
+  // Handle both null/undefined and empty string as "no user" (general block)
+  // Also handle old records where userId field doesn't exist at all
   if (userId !== undefined && userId !== null) {
     // Return only blocks for this specific user
     results = results.filter((block: AccessBlock) => block.userId === userId)
   } else {
-    // Return only general blocks (no userId)
+    // Return only general blocks (no userId, null, undefined, or empty string)
     results = results.filter((block: AccessBlock) => !block.userId)
   }
 

@@ -76,7 +76,8 @@ export const AccessBlocksForm = ({ onClose }: AccessBlocksFormProps) => {
         isActive: formData.isActive,
         createdBy: user?.id || 'admin',
         createdAt: new Date().toISOString(),
-        ...(formData.userId ? { userId: formData.userId } : {}),
+        // Always include userId - empty string for general blocks
+        userId: formData.userId || '',
         ...(formData.expiresAt ? { expiresAt: formData.expiresAt } : {})
       }
 
