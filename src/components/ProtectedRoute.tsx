@@ -34,6 +34,7 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     if (path === '/rating') return 'rating'
     if (path === '/profile') return 'profile'
     if (path === '/approvals') return 'admin'
+    if (path === '/call') return 'slots'
     if (path === '/meme-evaluation') return 'tools_meme_evaluation'
     if (path === '/ai-ao-alerts') return 'tools_ai_ao_alerts'
     if (path === '/signals-trigger-bot') return 'tools_signals_trigger_bot'

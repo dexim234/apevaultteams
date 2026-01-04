@@ -418,7 +418,7 @@ export const Management = () => {
 
 
   return (
-    <div className="space-y-6 relative">
+    <div className="space-y-6 relative isolate">
       {/* Header & Stats */}
       <div className="space-y-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -472,7 +472,7 @@ export const Management = () => {
       </div>
 
       {/* Controls Toolbar */}
-      <div className={`sticky top-4 z-40 p-2 rounded-2xl border shadow-xl backdrop-blur-xl ${theme === 'dark'
+      <div className={`sticky top-4 z-50 p-2 rounded-2xl border shadow-xl backdrop-blur-xl ${theme === 'dark'
         ? 'bg-[#0b1015]/80 border-white/10'
         : 'bg-white/80 border-gray-200'
         }`}>
