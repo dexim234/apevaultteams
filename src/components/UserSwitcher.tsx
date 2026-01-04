@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Users, ChevronDown, Eye, EyeOff } from 'lucide-react'
 import { TEAM_MEMBERS } from '@/types'
 import { useViewedUserStore, getViewedUser } from '@/store/viewedUserStore'
@@ -9,6 +9,8 @@ export const UserSwitcher = () => {
   const { user: authUser } = useAuthStore()
   const { viewedUserId, setViewedUser, resetViewedUser } = useViewedUserStore()
   const [isOpen, setIsOpen] = useState(false)
+  const buttonRef = useRef<HTMLButtonElement>(null)
+  const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 })
 
   // Check if current user is Artyom (only Artyom can use this feature)
   const isArtyom = authUser?.id === '1'
@@ -18,9 +20,36 @@ export const UserSwitcher = () => {
   const viewedUser = getViewedUser(viewedUserId)
   const viewedUserNickname = useUserNickname(viewedUserId || '')
 
+  // Calculate menu position when opening
+  useEffect(() => {
+    if (isOpen && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect()
+      // Position menu above and to the right of the button
+      setMenuPosition({
+        top: rect.top,
+        left: rect.right + 8
+      })
+    }
+  }, [isOpen])
+
+  // Handle click outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (isOpen) {
+        const target = e.target as HTMLElement
+        if (!target.closest('.user-switcher-menu')) {
+          setIsOpen(false)
+        }
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [isOpen])
+
   return (
     <div className="relative">
       <button
+        ref={buttonRef}
         onClick={() => setIsOpen(!isOpen)}
         className={`w-full flex items-center gap-2 px-3 py-2 rounded-xl transition-all ${
           viewedUserId
@@ -37,8 +66,20 @@ export const UserSwitcher = () => {
 
       {isOpen && (
         <>
-          <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
-          <div className="absolute left-full top-0 ml-2 w-64 glass-panel rounded-2xl border border-white/40 dark:border-white/10 shadow-2xl z-50 overflow-hidden animate-fade-in">
+          {/* Backdrop */}
+          <div 
+            className="fixed inset-0 z-40" 
+            onClick={() => setIsOpen(false)} 
+          />
+          
+          {/* Menu - positioned fixed to escape sidebar overflow */}
+          <div 
+            className="user-switcher-menu fixed z-50 w-64 glass-panel rounded-2xl border border-white/40 dark:border-white/10 shadow-2xl overflow-hidden animate-fade-in"
+            style={{ 
+              top: menuPosition.top - 8,
+              left: menuPosition.left
+            }}
+          >
             <div className="p-3 border-b border-white/10 flex items-center justify-between">
               <span className="text-xs font-bold text-gray-500">Просмотр данных от лица:</span>
               {viewedUserId && (

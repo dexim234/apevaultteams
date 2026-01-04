@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react'
 import { useThemeStore } from '@/store/themeStore'
 import { useAuthStore } from '@/store/authStore'
 import { useAdminStore, ADMIN_PASSWORD } from '@/store/adminStore'
+import { useViewedUserStore } from '@/store/viewedUserStore'
+import { useEffectiveUserId } from '@/hooks/useEffectiveUserId'
 import {
   getTasks,
   getRatingData,
@@ -51,7 +53,12 @@ export const Profile = () => {
   const { theme } = useThemeStore()
   const { user, logout } = useAuthStore()
   const { isAdmin, deactivateAdmin } = useAdminStore()
+  const { isViewingOtherUser } = useViewedUserStore()
+  const effectiveUserId = useEffectiveUserId()
   const navigate = useNavigate()
+
+  // Use effective user ID (viewed user or current user)
+  const targetUserId = effectiveUserId || user?.id || 'admin'
 
   const [showPassword, setShowPassword] = useState(false)
   const [passwordCopied, setPasswordCopied] = useState(false)
@@ -79,10 +86,13 @@ export const Profile = () => {
   const [newNickname, setNewNickname] = useState('')
   const [isEditingNickname, setIsEditingNickname] = useState(false)
   const [nicknameRequestPending, setNicknameRequestPending] = useState(false)
-  const nickname = useUserNickname(user?.id || '')
+  const nickname = useUserNickname(targetUserId || '')
+
+  // Get viewed user info if viewing other user
+  const viewedUserMember = effectiveUserId ? TEAM_MEMBERS.find(m => m.id === effectiveUserId) : null
 
   const userData = user || (isAdmin ? { name: 'Администратор', login: 'admin', password: ADMIN_PASSWORD } : null)
-  const profileAvatar = user?.id ? TEAM_MEMBERS.find((m) => m.id === user.id)?.avatar : undefined
+  const profileAvatar = effectiveUserId ? TEAM_MEMBERS.find((m) => m.id === effectiveUserId)?.avatar : undefined
   const profileInitial = userData?.name ? userData.name.charAt(0).toUpperCase() : 'A'
 
   const headingColor = theme === 'dark' ? 'text-white' : 'text-gray-900'
@@ -100,9 +110,10 @@ export const Profile = () => {
 
     setLoading(true)
     try {
-      const userId = user?.id || 'admin'
+      // Use effective user ID (viewed user or current user)
+      const targetUserId = effectiveUserId || user?.id || 'admin'
 
-      const userTasks = await getTasks({ assignedTo: userId })
+      const userTasks = await getTasks({ assignedTo: targetUserId })
       setTasks(userTasks)
 
       if (user) {
@@ -120,7 +131,7 @@ export const Profile = () => {
         const ninetyDayStart = formatDate(ninetyDayRange.start, 'yyyy-MM-dd')
         const ninetyDayEnd = formatDate(ninetyDayRange.end, 'yyyy-MM-dd')
 
-        const weekEarnings = await getEarnings(userId, weekStart, weekEnd)
+        const weekEarnings = await getEarnings(targetUserId, weekStart, weekEnd)
         const weeklyEarnings = weekEarnings.reduce((sum: number, e: Earnings) => {
           const participantCount = e.participants && e.participants.length > 0 ? e.participants.length : 1
           return sum + (e.amount / participantCount)
@@ -130,7 +141,7 @@ export const Profile = () => {
           return sum + (e.poolAmount / participantCount)
         }, 0)
 
-        const monthEarnings = await getEarnings(userId, monthStart, monthEnd)
+        const monthEarnings = await getEarnings(targetUserId, monthStart, monthEnd)
         const totalEarnings = monthEarnings.reduce((sum: number, e: Earnings) => {
           const participantCount = e.participants && e.participants.length > 0 ? e.participants.length : 1
           return sum + (e.amount / participantCount)
@@ -140,7 +151,7 @@ export const Profile = () => {
           return sum + (e.poolAmount / participantCount)
         }, 0)
 
-        const statuses = await getDayStatuses(userId)
+        const statuses = await getDayStatuses(targetUserId)
         const monthStatuses = statuses.filter((s: DayStatus) => {
           const statusStart = s.date
           const statusEnd = s.endDate || s.date
@@ -185,13 +196,13 @@ export const Profile = () => {
           .filter((s: any) => s.type === 'vacation')
           .reduce((sum: number, s: any) => sum + countDaysInPeriod(s.date, s.endDate, ninetyDayStart, ninetyDayEnd), 0)
 
-        const slots = await getWorkSlots(userId)
+        const slots = await getWorkSlots(targetUserId)
         const weekSlots = slots.filter((s: any) => s.date >= weekStart && s.date <= weekEnd)
         const weeklyHours = weekSlots.reduce((sum: number, slot: any) => sum + calculateHours(slot.slots), 0)
 
-        const existingRatings = await getRatingData(userId)
+        const existingRatings = await getRatingData(targetUserId)
         const ratingData = existingRatings[0] || {
-          userId,
+          userId: targetUserId,
           earnings: 0,
           messages: 0,
           initiatives: 0,
@@ -208,10 +219,10 @@ export const Profile = () => {
         }
 
         const currentReferrals = await getReferrals(undefined, monthIsoStart, monthIsoEnd)
-        const userReferrals = currentReferrals.filter((referral: any) => referral.ownerId === userId).length
+        const userReferrals = currentReferrals.filter((referral: any) => referral.ownerId === targetUserId).length
 
         const updatedData: Omit<RatingData, 'rating'> = {
-          userId,
+          userId: targetUserId,
           earnings: totalEarnings,
           messages: ratingData.messages || 0,
           initiatives: ratingData.initiatives || 0,
@@ -226,7 +237,7 @@ export const Profile = () => {
           lastUpdated: new Date().toISOString(),
         }
 
-        console.log('Profile.tsx calculateRating call for user:', userId, {
+        console.log('Profile.tsx calculateRating call for user:', targetUserId, {
           weeklyHours,
           weeklyEarnings,
           weeklyDaysOff,
@@ -267,7 +278,7 @@ export const Profile = () => {
           },
         })
 
-        const notesCacheKey = user?.id ? `notes-cache-${user.id}` : null
+        const notesCacheKey = targetUserId ? `notes-cache-${targetUserId}` : null
         const saveLocalNotes = (list: Note[]) => {
           if (notesCacheKey) {
             try {
@@ -279,8 +290,8 @@ export const Profile = () => {
         }
 
         try {
-          if (user) {
-            const userNotes = await getUserNotes(user.id, isAdmin)
+          if (targetUserId) {
+            const userNotes = await getUserNotes(targetUserId, isAdmin)
             setNotes(userNotes)
             saveLocalNotes(userNotes)
 
@@ -313,10 +324,10 @@ export const Profile = () => {
   }
 
   const handleSaveNote = async () => {
-    if (!user?.id) return
+    if (!targetUserId) return
     if (!noteDraft.title.trim() && !noteDraft.text.trim()) return
 
-    const notesCacheKey = user?.id ? `notes-cache-${user.id}` : null
+    const notesCacheKey = targetUserId ? `notes-cache-${targetUserId}` : null
     const saveLocalNotes = (list: Note[]) => {
       if (notesCacheKey) {
         try {
@@ -343,7 +354,7 @@ export const Profile = () => {
         saveLocalNotes(next)
       } else {
         const newId = await addNote({
-          userId: user.id,
+          userId: targetUserId,
           title: noteDraft.title,
           text: noteDraft.text,
           priority: noteDraft.priority,
@@ -352,7 +363,7 @@ export const Profile = () => {
         const next = [
           {
             id: newId,
-            userId: user.id,
+            userId: targetUserId,
             title: noteDraft.title,
             text: noteDraft.text,
             priority: noteDraft.priority,
@@ -427,7 +438,7 @@ export const Profile = () => {
   }
 
   const handleRequestNicknameChange = async () => {
-    if (!user?.id || !newNickname.trim()) return
+    if (!targetUserId || !newNickname.trim()) return
 
     const trimmedNickname = newNickname.trim()
     const currentNickname = nickname || ''
@@ -441,15 +452,15 @@ export const Profile = () => {
 
     setNicknameRequestPending(true)
     try {
-      const currentUserNickname = await getUserNickname(user.id)
+      const currentUserNickname = await getUserNickname(targetUserId)
 
       await addApprovalRequest({
         entity: 'login',
         action: 'update',
-        authorId: user.id,
-        targetUserId: user.id,
-        before: currentUserNickname || { id: '', userId: user.id, nickname: currentNickname, createdAt: '', updatedAt: '' },
-        after: { id: '', userId: user.id, nickname: trimmedNickname, createdAt: '', updatedAt: '' },
+        authorId: targetUserId,
+        targetUserId: targetUserId,
+        before: currentUserNickname || { id: '', userId: targetUserId, nickname: currentNickname, createdAt: '', updatedAt: '' },
+        after: { id: '', userId: targetUserId, nickname: trimmedNickname, createdAt: '', updatedAt: '' },
         comment: `Запрос на изменение ника с "${currentNickname}" на "${trimmedNickname}"`,
       })
 
@@ -499,7 +510,7 @@ export const Profile = () => {
               {profileAvatar ? (
                 <img
                   src={profileAvatar}
-                  alt={userData.name}
+                  alt={userData?.name}
                   className="w-full h-full object-cover"
                   onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
                     const target = e.target as HTMLImageElement
@@ -512,8 +523,21 @@ export const Profile = () => {
             </div>
             <div>
               <p className={`text-xs uppercase tracking-[0.14em] ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>ApeVault Black Ops</p>
-              <h1 className={`text-2xl sm:text-3xl font-extrabold ${headingColor}`}>Личный кабинет</h1>
-              <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Закрытый контур. Ваши данные и показатели.</p>
+              <div className="flex items-center gap-2">
+                <h1 className={`text-2xl sm:text-3xl font-extrabold ${headingColor}`}>
+                  {isViewingOtherUser() ? `Профиль ${viewedUserMember?.name || 'пользователя'}` : 'Личный кабинет'}
+                </h1>
+                {isViewingOtherUser() && (
+                  <span className="px-2 py-1 rounded-lg bg-amber-500/20 text-amber-500 text-xs font-bold border border-amber-500/30">
+                    Просмотр
+                  </span>
+                )}
+              </div>
+              <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+                {isViewingOtherUser() 
+                  ? `Вы просматриваете данные ${viewedUserMember?.name || ''}` 
+                  : 'Закрытый контур. Ваши данные и показатели.'}
+              </p>
             </div>
           </div>
           <div className="flex flex-wrap gap-2">

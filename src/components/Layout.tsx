@@ -2,8 +2,9 @@ import { Link, useLocation } from 'react-router-dom'
 import { useThemeStore } from '@/store/themeStore'
 import { useAdminStore, ADMIN_PASSWORD } from '@/store/adminStore'
 import { useAuthStore } from '@/store/authStore'
+import { useViewedUserStore, getEffectiveUserId } from '@/store/viewedUserStore'
 import { useUserActivity } from '@/hooks/useUserActivity'
-import { getApprovalRequests, getTasks, getWorkSlots, checkUserAccess } from '@/services/firestoreService'
+import { checkUserAccess, getApprovalRequests, getTasks, getWorkSlots } from '@/services/firestoreService'
 import { formatDate } from '@/utils/dateUtils'
 import {
   Moon,
@@ -37,6 +38,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
   const { theme, toggleTheme } = useThemeStore()
   const { isAdmin, activateAdmin, deactivateAdmin } = useAdminStore()
   const { user, logout } = useAuthStore()
+  const { viewedUserId } = useViewedUserStore()
   const location = useLocation()
   const [showToolsMenu, setShowToolsMenu] = useState(false)
   const [showFuncsMenu, setShowFuncsMenu] = useState(false)
@@ -48,6 +50,9 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
   const [notifications, setNotifications] = useState<{ id: string; text: string; time: string; status: string }[]>([])
   const [accessibleFeatures, setAccessibleFeatures] = useState<Set<string>>(new Set())
   const [isFeaturesLoading, setIsFeaturesLoading] = useState(true)
+
+  // Get effective user ID (viewed user or current user)
+  const effectiveUserId = getEffectiveUserId(user?.id, isAdmin, viewedUserId)
 
   // Track user activity
   useUserActivity()
@@ -67,7 +72,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
 
         for (const feature of features) {
           try {
-            const accessResult = await checkUserAccess(user.id, feature)
+            const accessResult = await checkUserAccess(effectiveUserId, feature)
             if (accessResult.hasAccess) {
               accessible.add(feature)
             }
@@ -83,7 +88,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
     }
 
     checkFeaturesAccess()
-  }, [user, isAdmin])
+  }, [user, isAdmin, effectiveUserId])
 
   const funcsSubItems: { path: string; label: string; icon: LucideIcon; feature?: string }[] = [
     { path: '/call', label: 'AVF HUB', icon: Radio, feature: 'avf_hub' },
@@ -120,7 +125,8 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     const loadNotifications = async () => {
-      if (isAdmin || !user) {
+      // Only load notifications for admin, not when viewing other users
+      if (isAdmin || !user || viewedUserId) {
         setNotifications([])
         return
       }
@@ -278,7 +284,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
     loadNotifications()
     const id = setInterval(loadNotifications, 2 * 60 * 1000)
     return () => clearInterval(id)
-  }, [user, isAdmin])
+  }, [user, isAdmin, viewedUserId])
 
   const toggleCollapsed = () => {
     const newState = !isCollapsed
