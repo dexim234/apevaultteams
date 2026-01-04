@@ -96,6 +96,7 @@ export const getWorkSlots = async (userId?: string, date?: string) => {
       slots,
       participants: data?.participants || [],
       ...(data?.comment && { comment: data.comment }),
+      ...(data?.category && { category: data.category }),
     } as WorkSlot
   })
 
