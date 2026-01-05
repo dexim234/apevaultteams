@@ -4,7 +4,12 @@ import { useAuthStore } from '@/store/authStore'
 import { getTriggerAlerts, addTriggerAlert, updateTriggerAlert, deleteTriggerAlert } from '@/services/firestoreService'
 import { TriggerAlert, TriggerStrategy, TriggerProfit } from '@/types'
 import { Plus, Edit, Trash2, Save, X, Copy, Check, Table, Filter, ArrowUp, ArrowDown, RotateCcw, Zap, Image, XCircle, Activity, Target } from 'lucide-react'
-import { MultiStrategySelector } from '@/components/Management/MultiStrategySelector'
+import { MultiStrategySelector } from '../components/Management/MultiStrategySelector'
+
+// ... (in imports section, handle this separately or just do it in one go if close)
+// Actually I can't do multiple disparate blocks with replace_file_content.
+// I will use multi_replace_file_content.
+
 
 type SortField = 'date' | 'drop' | 'profit'
 type SortOrder = 'asc' | 'desc'
@@ -19,11 +24,11 @@ export const SignalsTriggerBot = () => {
     const [editingAlert, setEditingAlert] = useState<TriggerAlert | null>(null)
     const [copyingId, setCopyingId] = useState<string | null>(null)
     const [isCopyingTable, setIsCopyingTable] = useState(false)
-    const [showSuccess, setShowSuccess] = useState(false)
-    const [successCount, setSuccessCount] = useState(0)
-    const [showConfirmSave, setShowConfirmSave] = useState(false)
-    const [pendingAlertsCount, setPendingAlertsCount] = useState(0)
-    const [successMessage, setSuccessMessage] = useState('')
+    const [_showSuccess, _setShowSuccess] = useState(false)
+    const [_successCount, _setSuccessCount] = useState(0)
+    const [_showConfirmSave, _setShowConfirmSave] = useState(false)
+    const [_pendingAlertsCount, _setPendingAlertsCount] = useState(0)
+    const [_successMessage, _setSuccessMessage] = useState('')
     const [previewImage, setPreviewImage] = useState<string | null>(null)
 
     // Filter states
@@ -56,18 +61,11 @@ export const SignalsTriggerBot = () => {
         isScam: false
     })
 
-    // Screenshot preview state
-    const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null)
-    const fileInputRef = useRef<HTMLInputElement>(null)
-
-    // Multiple profits input state
-    const [profitsInput, setProfitsInput] = useState<{ strategy: TriggerStrategy; value: string }[]>([])
-
-    // Common date for all alerts in batch mode
-    const [commonDate, setCommonDate] = useState<string>(formData.signalDate || '')
-
-    // List of alerts to add (batch mode)
     const [alertsToAdd, setAlertsToAdd] = useState<Partial<TriggerAlert>[]>([])
+    const [commonDate, setCommonDate] = useState(new Date().toISOString().split('T')[0])
+    const [profitsInput, setProfitsInput] = useState<{ strategy: TriggerStrategy, value: string }[]>([])
+    const fileInputRef = useRef<HTMLInputElement>(null)
+    const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null)
 
     useEffect(() => {
         loadAlerts()
@@ -75,6 +73,7 @@ export const SignalsTriggerBot = () => {
 
     const loadAlerts = async () => {
         try {
+            setLoading(true)
             const data = await getTriggerAlerts()
             setAlerts(data)
         } catch (error) {
@@ -87,13 +86,13 @@ export const SignalsTriggerBot = () => {
     // Add current form to the list
     const handleAddToList = () => {
         if (!formData.address) {
-            alert('Введите адрес токена')
+            alert('Укажите адрес токена')
             return
         }
 
         // Require strategies only if not marked as scam
         if (!formData.isScam && (!formData.strategies || formData.strategies.length === 0)) {
-            alert('Выберите хотя бы одну стратегию')
+            alert('Выберите стратегию или отметьте как скам')
             return
         }
 
@@ -131,12 +130,16 @@ export const SignalsTriggerBot = () => {
     }
 
     // Remove alert from list
-    const handleRemoveFromList = (index: number) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    /*
+    const _handleRemoveFromList = (index: number) => {
         setAlertsToAdd(alertsToAdd.filter((_, i) => i !== index))
     }
+    */
 
     // Save all alerts to Firestore
-    const handleSaveAll = async () => {
+    /*
+    const _handleSaveAll = async () => {
         if (alertsToAdd.length === 0) {
             alert('Добавьте хотя бы один сигнал')
             return
@@ -146,11 +149,12 @@ export const SignalsTriggerBot = () => {
         setPendingAlertsCount(alertsToAdd.length)
         setShowConfirmSave(true)
     }
+    */
 
-    // Подтверждение сохранения
-    const confirmSave = async () => {
+    /*
+    const _confirmSave = async () => {
         setShowConfirmSave(false)
-        
+
         try {
             const promises = alertsToAdd.map(alert =>
                 addTriggerAlert({
@@ -191,6 +195,7 @@ export const SignalsTriggerBot = () => {
             console.error('Error saving alerts:', error)
         }
     }
+    */
 
     // Handle single save (for editing or single alert)
     const handleSubmit = async (e: React.FormEvent) => {
@@ -504,7 +509,7 @@ export const SignalsTriggerBot = () => {
 
     // Update profit value
     const updateProfitValue = (strategy: TriggerStrategy, value: string) => {
-        setProfitsInput(prev => prev.map(p => 
+        setProfitsInput(prev => prev.map(p =>
             p.strategy === strategy ? { ...p, value } : p
         ))
     }
@@ -1126,8 +1131,7 @@ export const SignalsTriggerBot = () => {
                                         </div>
                                         <MultiStrategySelector
                                             value={formData.strategies || []}
-                                            onChange={(strategies) => setFormData({ ...formData, strategies })}
-                                            theme={theme}
+                                            onChange={(strategies: TriggerStrategy[]) => setFormData({ ...formData, strategies })}
                                         />
                                     </div>
 
@@ -1238,9 +1242,9 @@ export const SignalsTriggerBot = () => {
                                         <div className={`flex items-center gap-3 ${theme === 'dark' ? 'bg-black/30' : 'bg-gray-100'} p-3 rounded-xl border border-dashed ${theme === 'dark' ? 'border-white/10' : 'border-gray-300'}`}>
                                             {screenshotPreview ? (
                                                 <div className="relative">
-                                                    <img 
-                                                        src={screenshotPreview} 
-                                                        alt="Preview" 
+                                                    <img
+                                                        src={screenshotPreview}
+                                                        alt="Preview"
                                                         className="w-16 h-16 object-cover rounded-lg"
                                                     />
                                                     <button
@@ -1323,7 +1327,7 @@ export const SignalsTriggerBot = () => {
                                             </div>
                                             <MultiStrategySelector
                                                 value={formData.strategies || []}
-                                                onChange={(strategies) => setFormData({ ...formData, strategies })}
+                                                onChange={(strategies: TriggerStrategy[]) => setFormData({ ...formData, strategies })}
                                                 theme={theme}
                                             />
                                         </div>
@@ -1397,7 +1401,7 @@ export const SignalsTriggerBot = () => {
                                                         Добавить
                                                     </button>
                                                 </div>
-                                                
+
                                                 {profitsInput.length > 0 ? (
                                                     <div className="space-y-2">
                                                         {profitsInput.map((profit, idx) => (
@@ -1434,9 +1438,9 @@ export const SignalsTriggerBot = () => {
                                             <div className={`flex items-center gap-3 ${theme === 'dark' ? 'bg-black/30' : 'bg-gray-100'} p-3 rounded-xl border border-dashed ${theme === 'dark' ? 'border-white/10' : 'border-gray-300'}`}>
                                                 {screenshotPreview ? (
                                                     <div className="relative">
-                                                        <img 
-                                                            src={screenshotPreview} 
-                                                            alt="Preview" 
+                                                        <img
+                                                            src={screenshotPreview}
+                                                            alt="Preview"
                                                             className="w-16 h-16 object-cover rounded-lg"
                                                         />
                                                         <button
@@ -1517,10 +1521,10 @@ export const SignalsTriggerBot = () => {
                         </div>
                     </div>
                 </div>
-            </>
-        </div>
+            )}
+        </>
     )
 }
 
 export default SignalsTriggerBot
-}
+
