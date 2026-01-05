@@ -87,13 +87,14 @@ export interface ApprovalRequest {
 }
 
 // Earnings types
-export type EarningsCategory = 'memecoins' | 'futures' | 'nft' | 'spot' | 'polymarket' | 'staking' | 'other'
+export type EarningsCategory = 'memecoins' | 'futures' | 'nft' | 'spot' | 'airdrop' | 'polymarket' | 'staking' | 'other'
 
-export const EARNINGS_CATEGORY_META: Record<EarningsCategory, { label: string; accent: string; icon: 'rocket' | 'line' | 'image' | 'coins' | 'barchart' | 'shield' | 'sparkles' }> = {
+export const EARNINGS_CATEGORY_META: Record<EarningsCategory, { label: string; accent: string; icon: 'rocket' | 'line' | 'image' | 'coins' | 'gift' | 'barchart' | 'shield' | 'sparkles' }> = {
   memecoins: { label: 'Мемкоины', accent: 'emerald', icon: 'rocket' },
   futures: { label: 'Фьючерсы', accent: 'blue', icon: 'line' },
   nft: { label: 'NFT', accent: 'purple', icon: 'image' },
   spot: { label: 'Спот', accent: 'amber', icon: 'coins' },
+  airdrop: { label: 'AirDrop', accent: 'cyan', icon: 'gift' },
   polymarket: { label: 'PolyMarket', accent: 'pink', icon: 'barchart' },
   staking: { label: 'Стейкинг', accent: 'indigo', icon: 'shield' },
   other: { label: 'Другое', accent: 'gray', icon: 'sparkles' },

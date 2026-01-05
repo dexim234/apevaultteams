@@ -7,7 +7,7 @@ import { addEarnings, getWorkSlots, updateEarnings, addApprovalRequest } from '@
 import { canAddEarnings, formatDate, getMoscowTime } from '@/utils/dateUtils'
 import { getUserNicknameSync } from '@/utils/userUtils'
 import { EARNINGS_CATEGORY_META, Earnings, EarningsCategory, TEAM_MEMBERS } from '@/types'
-import { X, Rocket, LineChart, Image, Coins, BarChart3, ShieldCheck, Sparkles, Trash2, PlusCircle } from 'lucide-react'
+import { X, Rocket, LineChart, Image, Coins, BarChart3, ShieldCheck, Sparkles, Trash2, PlusCircle, Gift } from 'lucide-react'
 import { useScrollLock } from '@/hooks/useScrollLock'
 
 interface EarningsFormProps {
@@ -63,6 +63,8 @@ export const EarningsForm = ({ onClose, onSave, editingEarning }: EarningsFormPr
         return <BarChart3 className={className} />
       case 'staking':
         return <ShieldCheck className={className} />
+      case 'airdrop':
+        return <Gift className={className} />
       default:
         return <Sparkles className={className} />
     }
@@ -116,26 +118,26 @@ export const EarningsForm = ({ onClose, onSave, editingEarning }: EarningsFormPr
     try {
       // When editing or admin, load all slots for the date (not filtered by user)
       // When creating, load slots for current user
-      const slots = (isEditing || isAdmin) 
+      const slots = (isEditing || isAdmin)
         ? await getWorkSlots(undefined, date)
         : await getWorkSlots(user!.id, date)
-      
+
       const moscowTime = getMoscowTime()
       const currentDate = formatDate(moscowTime, 'yyyy-MM-dd')
 
       // Filter slots that are finished or after 21:00 (only for new earnings, not editing)
-      const validSlots = isEditing 
+      const validSlots = isEditing
         ? slots // When editing, show all slots
         : slots.filter((slot) => {
-            if (date !== currentDate) {
-              // Can only add earnings for today (unless admin)
-              return isAdmin
-            }
+          if (date !== currentDate) {
+            // Can only add earnings for today (unless admin)
+            return isAdmin
+          }
 
-            // Check if slot is finished or it's after 21:00
-            const lastSlot = slot.slots[slot.slots.length - 1]
-            return canAddEarnings(lastSlot.end, moscowTime) || isAdmin
-          })
+          // Check if slot is finished or it's after 21:00
+          const lastSlot = slot.slots[slot.slots.length - 1]
+          return canAddEarnings(lastSlot.end, moscowTime) || isAdmin
+        })
 
       setAvailableSlots(validSlots)
     } catch (error) {
@@ -374,11 +376,10 @@ export const EarningsForm = ({ onClose, onSave, editingEarning }: EarningsFormPr
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
                 disabled={!isAdmin && !isEditing}
-                className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base rounded-lg border touch-manipulation ${
-                  theme === 'dark'
+                className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base rounded-lg border touch-manipulation ${theme === 'dark'
                     ? 'bg-gray-700 border-gray-800 text-white'
                     : 'bg-white border-gray-300 text-gray-900'
-                } focus:outline-none focus:ring-2 focus:ring-[#4E6E49] disabled:opacity-50 disabled:cursor-not-allowed`}
+                  } focus:outline-none focus:ring-2 focus:ring-[#4E6E49] disabled:opacity-50 disabled:cursor-not-allowed`}
               />
               {isEditing && !isAdmin && (
                 <p className={`mt-1 text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
@@ -395,11 +396,10 @@ export const EarningsForm = ({ onClose, onSave, editingEarning }: EarningsFormPr
               <select
                 value={selectedSlotId}
                 onChange={(e) => setSelectedSlotId(e.target.value)}
-                className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base rounded-lg border touch-manipulation ${
-                  theme === 'dark'
+                className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base rounded-lg border touch-manipulation ${theme === 'dark'
                     ? 'bg-gray-700 border-gray-800 text-white'
                     : 'bg-white border-gray-300 text-gray-900'
-                } focus:outline-none focus:ring-2 focus:ring-[#4E6E49]`}
+                  } focus:outline-none focus:ring-2 focus:ring-[#4E6E49]`}
               >
                 <option value="">Выберите слот</option>
                 {availableSlots.map((slot) => (
@@ -430,11 +430,10 @@ export const EarningsForm = ({ onClose, onSave, editingEarning }: EarningsFormPr
                   type="number"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
-                  className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base rounded-lg border touch-manipulation ${
-                    theme === 'dark'
+                  className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base rounded-lg border touch-manipulation ${theme === 'dark'
                       ? 'bg-gray-700 border-gray-800 text-white'
                       : 'bg-white border-gray-300 text-gray-900'
-                  } focus:outline-none focus:ring-2 focus:ring-[#4E6E49]`}
+                    } focus:outline-none focus:ring-2 focus:ring-[#4E6E49]`}
                   placeholder="0"
                   min="0"
                   step="100"
@@ -450,11 +449,10 @@ export const EarningsForm = ({ onClose, onSave, editingEarning }: EarningsFormPr
                       type="number"
                       value={extraWalletsCount}
                       onChange={(e) => setExtraWalletsCount(e.target.value)}
-                      className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base rounded-lg border touch-manipulation ${
-                        theme === 'dark'
+                      className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base rounded-lg border touch-manipulation ${theme === 'dark'
                           ? 'bg-gray-700 border-gray-800 text-white'
                           : 'bg-white border-gray-300 text-gray-900'
-                      } focus:outline-none focus:ring-2 focus:ring-[#4E6E49]`}
+                        } focus:outline-none focus:ring-2 focus:ring-[#4E6E49]`}
                       placeholder="0"
                       min="0"
                       step="1"
@@ -468,11 +466,10 @@ export const EarningsForm = ({ onClose, onSave, editingEarning }: EarningsFormPr
                       type="number"
                       value={extraWalletsAmount}
                       onChange={(e) => setExtraWalletsAmount(e.target.value)}
-                      className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base rounded-lg border touch-manipulation ${
-                        theme === 'dark'
+                      className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base rounded-lg border touch-manipulation ${theme === 'dark'
                           ? 'bg-gray-700 border-gray-800 text-white'
                           : 'bg-white border-gray-300 text-gray-900'
-                      } focus:outline-none focus:ring-2 focus:ring-[#4E6E49]`}
+                        } focus:outline-none focus:ring-2 focus:ring-[#4E6E49]`}
                       placeholder="0"
                       min="0"
                       step="100"
@@ -499,13 +496,12 @@ export const EarningsForm = ({ onClose, onSave, editingEarning }: EarningsFormPr
                     key={key}
                     type="button"
                     onClick={() => setCategory(key as EarningsCategory)}
-                    className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-left transition-all ${
-                      category === key
+                    className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-left transition-all ${category === key
                         ? 'border-[#4E6E49] bg-[#4E6E49]/10 text-[#4E6E49]'
                         : theme === 'dark'
                           ? 'border-gray-800 bg-gray-800/60 text-gray-200 hover:border-[#4E6E49]/40'
                           : 'border-gray-200 bg-white text-gray-800 hover:border-[#4E6E49]/40'
-                    }`}
+                      }`}
                   >
                     <span className="p-1.5 rounded-lg bg-gray-100 dark:bg-gray-800/80">
                       {getCategoryIcon(key as EarningsCategory, 'w-4 h-4')}
@@ -589,9 +585,8 @@ export const EarningsForm = ({ onClose, onSave, editingEarning }: EarningsFormPr
                   plannedParticipants.map((pid) => (
                     <span
                       key={pid}
-                      className={`px-2.5 py-1 rounded-full text-xs font-semibold border ${
-                        theme === 'dark' ? 'border-gray-800 bg-gray-800/70 text-gray-100' : 'border-gray-200 bg-white text-gray-800'
-                      }`}
+                      className={`px-2.5 py-1 rounded-full text-xs font-semibold border ${theme === 'dark' ? 'border-gray-800 bg-gray-800/70 text-gray-100' : 'border-gray-200 bg-white text-gray-800'
+                        }`}
                     >
                       {getUserNicknameSync(pid)}
                     </span>
@@ -610,9 +605,8 @@ export const EarningsForm = ({ onClose, onSave, editingEarning }: EarningsFormPr
                   {draftEntries.map((entry) => (
                     <div
                       key={entry.id}
-                      className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-lg border ${
-                        theme === 'dark' ? 'border-gray-800 bg-gray-800/60' : 'border-gray-200 bg-white'
-                      }`}
+                      className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-lg border ${theme === 'dark' ? 'border-gray-800 bg-gray-800/60' : 'border-gray-200 bg-white'
+                        }`}
                     >
                       <div className="flex items-center gap-3 min-w-0">
                         <div className="p-2 rounded-lg bg-gray-100 dark:bg-gray-900/70">
@@ -673,11 +667,10 @@ export const EarningsForm = ({ onClose, onSave, editingEarning }: EarningsFormPr
               <button
                 type="button"
                 onClick={onClose}
-                className={`flex-1 px-4 py-2.5 sm:py-2 rounded-lg sm:rounded-xl border text-sm sm:text-base font-medium transition-colors touch-manipulation active:scale-95 ${
-                  theme === 'dark'
+                className={`flex-1 px-4 py-2.5 sm:py-2 rounded-lg sm:rounded-xl border text-sm sm:text-base font-medium transition-colors touch-manipulation active:scale-95 ${theme === 'dark'
                     ? 'border-gray-700 text-gray-200 hover:bg-gray-800'
                     : 'border-gray-300 text-gray-800 hover:bg-gray-100'
-                }`}
+                  }`}
               >
                 Отмена
               </button>

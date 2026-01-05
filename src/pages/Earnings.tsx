@@ -293,7 +293,8 @@ export const Earnings = () => {
                           meta.accent === 'purple' ? 'bg-purple-500' :
                             meta.accent === 'amber' ? 'bg-amber-500' :
                               meta.accent === 'pink' ? 'bg-pink-500' :
-                                meta.accent === 'indigo' ? 'bg-indigo-500' : 'bg-gray-500'
+                                meta.accent === 'indigo' ? 'bg-indigo-500' :
+                                  meta.accent === 'cyan' ? 'bg-cyan-500' : 'bg-gray-500'
                         }`} />
                       <span className={theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}>{meta.label}</span>
                     </div>
@@ -306,7 +307,8 @@ export const Earnings = () => {
                           meta.accent === 'purple' ? 'bg-purple-500' :
                             meta.accent === 'amber' ? 'bg-amber-500' :
                               meta.accent === 'pink' ? 'bg-pink-500' :
-                                meta.accent === 'indigo' ? 'bg-indigo-500' : 'bg-gray-500'
+                                meta.accent === 'indigo' ? 'bg-indigo-500' :
+                                  meta.accent === 'cyan' ? 'bg-cyan-500' : 'bg-gray-500'
                         }`}
                       style={{ width: `${cat.share}%` }}
                     />
@@ -339,7 +341,8 @@ export const Earnings = () => {
                         meta.accent === 'purple' ? 'bg-purple-500' :
                           meta.accent === 'amber' ? 'bg-amber-500' :
                             meta.accent === 'pink' ? 'bg-pink-500' :
-                              meta.accent === 'indigo' ? 'bg-indigo-500' : 'bg-gray-500'
+                              meta.accent === 'indigo' ? 'bg-indigo-500' :
+                                meta.accent === 'cyan' ? 'bg-cyan-500' : 'bg-gray-500'
                       }`} />
                     <span className={`text-xs font-black uppercase tracking-widest ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{meta.label}</span>
                   </div>
@@ -362,7 +365,8 @@ export const Earnings = () => {
                           meta.accent === 'purple' ? 'bg-purple-500 focus:bg-purple-400' :
                             meta.accent === 'amber' ? 'bg-amber-500 focus:bg-amber-400' :
                               meta.accent === 'pink' ? 'bg-pink-500 focus:bg-pink-400' :
-                                meta.accent === 'indigo' ? 'bg-indigo-500 focus:bg-indigo-400' : 'bg-gray-500'
+                                meta.accent === 'indigo' ? 'bg-indigo-500 focus:bg-indigo-400' :
+                                  meta.accent === 'cyan' ? 'bg-cyan-500 focus:bg-cyan-400' : 'bg-gray-500'
                         }`}
                       style={{ width: `${cat.share}%` }}
                     />

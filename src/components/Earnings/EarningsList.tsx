@@ -7,7 +7,7 @@ import { deleteEarnings, addApprovalRequest } from '@/services/firestoreService'
 import { Earnings, EARNINGS_CATEGORY_META, EarningsCategory } from '@/types'
 import { formatDate } from '@/utils/dateUtils'
 import { getUserNicknameSync } from '@/utils/userUtils'
-import { Edit2, Trash2, Rocket, LineChart, Image, Coins, BarChart3, ShieldCheck, Sparkles } from 'lucide-react'
+import { Edit2, Trash2, Rocket, LineChart, Image, Coins, BarChart3, ShieldCheck, Sparkles, Gift } from 'lucide-react'
 
 interface EarningsListProps {
   earnings: Earnings[]
@@ -36,6 +36,8 @@ export const EarningsList = ({ earnings, onEdit, onDelete }: EarningsListProps) 
         return <BarChart3 className={className} />
       case 'staking':
         return <ShieldCheck className={className} />
+      case 'airdrop':
+        return <Gift className={className} />
       default:
         return <Sparkles className={className} />
     }
