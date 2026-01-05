@@ -39,9 +39,8 @@ export type SlotFilter = 'all' | 'upcoming' | 'completed'
 export const Management = () => {
   const { theme } = useThemeStore()
   const { isAdmin } = useAdminStore()
-  const { viewMode: persistedViewMode, setViewMode: setPersistedViewMode, selectedDate: persistedDate, selectedWeekStart: persistedWeekStart, setSelectedDate, setSelectedWeekStart } = useScheduleDateStore()
+  const { viewMode: persistedViewMode, setViewMode: setPersistedViewMode, selectedWeekStart: persistedWeekStart, setSelectedDate, setSelectedWeekStart } = useScheduleDateStore()
   const [viewMode, setViewModeState] = useState<ViewMode>(persistedViewMode || 'table')
-  const [selectedDate, setSelectedDateState] = useState<string | null>(null)
   const [selectedWeekStart, setSelectedWeekStartState] = useState<string | null>(null)
   const [slotFilter] = useState<SlotFilter>('all')
   const [showSlotForm, setShowSlotForm] = useState(false)
@@ -82,9 +81,7 @@ export const Management = () => {
     setViewModeState(persistedViewMode || 'table')
   }, [persistedViewMode])
 
-  useEffect(() => {
-    setSelectedDateState(persistedDate)
-  }, [persistedDate])
+
 
   useEffect(() => {
     setSelectedWeekStartState(persistedWeekStart)
@@ -361,7 +358,6 @@ export const Management = () => {
 
   // Callback when date changes in child components
   const handleDateChange = (date: string | null, weekStart: string | null) => {
-    setSelectedDateState(date)
     setSelectedWeekStartState(weekStart)
     setSelectedDate(date)
     setSelectedWeekStart(weekStart)
