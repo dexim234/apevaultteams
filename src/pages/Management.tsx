@@ -495,9 +495,9 @@ export const Management = () => {
 
       {/* Controls Toolbar - Sticky header */}
       <div className="sticky top-0 z-40">
-        <div className={`p-2 rounded-2xl border shadow-xl backdrop-blur-xl ${theme === 'dark'
-          ? 'bg-[#0b1015]/80 border-white/10'
-          : 'bg-white/80 border-gray-200'
+        <div className={`p-2 rounded-2xl border shadow-xl ${theme === 'dark'
+          ? 'bg-[#0b1015] border-white/10'
+          : 'bg-white border-gray-200'
           }`}>
           <div className="flex flex-col lg:flex-row items-center justify-between gap-4 p-2">
             {/* Left: View Toggle */}
@@ -583,7 +583,7 @@ export const Management = () => {
       </div>
 
       {/* Main Content */}
-      <div className={`rounded-2xl border overflow-hidden ${theme === 'dark'
+      <div className={`rounded-2xl border ${theme === 'dark'
         ? 'bg-[#0b1015] border-white/5'
         : 'bg-white border-gray-200'
         }`}>
