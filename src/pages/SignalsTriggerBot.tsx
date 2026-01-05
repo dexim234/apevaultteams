@@ -592,7 +592,6 @@ export const SignalsTriggerBot = () => {
                                         maxDropFromLevel07: '',
                                         comment: ''
                                     })
-                                    setShowModal(true)
                                 }}
                                 className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-semibold transition-colors flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20"
                             >
@@ -1082,8 +1081,8 @@ export const SignalsTriggerBot = () => {
                             <button onClick={() => {
                                 setShowModal(false)
                                 setAlertsToAdd([])
+                                setCommonDate(new Date().toISOString().split('T')[0])
                                 setFormData({
-                                    signalDate: new Date().toISOString().split('T')[0],
                                     signalTime: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }),
                                     marketCap: '',
                                     address: '',
@@ -1116,13 +1115,13 @@ export const SignalsTriggerBot = () => {
                                 <form onSubmit={handleSubmit} className="space-y-4">
                                     <div className="grid grid-cols-2 gap-4">
                                         <div className="space-y-1">
-                                            <label className={`text-xs font-semibold uppercase ${subTextColor}`}>Время</label>
+                                            <label className={`text-xs ${subTextColor}`}>Время</label>
                                             <input
                                                 type="time"
                                                 required
                                                 value={formData.signalTime}
                                                 onChange={(e) => setFormData({ ...formData, signalTime: e.target.value })}
-                                                className={`w-full p-3 rounded-xl border outline-none transition-all ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white focus:border-amber-500' : 'bg-white border-gray-200 text-gray-900 focus-border-amber-500'}`}
+                                                className={`w-full p-3 rounded-xl border outline-none transition-all ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white focus-border-amber-500' : 'bg-white border-gray-200 text-gray-900 focus-border-amber-500'}`}
                                             />
                                         </div>
                                         <MultiStrategySelector
@@ -1235,7 +1234,7 @@ export const SignalsTriggerBot = () => {
 
                                     {/* Screenshot Upload */}
                                     <div className="space-y-2">
-                                        <label className={`text-xs font-semibold uppercase ${subTextColor}`}>Скриншот</label>
+                                        <label className={`text-xs ${subTextColor}`}>Скриншот</label>
                                         <div className={`flex items-center gap-3 ${theme === 'dark' ? 'bg-black/30' : 'bg-gray-100'} p-3 rounded-xl border border-dashed ${theme === 'dark' ? 'border-white/10' : 'border-gray-300'}`}>
                                             {screenshotPreview ? (
                                                 <div className="relative">
@@ -1275,12 +1274,12 @@ export const SignalsTriggerBot = () => {
                                     <div className="flex items-center gap-3 p-3 rounded-xl bg-red-500/10 border border-red-500/20">
                                         <input
                                             type="checkbox"
-                                            id="isScamEdit"
+                                            id="isScamNew"
                                             checked={formData.isScam || false}
                                             onChange={(e) => setFormData({ ...formData, isScam: e.target.checked })}
                                             className={`w-5 h-5 rounded border-2 ${theme === 'dark' ? 'border-gray-700 bg-gray-800' : 'border-gray-300 bg-white'} cursor-pointer accent-red-500`}
                                         />
-                                        <label htmlFor="isScamEdit" className="cursor-pointer">
+                                        <label htmlFor="isScamNew" className="cursor-pointer">
                                             <span className={`text-sm font-semibold ${theme === 'dark' ? 'text-red-400' : 'text-red-600'}`}>Это скам</span>
                                             <p className={`text-xs ${subTextColor} mt-0.5`}>При отметке выбор стратегии необязателен</p>
                                         </label>
@@ -1336,7 +1335,7 @@ export const SignalsTriggerBot = () => {
                                                 placeholder="Адрес контракта..."
                                                 value={formData.address || ''}
                                                 onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                                                className={`w-full p-2 rounded-lg border outline-none transition-all font-mono text-sm ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white' : 'bg-white border-gray-200 text-gray-900'}`}
+                                                className={`w-full p-2 rounded-lg border outline-none transition-all font-mono text-sm ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white focus-border-amber-500' : 'bg-white border-gray-200 text-gray-900'}`}
                                             />
                                         </div>
 
@@ -1431,7 +1430,7 @@ export const SignalsTriggerBot = () => {
 
                                         {/* Screenshot Upload */}
                                         <div className="space-y-2">
-                                            <label className={`text-xs font-semibold uppercase ${subTextColor}`}>Скриншот</label>
+                                            <label className={`text-xs ${subTextColor}`}>Скриншот</label>
                                             <div className={`flex items-center gap-3 ${theme === 'dark' ? 'bg-black/30' : 'bg-gray-100'} p-3 rounded-xl border border-dashed ${theme === 'dark' ? 'border-white/10' : 'border-gray-300'}`}>
                                                 {screenshotPreview ? (
                                                     <div className="relative">
@@ -1462,4 +1461,66 @@ export const SignalsTriggerBot = () => {
                                                     </label>
                                                 )}
                                                 {!screenshotPreview && (
-                                                    <span className={`text-xs ${sub
+                                                    <span className={`text-xs ${subTextColor}`}>Макс. 5MB</span>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        {/* Is Scam checkbox */}
+                                        <div className="flex items-center gap-3 p-3 rounded-xl bg-red-500/10 border border-red-500/20">
+                                            <input
+                                                type="checkbox"
+                                                id="isScamNew"
+                                                checked={formData.isScam || false}
+                                                onChange={(e) => setFormData({ ...formData, isScam: e.target.checked })}
+                                                className={`w-5 h-5 rounded border-2 ${theme === 'dark' ? 'border-gray-700 bg-gray-800' : 'border-gray-300 bg-white'} cursor-pointer accent-red-500`}
+                                            />
+                                            <label htmlFor="isScamNew" className="cursor-pointer">
+                                                <span className={`text-sm font-semibold ${theme === 'dark' ? 'text-red-400' : 'text-red-600'}`}>Это скам</span>
+                                                <p className={`text-xs ${subTextColor} mt-0.5`}>При отметке выбор стратегии необязателен</p>
+                                            </label>
+                                        </div>
+
+                                        <div className="pt-4 flex gap-3">
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    setShowModal(false)
+                                                    setAlertsToAdd([])
+                                                    setFormData({
+                                                        signalDate: new Date().toISOString().split('T')[0],
+                                                        signalTime: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }),
+                                                        marketCap: '',
+                                                        address: '',
+                                                        strategies: [],
+                                                        maxDropFromSignal: '',
+                                                        maxDropFromLevel07: '',
+                                                        comment: ''
+                                                    })
+                                                }}
+                                                className={`flex-1 py-3 rounded-xl font-semibold transition-colors ${theme === 'dark' ? 'bg-white/5 hover:bg-white/10 text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-800'}`}
+                                            >
+                                                Отмена
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={handleAddAlerts}
+                                                className="flex-1 py-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-semibold transition-colors flex items-center justify-center gap-2"
+                                            >
+                                                <Plus className="w-4 h-4" />
+                                                <span>Добавить</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </>
+        </>
+    )
+}
+
+export default SignalsTriggerBot
+}
