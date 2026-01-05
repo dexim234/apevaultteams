@@ -528,6 +528,7 @@ export interface FasolTriggerAlert {
   comment?: string
   screenshot?: string
   isScam?: boolean
+  setup?: 'One' | 'Two' | 'Three' | 'Four' | 'Five'
   createdAt: string
   createdBy: string
 }

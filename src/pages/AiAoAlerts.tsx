@@ -4,6 +4,8 @@ import { useAuthStore } from '@/store/authStore'
 import { getAiAlerts, addAiAlert, updateAiAlert, deleteAiAlert } from '@/services/firestoreService'
 import { AiAlert } from '@/types'
 import { Plus, Edit, Trash2, Save, X, Copy, Check, Terminal, Table, Filter, ArrowUp, ArrowDown, RotateCcw } from 'lucide-react'
+import { UserNickname } from '../components/UserNickname'
+import { useAdminStore } from '@/store/adminStore'
 
 type SortField = 'date' | 'drop' | 'profit'
 type SortOrder = 'asc' | 'desc'
@@ -11,6 +13,7 @@ type SortOrder = 'asc' | 'desc'
 export const AiAoAlerts = () => {
     const { theme } = useThemeStore()
     const { user } = useAuthStore()
+    const { isAdmin } = useAdminStore()
 
     const [alerts, setAlerts] = useState<AiAlert[]>([])
     const [loading, setLoading] = useState(true)
@@ -58,7 +61,7 @@ export const AiAoAlerts = () => {
             alert('Введите адрес токена')
             return
         }
-        
+
         const newAlert: Partial<AiAlert> = {
             signalDate: commonDate,
             signalTime: formData.signalTime,
@@ -68,9 +71,9 @@ export const AiAoAlerts = () => {
             maxProfit: formData.maxProfit,
             comment: formData.comment
         }
-        
+
         setAlertsToAdd([...alertsToAdd, newAlert])
-        
+
         // Reset form fields except date (which is now common)
         setFormData({
             signalTime: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }),
@@ -95,7 +98,7 @@ export const AiAoAlerts = () => {
         }
 
         try {
-            const promises = alertsToAdd.map(alert => 
+            const promises = alertsToAdd.map(alert =>
                 addAiAlert({
                     ...alert as AiAlert,
                     createdAt: new Date().toISOString(),
@@ -103,7 +106,7 @@ export const AiAoAlerts = () => {
                 })
             )
             await Promise.all(promises)
-            
+
             // Show success animation
             setSuccessCount(alertsToAdd.length)
             setShowSuccess(true)
@@ -333,6 +336,9 @@ export const AiAoAlerts = () => {
             switch (sortBy) {
                 case 'date':
                     comparison = a.signalDate.localeCompare(b.signalDate)
+                    if (comparison === 0) {
+                        comparison = a.signalTime.localeCompare(b.signalTime)
+                    }
                     break
                 case 'drop':
                     comparison = parseValue(a.maxDrop) - parseValue(b.maxDrop)
@@ -635,6 +641,7 @@ export const AiAoAlerts = () => {
                                     <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>Макс. Падение</th>
                                     <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>Макс. Профит</th>
                                     <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>Комментарий</th>
+                                    <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>Автор</th>
                                     <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor}`}>Действия</th>
                                 </tr>
                             </thead>
@@ -666,12 +673,12 @@ export const AiAoAlerts = () => {
 
                                         dates.forEach((dateKey, dateIndex) => {
                                             const dateAlerts = groupedAlerts[dateKey]
-                                            
+
                                             // Add date separator row (except for first group)
                                             if (dateIndex > 0) {
                                                 rows.push(
                                                     <tr key={`separator-${dateKey}`}>
-                                                        <td colSpan={8} className="py-2">
+                                                        <td colSpan={9} className="py-2">
                                                             <div className={`h-px ${theme === 'dark' ? 'bg-white/10' : 'bg-gray-200'}`}></div>
                                                         </td>
                                                     </tr>
@@ -681,7 +688,7 @@ export const AiAoAlerts = () => {
                                             // Add date header row
                                             rows.push(
                                                 <tr key={`header-${dateKey}`} className={`${theme === 'dark' ? 'bg-white/5' : 'bg-gray-50'}`}>
-                                                    <td colSpan={8} className="p-3 px-4">
+                                                    <td colSpan={9} className="p-3 px-4">
                                                         <span className={`text-sm font-semibold ${subTextColor}`}>
                                                             {formatDateForDisplay(dateKey)}
                                                         </span>
@@ -737,19 +744,26 @@ export const AiAoAlerts = () => {
                                                             </div>
                                                         </td>
                                                         <td className="p-4 whitespace-nowrap">
+                                                            <UserNickname userId={alert.createdBy} className="text-[10px] sm:text-xs font-medium" />
+                                                        </td>
+                                                        <td className="p-4 whitespace-nowrap">
                                                             <div className="flex items-center gap-1">
-                                                                <button
-                                                                    onClick={() => handleEdit(alert)}
-                                                                    className={`p-2 rounded-lg hover:bg-white/10 transition-colors ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}
-                                                                >
-                                                                    <Edit className="w-4 h-4" />
-                                                                </button>
-                                                                <button
-                                                                    onClick={() => handleDelete(alert.id)}
-                                                                    className="p-2 rounded-lg hover:bg-red-500/10 text-red-500 transition-colors"
-                                                                >
-                                                                    <Trash2 className="w-4 h-4" />
-                                                                </button>
+                                                                {(isAdmin || user?.id === alert.createdBy) && (
+                                                                    <button
+                                                                        onClick={() => handleEdit(alert)}
+                                                                        className={`p-2 rounded-lg hover:bg-white/10 transition-colors ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}
+                                                                    >
+                                                                        <Edit className="w-4 h-4" />
+                                                                    </button>
+                                                                )}
+                                                                {isAdmin && (
+                                                                    <button
+                                                                        onClick={() => handleDelete(alert.id)}
+                                                                        className="p-2 rounded-lg hover:bg-red-500/10 text-red-500 transition-colors"
+                                                                    >
+                                                                        <Trash2 className="w-4 h-4" />
+                                                                    </button>
+                                                                )}
                                                             </div>
                                                         </td>
                                                     </tr>
@@ -807,19 +821,26 @@ export const AiAoAlerts = () => {
                                                 </div>
                                             </td>
                                             <td className="p-4 whitespace-nowrap">
+                                                <UserNickname userId={alert.createdBy} className="text-[10px] sm:text-xs font-medium" />
+                                            </td>
+                                            <td className="p-4 whitespace-nowrap">
                                                 <div className="flex items-center gap-1">
-                                                    <button
-                                                        onClick={() => handleEdit(alert)}
-                                                        className={`p-2 rounded-lg hover:bg-white/10 transition-colors ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}
-                                                    >
-                                                        <Edit className="w-4 h-4" />
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleDelete(alert.id)}
-                                                        className="p-2 rounded-lg hover:bg-red-500/10 text-red-500 transition-colors"
-                                                    >
-                                                        <Trash2 className="w-4 h-4" />
-                                                    </button>
+                                                    {(isAdmin || user?.id === alert.createdBy) && (
+                                                        <button
+                                                            onClick={() => handleEdit(alert)}
+                                                            className={`p-2 rounded-lg hover:bg-white/10 transition-colors ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}
+                                                        >
+                                                            <Edit className="w-4 h-4" />
+                                                        </button>
+                                                    )}
+                                                    {isAdmin && (
+                                                        <button
+                                                            onClick={() => handleDelete(alert.id)}
+                                                            className="p-2 rounded-lg hover:bg-red-500/10 text-red-500 transition-colors"
+                                                        >
+                                                            <Trash2 className="w-4 h-4" />
+                                                        </button>
+                                                    )}
                                                 </div>
                                             </td>
                                         </tr>
@@ -975,7 +996,7 @@ export const AiAoAlerts = () => {
                                         {/* Form for new alert */}
                                         <div className={`p-4 rounded-2xl ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-50'} space-y-4`}>
                                             <h4 className={`text-sm font-semibold ${headingColor}`}>Новый сигнал</h4>
-                                            
+
                                             <div className="grid grid-cols-2 gap-4">
                                                 <div className="space-y-1">
                                                     <label className={`text-xs ${subTextColor}`}>Время</label>
@@ -1068,10 +1089,10 @@ export const AiAoAlerts = () => {
                                                         Очистить всё
                                                     </button>
                                                 </div>
-                                                
+
                                                 <div className="space-y-2 max-h-60 overflow-y-auto">
                                                     {alertsToAdd.map((alert, index) => (
-                                                        <div 
+                                                        <div
                                                             key={index}
                                                             className={`flex items-center justify-between p-3 rounded-xl ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-50'}`}
                                                         >

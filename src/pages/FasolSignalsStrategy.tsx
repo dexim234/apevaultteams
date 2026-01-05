@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { useThemeStore } from '@/store/themeStore'
 import { useAuthStore } from '@/store/authStore'
+import { useAdminStore } from '@/store/adminStore'
 import { getFasolTriggerAlerts, addFasolTriggerAlert, updateFasolTriggerAlert, deleteFasolTriggerAlert } from '@/services/firestoreService'
 import { FasolTriggerAlert, TriggerStrategy, TriggerProfit } from '@/types'
 import { Plus, Edit, Trash2, Save, X, Copy, Check, Table, Filter, ArrowUp, ArrowDown, RotateCcw, Zap, Image, XCircle, Activity, Target } from 'lucide-react'
 import { MultiStrategySelector } from '../components/Management/MultiStrategySelector'
+import { UserNickname } from '../components/UserNickname'
 
 type SortField = 'date' | 'drop' | 'profit'
 type SortOrder = 'asc' | 'desc'
@@ -12,6 +14,7 @@ type SortOrder = 'asc' | 'desc'
 export const FasolSignalsStrategy = () => {
     const { theme } = useThemeStore()
     const { user } = useAuthStore()
+    const { isAdmin } = useAdminStore()
 
     const [alerts, setAlerts] = useState<FasolTriggerAlert[]>([])
     const [loading, setLoading] = useState(true)
@@ -48,7 +51,8 @@ export const FasolSignalsStrategy = () => {
         maxDropFromLevel07: '',
         profits: [],
         comment: '',
-        isScam: false
+        isScam: false,
+        setup: 'One'
     })
 
     const [alertsToAdd, setAlertsToAdd] = useState<Partial<FasolTriggerAlert>[]>([])
@@ -95,7 +99,8 @@ export const FasolSignalsStrategy = () => {
             profits: profitsInput.length > 0 ? profitsInput : undefined,
             comment: formData.comment,
             screenshot: screenshotPreview || undefined,
-            isScam: formData.isScam || false
+            isScam: formData.isScam || false,
+            setup: formData.setup
         }
 
         setAlertsToAdd([...alertsToAdd, newAlert])
@@ -321,7 +326,12 @@ export const FasolSignalsStrategy = () => {
         result.sort((a, b) => {
             let comparison = 0
             switch (sortBy) {
-                case 'date': comparison = a.signalDate.localeCompare(b.signalDate); break
+                case 'date':
+                    comparison = a.signalDate.localeCompare(b.signalDate)
+                    if (comparison === 0) {
+                        comparison = a.signalTime.localeCompare(b.signalTime)
+                    }
+                    break
                 case 'drop': comparison = parseValue(a.maxDropFromSignal) - parseValue(b.maxDropFromSignal); break
                 case 'profit': comparison = parseValue(a.maxProfit) - parseValue(b.maxProfit); break
             }
@@ -527,7 +537,7 @@ export const FasolSignalsStrategy = () => {
                         <table className="w-full text-left border-collapse">
                             <thead>
                                 <tr className={`border-b ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-gray-50'}`}>
-                                    {['Дата', 'Время', 'Стратегии', 'MC', 'Адрес', 'Drop', '0.7', 'Профит', 'Коммент', '📷', '⚙'].map(h => (
+                                    {['Дата', 'Время', 'Setup', 'Стратегии', 'MC', 'Адрес', 'Drop', '0.7', 'Профит', 'Коммент', 'Автор', '📷', '⚙'].map(h => (
                                         <th key={h} className={`p-2 sm:p-3 text-[10px] sm:text-xs uppercase tracking-wider font-semibold ${subTextColor} text-center`}>{h}</th>
                                     ))}
                                 </tr>
@@ -538,6 +548,7 @@ export const FasolSignalsStrategy = () => {
                                         <tr key={alert.id} className={`${theme === 'dark' ? 'hover:bg-white/5' : 'hover:bg-gray-50'} transition-colors ${alert.isScam ? 'bg-red-500/10' : ''}`}>
                                             <td className="p-2 sm:p-3 whitespace-nowrap text-center font-mono text-xs sm:text-sm">{formatDateForDisplay(alert.signalDate)}</td>
                                             <td className="p-2 sm:p-3 whitespace-nowrap text-center font-mono text-xs sm:text-sm">{alert.signalTime}</td>
+                                            <td className="p-2 sm:p-3 text-center font-mono text-xs font-bold text-purple-400">{alert.setup || '-'}</td>
                                             <td className="p-2 sm:p-3 text-center">
                                                 {alert.isScam ? <span className="text-red-500 font-bold text-[10px]">СКАМ</span> : (
                                                     <div className="flex flex-wrap gap-0.5 justify-center">
@@ -561,11 +572,18 @@ export const FasolSignalsStrategy = () => {
                                             <td className="p-2 sm:p-3 text-center font-mono text-xs">{alert.maxDropFromLevel07 || '-'}</td>
                                             <td className="p-2 sm:p-3 text-center font-mono text-xs text-green-500 font-bold">{getProfitDisplay(alert.profits)}</td>
                                             <td className="p-2 sm:p-3 text-center"><div className="text-[10px] sm:text-xs truncate max-w-[150px] mx-auto">{alert.comment || '-'}</div></td>
+                                            <td className="p-2 sm:p-3 text-center">
+                                                <UserNickname userId={alert.createdBy} className="text-[10px] sm:text-xs font-medium" />
+                                            </td>
                                             <td className="p-2 sm:p-3 text-center">{alert.screenshot ? <button onClick={() => setPreviewImage(alert.screenshot!)} className="text-xs">📷</button> : '—'}</td>
                                             <td className="p-2 sm:p-3 text-center">
                                                 <div className="flex items-center justify-center gap-1">
-                                                    <button onClick={() => handleEdit(alert)} className="p-1.5 rounded-lg hover:bg-white/10 text-blue-500"><Edit size={14} /></button>
-                                                    <button onClick={() => handleDelete(alert.id)} className="p-1.5 rounded-lg hover:bg-red-500/10 text-red-500"><Trash2 size={14} /></button>
+                                                    {(isAdmin || user?.id === alert.createdBy) && (
+                                                        <button onClick={() => handleEdit(alert)} className="p-1.5 rounded-lg hover:bg-white/10 text-blue-500"><Edit size={14} /></button>
+                                                    )}
+                                                    {isAdmin && (
+                                                        <button onClick={() => handleDelete(alert.id)} className="p-1.5 rounded-lg hover:bg-red-500/10 text-red-500"><Trash2 size={14} /></button>
+                                                    )}
                                                 </div>
                                             </td>
                                         </tr>

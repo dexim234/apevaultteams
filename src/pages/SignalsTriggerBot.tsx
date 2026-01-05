@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { useThemeStore } from '@/store/themeStore'
 import { useAuthStore } from '@/store/authStore'
+import { useAdminStore } from '@/store/adminStore'
 import { getTriggerAlerts, addTriggerAlert, updateTriggerAlert, deleteTriggerAlert } from '@/services/firestoreService'
 import { TriggerAlert, TriggerStrategy, TriggerProfit } from '@/types'
 import { Plus, Edit, Trash2, Save, X, Copy, Check, Table, Filter, ArrowUp, ArrowDown, RotateCcw, Zap, Image, XCircle, Activity, Target } from 'lucide-react'
 import { MultiStrategySelector } from '../components/Management/MultiStrategySelector'
+import { UserNickname } from '../components/UserNickname'
 
 // ... (in imports section, handle this separately or just do it in one go if close)
 // Actually I can't do multiple disparate blocks with replace_file_content.
@@ -17,6 +19,7 @@ type SortOrder = 'asc' | 'desc'
 export const SignalsTriggerBot = () => {
     const { theme } = useThemeStore()
     const { user } = useAuthStore()
+    const { isAdmin } = useAdminStore()
 
     const [alerts, setAlerts] = useState<TriggerAlert[]>([])
     const [loading, setLoading] = useState(true)
@@ -385,6 +388,9 @@ export const SignalsTriggerBot = () => {
             switch (sortBy) {
                 case 'date':
                     comparison = a.signalDate.localeCompare(b.signalDate)
+                    if (comparison === 0) {
+                        comparison = a.signalTime.localeCompare(b.signalTime)
+                    }
                     break
                 case 'drop':
                     comparison = parseValue(a.maxDropFromSignal) - parseValue(b.maxDropFromSignal)
@@ -988,6 +994,9 @@ export const SignalsTriggerBot = () => {
                                                     {alert.comment || '-'}
                                                 </div>
                                             </td>
+                                            <td className="p-2 sm:p-3 text-center">
+                                                <UserNickname userId={alert.createdBy} className="text-[10px] sm:text-xs font-medium" />
+                                            </td>
                                             <td className="p-2 sm:p-3 whitespace-nowrap text-center">
                                                 {alert.screenshot ? (
                                                     <button
@@ -1003,18 +1012,22 @@ export const SignalsTriggerBot = () => {
                                             </td>
                                             <td className="p-2 sm:p-3 whitespace-nowrap text-center">
                                                 <div className="flex items-center justify-center gap-0.5 sm:gap-1">
-                                                    <button
-                                                        onClick={() => handleEdit(alert)}
-                                                        className={`p-1 sm:p-2 rounded-lg hover:bg-white/10 transition-colors ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}
-                                                    >
-                                                        <Edit className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleDelete(alert.id)}
-                                                        className="p-1 sm:p-2 rounded-lg hover:bg-red-500/10 text-red-500 transition-colors"
-                                                    >
-                                                        <Trash2 size={16} className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                                                    </button>
+                                                    {(isAdmin || user?.id === alert.createdBy) && (
+                                                        <button
+                                                            onClick={() => handleEdit(alert)}
+                                                            className={`p-1 sm:p-2 rounded-lg hover:bg-white/10 transition-colors ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}
+                                                        >
+                                                            <Edit className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                                                        </button>
+                                                    )}
+                                                    {isAdmin && (
+                                                        <button
+                                                            onClick={() => handleDelete(alert.id)}
+                                                            className="p-1 sm:p-2 rounded-lg hover:bg-red-500/10 text-red-500 transition-colors"
+                                                        >
+                                                            <Trash2 size={16} className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                                                        </button>
+                                                    )}
                                                 </div>
                                             </td>
                                         </tr>
