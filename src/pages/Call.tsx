@@ -26,7 +26,6 @@ import {
   FileCode,
   MapPin,
   ShieldAlert,
-  CalendarCheck,
   Activity,
   TrendingUp,
   Octagon,
@@ -556,11 +555,11 @@ export const CallPage = () => {
             <div className="flex flex-col gap-4 sm:gap-5 lg:flex-row lg:items-center lg:justify-between">
               <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
                 <div className="hidden sm:block p-3 rounded-2xl bg-white/80 dark:bg-white/5 border border-white/40 dark:border-white/10 shadow-lg">
-                  <CalendarCheck className="w-6 h-6 text-[#4E6E49]" />
+                  <Activity className="w-6 h-6 text-[#4E6E49]" />
                 </div>
                 <div className="flex items-center text-center sm:text-left w-full sm:w-auto justify-center sm:justify-start">
                   <h1 className={`text-xl sm:text-3xl font-extrabold leading-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    Signals HUB
+                    AVF HUB
                   </h1>
                 </div>
               </div>
@@ -581,21 +580,32 @@ export const CallPage = () => {
               <button
                 key={cat}
                 onClick={() => { setFormCategory(cat); setEditingCall(null); setShowForm(true) }}
-                className={`p-5 rounded-[1.5rem] border-2 ${tone.border} ${tone.bg} text-left shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 space-y-3 group/card relative overflow-hidden`}
+                className={`p-5 rounded-[1.5rem] border-2 ${tone.border} ${tone.bg} text-left shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 space-y-4 group/card relative overflow-hidden`}
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity" />
-                <div className="flex items-start justify-between gap-3 relative z-10">
+
+                {/* Header with icon and active count */}
+                <div className="flex items-center justify-between gap-3 relative z-10">
                   <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-bold ${tone.text} bg-white/10 border border-white/10 backdrop-blur-md`}>
                     {meta.icon}
                     <span>{meta.label}</span>
                   </div>
-                  <span className={`px-2.5 py-1 rounded-lg text-[10px] font-bold border ${tone.border} ${tone.text} ${theme === 'dark' ? 'bg-black/20' : 'bg-white/50'} group-hover/card:bg-[#4E6E49] group-hover/card:text-white group-hover/card:border-transparent transition-all`}>
-                    Добавить
+                  <span className={`px-2.5 py-1 rounded-lg text-[10px] font-bold ${theme === 'dark' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20'}`}>
+                    + {stats?.active || 0} АКТИВН
                   </span>
                 </div>
-                <div className="pl-1 relative z-10">
-                  <p className={`text-3xl font-black ${textColor} leading-none mb-1 group-hover/card:scale-105 transition-transform origin-left`}>{stats?.total || 0}</p>
-                  <p className={`text-[10px] uppercase tracking-wider font-bold ${subtleColor} opacity-80`}>Всего сигналов • Активных {stats?.active || 0}</p>
+
+                {/* Total count */}
+                <div className="relative z-10">
+                  <p className={`text-xs uppercase tracking-wider font-bold ${subtleColor} opacity-70 mb-1`}>Всего</p>
+                  <p className={`text-4xl font-black ${textColor} leading-none group-hover/card:scale-105 transition-transform origin-left`}>{stats?.total || 0}</p>
+                </div>
+
+                {/* Add Signal Button */}
+                <div className="relative z-10 pt-2">
+                  <div className={`w-full px-4 py-2.5 rounded-xl text-sm font-bold text-center transition-all ${theme === 'dark' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 group-hover/card:bg-emerald-500 group-hover/card:text-white group-hover/card:border-emerald-500' : 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 group-hover/card:bg-emerald-500 group-hover/card:text-white'}`}>
+                    Добавить сигнал
+                  </div>
                 </div>
               </button>
             )
