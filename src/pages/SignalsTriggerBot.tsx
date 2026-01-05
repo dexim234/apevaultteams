@@ -1504,7 +1504,7 @@ export const SignalsTriggerBot = () => {
                                             </button>
                                             <button
                                                 type="button"
-                                                onClick={handleAddAlerts}
+                                                onClick={handleAddToList}
                                                 className="flex-1 py-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-semibold transition-colors flex items-center justify-center gap-2"
                                             >
                                                 <Plus className="w-4 h-4" />
@@ -1518,7 +1518,7 @@ export const SignalsTriggerBot = () => {
                     </div>
                 </div>
             </>
-        </>
+        </div>
     )
 }
 
