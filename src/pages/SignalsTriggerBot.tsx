@@ -595,8 +595,11 @@ export const SignalsTriggerBot = () => {
                                         strategies: [],
                                         maxDropFromSignal: '',
                                         maxDropFromLevel07: '',
-                                        comment: ''
+                                        profits: [],
+                                        comment: '',
+                                        isScam: false
                                     })
+                                    setShowModal(true)
                                 }}
                                 className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-semibold transition-colors flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20"
                             >
@@ -1068,262 +1071,66 @@ export const SignalsTriggerBot = () => {
                         </table>
                     </div>
                 </div>
-            </div>
+            </div >
 
             {/* Modal */}
-            {showModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-                    <div className={`w-full max-w-2xl rounded-3xl ${cardBg} ${cardBorder} border shadow-2xl overflow-hidden max-h-[90vh] flex flex-col`}>
-                        <div className={`p-6 border-b ${theme === 'dark' ? 'border-white/10' : 'border-gray-100'} flex items-center justify-between flex-shrink-0`}>
-                            <div>
-                                <h3 className={`text-xl font-bold ${headingColor}`}>
-                                    {editingAlert ? 'Редактировать сигнал' : 'Добавить сигналы'}
-                                </h3>
-                                {!editingAlert && (
-                                    <p className={`text-sm ${subTextColor}`}>Добавьте один или несколько сигналов за одну дату</p>
-                                )}
-                            </div>
-                            <button onClick={() => {
-                                setShowModal(false)
-                                setAlertsToAdd([])
-                                setCommonDate(new Date().toISOString().split('T')[0])
-                                setFormData({
-                                    signalTime: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }),
-                                    marketCap: '',
-                                    address: '',
-                                    strategies: [],
-                                    maxDropFromSignal: '',
-                                    maxDropFromLevel07: '',
-                                    comment: ''
-                                })
-                            }} className={`p-2 rounded-lg hover:bg-white/10 transition-colors ${subTextColor}`}>
-                                <X className="w-5 h-5" />
-                            </button>
-                        </div>
-
-                        <div className="flex-1 overflow-y-auto p-6 space-y-6">
-                            {/* Common Date */}
-                            <div className="space-y-1">
-                                <label className={`text-xs font-semibold uppercase ${subTextColor}`}>Дата</label>
-                                <input
-                                    type="date"
-                                    value={editingAlert?.signalDate || commonDate || formData.signalDate || ''}
-                                    onChange={(e) => {
-                                        setCommonDate(e.target.value)
-                                        setFormData({ ...formData, signalDate: e.target.value })
-                                    }}
-                                    className={`w-full p-3 rounded-xl border outline-none transition-all ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white focus:border-amber-500' : 'bg-white border-gray-200 text-gray-900 focus:border-amber-500'}`}
-                                />
-                            </div>
-
-                            {editingAlert ? (
-                                <form onSubmit={handleSubmit} className="space-y-4">
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div className="space-y-1">
-                                            <label className={`text-xs ${subTextColor}`}>Время</label>
-                                            <input
-                                                type="time"
-                                                required
-                                                value={formData.signalTime}
-                                                onChange={(e) => setFormData({ ...formData, signalTime: e.target.value })}
-                                                className={`w-full p-3 rounded-xl border outline-none transition-all ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white focus-border-amber-500' : 'bg-white border-gray-200 text-gray-900 focus-border-amber-500'}`}
-                                            />
-                                        </div>
-                                        <MultiStrategySelector
-                                            value={formData.strategies || []}
-                                            onChange={(strategies: TriggerStrategy[]) => setFormData({ ...formData, strategies })}
-                                            theme={theme}
-                                        />
-                                    </div>
-
-                                    <div className="space-y-1">
-                                        <label className={`text-xs ${subTextColor}`}>Адрес токена</label>
-                                        <input
-                                            type="text"
-                                            required
-                                            placeholder="Адрес контракта..."
-                                            value={formData.address || ''}
-                                            onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                                            className={`w-full p-3 rounded-xl border outline-none transition-all font-mono text-sm ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white focus-border-amber-500' : 'bg-white border-gray-200 text-gray-900 focus-border-amber-500'}`}
-                                        />
-                                    </div>
-
-                                    <div className="grid grid-cols-3 gap-4">
-                                        <div className="space-y-1">
-                                            <label className={`text-xs ${subTextColor}`}>Market Cap</label>
-                                            <input
-                                                type="text"
-                                                placeholder="e.g. 300,77"
-                                                value={formData.marketCap || ''}
-                                                onChange={(e) => setFormData({ ...formData, marketCap: e.target.value })}
-                                                className={`w-full p-2 rounded-lg border text-sm outline-none mt-1 ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white' : 'bg-white border-gray-200 text-gray-900'}`}
-                                            />
-                                        </div>
-                                        <div className="space-y-1">
-                                            <label className={`text-xs ${subTextColor}`}>Макс. падение от сигнала</label>
-                                            <input
-                                                type="text"
-                                                placeholder="e.g. -16"
-                                                value={formData.maxDropFromSignal || ''}
-                                                onChange={(e) => setFormData({ ...formData, maxDropFromSignal: e.target.value })}
-                                                className={`w-full p-2 rounded-lg border text-sm outline-none mt-1 ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white' : 'bg-white border-gray-200 text-gray-900'}`}
-                                            />
-                                        </div>
-                                        <div className="space-y-1">
-                                            <label className={`text-xs ${subTextColor}`}>Макс. падение от 0.7</label>
-                                            <input
-                                                type="text"
-                                                placeholder="e.g. -5"
-                                                value={formData.maxDropFromLevel07 || ''}
-                                                onChange={(e) => setFormData({ ...formData, maxDropFromLevel07: e.target.value })}
-                                                className={`w-full p-2 rounded-lg border text-sm outline-none mt-1 ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white' : 'bg-white border-gray-200 text-gray-900'}`}
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div className="space-y-1">
-                                        <label className={`text-xs ${subTextColor}`}>Комментарий</label>
-                                        <input
-                                            type="text"
-                                            placeholder="Дополнительная информация..."
-                                            value={formData.comment || ''}
-                                            onChange={(e) => setFormData({ ...formData, comment: e.target.value })}
-                                            className={`w-full p-2 rounded-xl border outline-none transition-all font-mono text-sm ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white focus-border-amber-500' : 'bg-white border-gray-200 text-gray-900'}`}
-                                        />
-                                    </div>
-
-                                    {/* Multiple Profits Input */}
-                                    {formData.strategies && formData.strategies.length > 0 && !formData.isScam && (
-                                        <div className="space-y-2">
-                                            <div className="flex items-center justify-between">
-                                                <label className={`text-xs font-semibold uppercase ${subTextColor}`}>Профиты по стратегиям</label>
-                                                <button
-                                                    type="button"
-                                                    onClick={addProfitEntry}
-                                                    className="text-xs text-amber-500 hover:text-amber-400 transition-colors flex items-center gap-1"
-                                                >
-                                                    <Plus className="w-3 h-3" />
-                                                    Добавить
-                                                </button>
-                                            </div>
-
-                                            {profitsInput.length > 0 ? (
-                                                <div className="space-y-2">
-                                                    {profitsInput.map((profit, idx) => (
-                                                        <div key={idx} className={`flex items-center gap-2 p-2 rounded-lg ${theme === 'dark' ? 'bg-black/30' : 'bg-gray-100'}`}>
-                                                            <span className={`text-xs font-medium w-24 ${subTextColor}`}>
-                                                                {profit.strategy}
-                                                            </span>
-                                                            <input
-                                                                type="text"
-                                                                placeholder="+28 или X3"
-                                                                value={profit.value}
-                                                                onChange={(e) => updateProfitValue(profit.strategy, e.target.value)}
-                                                                className={`flex-1 p-1.5 rounded border text-sm outline-none ${theme === 'dark' ? 'bg-[#1a1f26] border-white/10 text-white' : 'bg-white border-gray-200 text-gray-900'}`}
-                                                            />
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => removeProfitEntry(profit.strategy)}
-                                                                className="p-1 rounded hover:bg-red-500/20 text-red-500 transition-colors"
-                                                            >
-                                                                <XCircle className="w-4 h-4" />
-                                                            </button>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            ) : (
-                                                <p className={`text-xs ${subTextColor}`}>Выберите стратегии и добавьте профиты для каждой</p>
-                                            )}
-                                        </div>
+            {
+                showModal && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+                        <div className={`w-full max-w-2xl rounded-3xl ${cardBg} ${cardBorder} border shadow-2xl overflow-hidden max-h-[90vh] flex flex-col`}>
+                            <div className={`p-6 border-b ${theme === 'dark' ? 'border-white/10' : 'border-gray-100'} flex items-center justify-between flex-shrink-0`}>
+                                <div>
+                                    <h3 className={`text-xl font-bold ${headingColor}`}>
+                                        {editingAlert ? 'Редактировать сигнал' : 'Добавить сигналы'}
+                                    </h3>
+                                    {!editingAlert && (
+                                        <p className={`text-sm ${subTextColor}`}>Добавьте один или несколько сигналов за одну дату</p>
                                     )}
+                                </div>
+                                <button onClick={() => {
+                                    setShowModal(false)
+                                    setAlertsToAdd([])
+                                    setCommonDate(new Date().toISOString().split('T')[0])
+                                    setFormData({
+                                        signalTime: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }),
+                                        marketCap: '',
+                                        address: '',
+                                        strategies: [],
+                                        maxDropFromSignal: '',
+                                        maxDropFromLevel07: '',
+                                        comment: ''
+                                    })
+                                }} className={`p-2 rounded-lg hover:bg-white/10 transition-colors ${subTextColor}`}>
+                                    <X className="w-5 h-5" />
+                                </button>
+                            </div>
 
-                                    {/* Screenshot Upload */}
-                                    <div className="space-y-2">
-                                        <label className={`text-xs ${subTextColor}`}>Скриншот</label>
-                                        <div className={`flex items-center gap-3 ${theme === 'dark' ? 'bg-black/30' : 'bg-gray-100'} p-3 rounded-xl border border-dashed ${theme === 'dark' ? 'border-white/10' : 'border-gray-300'}`}>
-                                            {screenshotPreview ? (
-                                                <div className="relative">
-                                                    <img
-                                                        src={screenshotPreview}
-                                                        alt="Preview"
-                                                        className="w-16 h-16 object-cover rounded-lg"
-                                                    />
-                                                    <button
-                                                        type="button"
-                                                        onClick={removeScreenshot}
-                                                        className="absolute -top-2 -right-2 p-0.5 rounded-full bg-red-500 text-white hover:bg-red-600 transition-colors"
-                                                    >
-                                                        <XCircle className="w-4 h-4" />
-                                                    </button>
-                                                </div>
-                                            ) : (
-                                                <label className="flex items-center gap-2 cursor-pointer text-amber-500 hover:text-amber-400 transition-colors">
-                                                    <Image className="w-5 h-5" />
-                                                    <span className="text-sm">Загрузить фото</span>
-                                                    <input
-                                                        ref={fileInputRef}
-                                                        type="file"
-                                                        accept="image/*"
-                                                        onChange={handleScreenshotChange}
-                                                        className="hidden"
-                                                    />
-                                                </label>
-                                            )}
-                                            {!screenshotPreview && (
-                                                <span className={`text-xs ${subTextColor}`}>Макс. 5MB</span>
-                                            )}
-                                        </div>
-                                    </div>
+                            <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                                {/* Common Date */}
+                                <div className="space-y-1">
+                                    <label className={`text-xs font-semibold uppercase ${subTextColor}`}>Дата</label>
+                                    <input
+                                        type="date"
+                                        value={editingAlert?.signalDate || commonDate || formData.signalDate || ''}
+                                        onChange={(e) => {
+                                            setCommonDate(e.target.value)
+                                            setFormData({ ...formData, signalDate: e.target.value })
+                                        }}
+                                        className={`w-full p-3 rounded-xl border outline-none transition-all ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white focus:border-amber-500' : 'bg-white border-gray-200 text-gray-900 focus:border-amber-500'}`}
+                                    />
+                                </div>
 
-                                    {/* Is Scam checkbox */}
-                                    <div className="flex items-center gap-3 p-3 rounded-xl bg-red-500/10 border border-red-500/20">
-                                        <input
-                                            type="checkbox"
-                                            id="isScamNew"
-                                            checked={formData.isScam || false}
-                                            onChange={(e) => setFormData({ ...formData, isScam: e.target.checked })}
-                                            className={`w-5 h-5 rounded border-2 ${theme === 'dark' ? 'border-gray-700 bg-gray-800' : 'border-gray-300 bg-white'} cursor-pointer accent-red-500`}
-                                        />
-                                        <label htmlFor="isScamNew" className="cursor-pointer">
-                                            <span className={`text-sm font-semibold ${theme === 'dark' ? 'text-red-400' : 'text-red-600'}`}>Это скам</span>
-                                            <p className={`text-xs ${subTextColor} mt-0.5`}>При отметке выбор стратегии необязателен</p>
-                                        </label>
-                                    </div>
-
-                                    <div className="pt-4 flex gap-3">
-                                        <button
-                                            type="button"
-                                            onClick={() => {
-                                                setShowModal(false)
-                                                setEditingAlert(null)
-                                            }}
-                                            className={`flex-1 py-3 rounded-xl font-semibold transition-colors ${theme === 'dark' ? 'bg-white/5 hover:bg-white/10 text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-800'}`}
-                                        >
-                                            Отмена
-                                        </button>
-                                        <button
-                                            type="submit"
-                                            className="flex-1 py-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-semibold transition-colors flex items-center justify-center gap-2"
-                                        >
-                                            <Save className="w-4 h-4" />
-                                            <span>Сохранить</span>
-                                        </button>
-                                    </div>
-                                </form>
-                            ) : (
-                                <>
-                                    {/* Form for new alert */}
-                                    <div className={`p-4 rounded-2xl ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-50'} space-y-4`}>
-                                        <h4 className={`text-sm font-semibold ${headingColor}`}>Новый сигнал</h4>
-
+                                {editingAlert ? (
+                                    <form onSubmit={handleSubmit} className="space-y-4">
                                         <div className="grid grid-cols-2 gap-4">
                                             <div className="space-y-1">
                                                 <label className={`text-xs ${subTextColor}`}>Время</label>
                                                 <input
                                                     type="time"
+                                                    required
                                                     value={formData.signalTime}
                                                     onChange={(e) => setFormData({ ...formData, signalTime: e.target.value })}
-                                                    className={`w-full p-2 rounded-lg border outline-none transition-all ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white' : 'bg-white border-gray-200 text-gray-900'}`}
+                                                    className={`w-full p-3 rounded-xl border outline-none transition-all ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white focus-border-amber-500' : 'bg-white border-gray-200 text-gray-900 focus-border-amber-500'}`}
                                                 />
                                             </div>
                                             <MultiStrategySelector
@@ -1337,10 +1144,11 @@ export const SignalsTriggerBot = () => {
                                             <label className={`text-xs ${subTextColor}`}>Адрес токена</label>
                                             <input
                                                 type="text"
+                                                required
                                                 placeholder="Адрес контракта..."
                                                 value={formData.address || ''}
                                                 onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                                                className={`w-full p-2 rounded-lg border outline-none transition-all font-mono text-sm ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white focus-border-amber-500' : 'bg-white border-gray-200 text-gray-900'}`}
+                                                className={`w-full p-3 rounded-xl border outline-none transition-all font-mono text-sm ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white focus-border-amber-500' : 'bg-white border-gray-200 text-gray-900 focus-border-amber-500'}`}
                                             />
                                         </div>
 
@@ -1491,38 +1299,235 @@ export const SignalsTriggerBot = () => {
                                                 type="button"
                                                 onClick={() => {
                                                     setShowModal(false)
-                                                    setAlertsToAdd([])
-                                                    setFormData({
-                                                        signalDate: new Date().toISOString().split('T')[0],
-                                                        signalTime: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }),
-                                                        marketCap: '',
-                                                        address: '',
-                                                        strategies: [],
-                                                        maxDropFromSignal: '',
-                                                        maxDropFromLevel07: '',
-                                                        comment: ''
-                                                    })
+                                                    setEditingAlert(null)
                                                 }}
                                                 className={`flex-1 py-3 rounded-xl font-semibold transition-colors ${theme === 'dark' ? 'bg-white/5 hover:bg-white/10 text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-800'}`}
                                             >
                                                 Отмена
                                             </button>
                                             <button
-                                                type="button"
-                                                onClick={handleAddToList}
+                                                type="submit"
                                                 className="flex-1 py-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-semibold transition-colors flex items-center justify-center gap-2"
                                             >
-                                                <Plus className="w-4 h-4" />
-                                                <span>Добавить</span>
+                                                <Save className="w-4 h-4" />
+                                                <span>Сохранить</span>
                                             </button>
                                         </div>
-                                    </div>
-                                </>
-                            )}
+                                    </form>
+                                ) : (
+                                    <>
+                                        {/* Form for new alert */}
+                                        <div className={`p-4 rounded-2xl ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-50'} space-y-4`}>
+                                            <h4 className={`text-sm font-semibold ${headingColor}`}>Новый сигнал</h4>
+
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div className="space-y-1">
+                                                    <label className={`text-xs ${subTextColor}`}>Время</label>
+                                                    <input
+                                                        type="time"
+                                                        value={formData.signalTime}
+                                                        onChange={(e) => setFormData({ ...formData, signalTime: e.target.value })}
+                                                        className={`w-full p-2 rounded-lg border outline-none transition-all ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white' : 'bg-white border-gray-200 text-gray-900'}`}
+                                                    />
+                                                </div>
+                                                <MultiStrategySelector
+                                                    value={formData.strategies || []}
+                                                    onChange={(strategies: TriggerStrategy[]) => setFormData({ ...formData, strategies })}
+                                                    theme={theme}
+                                                />
+                                            </div>
+
+                                            <div className="space-y-1">
+                                                <label className={`text-xs ${subTextColor}`}>Адрес токена</label>
+                                                <input
+                                                    type="text"
+                                                    placeholder="Адрес контракта..."
+                                                    value={formData.address || ''}
+                                                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                                                    className={`w-full p-2 rounded-lg border outline-none transition-all font-mono text-sm ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white focus-border-amber-500' : 'bg-white border-gray-200 text-gray-900'}`}
+                                                />
+                                            </div>
+
+                                            <div className="grid grid-cols-3 gap-4">
+                                                <div className="space-y-1">
+                                                    <label className={`text-xs ${subTextColor}`}>Market Cap</label>
+                                                    <input
+                                                        type="text"
+                                                        placeholder="e.g. 300,77"
+                                                        value={formData.marketCap || ''}
+                                                        onChange={(e) => setFormData({ ...formData, marketCap: e.target.value })}
+                                                        className={`w-full p-2 rounded-lg border text-sm outline-none mt-1 ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white' : 'bg-white border-gray-200 text-gray-900'}`}
+                                                    />
+                                                </div>
+                                                <div className="space-y-1">
+                                                    <label className={`text-xs ${subTextColor}`}>Макс. падение от сигнала</label>
+                                                    <input
+                                                        type="text"
+                                                        placeholder="e.g. -16"
+                                                        value={formData.maxDropFromSignal || ''}
+                                                        onChange={(e) => setFormData({ ...formData, maxDropFromSignal: e.target.value })}
+                                                        className={`w-full p-2 rounded-lg border text-sm outline-none mt-1 ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white' : 'bg-white border-gray-200 text-gray-900'}`}
+                                                    />
+                                                </div>
+                                                <div className="space-y-1">
+                                                    <label className={`text-xs ${subTextColor}`}>Макс. падение от 0.7</label>
+                                                    <input
+                                                        type="text"
+                                                        placeholder="e.g. -5"
+                                                        value={formData.maxDropFromLevel07 || ''}
+                                                        onChange={(e) => setFormData({ ...formData, maxDropFromLevel07: e.target.value })}
+                                                        className={`w-full p-2 rounded-lg border text-sm outline-none mt-1 ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white' : 'bg-white border-gray-200 text-gray-900'}`}
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            <div className="space-y-1">
+                                                <label className={`text-xs ${subTextColor}`}>Комментарий</label>
+                                                <input
+                                                    type="text"
+                                                    placeholder="Дополнительная информация..."
+                                                    value={formData.comment || ''}
+                                                    onChange={(e) => setFormData({ ...formData, comment: e.target.value })}
+                                                    className={`w-full p-2 rounded-xl border outline-none transition-all font-mono text-sm ${theme === 'dark' ? 'bg-black/30 border-white/10 text-white focus-border-amber-500' : 'bg-white border-gray-200 text-gray-900'}`}
+                                                />
+                                            </div>
+
+                                            {/* Multiple Profits Input */}
+                                            {formData.strategies && formData.strategies.length > 0 && !formData.isScam && (
+                                                <div className="space-y-2">
+                                                    <div className="flex items-center justify-between">
+                                                        <label className={`text-xs font-semibold uppercase ${subTextColor}`}>Профиты по стратегиям</label>
+                                                        <button
+                                                            type="button"
+                                                            onClick={addProfitEntry}
+                                                            className="text-xs text-amber-500 hover:text-amber-400 transition-colors flex items-center gap-1"
+                                                        >
+                                                            <Plus className="w-3 h-3" />
+                                                            Добавить
+                                                        </button>
+                                                    </div>
+
+                                                    {profitsInput.length > 0 ? (
+                                                        <div className="space-y-2">
+                                                            {profitsInput.map((profit, idx) => (
+                                                                <div key={idx} className={`flex items-center gap-2 p-2 rounded-lg ${theme === 'dark' ? 'bg-black/30' : 'bg-gray-100'}`}>
+                                                                    <span className={`text-xs font-medium w-24 ${subTextColor}`}>
+                                                                        {profit.strategy}
+                                                                    </span>
+                                                                    <input
+                                                                        type="text"
+                                                                        placeholder="+28 или X3"
+                                                                        value={profit.value}
+                                                                        onChange={(e) => updateProfitValue(profit.strategy, e.target.value)}
+                                                                        className={`flex-1 p-1.5 rounded border text-sm outline-none ${theme === 'dark' ? 'bg-[#1a1f26] border-white/10 text-white' : 'bg-white border-gray-200 text-gray-900'}`}
+                                                                    />
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => removeProfitEntry(profit.strategy)}
+                                                                        className="p-1 rounded hover:bg-red-500/20 text-red-500 transition-colors"
+                                                                    >
+                                                                        <XCircle className="w-4 h-4" />
+                                                                    </button>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    ) : (
+                                                        <p className={`text-xs ${subTextColor}`}>Выберите стратегии и добавьте профиты для каждой</p>
+                                                    )}
+                                                </div>
+                                            )}
+
+                                            {/* Screenshot Upload */}
+                                            <div className="space-y-2">
+                                                <label className={`text-xs ${subTextColor}`}>Скриншот</label>
+                                                <div className={`flex items-center gap-3 ${theme === 'dark' ? 'bg-black/30' : 'bg-gray-100'} p-3 rounded-xl border border-dashed ${theme === 'dark' ? 'border-white/10' : 'border-gray-300'}`}>
+                                                    {screenshotPreview ? (
+                                                        <div className="relative">
+                                                            <img
+                                                                src={screenshotPreview}
+                                                                alt="Preview"
+                                                                className="w-16 h-16 object-cover rounded-lg"
+                                                            />
+                                                            <button
+                                                                type="button"
+                                                                onClick={removeScreenshot}
+                                                                className="absolute -top-2 -right-2 p-0.5 rounded-full bg-red-500 text-white hover:bg-red-600 transition-colors"
+                                                            >
+                                                                <XCircle className="w-4 h-4" />
+                                                            </button>
+                                                        </div>
+                                                    ) : (
+                                                        <label className="flex items-center gap-2 cursor-pointer text-amber-500 hover:text-amber-400 transition-colors">
+                                                            <Image className="w-5 h-5" />
+                                                            <span className="text-sm">Загрузить фото</span>
+                                                            <input
+                                                                ref={fileInputRef}
+                                                                type="file"
+                                                                accept="image/*"
+                                                                onChange={handleScreenshotChange}
+                                                                className="hidden"
+                                                            />
+                                                        </label>
+                                                    )}
+                                                    {!screenshotPreview && (
+                                                        <span className={`text-xs ${subTextColor}`}>Макс. 5MB</span>
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            {/* Is Scam checkbox */}
+                                            <div className="flex items-center gap-3 p-3 rounded-xl bg-red-500/10 border border-red-500/20">
+                                                <input
+                                                    type="checkbox"
+                                                    id="isScamNew"
+                                                    checked={formData.isScam || false}
+                                                    onChange={(e) => setFormData({ ...formData, isScam: e.target.checked })}
+                                                    className={`w-5 h-5 rounded border-2 ${theme === 'dark' ? 'border-gray-700 bg-gray-800' : 'border-gray-300 bg-white'} cursor-pointer accent-red-500`}
+                                                />
+                                                <label htmlFor="isScamNew" className="cursor-pointer">
+                                                    <span className={`text-sm font-semibold ${theme === 'dark' ? 'text-red-400' : 'text-red-600'}`}>Это скам</span>
+                                                    <p className={`text-xs ${subTextColor} mt-0.5`}>При отметке выбор стратегии необязателен</p>
+                                                </label>
+                                            </div>
+
+                                            <div className="pt-4 flex gap-3">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setShowModal(false)
+                                                        setAlertsToAdd([])
+                                                        setFormData({
+                                                            signalDate: new Date().toISOString().split('T')[0],
+                                                            signalTime: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }),
+                                                            marketCap: '',
+                                                            address: '',
+                                                            strategies: [],
+                                                            maxDropFromSignal: '',
+                                                            maxDropFromLevel07: '',
+                                                            comment: ''
+                                                        })
+                                                    }}
+                                                    className={`flex-1 py-3 rounded-xl font-semibold transition-colors ${theme === 'dark' ? 'bg-white/5 hover:bg-white/10 text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-800'}`}
+                                                >
+                                                    Отмена
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={handleAddToList}
+                                                    className="flex-1 py-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-semibold transition-colors flex items-center justify-center gap-2"
+                                                >
+                                                    <Plus className="w-4 h-4" />
+                                                    <span>Добавить</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )
+            }
         </>
     )
 }
