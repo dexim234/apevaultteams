@@ -24,12 +24,7 @@ export const SignalsTriggerBot = () => {
     const [editingAlert, setEditingAlert] = useState<TriggerAlert | null>(null)
     const [copyingId, setCopyingId] = useState<string | null>(null)
     const [isCopyingTable, setIsCopyingTable] = useState(false)
-    const [_showSuccess, _setShowSuccess] = useState(false)
-    const [_successCount, _setSuccessCount] = useState(0)
-    const [_showConfirmSave, _setShowConfirmSave] = useState(false)
-    const [_pendingAlertsCount, _setPendingAlertsCount] = useState(0)
-    const [_successMessage, _setSuccessMessage] = useState('')
-    const [_previewImage, setPreviewImage] = useState<string | null>(null)
+    const [previewImage, setPreviewImage] = useState<string | null>(null)
 
     // Filter states
     const [showFilters, setShowFilters] = useState(false)
@@ -172,7 +167,7 @@ export const SignalsTriggerBot = () => {
             setProfitsInput([])
             setShowModal(false)
             await loadAlerts()
-            alert(`Успешно сохранено ${alertsToAdd.length} сигналов!`)
+            // Removed success alert for smoother flow
         } catch (error: any) {
             console.error('Error saving alerts:', error)
             alert('Ошибка при сохранении сигналов')
@@ -475,31 +470,7 @@ export const SignalsTriggerBot = () => {
         }
     }
 
-    // Add profit entry
-    const addProfitEntry = () => {
-        if (formData.strategies && formData.strategies.length > 0) {
-            const availableStrategy = formData.strategies.find(
-                s => !profitsInput.some(p => p.strategy === s)
-            )
-            if (availableStrategy) {
-                setProfitsInput([...profitsInput, { strategy: availableStrategy, value: '' }])
-            } else {
-                alert('Все стратегии уже имеют профит')
-            }
-        }
-    }
 
-    // Update profit value
-    const updateProfitValue = (strategy: TriggerStrategy, value: string) => {
-        setProfitsInput(prev => prev.map(p =>
-            p.strategy === strategy ? { ...p, value } : p
-        ))
-    }
-
-    // Remove profit entry
-    const removeProfitEntry = (strategy: TriggerStrategy) => {
-        setProfitsInput(prev => prev.filter(p => p.strategy !== strategy))
-    }
 
     // Get profit display text
     const getProfitDisplay = (profits: TriggerProfit[] | undefined) => {
@@ -1116,8 +1087,12 @@ export const SignalsTriggerBot = () => {
                                                 />
                                             </div>
                                             <MultiStrategySelector
-                                                value={formData.strategies || []}
-                                                onChange={(strategies: TriggerStrategy[]) => setFormData({ ...formData, strategies })}
+                                                strategies={formData.strategies || []}
+                                                profits={profitsInput}
+                                                onChange={(strategies, profits) => {
+                                                    setFormData({ ...formData, strategies })
+                                                    setProfitsInput(profits)
+                                                }}
                                                 theme={theme}
                                             />
                                         </div>
@@ -1178,50 +1153,7 @@ export const SignalsTriggerBot = () => {
                                             />
                                         </div>
 
-                                        {/* Multiple Profits Input */}
-                                        {formData.strategies && formData.strategies.length > 0 && !formData.isScam && (
-                                            <div className="space-y-2">
-                                                <div className="flex items-center justify-between">
-                                                    <label className={`text-xs font-semibold uppercase ${subTextColor}`}>Профиты по стратегиям</label>
-                                                    <button
-                                                        type="button"
-                                                        onClick={addProfitEntry}
-                                                        className="text-xs text-amber-500 hover:text-amber-400 transition-colors flex items-center gap-1"
-                                                    >
-                                                        <Plus className="w-3 h-3" />
-                                                        Добавить
-                                                    </button>
-                                                </div>
 
-                                                {profitsInput.length > 0 ? (
-                                                    <div className="space-y-2">
-                                                        {profitsInput.map((profit, idx) => (
-                                                            <div key={idx} className={`flex items-center gap-2 p-2 rounded-lg ${theme === 'dark' ? 'bg-black/30' : 'bg-gray-100'}`}>
-                                                                <span className={`text-xs font-medium w-24 ${subTextColor}`}>
-                                                                    {profit.strategy}
-                                                                </span>
-                                                                <input
-                                                                    type="text"
-                                                                    placeholder="+28 или X3"
-                                                                    value={profit.value}
-                                                                    onChange={(e) => updateProfitValue(profit.strategy, e.target.value)}
-                                                                    className={`flex-1 p-1.5 rounded border text-sm outline-none ${theme === 'dark' ? 'bg-[#1a1f26] border-white/10 text-white' : 'bg-white border-gray-200 text-gray-900'}`}
-                                                                />
-                                                                <button
-                                                                    type="button"
-                                                                    onClick={() => removeProfitEntry(profit.strategy)}
-                                                                    className="p-1 rounded hover:bg-red-500/20 text-red-500 transition-colors"
-                                                                >
-                                                                    <XCircle className="w-4 h-4" />
-                                                                </button>
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                ) : (
-                                                    <p className={`text-xs ${subTextColor}`}>Выберите стратегии и добавьте профиты для каждой</p>
-                                                )}
-                                            </div>
-                                        )}
 
                                         {/* Screenshot Upload */}
                                         <div className="space-y-2">
@@ -1313,8 +1245,12 @@ export const SignalsTriggerBot = () => {
                                                     />
                                                 </div>
                                                 <MultiStrategySelector
-                                                    value={formData.strategies || []}
-                                                    onChange={(strategies: TriggerStrategy[]) => setFormData({ ...formData, strategies })}
+                                                    strategies={formData.strategies || []}
+                                                    profits={profitsInput}
+                                                    onChange={(strategies, profits) => {
+                                                        setFormData({ ...formData, strategies })
+                                                        setProfitsInput(profits)
+                                                    }}
                                                     theme={theme}
                                                 />
                                             </div>
@@ -1374,50 +1310,7 @@ export const SignalsTriggerBot = () => {
                                                 />
                                             </div>
 
-                                            {/* Multiple Profits Input */}
-                                            {formData.strategies && formData.strategies.length > 0 && !formData.isScam && (
-                                                <div className="space-y-2">
-                                                    <div className="flex items-center justify-between">
-                                                        <label className={`text-xs font-semibold uppercase ${subTextColor}`}>Профиты по стратегиям</label>
-                                                        <button
-                                                            type="button"
-                                                            onClick={addProfitEntry}
-                                                            className="text-xs text-amber-500 hover:text-amber-400 transition-colors flex items-center gap-1"
-                                                        >
-                                                            <Plus className="w-3 h-3" />
-                                                            Добавить
-                                                        </button>
-                                                    </div>
 
-                                                    {profitsInput.length > 0 ? (
-                                                        <div className="space-y-2">
-                                                            {profitsInput.map((profit, idx) => (
-                                                                <div key={idx} className={`flex items-center gap-2 p-2 rounded-lg ${theme === 'dark' ? 'bg-black/30' : 'bg-gray-100'}`}>
-                                                                    <span className={`text-xs font-medium w-24 ${subTextColor}`}>
-                                                                        {profit.strategy}
-                                                                    </span>
-                                                                    <input
-                                                                        type="text"
-                                                                        placeholder="+28 или X3"
-                                                                        value={profit.value}
-                                                                        onChange={(e) => updateProfitValue(profit.strategy, e.target.value)}
-                                                                        className={`flex-1 p-1.5 rounded border text-sm outline-none ${theme === 'dark' ? 'bg-[#1a1f26] border-white/10 text-white' : 'bg-white border-gray-200 text-gray-900'}`}
-                                                                    />
-                                                                    <button
-                                                                        type="button"
-                                                                        onClick={() => removeProfitEntry(profit.strategy)}
-                                                                        className="p-1 rounded hover:bg-red-500/20 text-red-500 transition-colors"
-                                                                    >
-                                                                        <XCircle className="w-4 h-4" />
-                                                                    </button>
-                                                                </div>
-                                                            ))}
-                                                        </div>
-                                                    ) : (
-                                                        <p className={`text-xs ${subTextColor}`}>Выберите стратегии и добавьте профиты для каждой</p>
-                                                    )}
-                                                </div>
-                                            )}
 
                                             {/* Screenshot Upload */}
                                             <div className="space-y-2">
@@ -1531,6 +1424,27 @@ export const SignalsTriggerBot = () => {
                     </div>
                 )
             }
+            {/* Image Preview Modal */}
+            {previewImage && (
+                <div
+                    className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-md p-4 cursor-zoom-out"
+                    onClick={() => setPreviewImage(null)}
+                >
+                    <div className="relative max-w-full max-h-full">
+                        <img
+                            src={previewImage}
+                            alt="Preview"
+                            className="max-w-full max-h-[90vh] object-contain rounded-2xl shadow-2xl animate-in zoom-in-95 duration-200"
+                        />
+                        <button
+                            onClick={() => setPreviewImage(null)}
+                            className="absolute -top-12 right-0 p-3 text-white/70 hover:text-white transition-colors"
+                        >
+                            <X className="w-8 h-8" />
+                        </button>
+                    </div>
+                </div>
+            )}
         </>
     )
 }

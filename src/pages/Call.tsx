@@ -26,8 +26,12 @@ import {
   Plus,
   User,
   Zap,
-  ShieldAlert
+  ShieldAlert,
+  CheckCircle2,
+  XCircle,
+  History
 } from 'lucide-react'
+import { useAuthStore } from '@/store/authStore'
 import { useScrollLock } from '@/hooks/useScrollLock'
 
 type StatusFilter = 'all' | 'active' | 'completed' | 'cancelled' | 'reviewed'
@@ -59,6 +63,8 @@ const riskLabels: Record<CallRiskLevel, string> = {
 
 export const CallPage = () => {
   const { theme } = useThemeStore()
+  const { user } = useAuthStore()
+  const isAdmin = user?.id === '1'
   const [calls, setCalls] = useState<Call[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -106,6 +112,16 @@ export const CallPage = () => {
   const handleCancel = () => {
     setShowForm(false)
     setEditingCall(null)
+  }
+
+  const handleUpdateStatus = async (callId: string, status: 'active' | 'completed' | 'cancelled') => {
+    try {
+      await updateCall(callId, { status })
+      await loadCalls()
+    } catch (error) {
+      console.error('Error updating status:', error)
+      alert('Ошибка при обновлении статуса')
+    }
   }
 
   const handleEdit = (call: Call) => {
@@ -473,7 +489,7 @@ export const CallPage = () => {
                   className={`p-4 rounded-xl border ${borderColor} ${theme === 'dark' ? 'bg-gray-900 hover:bg-gray-800' : 'bg-white hover:bg-gray-50'
                     } transition-colors group`}
                 >
-                  <div className="flex items-start justify-between gap-4">
+                  <div className={`flex items-start justify-between gap-4 ${call.status !== 'active' ? 'opacity-60' : ''}`}>
                     {/* Left: Icon & Title */}
                     <div className="flex items-start gap-3 flex-1">
                       <div className={`p-2.5 rounded-xl bg-gradient-to-br ${meta.gradient} bg-opacity-10 text-white shrink-0`}>
@@ -488,6 +504,18 @@ export const CallPage = () => {
                           <span className={`px-2 py-0.5 rounded text-[10px] font-medium border ${borderColor} ${subtleColor}`}>
                             {meta.label}
                           </span>
+                          {call.status === 'completed' && (
+                            <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-500 px-2 py-0.5 rounded-full">
+                              <CheckCircle2 className="w-3 h-3" />
+                              Завершен
+                            </span>
+                          )}
+                          {call.status === 'cancelled' && (
+                            <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider bg-rose-500/10 text-rose-500 px-2 py-0.5 rounded-full">
+                              <XCircle className="w-3 h-3" />
+                              Отменен
+                            </span>
+                          )}
                         </div>
 
                         {/* Metrics Grid */}
@@ -528,7 +556,8 @@ export const CallPage = () => {
                     </div>
 
                     {/* Right: Actions */}
-                    <div className="flex items-center gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                    <div className="flex items-center gap-1 sm:gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                      {/* Copy Signal */}
                       <button
                         onClick={() => {
                           const text = `🚀 ${meta.label}: ${getPrimaryTitle(call)}\n` +
@@ -539,27 +568,65 @@ export const CallPage = () => {
                             (details.link ? `🔗 Ссылка: ${details.link}\n` : '') +
                             `👤 Трейдер: ${trader?.name || 'Admin'}`
                           navigator.clipboard.writeText(text)
-                          // Optional: add a success toast or visual cue
                         }}
                         className={`p-2 rounded-lg transition-colors ${theme === 'dark' ? 'hover:bg-emerald-500/20 text-emerald-400 hover:text-emerald-300' : 'hover:bg-emerald-50 text-emerald-600 hover:text-emerald-700'}`}
                         title="Копировать сигнал"
                       >
                         <Copy className="w-4 h-4" />
                       </button>
-                      <button
-                        onClick={() => handleEdit(call)}
-                        className={`p-2 rounded-lg transition-colors ${theme === 'dark' ? 'hover:bg-white/10 text-gray-400 hover:text-white' : 'hover:bg-gray-100 text-gray-500 hover:text-gray-900'}`}
-                        title="Редактировать"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteClick(call.id)}
-                        className={`p-2 rounded-lg transition-colors ${theme === 'dark' ? 'hover:bg-red-500/20 text-gray-400 hover:text-red-500' : 'hover:bg-red-50 text-gray-500 hover:text-red-600'}`}
-                        title="Удалить"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+
+                      {/* Status Actions (Author or Admin) */}
+                      {(isAdmin || user?.id === call.userId) && call.status === 'active' && (
+                        <>
+                          <button
+                            onClick={() => handleUpdateStatus(call.id, 'completed')}
+                            className={`p-2 rounded-lg transition-colors ${theme === 'dark' ? 'hover:bg-emerald-500/20 text-emerald-400' : 'hover:bg-emerald-50 text-emerald-600'}`}
+                            title="Завершить (Цели достигнуты)"
+                          >
+                            <CheckCircle2 className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleUpdateStatus(call.id, 'cancelled')}
+                            className={`p-2 rounded-lg transition-colors ${theme === 'dark' ? 'hover:bg-rose-500/20 text-rose-400' : 'hover:bg-rose-50 text-rose-600'}`}
+                            title="Отменить сигнал"
+                          >
+                            <XCircle className="w-4 h-4" />
+                          </button>
+                        </>
+                      )}
+
+                      {/* Restore Action (Author or Admin) */}
+                      {(isAdmin || user?.id === call.userId) && call.status !== 'active' && (
+                        <button
+                          onClick={() => handleUpdateStatus(call.id, 'active')}
+                          className={`p-2 rounded-lg transition-colors ${theme === 'dark' ? 'hover:bg-blue-500/20 text-blue-400' : 'hover:bg-blue-50 text-blue-600'}`}
+                          title="Вернуть в работу"
+                        >
+                          <History className="w-4 h-4" />
+                        </button>
+                      )}
+
+                      {/* Edit (Author or Admin) */}
+                      {(isAdmin || user?.id === call.userId) && (
+                        <button
+                          onClick={() => handleEdit(call)}
+                          className={`p-2 rounded-lg transition-colors ${theme === 'dark' ? 'hover:bg-white/10 text-gray-400 hover:text-white' : 'hover:bg-gray-100 text-gray-500 hover:text-gray-900'}`}
+                          title="Редактировать"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+                      )}
+
+                      {/* Delete (Admin Only) */}
+                      {isAdmin && (
+                        <button
+                          onClick={() => handleDeleteClick(call.id)}
+                          className={`p-2 rounded-lg transition-colors ${theme === 'dark' ? 'hover:bg-red-500/20 text-red-400' : 'hover:bg-red-50 text-red-600'}`}
+                          title="Удалить"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
