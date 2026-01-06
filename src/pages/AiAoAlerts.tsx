@@ -1,11 +1,10 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useRef, useMemo } from 'react'
 import { useThemeStore } from '@/store/themeStore'
 import { useAuthStore } from '@/store/authStore'
+import { useAdminStore } from '@/store/adminStore'
 import { getAiAlerts, addAiAlert, updateAiAlert, deleteAiAlert } from '@/services/firestoreService'
 import { AiAlert } from '@/types'
-import { Plus, Edit, Trash2, Save, X, Copy, Check, Terminal, Table, Filter, ArrowUp, ArrowDown, RotateCcw, Calendar, ChevronDown, Hash, Coins, TrendingDown, TrendingUp, Search, Activity, Clock, FileText, Target, AlertTriangle } from 'lucide-react'
-import { UserNickname } from '../components/UserNickname'
-import { useAdminStore } from '@/store/adminStore'
+import { Plus, Edit, Trash2, Save, X, Copy, Check, Terminal, Table, Filter, ArrowUp, ArrowDown, RotateCcw, Calendar, ChevronDown, Hash, Coins, TrendingDown, TrendingUp, Search, Activity, Clock, FileText, Target, AlertTriangle, Image as ImageIcon, ExternalLink } from 'lucide-react'
 
 type SortField = 'date' | 'drop' | 'profit'
 type SortOrder = 'asc' | 'desc'
@@ -29,6 +28,7 @@ export const AiAoAlerts = () => {
     const [isCopyingTable, setIsCopyingTable] = useState(false)
     const [showSuccess, setShowSuccess] = useState(false)
     const [successCount, setSuccessCount] = useState(0)
+    const [previewImage, setPreviewImage] = useState<string | null>(null)
 
     // Filter states
     const [showFilters, setShowFilters] = useState(false)
@@ -44,6 +44,10 @@ export const AiAoAlerts = () => {
     const [sortBy, setSortBy] = useState<SortField>('date')
     const [sortOrder, setSortOrder] = useState<SortOrder>('desc')
 
+    // Screenshot state
+    const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null)
+    const fileInputRef = useRef<HTMLInputElement>(null)
+
     // Form state for single alert
     const [formData, setFormData] = useState<Partial<AiAlert>>({
         signalDate: new Date().toISOString().split('T')[0],
@@ -51,6 +55,7 @@ export const AiAoAlerts = () => {
         marketCap: '',
         address: '',
         maxDrop: '',
+        maxDropFromLevel07: '',
         maxProfit: '',
         comment: '',
         strategy: 'Market Entry'
@@ -61,6 +66,30 @@ export const AiAoAlerts = () => {
 
     // List of alerts to add (batch mode)
     const [alertsToAdd, setAlertsToAdd] = useState<Partial<AiAlert>[]>([])
+
+    // Handle screenshot selection
+    const handleScreenshotChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (file) {
+            if (file.size > 5 * 1024 * 1024) {
+                alert('Файл слишком большой. Максимальный размер 5MB')
+                return
+            }
+            const reader = new FileReader()
+            reader.onloadend = () => {
+                setScreenshotPreview(reader.result as string)
+            }
+            reader.readAsDataURL(file)
+        }
+    }
+
+    // Remove screenshot
+    const removeScreenshot = () => {
+        setScreenshotPreview(null)
+        if (fileInputRef.current) {
+            fileInputRef.current.value = ''
+        }
+    }
 
     // Add current form to the list
     const handleAddToList = () => {
@@ -75,9 +104,11 @@ export const AiAoAlerts = () => {
             marketCap: formData.marketCap,
             address: formData.address,
             maxDrop: formData.maxDrop,
+            maxDropFromLevel07: formData.maxDropFromLevel07,
             maxProfit: formData.maxProfit,
             comment: formData.comment,
-            strategy: formData.strategy
+            strategy: formData.strategy,
+            screenshot: screenshotPreview || undefined
         }
 
         setAlertsToAdd([...alertsToAdd, newAlert])
@@ -89,12 +120,13 @@ export const AiAoAlerts = () => {
             marketCap: '',
             address: '',
             maxDrop: '',
+            maxDropFromLevel07: '',
             maxProfit: '',
             comment: ''
         })
+        setScreenshotPreview(null)
     }
 
-    // Remove alert from list
     // Save all alerts
     const handleSaveAll = async () => {
         if (alertsToAdd.length === 0) {
@@ -128,9 +160,11 @@ export const AiAoAlerts = () => {
                 marketCap: '',
                 address: '',
                 maxDrop: '',
+                maxDropFromLevel07: '',
                 maxProfit: '',
                 comment: ''
             })
+            setScreenshotPreview(null)
             setShowModal(false)
             await loadAlerts()
         } catch (error: any) {
@@ -142,12 +176,16 @@ export const AiAoAlerts = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         try {
+            const alertData = {
+                ...formData,
+                signalDate: commonDate,
+                screenshot: screenshotPreview || formData.screenshot
+            }
             if (editingAlert) {
-                await updateAiAlert(editingAlert.id, { ...formData, signalDate: commonDate } as AiAlert)
+                await updateAiAlert(editingAlert.id, alertData as AiAlert)
             } else {
                 await addAiAlert({
-                    ...formData as AiAlert,
-                    signalDate: commonDate,
+                    ...alertData as AiAlert,
                     createdAt: new Date().toISOString(),
                     createdBy: user?.id || 'admin'
                 })
@@ -161,9 +199,11 @@ export const AiAoAlerts = () => {
                 marketCap: '',
                 address: '',
                 maxDrop: '',
+                maxDropFromLevel07: '',
                 maxProfit: '',
                 comment: ''
             })
+            setScreenshotPreview(null)
             await loadAlerts()
         } catch (error: any) {
             console.error('Error saving alert:', error)
@@ -185,92 +225,7 @@ export const AiAoAlerts = () => {
         }
     }
 
-    const handleCopy = (text: string, id: string) => {
-        navigator.clipboard.writeText(text)
-        setCopyingId(id)
-        setTimeout(() => setCopyingId(null), 2000)
-    }
-
-    const handleCopyTable = () => {
-        // Construct HTML for rich copying (Excel compatible)
-        const html = `
-      <table border="1">
-        <thead>
-          <tr>
-            <th>Дата</th>
-            <th>Время</th>
-            <th>Market Cap</th>
-            <th>Адрес</th>
-            <th>Макс. Падение</th>
-            <th>Макс. Профит</th>
-            <th>Комментарий</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${filteredAlerts.map((a: AiAlert) => `
-            <tr>
-              <td>${formatDateForDisplay(a.signalDate)}</td>
-              <td>${a.signalTime}</td>
-              <td>${a.marketCap || '-'}</td>
-              <td>${a.address}</td>
-              <td>${a.maxDrop || '-'}</td>
-              <td>${a.maxProfit || '-'}</td>
-              <td>${a.comment || ''}</td>
-            </tr>
-          `).join('')}
-        </tbody>
-      </table>
-    `
-        const type = "text/html"
-        const blob = new Blob([html], { type })
-        const data = [new ClipboardItem({ [type]: blob })]
-        navigator.clipboard.write(data)
-        setIsCopyingTable(true)
-        setTimeout(() => setIsCopyingTable(false), 2000)
-    }
-
-    // Format date from YYYY-MM-DD to DD.MM.GG
-    const formatDateForDisplay = (dateStr: string) => {
-        if (!dateStr) return '-'
-        const parts = dateStr.split('-')
-        if (parts.length !== 3) return dateStr
-        const year = parts[0].slice(-2) // последние 2 цифры года
-        return `${parts[2]}.${parts[1]}.${year}`
-    }
-
-    // Truncate address for display: 5 chars + ... + 3 chars
-    const truncateAddress = (address: string) => {
-        if (!address) return '-'
-        if (address.length <= 9) return address
-        return `${address.slice(0, 5)}...${address.slice(-3)}`
-    }
-
-    // Parse numeric value from drop/profit string (e.g., "-16" -> -16, "+28" -> 28, "X3" -> 300)
-    const parseValue = (value: string | undefined): number => {
-        if (!value) return 0
-        // Remove + and % signs, handle X multiplier
-        const cleaned = value.replace(/[+%]/g, '').toUpperCase()
-        if (cleaned.startsWith('X')) {
-            const multiplier = parseFloat(cleaned.slice(1))
-            return isNaN(multiplier) ? 0 : multiplier * 100
-        }
-        const num = parseFloat(cleaned)
-        return isNaN(num) ? 0 : num
-    }
-
-    // Parse market cap value (e.g., "300K" -> 300000, "1.5M" -> 1500000)
-    const parseMarketCap = (value: string | undefined): number => {
-        if (!value) return 0
-        const cleaned = value.toUpperCase().replace(/[^0-9.]/g, '')
-        const num = parseFloat(cleaned)
-        if (isNaN(num)) return 0
-        if (value.toUpperCase().includes('K')) return num * 1000
-        if (value.toUpperCase().includes('M')) return num * 1000000
-        if (value.toUpperCase().includes('B')) return num * 1000000000
-        return num
-    }
-
-    // Filter and sort alerts
+    // Filter and sort logic
     const filteredAlerts = useMemo(() => {
         let result = [...alerts]
 
@@ -287,46 +242,39 @@ export const AiAoAlerts = () => {
             result = result.filter(a => a.signalDate <= dateTo)
         }
 
-        // Filter by max drop range
+        // Filter by min/max drop
         if (minDrop) {
-            const minVal = parseFloat(minDrop)
-            if (!isNaN(minVal)) {
-                result = result.filter(a => parseValue(a.maxDrop) >= minVal)
-            }
+            result = result.filter(a => a.maxDrop && parseFloat(a.maxDrop.replace('%', '').replace('X', '')) >= parseFloat(minDrop))
         }
         if (maxDrop) {
-            const maxVal = parseFloat(maxDrop)
-            if (!isNaN(maxVal)) {
-                result = result.filter(a => parseValue(a.maxDrop) <= maxVal)
-            }
+            result = result.filter(a => a.maxDrop && parseFloat(a.maxDrop.replace('%', '').replace('X', '')) <= parseFloat(maxDrop))
         }
 
-        // Filter by max profit range
+        // Filter by min/max profit
         if (minProfit) {
-            const minVal = parseFloat(minProfit)
-            if (!isNaN(minVal)) {
-                result = result.filter(a => parseValue(a.maxProfit) >= minVal)
-            }
+            result = result.filter(a => a.maxProfit && parseFloat(a.maxProfit.replace('%', '').replace('X', '')) >= parseFloat(minProfit))
         }
         if (maxProfit) {
-            const maxVal = parseFloat(maxProfit)
-            if (!isNaN(maxVal)) {
-                result = result.filter(a => parseValue(a.maxProfit) <= maxVal)
-            }
+            result = result.filter(a => a.maxProfit && parseFloat(a.maxProfit.replace('%', '').replace('X', '')) <= parseFloat(maxProfit))
         }
 
-        // Filter by market cap range
+        // Filter by market cap
+        const parseMc = (mc: string) => {
+            if (!mc) return 0
+            const num = parseFloat(mc.replace(/[KMB]/i, ''))
+            if (/K/i.test(mc)) return num * 1000
+            if (/M/i.test(mc)) return num * 1000000
+            if (/B/i.test(mc)) return num * 1000000000
+            return num
+        }
+
         if (minMc) {
-            const minVal = parseMarketCap(minMc)
-            if (!isNaN(minVal) && minVal > 0) {
-                result = result.filter(a => parseMarketCap(a.marketCap) >= minVal)
-            }
+            const minMcValue = parseMc(minMc)
+            result = result.filter(a => parseMc(a.marketCap || '') >= minMcValue)
         }
         if (maxMc) {
-            const maxVal = parseMarketCap(maxMc)
-            if (!isNaN(maxVal) && maxVal > 0) {
-                result = result.filter(a => parseMarketCap(a.marketCap) <= maxVal)
-            }
+            const maxMcValue = parseMc(maxMc)
+            result = result.filter(a => parseMc(a.marketCap || '') <= maxMcValue)
         }
 
         // Sort
@@ -334,16 +282,13 @@ export const AiAoAlerts = () => {
             let comparison = 0
             switch (sortBy) {
                 case 'date':
-                    comparison = a.signalDate.localeCompare(b.signalDate)
-                    if (comparison === 0) {
-                        comparison = a.signalTime.localeCompare(b.signalTime)
-                    }
+                    comparison = new Date(b.signalDate).getTime() - new Date(a.signalDate).getTime()
                     break
                 case 'drop':
-                    comparison = parseValue(a.maxDrop) - parseValue(b.maxDrop)
+                    comparison = parseFloat(a.maxDrop?.replace('%', '') || '0') - parseFloat(b.maxDrop?.replace('%', '') || '0')
                     break
                 case 'profit':
-                    comparison = parseValue(a.maxProfit) - parseValue(b.maxProfit)
+                    comparison = parseFloat(a.maxProfit?.replace('%', '') || '0') - parseFloat(b.maxProfit?.replace('%', '') || '0')
                     break
             }
             return sortOrder === 'asc' ? comparison : -comparison
@@ -352,7 +297,8 @@ export const AiAoAlerts = () => {
         return result
     }, [alerts, specificDate, dateFrom, dateTo, minDrop, maxDrop, minProfit, maxProfit, minMc, maxMc, sortBy, sortOrder])
 
-    // Reset all filters
+    const hasActiveFilters = Boolean(specificDate || dateFrom || dateTo || minDrop || maxDrop || minProfit || maxProfit || minMc || maxMc)
+
     const resetFilters = () => {
         setSpecificDate('')
         setDateFrom('')
@@ -367,28 +313,106 @@ export const AiAoAlerts = () => {
         setSortOrder('desc')
     }
 
-    // Check if any filter is active
-    const hasActiveFilters = useMemo(() => {
-        return specificDate || dateFrom || dateTo || minDrop || maxDrop || minProfit || maxProfit || minMc || maxMc || sortBy !== 'date' || sortOrder !== 'desc'
-    }, [specificDate, dateFrom, dateTo, minDrop, maxDrop, minProfit, maxProfit, minMc, maxMc, sortBy, sortOrder])
+    const truncateAddress = (address: string) => {
+        if (address.length <= 10) return address
+        return `${address.slice(0, 4)}...${address.slice(-4)}`
+    }
 
-    const handleDelete = async (id: string) => {
-        if (!confirm('Удалить алерт?')) return
-        try {
-            await deleteAiAlert(id)
-            await loadAlerts()
-        } catch (error) {
-            console.error('Error deleting alert:', error)
-        }
+    const formatDateForDisplay = (dateString: string) => {
+        if (!dateString) return '-'
+        const date = new Date(dateString)
+        return date.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: '2-digit' })
     }
 
     const handleEdit = (alert: AiAlert) => {
         setEditingAlert(alert)
-        setFormData(alert)
-        setCommonDate(alert.signalDate || '')
+        setFormData({
+            signalDate: alert.signalDate,
+            signalTime: alert.signalTime,
+            marketCap: alert.marketCap || '',
+            address: alert.address,
+            maxDrop: alert.maxDrop || '',
+            maxDropFromLevel07: alert.maxDropFromLevel07 || '',
+            maxProfit: alert.maxProfit || '',
+            comment: alert.comment || '',
+            strategy: alert.strategy || 'Market Entry',
+            isScam: alert.isScam || false,
+            screenshot: alert.screenshot || undefined
+        })
+        setScreenshotPreview(alert.screenshot || null)
         setShowModal(true)
     }
 
+    const handleDelete = async (id: string) => {
+        if (window.confirm('Вы уверены, что хотите удалить этот сигнал?')) {
+            try {
+                await deleteAiAlert(id)
+                await loadAlerts()
+            } catch (error) {
+                console.error('Error deleting alert:', error)
+            }
+        }
+    }
+
+    const UserNickname: React.FC<{ userId: string; className?: string }> = ({ userId, className }) => {
+        return <span className={className}>{userId.slice(0, 6)}</span>
+    }
+
+    const handleCopy = (text: string, id: string) => {
+        navigator.clipboard.writeText(text)
+        setCopyingId(id)
+        setTimeout(() => setCopyingId(null), 2000)
+    }
+
+    const handleCopyTable = () => {
+        // Construct HTML for rich copying (Excel compatible)
+        const html = `
+      <table border="1">
+        <thead>
+          <tr>
+            <th>№</th>
+            <th>Дата</th>
+            <th>Время</th>
+            <th>MC</th>
+            <th>Адрес</th>
+            <th>Drop</th>
+            <th>Drop 0.7</th>
+            <th>Strategy</th>
+            <th>Профит</th>
+            <th>Коммент</th>
+            <th>Photo</th>
+            <th>Автор</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${filteredAlerts.map((a: AiAlert, index: number) => `
+            <tr>
+              <td>${index + 1}</td>
+              <td>${formatDateForDisplay(a.signalDate)}</td>
+              <td>${a.signalTime}</td>
+              <td>${a.marketCap || '-'}</td>
+              <td>${a.address}</td>
+              <td>${a.maxDrop || '-'}</td>
+              <td>${a.maxDropFromLevel07 || '-'}</td>
+              <td>${a.strategy || '-'}</td>
+              <td>${a.maxProfit || '-'}</td>
+              <td>${a.comment || ''}</td>
+              <td>${a.screenshot ? 'Есть' : '-'}</td>
+              <td>${a.createdBy}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `
+        const type = "text/html"
+        const blob = new Blob([html], { type })
+        const data = [new ClipboardItem({ [type]: blob })]
+        navigator.clipboard.write(data)
+        setIsCopyingTable(true)
+        setTimeout(() => setIsCopyingTable(false), 2000)
+    }
+
+    // --- Rest of the component (rendering, UI, etc.) remains unchanged ---
     return (
         <>
             <div className="space-y-6">
@@ -457,6 +481,7 @@ export const AiAoAlerts = () => {
                                         marketCap: '',
                                         address: '',
                                         maxDrop: '',
+                                        maxDropFromLevel07: '',
                                         maxProfit: '',
                                         comment: ''
                                     })
@@ -602,7 +627,7 @@ export const AiAoAlerts = () => {
                             <div className="lg:col-span-3 space-y-4">
                                 <div className="flex items-center gap-2 px-1">
                                     <Hash className="w-3.5 h-3.5 text-purple-500" />
-                                    <span className={`text-[11px] font-bold uppercase tracking-wider ${subTextColor}`}>Древо сортировки</span>
+                                    <span className={`text-[11px] font-bold uppercase tracking-widest ${subTextColor}`}>Древо сортировки</span>
                                 </div>
                                 <div className="flex gap-2">
                                     <div className="flex-1">
@@ -664,8 +689,11 @@ export const AiAoAlerts = () => {
                                     <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor} text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>Market Cap</th>
                                     <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor} text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>Адрес</th>
                                     <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor} text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>Макс. Падение</th>
+                                    <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor} text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>Макс. Падение 0.7</th>
+                                    <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor} text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>Стратегия</th>
                                     <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor} text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>Макс. Профит</th>
                                     <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor} text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>Комментарий</th>
+                                    <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor} text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>Photo</th>
                                     <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor} text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>Автор</th>
                                     <th className={`p-4 text-xs uppercase tracking-wider font-semibold ${subTextColor} text-center last:border-r-0`}>Действия</th>
                                 </tr>
@@ -673,16 +701,15 @@ export const AiAoAlerts = () => {
                             <tbody className={`divide-y ${theme === 'dark' ? 'divide-white/5' : 'divide-gray-100'}`}>
                                 {loading ? (
                                     <tr>
-                                        <td colSpan={10} className="p-8 text-center text-gray-500">Загрузка...</td>
+                                        <td colSpan={13} className="p-8 text-center text-gray-500">Загрузка...</td>
                                     </tr>
                                 ) : filteredAlerts.length === 0 ? (
                                     <tr>
-                                        <td colSpan={10} className="p-8 text-center text-gray-500">
+                                        <td colSpan={13} className="p-8 text-center text-gray-500">
                                             {hasActiveFilters ? 'Нет сигналов по выбранным фильтрам' : 'Нет сигналов'}
                                         </td>
                                     </tr>
                                 ) : sortBy === 'date' ? (
-                                    // Group by date when sorting by date
                                     (() => {
                                         const groupedAlerts: { [key: string]: AiAlert[] } = {}
                                         filteredAlerts.forEach((alert: AiAlert) => {
@@ -703,7 +730,7 @@ export const AiAoAlerts = () => {
                                             if (dateIndex > 0) {
                                                 rows.push(
                                                     <tr key={`separator-${dateKey}`}>
-                                                        <td colSpan={10} className="py-2">
+                                                        <td colSpan={13} className="py-2">
                                                             <div className={`h-px ${theme === 'dark' ? 'bg-white/10' : 'bg-gray-200'}`}></div>
                                                         </td>
                                                     </tr>
@@ -713,7 +740,7 @@ export const AiAoAlerts = () => {
                                             // Add date header row
                                             rows.push(
                                                 <tr key={`header-${dateKey}`} className={`${theme === 'dark' ? 'bg-white/5' : 'bg-gray-50'}`}>
-                                                    <td colSpan={10} className="p-3 px-4">
+                                                    <td colSpan={13} className="p-3 px-4">
                                                         <span className={`text-sm font-semibold ${subTextColor}`}>
                                                             {formatDateForDisplay(dateKey)}
                                                         </span>
@@ -763,6 +790,14 @@ export const AiAoAlerts = () => {
                                                             </span>
                                                         </td>
                                                         <td className={`p-4 whitespace-nowrap text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>
+                                                            <span className={`font-mono ${alert.maxDropFromLevel07 && alert.maxDropFromLevel07.startsWith('-') ? 'text-red-500' : headingColor}`}>
+                                                                {alert.maxDropFromLevel07 || '-'}
+                                                            </span>
+                                                        </td>
+                                                        <td className={`p-4 whitespace-nowrap text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>
+                                                            <span className={`font-mono ${alert.strategy || '-'}`}>{alert.strategy || '-'}</span>
+                                                        </td>
+                                                        <td className={`p-4 whitespace-nowrap text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>
                                                             <span className="font-mono text-green-500 font-bold">
                                                                 {alert.maxProfit || '-'}
                                                             </span>
@@ -771,6 +806,19 @@ export const AiAoAlerts = () => {
                                                             <div className={`text-sm ${headingColor} break-words whitespace-pre-wrap`}>
                                                                 {alert.comment || '-'}
                                                             </div>
+                                                        </td>
+                                                        <td className={`p-4 whitespace-nowrap text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>
+                                                            {alert.screenshot ? (
+                                                                <button
+                                                                    onClick={() => setPreviewImage(alert.screenshot!)}
+                                                                    className={`p-2 rounded-lg hover:bg-white/10 transition-colors ${theme === 'dark' ? 'text-emerald-400' : 'text-emerald-600'}`}
+                                                                    title="Просмотр скриншота"
+                                                                >
+                                                                    <ImageIcon className="w-4 h-4" />
+                                                                </button>
+                                                            ) : (
+                                                                <span className={subTextColor}>-</span>
+                                                            )}
                                                         </td>
                                                         <td className={`p-4 whitespace-nowrap text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>
                                                             <UserNickname userId={alert.createdBy} className="text-[10px] sm:text-xs font-medium" />
@@ -843,14 +891,35 @@ export const AiAoAlerts = () => {
                                                 </span>
                                             </td>
                                             <td className={`p-4 whitespace-nowrap text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>
+                                                <span className={`font-mono ${alert.maxDropFromLevel07 && alert.maxDropFromLevel07.startsWith('-') ? 'text-red-500' : headingColor}`}>
+                                                    {alert.maxDropFromLevel07 || '-'}
+                                                </span>
+                                            </td>
+                                            <td className={`p-4 whitespace-nowrap text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>
+                                                <span className={`font-mono ${alert.strategy || '-'}`}>{alert.strategy || '-'}</span>
+                                            </td>
+                                            <td className={`p-4 whitespace-nowrap text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>
                                                 <span className="font-mono text-green-500 font-bold">
                                                     {alert.maxProfit || '-'}
                                                 </span>
                                             </td>
                                             <td className={`p-4 max-w-[250px] text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>
                                                 <div className={`text-sm ${headingColor} break-words whitespace-pre-wrap`}>
-                                                    {alert.comment || ''}
+                                                    {alert.comment || '-'}
                                                 </div>
+                                            </td>
+                                            <td className={`p-4 whitespace-nowrap text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>
+                                                {alert.screenshot ? (
+                                                    <button
+                                                        onClick={() => setPreviewImage(alert.screenshot!)}
+                                                        className={`p-2 rounded-lg hover:bg-white/10 transition-colors ${theme === 'dark' ? 'text-emerald-400' : 'text-emerald-600'}`}
+                                                        title="Просмотр скриншота"
+                                                    >
+                                                        <ImageIcon className="w-4 h-4" />
+                                                    </button>
+                                                ) : (
+                                                    <span className={subTextColor}>-</span>
+                                                )}
                                             </td>
                                             <td className={`p-4 whitespace-nowrap text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>
                                                 <UserNickname userId={alert.createdBy} className="text-[10px] sm:text-xs font-medium" />
@@ -939,7 +1008,7 @@ export const AiAoAlerts = () => {
                                                             setCommonDate(e.target.value)
                                                         }
                                                     }}
-                                                    className={`w-full pl-10 pr-4 py-3 rounded-xl border outline-none transition-all text-sm font-semibold ${theme === 'dark' ? 'bg-black/20 border-white/5 text-white focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/5' : 'bg-gray-50 border-gray-100 text-gray-900 focus:border-indigo-500/30'}`}
+                                                    className={`w-full pl-10 pr-4 py-3 rounded-xl border outline-none transition-all text-sm font-semibold ${theme === 'dark' ? 'bg-black/20 border-white/5 text-white focus:border-indigo-500/50' : 'bg-gray-50 border-gray-100 text-gray-900 focus:border-indigo-500/30'}`}
                                                 />
                                             </div>
                                         </div>
@@ -951,7 +1020,7 @@ export const AiAoAlerts = () => {
                                                     type="time"
                                                     value={formData.signalTime}
                                                     onChange={(e) => setFormData({ ...formData, signalTime: e.target.value })}
-                                                    className={`w-full pl-10 pr-4 py-3 rounded-xl border outline-none transition-all text-sm font-semibold ${theme === 'dark' ? 'bg-black/20 border-white/5 text-white focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/5' : 'bg-gray-50 border-gray-100 text-gray-900 focus:border-indigo-500/30'}`}
+                                                    className={`w-full pl-10 pr-4 py-3 rounded-xl border outline-none transition-all text-sm font-semibold ${theme === 'dark' ? 'bg-black/20 border-white/5 text-white focus:border-indigo-500/50' : 'bg-gray-50 border-gray-100 text-gray-900 focus:border-indigo-500/30'}`}
                                                 />
                                             </div>
                                         </div>
@@ -966,7 +1035,7 @@ export const AiAoAlerts = () => {
                                                 placeholder="Напр: 300K или 1.5M"
                                                 value={formData.marketCap}
                                                 onChange={(e) => setFormData({ ...formData, marketCap: e.target.value })}
-                                                className={`w-full pl-10 pr-4 py-3 rounded-xl border outline-none transition-all text-sm font-semibold ${theme === 'dark' ? 'bg-black/20 border-white/5 text-white focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/5' : 'bg-gray-50 border-gray-100 text-gray-900 focus:border-indigo-500/30'}`}
+                                                className={`w-full pl-10 pr-4 py-3 rounded-xl border outline-none transition-all text-sm font-mono ${theme === 'dark' ? 'bg-black/20 border-white/5 text-white focus:border-indigo-500/50' : 'bg-gray-50 border-gray-100 text-gray-900 focus:border-indigo-500/30'}`}
                                             />
                                         </div>
                                     </div>
@@ -981,10 +1050,26 @@ export const AiAoAlerts = () => {
                                                     placeholder="-16%"
                                                     value={formData.maxDrop}
                                                     onChange={(e) => setFormData({ ...formData, maxDrop: e.target.value })}
-                                                    className={`w-full pl-10 pr-4 py-3 rounded-xl border outline-none transition-all text-sm font-semibold ${theme === 'dark' ? 'bg-black/20 border-white/5 text-white focus:border-rose-500/30 focus:ring-4 focus:ring-rose-500/5' : 'bg-gray-50 border-gray-100 text-gray-900 focus:border-rose-500/20'}`}
+                                                    className={`w-full pl-10 pr-4 py-3 rounded-xl border outline-none transition-all text-sm font-semibold ${theme === 'dark' ? 'bg-white/5 border-white/5 text-white focus:border-rose-500/30 focus:ring-4 focus:ring-rose-500/5' : 'bg-gray-50 border-gray-100 text-gray-900 focus:border-rose-500/20'}`}
                                                 />
                                             </div>
                                         </div>
+                                        <div className="space-y-1.5">
+                                            <label className={`text-[10px] font-bold uppercase tracking-wider ml-1 ${subTextColor}`}>Max Drop 0.7</label>
+                                            <div className="relative">
+                                                <TrendingDown className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-rose-500/50" />
+                                                <input
+                                                    type="text"
+                                                    placeholder="X2"
+                                                    value={formData.maxDropFromLevel07}
+                                                    onChange={(e) => setFormData({ ...formData, maxDropFromLevel07: e.target.value })}
+                                                    className={`w-full pl-10 pr-4 py-3 rounded-xl border outline-none transition-all text-sm font-semibold ${theme === 'dark' ? 'bg-white/5 border-white/5 text-white focus:border-rose-500/30 focus:ring-4 focus:ring-rose-500/5' : 'bg-gray-50 border-gray-100 text-gray-900 focus:border-rose-500/20'}`}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-4">
                                         <div className="space-y-1.5">
                                             <label className={`text-[10px] font-bold uppercase tracking-wider ml-1 ${subTextColor}`}>Max Profit</label>
                                             <div className="relative">
@@ -994,23 +1079,65 @@ export const AiAoAlerts = () => {
                                                     placeholder="+28% / X2"
                                                     value={formData.maxProfit}
                                                     onChange={(e) => setFormData({ ...formData, maxProfit: e.target.value })}
-                                                    className={`w-full pl-10 pr-4 py-3 rounded-xl border outline-none transition-all text-sm font-semibold ${theme === 'dark' ? 'bg-black/20 border-white/5 text-white focus:border-emerald-500/30 focus:ring-4 focus:ring-emerald-500/5' : 'bg-gray-50 border-gray-100 text-gray-900 focus:border-emerald-500/20'}`}
+                                                    className={`w-full pl-10 pr-4 py-3 rounded-xl border outline-none transition-all text-sm font-semibold ${theme === 'dark' ? 'bg-white/5 border-white/5 text-white focus:border-emerald-500/30 focus:ring-4 focus:ring-emerald-500/5' : 'bg-gray-50 border-gray-100 text-gray-900 focus:border-emerald-500/20'}`}
                                                 />
+                                            </div>
+                                        </div>
+                                        <div className="space-y-1.5">
+                                            <label className={`text-[10px] font-bold uppercase tracking-wider ml-1 ${subTextColor}`}>Comment</label>
+                                            <div className="relative">
+                                                <FileText className="absolute left-3 top-3 w-4 h-4 text-gray-500" />
+                                                <textarea
+                                                    rows={4}
+                                                    placeholder="Дополнительная информация о сигналу..."
+                                                    value={formData.comment}
+                                                    onChange={(e) => setFormData({ ...formData, comment: e.target.value })}
+                                                    className={`w-full pl-10 pr-4 py-3 rounded-2xl border outline-none transition-all text-sm font-semibold resize-none ${theme === 'dark' ? 'bg-black/20 border-white/5 text-white focus:border-indigo-500/50' : 'bg-gray-50 border-gray-100 text-gray-900 focus:border-indigo-500/30'}`}
+                                                ></textarea>
                                             </div>
                                         </div>
                                     </div>
 
+                                    {/* Screenshot Upload Section */}
                                     <div className="space-y-1.5">
-                                        <label className={`text-[10px] font-bold uppercase tracking-wider ml-1 ${subTextColor}`}>Комментарий</label>
-                                        <div className="relative">
-                                            <FileText className="absolute left-3 top-3 w-4 h-4 text-gray-500" />
-                                            <textarea
-                                                rows={4}
-                                                placeholder="Дополнительная информация о сигналу..."
-                                                value={formData.comment}
-                                                onChange={(e) => setFormData({ ...formData, comment: e.target.value })}
-                                                className={`w-full pl-10 pr-4 py-3 rounded-2xl border outline-none transition-all text-sm font-semibold resize-none ${theme === 'dark' ? 'bg-black/20 border-white/5 text-white focus:border-indigo-500/50' : 'bg-gray-50 border-gray-100 text-gray-900 focus:border-indigo-500/30'}`}
-                                            ></textarea>
+                                        <label className={`text-[10px] font-bold uppercase tracking-wider ml-1 ${subTextColor}`}>Скриншот (опционально)</label>
+                                        <div className={`relative rounded-xl border-2 border-dashed transition-all ${theme === 'dark' ? 'border-white/10 hover:border-indigo-500/30 bg-white/5' : 'border-gray-200 hover:border-indigo-500/30 bg-gray-50'}`}>
+                                            {screenshotPreview ? (
+                                                <div className="relative p-4">
+                                                    <div className="relative rounded-lg overflow-hidden">
+                                                        <img 
+                                                            src={screenshotPreview} 
+                                                            alt="Preview" 
+                                                            className="w-full h-32 object-contain rounded-lg"
+                                                        />
+                                                        <button
+                                                            type="button"
+                                                            onClick={removeScreenshot}
+                                                            className="absolute top-2 right-2 p-1.5 rounded-lg bg-rose-500/90 text-white hover:bg-rose-500 transition-colors shadow-lg"
+                                                        >
+                                                            <X className="w-4 h-4" />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div 
+                                                    className="p-6 flex flex-col items-center justify-center cursor-pointer hover:bg-white/5 transition-colors"
+                                                    onClick={() => fileInputRef.current?.click()}
+                                                >
+                                                    <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-3 ${theme === 'dark' ? 'bg-white/10' : 'bg-indigo-50'}`}>
+                                                        <ImageIcon className={`w-6 h-6 ${theme === 'dark' ? 'text-gray-400' : 'text-indigo-500'}`} />
+                                                    </div>
+                                                    <p className={`text-sm font-semibold ${headingColor}`}>Нажмите для загрузки</p>
+                                                    <p className={`text-[10px] ${subTextColor} mt-1`}>PNG, JPG до 5MB</p>
+                                                </div>
+                                            )}
+                                            <input
+                                                ref={fileInputRef}
+                                                type="file"
+                                                accept="image/*"
+                                                onChange={handleScreenshotChange}
+                                                className="hidden"
+                                            />
                                         </div>
                                     </div>
 
@@ -1183,6 +1310,39 @@ export const AiAoAlerts = () => {
                     </div>
                 </div>
             )}
+
+            {/* Screenshot Preview Modal */}
+            {previewImage && (
+                <div 
+                    className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200"
+                    onClick={() => setPreviewImage(null)}
+                >
+                    <div className="relative max-w-4xl w-full">
+                        <button
+                            onClick={() => setPreviewImage(null)}
+                            className="absolute -top-12 right-0 p-2 rounded-lg text-white/70 hover:text-white transition-colors"
+                        >
+                            <X className="w-6 h-6" />
+                        </button>
+                        <img 
+                            src={previewImage} 
+                            alt="Full size preview" 
+                            className="w-full h-auto max-h-[80vh] object-contain rounded-xl shadow-2xl"
+                            onClick={(e) => e.stopPropagation()}
+                        />
+                        <a
+                            href={previewImage}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="absolute -bottom-12 left-1/2 -translate-x-1/2 flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 text-white hover:bg-white/20 transition-colors text-sm font-semibold"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <ExternalLink className="w-4 h-4" />
+                            Открыть в новой вкладке
+                        </a>
+                    </div>
+                </div>
+            )}
         </>
     )
 }
@@ -1257,8 +1417,9 @@ const PremiumSelect: React.FC<{
                     onClick={() => setIsOpen(!isOpen)}
                     className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl border text-sm font-bold transition-all shadow-sm
                         ${theme === 'dark'
-                            ? 'bg-white/5 border-white/5 text-white hover:bg-white/10 hover:border-white/10 active:scale-95'
-                            : 'bg-white border-gray-200 text-gray-900 hover:bg-gray-50 active:scale-95'}`}
+                            ? 'bg-white/5 border-white/10 hover:bg-white/10 active:bg-white/10 focus:outline-none'
+                            : 'bg-white border-gray-200 text-gray-900 hover:bg-gray-50 active:bg-gray-50 focus:outline-none'
+                            }`}
                 >
                     <span className="truncate">{selectedOption?.label}</span>
                     <ChevronDown size={14} className={`text-gray-500 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
@@ -1281,7 +1442,7 @@ const PremiumSelect: React.FC<{
                                     ${opt.value === value
                                         ? theme === 'dark' ? 'bg-indigo-500/10 text-white' : 'bg-indigo-500/10 text-indigo-600'
                                         : theme === 'dark' ? 'text-gray-400 hover:bg-white/5 hover:text-white' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                                    }`}
+                                        }`}
                             >
                                 {opt.label}
                                 {opt.value === value && <Check size={12} className="ml-auto" />}

@@ -482,8 +482,10 @@ export interface AiAlert {
   address: string
   strategy?: 'Фиба' | 'Market Entry' // Trading strategy
   maxDrop?: string // e.g. "-16"
+  maxDropFromLevel07?: string // Drop after level 0.7, e.g. "-5"
   maxProfit?: string // e.g. "+28" or "X3"
   comment?: string // "Постепенное снижение" etc.
+  screenshot?: string // URL to screenshot
   isScam?: boolean
   createdAt: string
   createdBy: string
