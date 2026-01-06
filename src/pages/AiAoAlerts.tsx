@@ -1,58 +1,48 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useThemeStore } from '@/store/themeStore'
 import { useAuthStore } from '@/store/authStore'
 import { useAdminStore } from '@/store/adminStore'
 import { getAiAlerts, addAiAlert, updateAiAlert, deleteAiAlert } from '@/services/firestoreService'
 import { AiAlert } from '@/types'
-import { Plus, Edit, Trash2, Save, X, Copy, Check, Table, Filter, ArrowUp, ArrowDown, RotateCcw, Calendar, Hash, Coins, TrendingDown, TrendingUp, Activity, Clock, FileText, Image as ImageIcon, Zap, AlertTriangle, Upload, XCircle } from 'lucide-react'
-import { MultiStrategySelector } from '@/components/Management/MultiStrategySelector'
-import { UserNickname } from '@/components/UserNickname'
+import { Plus, Edit, Trash2, Save, X, Copy, Check, Filter, ArrowUp, ArrowDown, RotateCcw, Calendar, Hash, Coins, TrendingDown, TrendingUp, Activity, Clock, FileText, Image as ImageIcon, Zap, AlertTriangle } from 'lucide-react'
 
 type SortField = 'date' | 'drop' | 'profit'
 type SortOrder = 'asc' | 'desc'
 
 // Premium Input Component
-const PremiumInput: React.FC<{
-    icon?: React.ComponentType<{ className?: string }>
+interface PremiumInputProps {
+    icon?: any
     label?: string
     placeholder?: string
     value: string
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
-    theme: string
     type?: string
-}> = ({ icon: Icon, label, placeholder, value, onChange, theme, type = 'text' }) => (
-    <div className="space-y-1.5">
-        {label && <label className={`text-[10px] font-bold uppercase tracking-wider ml-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{label}</label>}
+    theme: string
+}
+
+const PremiumInput: React.FC<PremiumInputProps> = ({ icon: Icon, label, placeholder, value, onChange, type = 'text', theme }) => (
+    <div className="space-y-1.5 group/input">
+        {label && (
+            <label className={`text-[10px] font-bold uppercase tracking-wider ml-1 opacity-50 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                {label}
+            </label>
+        )}
         <div className="relative">
-            {Icon && <Icon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />}
+            {Icon && (
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center pointer-events-none">
+                    <Icon size={14} className={theme === 'dark' ? 'text-gray-500' : 'text-gray-400'} />
+                </div>
+            )}
             <input
                 type={type}
-                placeholder={placeholder}
                 value={value}
                 onChange={onChange}
-                className={`w-full ${Icon ? 'pl-10' : 'pl-4'} pr-4 py-3 rounded-xl border outline-none transition-all text-sm font-mono ${theme === 'dark' ? 'bg-black/20 border-white/5 text-white focus:border-emerald-500/50' : 'bg-gray-50 border-gray-100 text-gray-900 focus:border-emerald-500/30'}`}
+                placeholder={placeholder}
+                className={`w-full px-4 py-2.5 ${Icon ? 'pl-10' : ''} rounded-xl border text-sm font-semibold transition-all outline-none shadow-sm
+                ${theme === 'dark'
+                        ? 'bg-white/5 border-white/5 text-white placeholder:text-gray-600 focus:bg-white/10 focus:border-blue-500/30 focus:ring-4 focus:ring-blue-500/5'
+                        : 'bg-white border-gray-200 text-gray-900 placeholder:text-gray-400 focus:border-blue-500/30 focus:ring-4 focus:ring-blue-500/5 hover:border-gray-300'}`}
             />
-        </div>
-    </div>
-)
-
-// Premium Select Component
-const PremiumSelect: React.FC<{
-    value: string
-    options: { value: string; label: string }[]
-    onChange: (val: string) => void
-    theme: string
-}> = ({ value, options, onChange, theme }) => (
-    <div className="relative">
-        <select
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
-            className={`w-full px-4 py-3 rounded-xl border outline-none transition-all text-sm font-semibold appearance-none cursor-pointer ${theme === 'dark' ? 'bg-black/20 border-white/5 text-white focus:border-emerald-500/50' : 'bg-gray-50 border-gray-100 text-gray-900 focus:border-emerald-500/30'}`}
-        >
-            {options.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
-        </select>
-        <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-            <div className={`w-2 h-2 border-r-2 border-b-2 rotate-45 ${theme === 'dark' ? 'border-gray-500' : 'border-gray-400'}`}></div>
         </div>
     </div>
 )
@@ -62,7 +52,7 @@ export const AiAoAlerts = () => {
     const { user } = useAuthStore()
     const { isAdmin } = useAdminStore()
 
-    const subTextColor = theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+    const subTextColor = theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
     const headingColor = theme === 'dark' ? 'text-white' : 'text-gray-900'
     const cardBg = theme === 'dark' ? 'bg-[#10141c]' : 'bg-white'
     const cardBorder = theme === 'dark' ? 'border-blue-500/50' : 'border-blue-500/30'
@@ -87,8 +77,6 @@ export const AiAoAlerts = () => {
     const [maxDrop, setMaxDrop] = useState('')
     const [minProfit, setMinProfit] = useState('')
     const [maxProfit, setMaxProfit] = useState('')
-    const [minMc, setMinMc] = useState('')
-    const [maxMc, setMaxMc] = useState('')
     const [sortBy, setSortBy] = useState<SortField>('date')
     const [sortOrder, setSortOrder] = useState<SortOrder>('desc')
 
@@ -115,11 +103,19 @@ export const AiAoAlerts = () => {
     // List of alerts to add (batch mode)
     const [alertsToAdd, setAlertsToAdd] = useState<Partial<AiAlert>[]>([])
 
-    // MultiStrategySelector state
-    const [selectedStrategyId, setSelectedStrategyId] = useState<string | null>(null)
-
     // Scam alert toggle
     const [isScamAlert, setIsScamAlert] = useState(false)
+
+    useEffect(() => {
+        loadAlerts()
+    }, [])
+
+    const loadAlerts = async () => {
+        setLoading(true)
+        const data = await getAiAlerts()
+        setAlerts(data)
+        setLoading(false)
+    }
 
     // Handle screenshot selection
     const handleScreenshotChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -162,7 +158,8 @@ export const AiAoAlerts = () => {
             maxProfit: formData.maxProfit,
             comment: formData.comment,
             strategy: formData.strategy,
-            screenshot: screenshotPreview || undefined
+            screenshot: screenshotPreview || undefined,
+            isScam: isScamAlert || false
         }
 
         setAlertsToAdd([...alertsToAdd, newAlert])
@@ -179,7 +176,6 @@ export const AiAoAlerts = () => {
             comment: ''
         })
         setScreenshotPreview(null)
-        setSelectedStrategyId(null)
         setIsScamAlert(false)
     }
 
@@ -259,7 +255,6 @@ export const AiAoAlerts = () => {
                 comment: ''
             })
             setScreenshotPreview(null)
-            setSelectedStrategyId(null)
             setIsScamAlert(false)
             await loadAlerts()
         } catch (error: any) {
@@ -271,14 +266,6 @@ export const AiAoAlerts = () => {
     const truncateAddress = (address: string) => {
         if (address.length <= 16) return address
         return `${address.slice(0, 6)}...${address.slice(-6)}`
-    }
-
-    // Load alerts
-    const loadAlerts = async () => {
-        setLoading(true)
-        const data = await getAiAlerts()
-        setAlerts(data)
-        setLoading(false)
     }
 
     // Copy to clipboard
@@ -338,104 +325,53 @@ export const AiAoAlerts = () => {
         setMaxDrop('')
         setMinProfit('')
         setMaxProfit('')
-        setMinMc('')
-        setMaxMc('')
     }
 
     // Filter and sort alerts
-    const filteredAlerts = useMemo(() => {
-        let result = [...alerts]
-
+    const filteredAlerts = alerts.filter(a => {
         // Date filters
-        if (specificDate) {
-            result = result.filter(a => a.signalDate === specificDate)
-        }
-        if (dateFrom) {
-            result = result.filter(a => a.signalDate >= dateFrom)
-        }
-        if (dateTo) {
-            result = result.filter(a => a.signalDate <= dateTo)
-        }
-
-        // Numeric filters
+        if (specificDate && a.signalDate !== specificDate) return false
+        if (dateFrom && a.signalDate < dateFrom) return false
+        if (dateTo && a.signalDate > dateTo) return false
+        
+        // Drop filters
         if (minDrop) {
-            result = result.filter(a => {
-                if (!a.maxDrop) return false
-                const val = parseFloat(a.maxDrop.replace('%', '').replace('X', '').replace('x', ''))
-                return !isNaN(val) && Math.abs(val) >= parseFloat(minDrop)
-            })
+            const val = a.maxDrop ? parseFloat(a.maxDrop.replace('%', '').replace('X', '').replace('x', '')) : 0
+            if (Math.abs(val) < parseFloat(minDrop)) return false
         }
         if (maxDrop) {
-            result = result.filter(a => {
-                if (!a.maxDrop) return false
-                const val = parseFloat(a.maxDrop.replace('%', '').replace('X', '').replace('x', ''))
-                return !isNaN(val) && Math.abs(val) <= parseFloat(maxDrop)
-            })
+            const val = a.maxDrop ? parseFloat(a.maxDrop.replace('%', '').replace('X', '').replace('x', '')) : 0
+            if (Math.abs(val) > parseFloat(maxDrop)) return false
         }
+        
+        // Profit filters
         if (minProfit) {
-            result = result.filter(a => {
-                if (!a.maxProfit) return false
-                const val = parseFloat(a.maxProfit.replace('%', '').replace('X', '').replace('x', '').replace('+', ''))
-                return !isNaN(val) && val >= parseFloat(minProfit)
-            })
+            const val = a.maxProfit ? parseFloat(a.maxProfit.replace('%', '').replace('X', '').replace('x', '').replace('+', '')) : 0
+            if (val < parseFloat(minProfit)) return false
         }
         if (maxProfit) {
-            result = result.filter(a => {
-                if (!a.maxProfit) return false
-                const val = parseFloat(a.maxProfit.replace('%', '').replace('X', '').replace('x', '').replace('+', ''))
-                return !isNaN(val) && val <= parseFloat(maxProfit)
-            })
+            const val = a.maxProfit ? parseFloat(a.maxProfit.replace('%', '').replace('X', '').replace('x', '').replace('+', '')) : 0
+            if (val > parseFloat(maxProfit)) return false
         }
-        if (minMc) {
-            result = result.filter(a => {
-                if (!a.marketCap) return false
-                let val = 0
-                const mcStr = a.marketCap.toLowerCase()
-                if (mcStr.includes('k')) val = parseFloat(mcStr) * 1000
-                else if (mcStr.includes('m')) val = parseFloat(mcStr) * 1000000
-                else if (mcStr.includes('b')) val = parseFloat(mcStr) * 1000000000
-                else val = parseFloat(mcStr)
-                return !isNaN(val) && val >= parseFloat(minMc) * 1000000
-            })
+        
+        return true
+    }).sort((a, b) => {
+        let comparison = 0
+        if (sortBy === 'date') {
+            comparison = new Date(a.signalDate).getTime() - new Date(b.signalDate).getTime()
+        } else if (sortBy === 'drop') {
+            const dropA = a.maxDrop ? parseFloat(a.maxDrop.replace('%', '').replace('X', '').replace('x', '')) : 0
+            const dropB = b.maxDrop ? parseFloat(b.maxDrop.replace('%', '').replace('X', '').replace('x', '')) : 0
+            comparison = dropA - dropB
+        } else if (sortBy === 'profit') {
+            const profitA = a.maxProfit ? parseFloat(a.maxProfit.replace('%', '').replace('X', '').replace('x', '').replace('+', '')) : 0
+            const profitB = b.maxProfit ? parseFloat(b.maxProfit.replace('%', '').replace('X', '').replace('x', '').replace('+', '')) : 0
+            comparison = profitA - profitB
         }
-        if (maxMc) {
-            result = result.filter(a => {
-                if (!a.marketCap) return false
-                let val = 0
-                const mcStr = a.marketCap.toLowerCase()
-                if (mcStr.includes('k')) val = parseFloat(mcStr) * 1000
-                else if (mcStr.includes('m')) val = parseFloat(mcStr) * 1000000
-                else if (mcStr.includes('b')) val = parseFloat(mcStr) * 1000000000
-                else val = parseFloat(mcStr)
-                return !isNaN(val) && val <= parseFloat(maxMc) * 1000000
-            })
-        }
-
-        // Sort
-        result.sort((a, b) => {
-            let comparison = 0
-            if (sortBy === 'date') {
-                comparison = new Date(a.signalDate).getTime() - new Date(b.signalDate).getTime()
-            } else if (sortBy === 'drop') {
-                const dropA = a.maxDrop ? parseFloat(a.maxDrop.replace('%', '').replace('X', '').replace('x', '')) : 0
-                const dropB = b.maxDrop ? parseFloat(b.maxDrop.replace('%', '').replace('X', '').replace('x', '')) : 0
-                comparison = dropA - dropB
-            } else if (sortBy === 'profit') {
-                const profitA = a.maxProfit ? parseFloat(a.maxProfit.replace('%', '').replace('X', '').replace('x', '').replace('+', '')) : 0
-                const profitB = b.maxProfit ? parseFloat(b.maxProfit.replace('%', '').replace('X', '').replace('x', '').replace('+', '')) : 0
-                comparison = profitA - profitB
-            }
-            return sortOrder === 'asc' ? comparison : -comparison
-        })
-
-        return result
-    }, [alerts, specificDate, dateFrom, dateTo, minDrop, maxDrop, minProfit, maxProfit, minMc, maxMc, sortBy, sortOrder])
+        return sortOrder === 'asc' ? comparison : -comparison
+    })
 
     const stats = calculateStats()
-
-    useEffect(() => {
-        loadAlerts()
-    }, [])
 
     // Handlers for editing
     const handleEdit = (alert: AiAlert) => {
@@ -490,7 +426,6 @@ export const AiAoAlerts = () => {
                                         strategy: 'Market Entry'
                                     })
                                     setScreenshotPreview(null)
-                                    setSelectedStrategyId(null)
                                     setIsScamAlert(false)
                                     setShowModal(true)
                                 }}
@@ -525,7 +460,7 @@ export const AiAoAlerts = () => {
                             <Filter size={14} />
                             Фильтры
                         </button>
-                        {(specificDate || dateFrom || dateTo || minDrop || maxDrop || minProfit || maxProfit || minMc || maxMc) && (
+                        {(specificDate || dateFrom || dateTo || minDrop || maxDrop || minProfit || maxProfit) && (
                             <button
                                 onClick={resetFilters}
                                 className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium bg-rose-500/10 text-rose-500 hover:bg-rose-500/20 transition-colors"
@@ -595,6 +530,16 @@ export const AiAoAlerts = () => {
                                     placeholder="10"
                                     value={minProfit}
                                     onChange={(e) => setMinProfit(e.target.value)}
+                                    className={`w-full mt-1 px-3 py-2 rounded-xl border text-sm outline-none ${theme === 'dark' ? 'bg-white/5 border-white/5 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'}`}
+                                />
+                            </div>
+                            <div>
+                                <label className={`text-[10px] font-bold uppercase tracking-wider ml-1 ${subTextColor}`}>Макс. Профит</label>
+                                <input
+                                    type="number"
+                                    placeholder="10"
+                                    value={maxProfit}
+                                    onChange={(e) => setMaxProfit(e.target.value)}
                                     className={`w-full mt-1 px-3 py-2 rounded-xl border text-sm outline-none ${theme === 'dark' ? 'bg-white/5 border-white/5 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'}`}
                                 />
                             </div>
@@ -692,180 +637,161 @@ export const AiAoAlerts = () => {
             {showModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto">
                     <div className={`w-full max-w-4xl rounded-[32px] ${cardBg} ${cardBorder} border shadow-2xl overflow-hidden my-auto flex flex-col relative`}>
-                        {/* Decorative background elements */}
-                        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                            <div className="absolute -top-24 -right-24 w-64 h-64 rounded-full bg-emerald-500/5 blur-3xl"></div>
-                            <div className="absolute -bottom-24 -left-24 w-64 h-64 rounded-full bg-blue-500/5 blur-3xl"></div>
-                        </div>
-                        
-                        {/* Header */}
-                        <div className={`p-6 border-b ${theme === 'dark' ? 'border-white/10' : 'border-gray-100'} flex items-center justify-between flex-shrink-0 relative z-10`}>
-                            <div className="flex items-center gap-4">
-                                <div className={`p-3 rounded-2xl ${theme === 'dark' ? 'bg-white/10 border-white/20' : 'bg-emerald-600/10 border-emerald-600/30'} border`}>
-                                    <Zap className={`w-6 h-6 ${theme === 'dark' ? 'text-white' : 'text-emerald-600'}`} />
-                                </div>
-                                <div>
-                                    <h3 className={`text-xl font-bold ${headingColor}`}>
-                                        {editingAlert ? 'Редактировать сигнал' : 'Добавить новые сигналы'}
-                                    </h3>
-                                    <p className={`text-sm ${subTextColor}`}>
-                                        {editingAlert ? 'Изменение параметров' : 'Заполнение данных для сигналов'}
-                                    </p>
-                                </div>
-                            </div>
+                        {/* Decorative Background Elements */}
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-[100px] -mr-32 -mt-32"></div>
+                        <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/5 rounded-full blur-[100px] -ml-32 -mb-32"></div>
 
+                        {/* Header */}
+                        <div className="p-8 border-b border-white/5 flex items-center justify-between relative z-10">
+                            <div>
+                                <div className="flex items-center gap-3 mb-1">
+                                    <div className="w-10 h-10 rounded-2xl bg-blue-500/20 flex items-center justify-center">
+                                        <Zap className="w-6 h-6 text-blue-500" />
+                                    </div>
+                                    <h3 className={`text-2xl font-black uppercase tracking-tight ${headingColor}`}>
+                                        {editingAlert ? 'Редактировать сигнал' : 'Добавить сигналы'}
+                                    </h3>
+                                </div>
+                                {!editingAlert && (
+                                    <p className={`text-sm ${subTextColor} font-medium`}>Сигналы будут сгруппированы за выбранную дату</p>
+                                )}
+                            </div>
                             <button
-                                onClick={() => setShowModal(false)}
-                                className={`p-2 rounded-xl ${theme === 'dark' ? 'hover:bg-white/10' : 'hover:bg-gray-100'} transition-colors`}
+                                onClick={() => {
+                                    setShowModal(false)
+                                    setEditingAlert(null)
+                                    setAlertsToAdd([])
+                                }}
+                                className={`p-3 rounded-2xl ${theme === 'dark' ? 'hover:bg-white/5' : 'hover:bg-gray-100'} transition-all group active:scale-95`}
                             >
-                                <X className={`w-6 h-6 ${subTextColor}`} />
+                                <X className={`w-6 h-6 ${subTextColor} group-hover:text-blue-500 transition-colors`} />
                             </button>
                         </div>
 
                         {/* Body */}
-                        <div className="p-6 lg:p-8 relative z-10">
+                        <div className="flex-1 overflow-y-auto p-6 lg:p-8 relative z-10">
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
                                 {/* Left Column */}
-                                <div className="space-y-4">
+                                <div className="space-y-6">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]"></div>
+                                        <span className={`text-xs font-bold uppercase tracking-widest ${subTextColor} opacity-60`}>Основная информация</span>
+                                    </div>
+
                                     <div className="grid grid-cols-2 gap-4">
                                         <PremiumInput
                                             icon={Calendar}
-                                            label="Дата"
-                                            placeholder=""
+                                            label="Дата сигнала"
                                             value={editingAlert?.signalDate || commonDate}
                                             onChange={(e) => editingAlert ? setFormData({ ...formData, signalDate: e.target.value }) : setCommonDate(e.target.value)}
-                                            theme={theme}
                                             type="date"
+                                            theme={theme}
                                         />
                                         <PremiumInput
                                             icon={Clock}
-                                            label="Время"
-                                            placeholder=""
-                                            value={formData.signalTime}
+                                            label="Время (UTC)"
+                                            value={formData.signalTime || ''}
                                             onChange={(e) => setFormData({ ...formData, signalTime: e.target.value })}
-                                            theme={theme}
                                             type="time"
+                                            theme={theme}
                                         />
                                     </div>
+
+                                    <PremiumInput
+                                        icon={Coins}
+                                        label="Market Cap"
+                                        placeholder="Напр. 300K или 1.5M"
+                                        value={formData.marketCap || ''}
+                                        onChange={(e) => setFormData({ ...formData, marketCap: e.target.value })}
+                                        theme={theme}
+                                    />
 
                                     <div className="grid grid-cols-2 gap-4">
                                         <PremiumInput
-                                            icon={Coins}
-                                            label="Market Cap"
-                                            placeholder="Напр: 300K или 1.5M"
-                                            value={formData.marketCap || ''}
-                                            onChange={(e) => setFormData({ ...formData, marketCap: e.target.value })}
+                                            icon={TrendingDown}
+                                            label="Max Drop"
+                                            placeholder="Напр. -16%"
+                                            value={formData.maxDrop || ''}
+                                            onChange={(e) => setFormData({ ...formData, maxDrop: e.target.value })}
                                             theme={theme}
                                         />
+                                        <PremiumInput
+                                            icon={TrendingDown}
+                                            label="Max Drop (0.7)"
+                                            placeholder="Напр. -5%"
+                                            value={formData.maxDropFromLevel07 || ''}
+                                            onChange={(e) => setFormData({ ...formData, maxDropFromLevel07: e.target.value })}
+                                            theme={theme}
+                                        />
+                                    </div>
 
-                                        <div className="space-y-1.5">
-                                            <label className={`text-[10px] font-bold uppercase tracking-wider ml-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Drop</label>
-                                            <div className="relative">
-                                                <TrendingDown className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-rose-500" />
-                                                <input
-                                                    type="text"
-                                                    placeholder="-16%"
-                                                    value={formData.maxDrop || ''}
-                                                    onChange={(e) => setFormData({ ...formData, maxDrop: e.target.value })}
-                                                    className={`w-full pl-10 py-3 rounded-xl border outline-none transition-all text-sm font-mono ${theme === 'dark' ? 'bg-black/20 border-white/5 text-white focus:border-emerald-500/50' : 'bg-gray-50 border-gray-100 text-gray-900 focus:border-emerald-500/30'}`}
-                                                />
-                                            </div>
-                                        </div>
+                                    <PremiumInput
+                                        icon={TrendingUp}
+                                        label="Max Profit"
+                                        placeholder="Напр. +28% или X3"
+                                        value={formData.maxProfit || ''}
+                                        onChange={(e) => setFormData({ ...formData, maxProfit: e.target.value })}
+                                        theme={theme}
+                                    />
 
-                                        <div className="space-y-1.5">
-                                            <label className={`text-[10px] font-bold uppercase tracking-wider ml-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Drop 0.7</label>
-                                            <div className="relative">
-                                                <TrendingDown className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-rose-500" />
-                                                <input
-                                                    type="text"
-                                                    placeholder="X2"
-                                                    value={formData.maxDropFromLevel07 || ''}
-                                                    onChange={(e) => setFormData({ ...formData, maxDropFromLevel07: e.target.value })}
-                                                    className={`w-full pl-10 py-3 rounded-xl border outline-none transition-all text-sm font-mono ${theme === 'dark' ? 'bg-black/20 border-white/5 text-white focus:border-emerald-500/50' : 'bg-gray-50 border-gray-100 text-gray-900 focus:border-emerald-500/30'}`}
-                                                />
-                                            </div>
-                                        </div>
-
-                                        <div className="space-y-1.5">
-                                            <label className={`text-[10px] font-bold uppercase tracking-wider ml-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Профит</label>
-                                            <div className="relative">
-                                                <TrendingUp className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500" />
-                                                <input
-                                                    type="text"
-                                                    placeholder="+28% / X2"
-                                                    value={formData.maxProfit || ''}
-                                                    onChange={(e) => setFormData({ ...formData, maxProfit: e.target.value })}
-                                                    className={`w-full pl-10 py-3 rounded-xl border outline-none transition-all text-sm font-mono ${theme === 'dark' ? 'bg-black/20 border-white/5 text-white focus:border-emerald-500/50' : 'bg-gray-50 border-gray-100 text-gray-900 focus:border-emerald-500/30'}`}
-                                                />
-                                            </div>
-                                        </div>
-
-                                        <div className="col-span-2 space-y-1.5">
-                                            <label className={`text-[10px] font-bold uppercase tracking-wider ml-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Коммент</label>
-                                            <div className="relative">
-                                                <FileText className="absolute left-3 top-3 w-4 h-4 text-gray-500" />
-                                                <textarea
-                                                    rows={2}
-                                                    placeholder="Дополнительная информация..."
-                                                    value={formData.comment || ''}
-                                                    onChange={(e) => setFormData({ ...formData, comment: e.target.value })}
-                                                    className={`w-full pl-10 pr-4 py-3 rounded-2xl border outline-none transition-all text-sm font-semibold resize-none ${theme === 'dark' ? 'bg-black/20 border-white/5 text-white' : 'bg-white border-gray-50 border-gray-100 text-gray-900'}`}
-                                                ></textarea>
-                                            </div>
+                                    <div className="space-y-1.5">
+                                        <label className={`text-[10px] font-bold uppercase tracking-wider ml-1 ${subTextColor}`}>Комментарий</label>
+                                        <div className="relative">
+                                            <FileText className="absolute left-3 top-3 w-4 h-4 text-gray-500" />
+                                            <textarea
+                                                rows={2}
+                                                placeholder="Дополнительные детали..."
+                                                value={formData.comment || ''}
+                                                onChange={(e) => setFormData({ ...formData, comment: e.target.value })}
+                                                className={`w-full pl-10 pr-4 py-3 rounded-xl border outline-none transition-all text-sm resize-none ${theme === 'dark' ? 'bg-black/20 border-white/5 text-white focus:border-blue-500/50' : 'bg-gray-50 border-gray-100 text-gray-900 focus:border-blue-500/30'}`}
+                                            />
                                         </div>
                                     </div>
 
-                                    {/* Screenshot Upload */}
-                                    <div className="space-y-1.5">
-                                        <label className={`text-[10px] font-bold tracking-wider ml-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Скриншот (опционально)</label>
-                                        <div className={`relative rounded-xl border-2 border-dashed transition-all ${theme === 'dark' ? 'border-white/10 hover:border-emerald-500/30 bg-white/5' : 'border-gray-200 hover:border-emerald-500/30 bg-gray-50'}`}>
-                                            {screenshotPreview ? (
-                                                <div className="relative p-4">
-                                                    <div className="relative rounded-lg overflow-hidden">
-                                                        <img src={screenshotPreview} alt="Preview" className="w-full h-32 object-contain rounded-lg" />
-                                                        <button
-                                                            type="button"
-                                                            onClick={removeScreenshot}
-                                                            className="absolute top-2 right-2 p-1.5 rounded-lg bg-rose-500/90 text-white hover:bg-rose-500 transition-colors shadow-lg"
-                                                        >
-                                                            <X className="w-4 h-4" />
-                                                        </button>
-                                                    </div>
+                                    {/* Scam Alert Toggle */}
+                                    <div className={`p-4 rounded-2xl border transition-all ${isScamAlert ? 'border-rose-500/50 bg-rose-500/5' : 'border-white/5 bg-white/5'}`}>
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-3">
+                                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isScamAlert ? 'bg-rose-500 text-white shadow-lg shadow-rose-500/20' : 'bg-white/10 text-gray-500'}`}>
+                                                    <AlertTriangle className="w-5 h-5" />
                                                 </div>
-                                            ) : (
-                                                <div
-                                                    className="p-6 flex flex-col items-center justify-center cursor-pointer hover:bg-white/5 transition-colors"
-                                                    onClick={() => fileInputRef.current?.click()}
-                                                >
-                                                    <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-3 ${theme === 'dark' ? 'bg-white/10' : 'bg-emerald-50'}`}>
-                                                        <ImageIcon className={`w-6 h-6 ${subTextColor}`} />
-                                                    </div>
-                                                    <p className={`text-sm font-semibold ${headingColor}`}>Нажмите для загрузки</p>
-                                                    <p className={`text-xs ${subTextColor} mt-1`}>PNG, JPG до 5MB</p>
+                                                <div>
+                                                    <p className={`text-sm font-bold ${isScamAlert ? 'text-rose-500' : headingColor}`}>Scam Alert</p>
+                                                    <p className={`text-[10px] ${subTextColor} opacity-60`}>Пометить как мошеннический</p>
                                                 </div>
-                                            )}
-                                            <input ref={fileInputRef} type="file" accept="image/*" onChange={handleScreenshotChange} className="hidden" />
+                                            </div>
+                                            <button
+                                                type="button"
+                                                onClick={() => setIsScamAlert(!isScamAlert)}
+                                                className={`w-12 h-6 rounded-full relative transition-all duration-300 ${isScamAlert ? 'bg-rose-500 shadow-lg shadow-rose-500/40' : 'bg-gray-700'}`}
+                                            >
+                                                <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all duration-300 shadow-sm ${isScamAlert ? 'left-7' : 'left-1'}`}></div>
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
 
                                 {/* Right Column */}
-                                <div className="space-y-4">
+                                <div className="space-y-6">
                                     <div className="flex items-center gap-2 mb-2">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
-                                        <span className={`text-xs font-bold uppercase tracking-widest ${subTextColor}`}>Стратегия и адрес</span>
+                                        <div className="w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]"></div>
+                                        <span className={`text-xs font-bold uppercase tracking-widest ${subTextColor} opacity-60`}>Стратегия и медиа</span>
                                     </div>
 
-                                    {/* Multi Strategy Selector */}
-                                    <MultiStrategySelector
-                                        value={selectedStrategyId}
-                                        onChange={setSelectedStrategyId}
-                                        theme={theme}
-                                        label="Выберите стратегию"
-                                    />
+                                    <div className="space-y-1.5">
+                                        <label className={`text-[10px] font-bold uppercase tracking-wider ml-1 ${subTextColor}`}>Стратегия</label>
+                                        <select
+                                            value={formData.strategy || 'Market Entry'}
+                                            onChange={(e) => setFormData({ ...formData, strategy: e.target.value as 'Фиба' | 'Market Entry' })}
+                                            className={`w-full px-4 py-3 rounded-xl border outline-none transition-all text-sm font-semibold appearance-none cursor-pointer ${theme === 'dark' ? 'bg-black/20 border-white/5 text-white focus:border-blue-500/50' : 'bg-gray-50 border-gray-100 text-gray-900 focus:border-blue-500/30'}`}
+                                        >
+                                            <option value="Market Entry">Market Entry</option>
+                                            <option value="Фиба">Фиба</option>
+                                        </select>
+                                    </div>
 
                                     <div className="space-y-1.5">
-                                        <label className={`text-[10px] font-bold uppercase tracking-wider ml-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Contract Address</label>
+                                        <label className={`text-[10px] font-bold uppercase tracking-wider ml-1 ${subTextColor}`}>Contract Address</label>
                                         <div className="relative">
                                             <Hash className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
                                             <input
@@ -873,49 +799,72 @@ export const AiAoAlerts = () => {
                                                 placeholder="Введите адрес контракта..."
                                                 value={formData.address}
                                                 onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                                                className={`w-full pl-10 py-3 rounded-xl border outline-none transition-all text-sm font-mono ${theme === 'dark' ? 'bg-black/20 border-white/5 text-white focus:border-emerald-500/50' : 'bg-gray-50 border-gray-100 text-gray-900 focus:border-emerald-500/30'}`}
+                                                className={`w-full pl-10 pr-4 py-3 rounded-xl border outline-none transition-all text-sm font-mono ${theme === 'dark' ? 'bg-black/20 border-white/5 text-white focus:border-blue-500/50' : 'bg-gray-50 border-gray-100 text-gray-900 focus:border-blue-500/30'}`}
                                             />
                                         </div>
                                     </div>
 
-                                    {/* Scam Alert Toggle */}
-                                    <div className={`p-4 rounded-xl border transition-all ${isScamAlert ? 'bg-rose-500/10 border-rose-500/30' : theme === 'dark' ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-100'}`}>
-                                        <button
-                                            onClick={() => setIsScamAlert(!isScamAlert)}
-                                            className="w-full flex items-center justify-between"
+                                    {/* Screenshot Upload */}
+                                    <div className="space-y-2">
+                                        <label className={`text-[10px] font-bold tracking-wider ml-1 ${subTextColor}`}>Скриншот графика</label>
+                                        <div
+                                            onClick={() => fileInputRef.current?.click()}
+                                            className={`group relative h-32 rounded-2xl border-2 border-dashed transition-all cursor-pointer overflow-hidden flex flex-col items-center justify-center gap-2
+                                                ${screenshotPreview
+                                                    ? 'border-blue-500/50 bg-blue-500/5'
+                                                    : 'border-white/10 hover:border-blue-500/30 hover:bg-white/5'}`}
                                         >
-                                            <div className="flex items-center gap-3">
-                                                <div className={`p-2 rounded-lg ${isScamAlert ? 'bg-rose-500/20' : 'bg-gray-500/20'}`}>
-                                                    <AlertTriangle className={`w-5 h-5 ${isScamAlert ? 'text-rose-500' : 'text-gray-500'}`} />
-                                                </div>
-                                                <div className="text-left">
-                                                    <p className={`font-bold ${headingColor}`}>Scam Alert</p>
-                                                    <p className={`text-xs ${subTextColor}`}>Пометить как скам</p>
-                                                </div>
-                                            </div>
-                                            <div className={`w-12 h-6 rounded-full transition-colors ${isScamAlert ? 'bg-rose-500' : 'bg-gray-500/30'} relative`}>
-                                                <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${isScamAlert ? 'left-7' : 'left-1'}`}></div>
-                                            </div>
-                                        </button>
+                                            {screenshotPreview ? (
+                                                <>
+                                                    <img src={screenshotPreview} alt="Preview" className="absolute inset-0 w-full h-full object-cover opacity-40" />
+                                                    <div className="relative z-10 flex flex-col items-center gap-1">
+                                                        <Check className="w-8 h-8 text-blue-500" />
+                                                        <span className="text-xs font-bold text-blue-500 uppercase tracking-widest">Фото загружено</span>
+                                                    </div>
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation()
+                                                            removeScreenshot()
+                                                        }}
+                                                        className="absolute top-2 right-2 p-1.5 rounded-lg bg-rose-500 text-white shadow-lg hover:scale-110 transition-transform"
+                                                    >
+                                                        <X className="w-4 h-4" />
+                                                    </button>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                                        <ImageIcon className="w-5 h-5 text-gray-500" />
+                                                    </div>
+                                                    <div className="text-center">
+                                                        <p className={`text-xs font-bold ${headingColor}`}>Нажмите для загрузки</p>
+                                                        <p className={`text-[10px] ${subTextColor} opacity-60`}>PNG, JPG до 5MB</p>
+                                                    </div>
+                                                </>
+                                            )}
+                                        </div>
+                                        <input ref={fileInputRef} type="file" accept="image/*" onChange={handleScreenshotChange} className="hidden" />
                                     </div>
 
                                     {!editingAlert && (
                                         <button
+                                            type="button"
                                             onClick={handleAddToList}
-                                            className="w-full py-4 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 text-white font-bold transition-all"
+                                            className="w-full py-4 rounded-2xl bg-blue-500 hover:bg-blue-600 text-white font-bold transition-all shadow-lg shadow-blue-500/20 active:scale-95 flex items-center justify-center gap-3"
                                         >
-                                            <Plus className="w-5 h-5 inline mr-2" />
-                                            Добавить в список
+                                            <Plus className="w-5 h-5" />
+                                            <span>Добавить в список</span>
                                         </button>
                                     )}
 
                                     {editingAlert && (
                                         <button
+                                            type="button"
                                             onClick={handleSubmit}
-                                            className="w-full py-4 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold transition-all shadow-lg shadow-emerald-500/25"
+                                            className="w-full py-4 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition-all shadow-lg shadow-blue-600/20 active:scale-95 flex items-center justify-center gap-3"
                                         >
-                                            <Save className="w-5 h-5 inline mr-2" />
-                                            СОХРАНИТЬ
+                                            <Save className="w-5 h-5" />
+                                            <span>Сохранить изменения</span>
                                         </button>
                                     )}
                                 </div>
@@ -923,18 +872,24 @@ export const AiAoAlerts = () => {
 
                             {/* Alerts List */}
                             {!editingAlert && alertsToAdd.length > 0 && (
-                                <div className="mt-8 pt-8 border-t border-white/5">
-                                    <div className="flex items-center justify-between mb-4">
-                                        <h4 className={`text-lg font-bold ${headingColor}`}>
-                                            Подготовленные сигналы ({alertsToAdd.length})
-                                        </h4>
+                                <div className="mt-12 space-y-4 pt-8 border-t border-white/5">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center">
+                                                <Activity className="w-5 h-5 text-blue-500" />
+                                            </div>
+                                            <h4 className={`text-lg font-bold ${headingColor}`}>
+                                                Подготовленные сигналы ({alertsToAdd.length})
+                                            </h4>
+                                        </div>
                                         <button
                                             onClick={() => setAlertsToAdd([])}
-                                            className="text-xs font-bold text-rose-500 uppercase tracking-widest"
+                                            className={`text-xs font-bold uppercase tracking-widest text-rose-500 hover:text-rose-400 transition-colors p-2`}
                                         >
-                                            Очистить
+                                            Очистить всё
                                         </button>
                                     </div>
+
                                     <div className={`rounded-2xl border ${theme === 'dark' ? 'border-white/5 bg-white/5' : 'border-gray-100 bg-gray-50'} overflow-hidden`}>
                                         <table className="w-full text-left text-sm">
                                             <thead>
@@ -942,19 +897,25 @@ export const AiAoAlerts = () => {
                                                     <th className={`p-4 font-bold ${subTextColor}`}>Время</th>
                                                     <th className={`p-4 font-bold ${subTextColor}`}>Адрес</th>
                                                     <th className={`p-4 font-bold ${subTextColor}`}>MC</th>
-                                                    <th className="p-4"></th>
+                                                    <th className={`p-4 font-bold ${subTextColor}`}>Стратегия</th>
+                                                    <th className={`p-4 font-bold ${subTextColor}`}>Удалить</th>
                                                 </tr>
                                             </thead>
-                                            <tbody className={`divide-y ${theme === 'dark' ? 'divide-white/5' : 'divide-gray-100'}`}>
+                                            <tbody className={`divide-y ${theme === 'dark' ? 'divide-white/5' : 'divide-gray-50'}`}>
                                                 {alertsToAdd.map((alert, index) => (
-                                                    <tr key={index}>
-                                                        <td className={`p-4 font-mono ${headingColor}`}>{alert.signalTime}</td>
+                                                    <tr key={index} className="hover:bg-white/5 transition-colors">
+                                                        <td className={`p-4 font-mono font-bold ${headingColor}`}>{alert.signalTime}</td>
                                                         <td className={`p-4 font-mono ${subTextColor}`}>{truncateAddress(alert.address || '')}</td>
                                                         <td className={`p-4 font-mono ${headingColor}`}>{alert.marketCap || '-'}</td>
+                                                        <td className="p-4">
+                                                            <span className="px-2 py-1 rounded-lg bg-blue-500/10 text-blue-500 text-[10px] font-bold uppercase">
+                                                                {alert.strategy}
+                                                            </span>
+                                                        </td>
                                                         <td className="p-4 text-right">
                                                             <button
-                                                                onClick={() => setAlertsToAdd(prev => prev.filter((_, i) => i !== index))}
-                                                                className="text-rose-500 hover:text-rose-400"
+                                                                onClick={() => setAlertsToAdd(alertsToAdd.filter((_, i) => i !== index))}
+                                                                className="p-2 rounded-lg hover:bg-rose-500/10 text-rose-500 transition-colors"
                                                             >
                                                                 <Trash2 className="w-4 h-4" />
                                                             </button>
@@ -964,12 +925,13 @@ export const AiAoAlerts = () => {
                                             </tbody>
                                         </table>
                                     </div>
+
                                     <button
                                         onClick={handleSaveAll}
-                                        className="w-full mt-4 py-4 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold transition-all shadow-xl shadow-emerald-500/25"
+                                        className="w-full py-4 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-black transition-all shadow-xl shadow-emerald-500/20 active:scale-95 flex items-center justify-center gap-3 mt-4"
                                     >
-                                        <Check className="w-5 h-5 inline mr-2" />
-                                        СОХРАНИТЬ ВСЁ ({alertsToAdd.length})
+                                        <Check className="w-6 h-6 stroke-[3]" />
+                                        <span className="text-lg">СОХРАНИТЬ ВСЕ ДАННЫЕ В БАЗУ</span>
                                     </button>
                                 </div>
                             )}
