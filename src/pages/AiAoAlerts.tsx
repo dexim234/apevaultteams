@@ -5,6 +5,7 @@ import { useAdminStore } from '@/store/adminStore'
 import { getAiAlerts, addAiAlert, updateAiAlert, deleteAiAlert } from '@/services/firestoreService'
 import { AiAlert } from '@/types'
 import { Plus, Edit, Trash2, Save, X, Copy, Check, Table, Filter, ArrowUp, ArrowDown, RotateCcw, Calendar, Hash, Coins, TrendingDown, TrendingUp, Activity, Clock, FileText, Image as ImageIcon } from 'lucide-react'
+import { UserNickname } from '@/components/UserNickname'
 
 type SortField = 'date' | 'drop' | 'profit'
 type SortOrder = 'asc' | 'desc'
@@ -17,8 +18,8 @@ export const AiAoAlerts = () => {
     const subTextColor = theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
     const headingColor = theme === 'dark' ? 'text-white' : 'text-gray-900'
     const cardBg = theme === 'dark' ? 'bg-[#10141c]' : 'bg-white'
-    const cardBorder = theme === 'dark' ? 'border-indigo-500/30' : 'border-indigo-500/20'
-    const cardShadow = theme === 'dark' ? 'shadow-[0_24px_80px_rgba(0,0,0,0.45)]' : 'shadow-[0_24px_80px_rgba(0,0,0,0.15)]'
+    const cardBorder = theme === 'dark' ? 'border-blue-500/50' : 'border-blue-500/30'
+    const cardShadow = theme === 'dark' ? 'shadow-[0_24px_80px_rgba(0,0,0,0.45)] shadow-blue-500/10' : 'shadow-[0_24px_80px_rgba(0,0,0,0.15)]'
 
     const [alerts, setAlerts] = useState<AiAlert[]>([])
     const [loading, setLoading] = useState(true)
@@ -352,10 +353,6 @@ export const AiAoAlerts = () => {
         }
     }
 
-    const UserNickname: React.FC<{ userId: string; className?: string }> = ({ userId, className }) => {
-        return <span className={className}>{userId.slice(0, 6)}</span>
-    }
-
     const handleCopy = (text: string, id: string) => {
         navigator.clipboard.writeText(text)
         setCopyingId(id)
@@ -476,7 +473,6 @@ export const AiAoAlerts = () => {
                                         marketCap: '',
                                         address: '',
                                         maxDrop: '',
-                                        maxDropFromLevel07: '',
                                         maxProfit: '',
                                         comment: ''
                                     })
@@ -518,28 +514,28 @@ export const AiAoAlerts = () => {
                             {/* Date Group */}
                             <div className="lg:col-span-3 space-y-4">
                                 <div className="flex items-center gap-2 px-1">
-                                    <Calendar className="w-3.5 h-3.5 text-blue-500" />
-                                    <span className={`text-[11px] font-bold uppercase tracking-wider ${subTextColor}`}>Временные рамки</span>
+                                    <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                                    <span className={`text-[11px] font-bold uppercase tracking-wider ml-1 ${subTextColor}`}>Временные рамки</span>
                                 </div>
                                 <div className="space-y-3">
                                     <input
                                         type="date"
                                         value={specificDate}
                                         onChange={(e) => setSpecificDate(e.target.value)}
-                                        className={`w-full px-4 py-2.5 rounded-xl border text-sm font-semibold transition-all outline-none ${theme === 'dark' ? 'bg-white/5 border-white/5 text-white' : 'bg-white border-gray-200 text-gray-900'}`}
+                                        className={`w-full px-4 py-2.5 rounded-xl border text-sm font-semibold outline-none ${theme === 'dark' ? 'bg-white/5 border-white/5 text-white' : 'bg-white border-gray-200 text-gray-900'}`}
                                     />
                                     <div className="grid grid-cols-2 gap-3">
                                         <input
                                             type="date"
                                             value={dateFrom}
                                             onChange={(e) => setDateFrom(e.target.value)}
-                                            className={`w-full px-4 py-2.5 rounded-xl border text-sm font-semibold transition-all outline-none ${theme === 'dark' ? 'bg-white/5 border-white/5 text-white' : 'bg-white border-gray-200 text-gray-900'}`}
+                                            className={`w-full px-4 py-2.5 rounded-xl border text-sm font-semibold outline-none ${theme === 'dark' ? 'bg-white/5 border-white/5 text-white' : 'bg-white border-gray-200 text-gray-900'}`}
                                         />
                                         <input
                                             type="date"
                                             value={dateTo}
                                             onChange={(e) => setDateTo(e.target.value)}
-                                            className={`w-full px-4 py-2.5 rounded-xl border text-sm font-semibold transition-all outline-none ${theme === 'dark' ? 'bg-white/5 border-white/5 text-white' : 'bg-white border-gray-200 text-gray-900'}`}
+                                            className={`w-full px-4 py-2.5 rounded-xl border text-sm font-semibold outline-none ${theme === 'dark' ? 'bg-white/5 border-white/5 text-white' : 'bg-white border-gray-200 text-gray-900'}`}
                                         />
                                     </div>
                                 </div>
@@ -549,22 +545,22 @@ export const AiAoAlerts = () => {
                             <div className="lg:col-span-2 space-y-4">
                                 <div className="flex items-center gap-2 px-1">
                                     <TrendingDown className="w-3.5 h-3.5 text-rose-500" />
-                                    <span className={`text-[11px] font-bold uppercase tracking-wider ${subTextColor}`}>Падение (%)</span>
+                                    <span className={`text-[11px] font-bold uppercase tracking-wider ml-1 ${subTextColor}`}>Падение (%)</span>
                                 </div>
-                                <div className="grid grid-cols-2 gap-3">
+                                <div className="grid grid-cols-2 gap-3 mt-2">
                                     <input
                                         type="text"
                                         placeholder="Min"
                                         value={minDrop}
                                         onChange={(e) => setMinDrop(e.target.value)}
-                                        className={`w-full px-10 py-2.5 rounded-xl border text-sm font-semibold transition-all outline-none ${theme === 'dark' ? 'bg-white/5 border-white/5 text-white' : 'bg-white border-gray-200 text-gray-900'}`}
+                                        className={`w-full pl-10 py-2.5 rounded-xl border text-sm font-mono outline-none ${theme === 'dark' ? 'bg-white/5 border-white/5 text-white' : 'bg-white border-gray-200 text-gray-900'}`}
                                     />
                                     <input
                                         type="text"
                                         placeholder="Max"
                                         value={maxDrop}
                                         onChange={(e) => setMaxDrop(e.target.value)}
-                                        className={`w-full px-10 py-2.5 rounded-xl border text-sm font-semibold transition-all outline-none ${theme === 'dark' ? 'bg-white/5 border-white/5 text-white' : 'bg-white border-gray-200 text-gray-900'}`}
+                                        className={`w-full pl-10 py-2.5 rounded-xl border text-sm font-mono outline-none ${theme === 'dark' ? 'bg-white/5 border-white/5 text-white' : 'bg-white border-gray-200 text-gray-900'}`}
                                     />
                                 </div>
                             </div>
@@ -573,22 +569,15 @@ export const AiAoAlerts = () => {
                             <div className="lg:col-span-2 space-y-4">
                                 <div className="flex items-center gap-2 px-1">
                                     <TrendingUp className="w-3.5 h-3.5 text-emerald-500" />
-                                    <span className={`text-[10px] font-bold uppercase tracking-wider ${subTextColor}`}>Профит (%)</span>
+                                    <span className={`text-[10px] font-bold uppercase tracking-wider ml-1 ${subTextColor}`}>Профит (%)</span>
                                 </div>
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-2 gap-4 mt-2">
                                     <input
                                         type="text"
-                                        placeholder="Min"
-                                        value={minProfit}
-                                        onChange={(e) => setMinProfit(e.target.value)}
-                                        className={`w-full px-10 py-2.5 rounded-xl border text-sm font-semibold transition-all outline-none ${theme === 'dark' ? 'bg-white/5 border-white/5 text-white' : 'bg-white border-gray-200 text-gray-900'}`}
-                                    />
-                                    <input
-                                        type="text"
-                                        placeholder="Max"
-                                        value={maxProfit}
-                                        onChange={(e) => setMaxProfit(e.target.value)}
-                                        className={`w-full px-10 py-2.5 rounded-xl border text-sm font-semibold transition-all outline-none ${theme === 'dark' ? 'bg-white/5 border-white/5 text-white' : 'bg-white border-gray-200 text-gray-900'}`}
+                                        placeholder="+28% / X2"
+                                        value={formData.maxProfit || ''}
+                                        onChange={(e) => setFormData({ ...formData, maxProfit: e.target.value })}
+                                        className={`w-full pl-10 py-2.5 rounded-xl border text-sm font-mono outline-none ${theme === 'dark' ? 'bg-white/5 border-white/5 text-white' : 'bg-white border-gray-200 text-gray-900'}`}
                                     />
                                 </div>
                             </div>
@@ -597,22 +586,15 @@ export const AiAoAlerts = () => {
                             <div className="lg:col-span-2 space-y-4">
                                 <div className="flex items-center gap-2 px-1">
                                     <Coins className="w-3.5 h-3.5 text-amber-500" />
-                                    <span className={`text-[10px] font-bold uppercase tracking-wider ${subTextColor}`}>Капитализация</span>
+                                    <span className={`text-[10px] font-bold uppercase tracking-wider ml-1 ${subTextColor}`}>Капитализация</span>
                                 </div>
-                                <div className="grid grid-cols-2 gap-3">
+                                <div className="grid grid-cols-2 gap-3 mt-2">
                                     <input
                                         type="text"
-                                        placeholder="Min"
-                                        value={minMc}
-                                        onChange={(e) => setMinMc(e.target.value)}
-                                        className={`w-full px-10 py-2.5 rounded-xl border text-sm font-mono outline-none ${theme === 'dark' ? 'bg-white/5 border-white/5 text-white' : 'bg-white border-gray-100 text-gray-900'}`}
-                                    />
-                                    <input
-                                        type="text"
-                                        placeholder="Max"
-                                        value={maxMc}
-                                        onChange={(e) => setMaxMc(e.target.value)}
-                                        className={`w-full px-10 py-2.5 rounded-xl border text-sm font-mono outline-none ${theme === 'dark' ? 'bg-white/5 border-white/5 text-white' : 'bg-white border-gray-100 text-gray-900'}`}
+                                        placeholder="Напр: 300K или 1.5M"
+                                        value={formData.marketCap || ''}
+                                        onChange={(e) => setFormData({ ...formData, marketCap: e.target.value })}
+                                        className={`w-full pl-10 py-2.5 rounded-xl border text-sm font-mono outline-none ${theme === 'dark' ? 'bg-white/5 border-white/5 text-white' : 'bg-white border-gray-200 text-gray-900'}`}
                                     />
                                 </div>
                             </div>
@@ -621,7 +603,7 @@ export const AiAoAlerts = () => {
                             <div className="lg:col-span-3 space-y-4">
                                 <div className="flex items-center gap-2 px-1">
                                     <Hash className="w-3.5 h-3.5 text-purple-500" />
-                                    <span className={`text-[11px] font-bold uppercase tracking-widest ${subTextColor}`}>Сортировка</span>
+                                    <span className={`text-[11px] font-bold tracking-widest ml-1 ${subTextColor}`}>Сортировка</span>
                                 </div>
                                 <div className="flex gap-2">
                                     <select
@@ -667,121 +649,256 @@ export const AiAoAlerts = () => {
                 )}
 
                 {/* Table */}
-                <div className="relative overflow-hidden rounded-3xl border ${cardBorder} ${cardShadow} ${cardBg}">
+                <div className={`relative overflow-hidden rounded-3xl border ${cardBorder} ${cardShadow} ${cardBg}`}>
                     <table className="w-full text-left border-collapse">
                         <thead>
                             <tr className={`border-b ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-gray-50'}`}>
-                                <th className={`p-1 text-[10px] uppercase tracking-wider font-semibold ${subTextColor} text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>№</th>
-                                <th className={`p-1 text-[10px] uppercase tracking-wider font-semibold ${subTextColor} text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>Date</th>
-                                <th className={`p-1 text-[10px] uppercase tracking-wider font-semibold ${subTextColor} text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>Time</th>
-                                <th className={`p-1 text-[10px] uppercase tracking-wider font-semibold ${subTextColor} text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>MC</th>
-                                <th className={`p-1 text-[10px] uppercase tracking-wider font-semibold ${subTextColor} text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>Адрес</th>
-                                <th className={`p-1 text-[10px] uppercase tracking-wider font-semibold ${subTextColor} text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>Drop</th>
-                                <th className={`p-1 text-[10px] uppercase tracking-wider font-semibold ${subTextColor} text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>Drop 0,7</th>
-                                <th className={`p-1 text-[10px] uppercase tracking-wider font-semibold ${subTextColor} text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>Профит</th>
-                                <th className={`p-1 text-[10px] uppercase tracking-wider font-semibold ${subTextColor} text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>Коммент</th>
-                                <th className={`p-1 text-[10px] uppercase tracking-wider font-semibold ${subTextColor} text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>Photo</th>
-                                <th className={`p-1 text-[10px] uppercase tracking-wider font-semibold ${subTextColor} text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>Автор</th>
-                                <th className={`p-1 text-[10px] uppercase tracking-wider font-semibold ${subTextColor} text-center last:border-r-0`}>Действия</th>
+                                <th className={`p-1.5 text-[10px] uppercase tracking-wider font-semibold ${subTextColor} text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>#</th>
+                                <th className={`p-1.5 text-[10px] uppercase tracking-wider font-semibold ${subTextColor} text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>Date</th>
+                                <th className={`p-1.5 text-[10px] uppercase tracking-wider font-semibold ${subTextColor} text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>Time</th>
+                                <th className={`p-1.5 text-[10px] uppercase tracking-wider font-semibold ${subTextColor} text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>MC</th>
+                                <th className={`p-1.5 text-[10px] uppercase tracking-wider font-semibold ${subTextColor} text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>Адрес</th>
+                                <th className={`p-1.5 text-[10px] uppercase tracking-wider font-semibold ${subTextColor} text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>Drop</th>
+                                <th className={`p-1.5 text-[10px] uppercase tracking-wider font-semibold ${subTextColor} text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>Drop 0,7</th>
+                                <th className={`p-1.5 text-[10px] uppercase tracking-wider font-semibold ${subTextColor} text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>Профит</th>
+                                <th className={`p-1.5 text-[10px] uppercase tracking-wider font-semibold ${subTextColor} text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>Коммент</th>
+                                <th className={`p-1.5 text-[10px] uppercase tracking-wider font-semibold ${subTextColor} text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>Photo</th>
+                                <th className={`p-1.5 text-[10px] uppercase tracking-wider font-semibold ${subTextColor} text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>Автор</th>
+                                <th className={`p-1.5 text-[10px] uppercase tracking-wider font-semibold ${subTextColor} text-center last:border-r-0`}>⚙</th>
                             </tr>
                         </thead>
                         <tbody className={`divide-y ${theme === 'dark' ? 'divide-white/5' : 'divide-gray-100'}`}>
                             {loading ? (
                                 <tr>
-                                    <td colSpan={12} className="p-4 text-center text-gray-500">Загрузка...</td>
+                                    <td colSpan={12} className="p-8 text-center text-gray-500">Загрузка...</td>
                                 </tr>
                             ) : filteredAlerts.length === 0 ? (
                                 <tr>
-                                    <td colSpan={12} className="p-4 text-center text-gray-500">
+                                    <td colSpan={12} className="p-8 text-center text-gray-500">
                                         {hasActiveFilters ? 'Нет сигналов по выбранным фильтрам' : 'Нет сигналов'}
                                     </td>
                                 </tr>
+                            ) : sortBy === 'date' ? (
+                                (() => {
+                                    const groupedAlerts: { [key: string]: AiAlert[] } = {}
+                                    filteredAlerts.forEach((alert: AiAlert) => {
+                                        const dateKey = alert.signalDate
+                                        if (!groupedAlerts[dateKey]) {
+                                            groupedAlerts[dateKey] = []
+                                        }
+                                        groupedAlerts[dateKey].push(alert)
+                                    })
+
+                                    const dates = Object.keys(groupedAlerts).sort().reverse()
+                                    const rows: React.ReactNode[] = []
+
+                                    dates.forEach((dateKey, dateIndex) => {
+                                        const dateAlerts = groupedAlerts[dateKey]
+
+                                        if (dateIndex > 0) {
+                                            rows.push(
+                                                <tr key={`separator-${dateKey}`}>
+                                                    <td colSpan={12} className="py-1">
+                                                        <div className={`h-px ${theme === 'dark' ? 'bg-white/10' : 'bg-gray-200'}`}></div>
+                                                    </td>
+                                                </tr>
+                                            )
+                                        }
+
+                                        rows.push(
+                                            <tr key={`header-${dateKey}`} className={`${theme === 'dark' ? 'bg-white/5' : 'bg-gray-50'}`}>
+                                                <td colSpan={12} className="p-2 px-3">
+                                                    <span className={`text-xs sm:text-sm font-semibold ${subTextColor}`}>
+                                                        {formatDateForDisplay(dateKey)}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        )
+
+                                        dateAlerts.forEach((alert: AiAlert) => {
+                                            const globalIndex = filteredAlerts.indexOf(alert) + 1
+                                            rows.push(
+                                                <tr key={alert.id} className={`${theme === 'dark' ? 'hover:bg-white/5' : 'hover:bg-gray-50'} transition-colors`}>
+                                                    <td className={`p-1.5 text-center whitespace-nowrap border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
+                                                        <div className={`font-mono text-[10px] sm:text-xs font-bold ${subTextColor}`}>{globalIndex}</div>
+                                                    </td>
+                                                    <td className={`p-1.5 text-center whitespace-nowrap border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
+                                                        <div className={`font-mono font-medium text-[10px] sm:text-xs ${headingColor}`}>{formatDateForDisplay(alert.signalDate)}</div>
+                                                    </td>
+                                                    <td className={`p-1.5 text-center whitespace-nowrap border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
+                                                        <div className={`font-mono text-[10px] sm:text-xs ${headingColor}`}>{alert.signalTime}</div>
+                                                    </td>
+                                                    <td className={`p-1.5 text-center whitespace-nowrap border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
+                                                        <div className={`font-mono text-[10px] sm:text-xs ${headingColor}`}>{alert.marketCap || '-'}</div>
+                                                    </td>
+                                                    <td className={`p-1.5 text-center whitespace-nowrap border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
+                                                        <div className="flex items-center justify-center gap-1">
+                                                            <a
+                                                                href={`https://gmgn.ai/sol/token/${alert.address}`}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className={`font-mono text-[10px] ${theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-500'} cursor-pointer`}
+                                                                title={alert.address}
+                                                            >
+                                                                {truncateAddress(alert.address)}
+                                                            </a>
+                                                            <button
+                                                                onClick={() => handleCopy(alert.address, alert.id)}
+                                                                className={`p-1 rounded hover:bg-white/10 transition-colors ${subTextColor}`}
+                                                            >
+                                                                {copyingId === alert.id ? <Check className="w-3 h-3 text-green-500" /> : <Copy className="w-3 h-3" />}
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                    <td className={`p-1.5 text-center whitespace-nowrap border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
+                                                        <span className={`font-mono text-[10px] sm:text-xs ${alert.maxDrop && alert.maxDrop.startsWith('-') ? 'text-red-500' : headingColor}`}>
+                                                            {alert.maxDrop || '-'}
+                                                        </span>
+                                                    </td>
+                                                    <td className={`p-1.5 text-center whitespace-nowrap border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
+                                                        <span className={`font-mono text-[10px] sm:text-xs ${alert.maxDropFromLevel07 && alert.maxDropFromLevel07.startsWith('-') ? 'text-red-500' : headingColor}`}>
+                                                            {alert.maxDropFromLevel07 || '-'}
+                                                        </span>
+                                                    </td>
+                                                    <td className={`p-1.5 text-center whitespace-nowrap border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
+                                                        <span className="font-mono text-[10px] sm:text-xs text-green-500 font-bold">
+                                                            {alert.maxProfit || '-'}
+                                                        </span>
+                                                    </td>
+                                                    <td className={`p-1.5 text-center whitespace-nowrap border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
+                                                        <div className={`text-[10px] ${headingColor} break-words whitespace-pre-wrap max-w-[200px] text-center`}>
+                                                            {alert.comment || '-'}
+                                                        </div>
+                                                    </td>
+                                                    <td className={`p-1.5 text-center whitespace-nowrap border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
+                                                        {alert.screenshot ? (
+                                                            <button
+                                                                onClick={() => setPreviewImage(alert.screenshot!)}
+                                                                className={`text-[10px] ${subTextColor} hover:text-emerald-500 transition-colors cursor-pointer`}
+                                                                title="Просмотр фото"
+                                                            >
+                                                                📷
+                                                            </button>
+                                                        ) : (
+                                                            <span className={`text-[10px] ${subTextColor}`}>—</span>
+                                                        )}
+                                                    </td>
+                                                    <td className={`p-1.5 text-center whitespace-nowrap border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
+                                                        <UserNickname userId={alert.createdBy} className="text-[10px] font-medium" />
+                                                    </td>
+                                                    <td className="p-1.5 text-center whitespace-nowrap last:border-r-0">
+                                                        <div className="flex items-center justify-center gap-0.5">
+                                                            {(isAdmin || user?.id === alert.createdBy) && (
+                                                                <button
+                                                                    onClick={() => handleEdit(alert)}
+                                                                    className={`p-1 rounded-lg hover:bg-white/10 transition-colors ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}
+                                                                >
+                                                                    <Edit className="w-3 h-3" />
+                                                                </button>
+                                                            )}
+                                                            {isAdmin && (
+                                                                <button
+                                                                    onClick={() => handleDelete(alert.id)}
+                                                                    className="p-1 rounded-lg hover:bg-red-500/10 text-red-500 transition-colors"
+                                                                >
+                                                                    <Trash2 className="w-3 h-3" />
+                                                                </button>
+                                                            )}
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            )
+                                        })
+                                    })
+
+                                    return rows
+                                })()
                             ) : (
                                 filteredAlerts.map((alert: AiAlert, index: number) => (
                                     <tr key={alert.id} className={`${theme === 'dark' ? 'hover:bg-white/5' : 'hover:bg-gray-50'} transition-colors`}>
-                                        <td className={`p-1 text-center whitespace-nowrap border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
-                                            <div className={`font-mono text-xs font-bold ${subTextColor}`}>{index + 1}</div>
+                                        <td className={`p-1.5 text-center whitespace-nowrap border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
+                                            <div className={`font-mono text-[10px] sm:text-xs font-bold ${subTextColor}`}>{index + 1}</div>
                                         </td>
-                                        <td className={`p-1 text-center whitespace-nowrap border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
-                                            <div className={`font-mono text-xs ${headingColor}`}>{formatDateForDisplay(alert.signalDate)}</div>
+                                        <td className={`p-1.5 text-center whitespace-nowrap border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
+                                            <div className={`font-mono font-medium text-[10px] sm:text-xs ${headingColor}`}>{formatDateForDisplay(alert.signalDate)}</div>
                                         </td>
-                                        <td className={`p-1 text-center whitespace-nowrap border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
-                                            <div className={`font-mono text-xs ${headingColor}`}>{alert.signalTime}</div>
+                                        <td className={`p-1.5 text-center whitespace-nowrap border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
+                                            <div className={`font-mono text-[10px] sm:text-xs ${headingColor}`}>{alert.signalTime}</div>
                                         </td>
-                                        <td className={`p-1 text-center whitespace-nowrap border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
-                                            <div className={`font-mono text-xs ${headingColor}`}>{alert.marketCap || '-'}</div>
+                                        <td className={`p-1.5 text-center whitespace-nowrap border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
+                                            <div className={`font-mono text-[10px] sm:text-xs ${headingColor}`}>{alert.marketCap || '-'}</div>
                                         </td>
-                                        <td className={`p-1 text-center whitespace-nowrap border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
+                                        <td className={`p-1.5 text-center whitespace-nowrap border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
                                             <div className="flex items-center justify-center gap-1">
                                                 <a
                                                     href={`https://gmgn.ai/sol/token/${alert.address}`}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    className={`font-mono text-xs ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}
+                                                    className={`font-mono text-[10px] ${theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-500'} cursor-pointer`}
                                                     title={alert.address}
                                                 >
                                                     {truncateAddress(alert.address)}
                                                 </a>
                                                 <button
                                                     onClick={() => handleCopy(alert.address, alert.id)}
-                                                    className={subTextColor}
+                                                    className={`p-1 rounded hover:bg-white/10 transition-colors ${subTextColor}`}
                                                 >
                                                     {copyingId === alert.id ? <Check className="w-3 h-3 text-green-500" /> : <Copy className="w-3 h-3" />}
                                                 </button>
                                             </div>
                                         </td>
-                                        <td className={`p-1 text-center whitespace-nowrap border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
-                                            <span className={`font-mono text-xs ${alert.maxDrop && alert.maxDrop.startsWith('-') ? 'text-red-500' : headingColor}`}>
+                                        <td className={`p-1.5 text-center whitespace-nowrap border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
+                                            <span className={`font-mono text-[10px] sm:text-xs ${alert.maxDrop && alert.maxDrop.startsWith('-') ? 'text-red-500' : headingColor}`}>
                                                 {alert.maxDrop || '-'}
                                             </span>
                                         </td>
-                                        <td className={`p-1 text-center whitespace-nowrap border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
-                                            <span className={`font-mono text-xs ${alert.maxDropFromLevel07 && alert.maxDropFromLevel07.startsWith('-') ? 'text-red-500' : headingColor}`}>
+                                        <td className={`p-1.5 text-center whitespace-nowrap border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
+                                            <span className={`font-mono text-[10px] sm:text-xs ${alert.maxDropFromLevel07 && alert.maxDropFromLevel07.startsWith('-') ? 'text-red-500' : headingColor}`}>
                                                 {alert.maxDropFromLevel07 || '-'}
                                             </span>
                                         </td>
-                                        <td className={`p-1 text-center whitespace-nowrap border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
-                                            <span className="font-mono text-green-500 font-bold">
+                                        <td className={`p-1.5 text-center whitespace-nowrap border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
+                                            <span className="font-mono text-[10px] sm:text-xs text-green-500 font-bold">
                                                 {alert.maxProfit || '-'}
                                             </span>
                                         </td>
-                                        <td className={`p-1 text-center whitespace-nowrap border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
-                                            <div className={`text-xs ${headingColor} break-words whitespace-pre-wrap max-w-[150px]`}>
+                                        <td className={`p-1.5 text-center whitespace-nowrap border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
+                                            <div className={`text-[10px] ${headingColor} break-words whitespace-pre-wrap max-w-[200px] text-center`}>
                                                 {alert.comment || '-'}
                                             </div>
                                         </td>
-                                        <td className={`p-1 text-center whitespace-nowrap border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
+                                        <td className={`p-1.5 text-center whitespace-nowrap border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
                                             {alert.screenshot ? (
                                                 <button
                                                     onClick={() => setPreviewImage(alert.screenshot!)}
-                                                    className={theme === 'dark' ? 'text-emerald-400' : 'text-emerald-600'}
+                                                    className={`text-[10px] ${subTextColor} hover:text-emerald-500 transition-colors cursor-pointer`}
                                                     title="Просмотр фото"
                                                 >
-                                                    <ImageIcon className="w-4 h-4" />
+                                                    📷
                                                 </button>
                                             ) : (
-                                                <span className={subTextColor}>—</span>
+                                                <span className={`text-[10px] ${subTextColor}`}>—</span>
                                             )}
                                         </td>
-                                        <td className={`p-1 text-center whitespace-nowrap border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
-                                            <UserNickname userId={alert.createdBy} className="text-xs" />
+                                        <td className={`p-1.5 text-center whitespace-nowrap border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
+                                            <UserNickname userId={alert.createdBy} className="text-[10px] font-medium" />
                                         </td>
-                                        <td className="p-1 text-center whitespace-nowrap last:border-r-0">
+                                        <td className="p-1.5 text-center whitespace-nowrap last:border-r-0">
                                             <div className="flex items-center justify-center gap-0.5">
                                                 {(isAdmin || user?.id === alert.createdBy) && (
                                                     <button
                                                         onClick={() => handleEdit(alert)}
-                                                        className={theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}
+                                                        className={`p-1 rounded-lg hover:bg-white/10 transition-colors ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}
                                                     >
-                                                        <Edit className="w-4 h-4" />
+                                                        <Edit className="w-3 h-3" />
                                                     </button>
                                                 )}
                                                 {isAdmin && (
                                                     <button
                                                         onClick={() => handleDelete(alert.id)}
-                                                        className="text-red-500 hover:text-red-400"
+                                                        className="p-1 rounded-lg hover:bg-red-500/10 text-red-500 transition-colors"
                                                     >
-                                                        <Trash2 className="w-4 h-4" />
+                                                        <Trash2 className="w-3 h-3" />
                                                     </button>
                                                 )}
                                             </div>
@@ -836,7 +953,7 @@ export const AiAoAlerts = () => {
                                                     type="date"
                                                     value={editingAlert?.signalDate || commonDate}
                                                     onChange={(e) => editingAlert ? setFormData({ ...formData, signalDate: e.target.value }) : setCommonDate(e.target.value)}
-                                                    className={`w-full pl-10 pr-4 py-3 rounded-xl border text-sm font-semibold outline-none ${theme === 'dark' ? 'bg-white/5 border-white/5 text-white' : 'bg-gray-50 border-gray-100 text-gray-900'}`}
+                                                    className={`w-full pl-10 pr-4 py-3 rounded-xl border text-sm font-semibold outline-none ${theme === 'dark' ? 'bg-white/5 border-white/5 text-white' : 'bg-white border-gray-200 text-gray-900'}`}
                                                 />
                                             </div>
                                         </div>
@@ -848,7 +965,7 @@ export const AiAoAlerts = () => {
                                                     type="time"
                                                     value={formData.signalTime}
                                                     onChange={(e) => setFormData({ ...formData, signalTime: e.target.value })}
-                                                    className={`w-full pl-10 pr-4 py-3 rounded-xl border text-sm font-semibold outline-none ${theme === 'dark' ? 'bg-white/5 border-white/5 text-white' : 'bg-gray-50 border-gray-100 text-gray-900'}`}
+                                                    className={`w-full pl-10 pr-4 py-3 rounded-xl border text-sm font-semibold outline-none ${theme === 'dark' ? 'bg-white/5 border-white/5 text-white' : 'bg-white border-gray-200 text-gray-900'}`}
                                                 />
                                             </div>
                                         </div>
@@ -864,7 +981,7 @@ export const AiAoAlerts = () => {
                                                     placeholder="Напр: 300K или 1.5M"
                                                     value={formData.marketCap || ''}
                                                     onChange={(e) => setFormData({ ...formData, marketCap: e.target.value })}
-                                                    className={`w-full pl-10 pr-4 py-3 rounded-xl border text-sm font-mono outline-none ${theme === 'dark' ? 'bg-white/5 border-white/5 text-white' : 'bg-gray-50 border-gray-100 text-gray-900'}`}
+                                                    className={`w-full pl-10 py-2.5 rounded-xl border text-sm font-mono outline-none ${theme === 'dark' ? 'bg-white/5 border-white/5 text-white' : 'bg-white border-gray-200 text-gray-900'}`}
                                                 />
                                             </div>
                                         </div>
@@ -878,7 +995,7 @@ export const AiAoAlerts = () => {
                                                     placeholder="-16%"
                                                     value={formData.maxDrop || ''}
                                                     onChange={(e) => setFormData({ ...formData, maxDrop: e.target.value })}
-                                                    className={`w-full pl-10 pr-4 py-3 rounded-xl border text-sm font-semibold outline-none ${theme === 'dark' ? 'bg-white/5 border-white/5 text-white' : 'bg-gray-50 border-gray-100 text-gray-900'}`}
+                                                    className={`w-full pl-10 py-2.5 rounded-xl border text-sm font-semibold outline-none ${theme === 'dark' ? 'bg-white/5 border-white/5 text-white' : 'bg-white border-gray-200 text-gray-900'}`}
                                                 />
                                             </div>
                                         </div>
@@ -892,7 +1009,7 @@ export const AiAoAlerts = () => {
                                                     placeholder="X2"
                                                     value={formData.maxDropFromLevel07 || ''}
                                                     onChange={(e) => setFormData({ ...formData, maxDropFromLevel07: e.target.value })}
-                                                    className={`w-full pl-10 pr-4 py-3 rounded-xl border text-sm font-semibold outline-none ${theme === 'dark' ? 'bg-white/5 border-white/5 text-white' : 'bg-gray-50 border-gray-100 text-gray-900'}`}
+                                                    className={`w-full pl-10 py-2.5 rounded-xl border text-sm font-semibold outline-none ${theme === 'dark' ? 'bg-white/5 border-white/5 text-white' : 'bg-white border-gray-200 text-gray-900'}`}
                                                 />
                                             </div>
                                         </div>
@@ -906,7 +1023,7 @@ export const AiAoAlerts = () => {
                                                     placeholder="+28% / X2"
                                                     value={formData.maxProfit || ''}
                                                     onChange={(e) => setFormData({ ...formData, maxProfit: e.target.value })}
-                                                    className={`w-full pl-10 pr-4 py-3 rounded-xl border text-sm font-semibold outline-none ${theme === 'dark' ? 'bg-white/5 border-white/5 text-white' : 'bg-gray-50 border-gray-100 text-gray-900'}`}
+                                                    className={`w-full pl-10 py-2.5 rounded-xl border text-sm font-mono outline-none ${theme === 'dark' ? 'bg-white/5 border-white/5 text-white' : 'bg-white border-gray-200 text-gray-900'}`}
                                                 />
                                             </div>
                                         </div>
@@ -920,7 +1037,7 @@ export const AiAoAlerts = () => {
                                                     placeholder="Дополнительная информация..."
                                                     value={formData.comment || ''}
                                                     onChange={(e) => setFormData({ ...formData, comment: e.target.value })}
-                                                    className={`w-full pl-10 pr-4 py-3 rounded-2xl border outline-none transition-all text-sm font-semibold resize-none ${theme === 'dark' ? 'bg-black/20 border-white/5 text-white' : 'bg-gray-50 border-gray-100 text-gray-900'}`}
+                                                    className={`w-full pl-10 pr-4 py-3 rounded-2xl border outline-none transition-all text-sm font-semibold resize-none ${theme === 'dark' ? 'bg-black/20 border-white/5 text-white' : 'bg-white border-gray-50 border-gray-100 text-gray-900'}`}
                                                 ></textarea>
                                             </div>
                                         </div>
@@ -992,7 +1109,7 @@ export const AiAoAlerts = () => {
                                             placeholder="Введите адрес контракта..."
                                             value={formData.address}
                                             onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                                            className={`w-full pl-10 pr-4 py-3 rounded-xl border text-sm font-mono outline-none ${theme === 'dark' ? 'bg-black/20 border-white/5 text-white' : 'bg-gray-50 border-gray-100 text-gray-900'}`}
+                                            className={`w-full pl-10 py-2.5 rounded-xl border text-sm font-mono outline-none ${theme === 'dark' ? 'bg-black/20 border-white/5 text-white' : 'bg-white border-gray-200 text-gray-900'}`}
                                         />
                                     </div>
 
