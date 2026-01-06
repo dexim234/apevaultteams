@@ -794,7 +794,7 @@ export const FasolSignalsStrategy = () => {
                                     {alertsToAdd.length > 0 && (
                                         <button onClick={handleSaveAll} className="flex-1 w-full py-4 rounded-2xl bg-sky-400 hover:bg-sky-500 text-[#0b1015] font-black flex items-center justify-center gap-2 transition-all shadow-lg shadow-sky-400/20">
                                             <Save className="w-5 h-5" />
-                                            Сохранить всё ({alertsToAdd.length})
+                                            Сохранить все ({alertsToAdd.length})
                                         </button>
                                     )}
                                     {editingAlert && (

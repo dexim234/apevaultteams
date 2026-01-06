@@ -1384,7 +1384,7 @@ export const SignalsTriggerBot = () => {
                                         className="w-full py-4 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-black transition-all shadow-xl shadow-emerald-500/20 active:scale-95 flex items-center justify-center gap-3 mt-4"
                                     >
                                         <Check className="w-6 h-6 stroke-[3]" />
-                                        <span className="text-lg">СОХРАНИТЬ ВСЁ</span>
+                                        <span className="text-lg">СОХРАНИТЬ ВСЕ ДАННЫЕ В БАЗУ</span>
                                     </button>
                                 </div>
                             )}

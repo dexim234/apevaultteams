@@ -480,13 +480,11 @@ export interface AiAlert {
   signalTime: string // HH:mm
   marketCap?: string // string to allow "300,77" format
   address: string
-  strategies?: TriggerStrategy[] // Multiple strategies
-  maxDropFromSignal?: string // e.g. "-16"
-  maxDropFromLevel07?: string // e.g. "-5"
-  profits?: TriggerProfit[] // Multiple profits (one per strategy)
+  strategy?: 'Фиба' | 'Market Entry' // Trading strategy
+  maxDrop?: string // e.g. "-16"
+  maxProfit?: string // e.g. "+28" or "X3"
   comment?: string // "Постепенное снижение" etc.
   isScam?: boolean
-  screenshot?: string // URL to screenshot
   createdAt: string
   createdBy: string
 }
