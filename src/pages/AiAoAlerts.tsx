@@ -3,7 +3,7 @@ import { useThemeStore } from '@/store/themeStore'
 import { useAuthStore } from '@/store/authStore'
 import { getAiAlerts, addAiAlert, updateAiAlert, deleteAiAlert } from '@/services/firestoreService'
 import { AiAlert } from '@/types'
-import { Plus, Edit, Trash2, Save, X, Copy, Check, Terminal, Table, Filter, ArrowUp, ArrowDown, RotateCcw, Calendar, ChevronDown, Hash, Coins, TrendingDown, TrendingUp, Search, Activity, Clock, FileText, Target } from 'lucide-react'
+import { Plus, Edit, Trash2, Save, X, Copy, Check, Terminal, Table, Filter, ArrowUp, ArrowDown, RotateCcw, Calendar, ChevronDown, Hash, Coins, TrendingDown, TrendingUp, Search, Activity, Clock, FileText, Target, AlertTriangle } from 'lucide-react'
 import { UserNickname } from '../components/UserNickname'
 import { useAdminStore } from '@/store/adminStore'
 
@@ -1005,14 +1005,28 @@ export const AiAoAlerts = () => {
                                         <div className="relative">
                                             <FileText className="absolute left-3 top-3 w-4 h-4 text-gray-500" />
                                             <textarea
-                                                rows={3}
-                                                placeholder="Дополнительная информация о сигнале..."
+                                                rows={4}
+                                                placeholder="Дополнительная информация о сигналу..."
                                                 value={formData.comment}
                                                 onChange={(e) => setFormData({ ...formData, comment: e.target.value })}
-                                                className={`w-full pl-10 pr-4 py-3 rounded-xl border outline-none transition-all text-sm font-semibold resize-none ${theme === 'dark' ? 'bg-black/20 border-white/5 text-white focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/5' : 'bg-gray-50 border-gray-100 text-gray-900 focus:border-indigo-500/30'}`}
+                                                className={`w-full pl-10 pr-4 py-3 rounded-2xl border outline-none transition-all text-sm font-semibold resize-none ${theme === 'dark' ? 'bg-black/20 border-white/5 text-white focus:border-indigo-500/50' : 'bg-gray-50 border-gray-100 text-gray-900 focus:border-indigo-500/30'}`}
                                             ></textarea>
                                         </div>
                                     </div>
+
+                                    <button
+                                        type="button"
+                                        onClick={() => setFormData({ ...formData, isScam: !formData.isScam })}
+                                        className={`w-full p-4 rounded-2xl border-2 border-dashed flex items-center gap-4 transition-all ${formData.isScam ? 'bg-red-500/10 border-red-500/50 text-red-500' : 'bg-black/10 border-white/5 text-gray-500 hover:border-white/10'}`}
+                                    >
+                                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${formData.isScam ? 'bg-red-500 text-white' : 'bg-white/5'}`}>
+                                            <AlertTriangle size={20} />
+                                        </div>
+                                        <div className="text-left">
+                                            <h4 className="text-sm font-bold">SCAM ALERT</h4>
+                                            <p className="text-[10px] opacity-70">Пометить этот сигнал как скам/мошенничество</p>
+                                        </div>
+                                    </button>
                                 </div>
 
                                 {/* Right Column: Strategy & Address */}
@@ -1025,7 +1039,7 @@ export const AiAoAlerts = () => {
                                     <div className="space-y-3">
                                         <label className={`text-[10px] font-bold uppercase tracking-wider ml-1 ${subTextColor}`}>Выбор стратегии</label>
                                         <div className="grid grid-cols-2 gap-3">
-                                            {(['Фиба', 'Market Entry', 'Флип'] as AiAlert['strategy'][]).map((strat) => (
+                                            {(['Фиба', 'Market Entry'] as AiAlert['strategy'][]).map((strat) => (
                                                 <button
                                                     key={strat}
                                                     type="button"
@@ -1059,30 +1073,33 @@ export const AiAoAlerts = () => {
                                             />
                                         </div>
                                     </div>
+                                </div>
+                            </div>
 
-                                    {!editingAlert && (
-                                        <button
-                                            type="button"
-                                            onClick={handleAddToList}
-                                            className="w-full py-4 rounded-2xl bg-indigo-500 hover:bg-indigo-600 text-white font-bold transition-all shadow-lg shadow-indigo-500/20 active:scale-95 flex items-center justify-center gap-3"
-                                        >
-                                            <Plus className="w-5 h-5" />
-                                            <span>Добавить в список</span>
-                                        </button>
-                                    )}
-
-                                    {editingAlert && (
-                                        <button
-                                            type="button"
-                                            onClick={handleSubmit}
-                                            className="w-full py-4 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold transition-all shadow-lg shadow-indigo-600/20 active:scale-95 flex items-center justify-center gap-3"
-                                        >
+                            {/* Footer: Multi-Add Buttons */}
+                            {!editingAlert && (
+                                <div className="mt-8 pt-6 border-t border-white/5 flex flex-col sm:flex-row items-center gap-4">
+                                    <button onClick={handleAddToList} className="flex-1 w-full py-4 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 text-white font-bold flex items-center justify-center gap-2 transition-all">
+                                        <Plus className="w-5 h-5" />
+                                        Добавить в список
+                                    </button>
+                                    {alertsToAdd.length > 0 && (
+                                        <button onClick={handleSaveAll} className="flex-1 w-full py-4 rounded-2xl bg-indigo-500 hover:bg-indigo-600 text-white font-black flex items-center justify-center gap-2 transition-all shadow-lg shadow-indigo-500/20">
                                             <Save className="w-5 h-5" />
-                                            <span>Сохранить изменения</span>
+                                            СОХРАНИТЬ ВСЁ ({alertsToAdd.length})
                                         </button>
                                     )}
                                 </div>
-                            </div>
+                            )}
+
+                            {editingAlert && (
+                                <div className="mt-8 pt-6 border-t border-white/5">
+                                    <button onClick={handleSubmit} className="w-full py-4 rounded-2xl bg-indigo-500 hover:bg-indigo-600 text-white font-black flex items-center justify-center gap-2 transition-all shadow-lg shadow-indigo-500/20">
+                                        <Save className="w-5 h-5" />
+                                        СОХРАНИТЬ ИЗМЕНЕНИЯ
+                                    </button>
+                                </div>
+                            )}
 
                             {!editingAlert && alertsToAdd.length > 0 && (
                                 <div className="mt-12 space-y-4 pt-8 border-t border-white/5">
@@ -1138,14 +1155,6 @@ export const AiAoAlerts = () => {
                                             </tbody>
                                         </table>
                                     </div>
-
-                                    <button
-                                        onClick={handleSaveAll}
-                                        className="w-full py-4 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-black transition-all shadow-xl shadow-emerald-500/20 active:scale-95 flex items-center justify-center gap-3 mt-4"
-                                    >
-                                        <Check className="w-6 h-6 stroke-[3]" />
-                                        <span className="text-lg">СОХРАНИТЬ ВСЕ ДАННЫЕ В БАЗУ</span>
-                                    </button>
                                 </div>
                             )}
                         </div>
