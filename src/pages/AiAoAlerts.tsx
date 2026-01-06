@@ -3,8 +3,10 @@ import { useThemeStore } from '@/store/themeStore'
 import { useAuthStore } from '@/store/authStore'
 import { useAdminStore } from '@/store/adminStore'
 import { getAiAlerts, addAiAlert, updateAiAlert, deleteAiAlert } from '@/services/firestoreService'
-import { AiAlert } from '@/types'
-import { Plus, Edit, Trash2, Save, X, Copy, Check, Filter, ArrowUp, ArrowDown, RotateCcw, Calendar, Hash, Coins, TrendingDown, TrendingUp, Activity, Clock, FileText, Image as ImageIcon, AlertTriangle, ChevronDown } from 'lucide-react'
+import { AiAlert, TriggerStrategy } from '@/types'
+import { Plus, Edit, Trash2, Save, X, Copy, Check, Filter, ArrowUp, ArrowDown, RotateCcw, Calendar, Hash, Coins, TrendingDown, TrendingUp, Activity, Clock, FileText, AlertTriangle, ChevronDown, Upload, TrendingUp as TrendingUpIcon, TrendingDown as TrendingDownIcon } from 'lucide-react'
+import { MultiStrategySelector } from '@/components/Management/MultiStrategySelector'
+import { UserNickname } from '@/components/UserNickname'
 
 type SortField = 'date' | 'drop' | 'profit'
 type SortOrder = 'asc' | 'desc'
@@ -26,6 +28,7 @@ export const AiAoAlerts = () => {
     const [editingAlert, setEditingAlert] = useState<AiAlert | null>(null)
     const [copyingId, setCopyingId] = useState<string | null>(null)
     const [isCopyingTable, setIsCopyingTable] = useState(false)
+    const [previewImage, setPreviewImage] = useState<string | null>(null)
 
     // Filter states
     const [showFilters, setShowFilters] = useState(false)
@@ -36,8 +39,6 @@ export const AiAoAlerts = () => {
     const [maxDrop, setMaxDrop] = useState('')
     const [minProfit, setMinProfit] = useState('')
     const [maxProfit, setMaxProfit] = useState('')
-    const [minMc, setMinMc] = useState('')
-    const [maxMc, setMaxMc] = useState('')
     const [sortBy, setSortBy] = useState<SortField>('date')
     const [sortOrder, setSortOrder] = useState<SortOrder>('desc')
 
@@ -57,6 +58,7 @@ export const AiAoAlerts = () => {
 
     const [alertsToAdd, setAlertsToAdd] = useState<Partial<AiAlert>[]>([])
     const [commonDate, setCommonDate] = useState(new Date().toISOString().split('T')[0])
+    const [profitsInput, setProfitsInput] = useState<{ strategy: TriggerStrategy, value: string }[]>([])
     const fileInputRef = useRef<HTMLInputElement>(null)
     const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null)
 
@@ -77,6 +79,11 @@ export const AiAoAlerts = () => {
             return
         }
 
+        if (!formData.isScam && (!formData.strategy || formData.strategy.length === 0)) {
+            alert('Выберите стратегию или отметьте как скам')
+            return
+        }
+
         const newAlert: Partial<AiAlert> = {
             signalDate: commonDate,
             signalTime: formData.signalTime,
@@ -85,7 +92,7 @@ export const AiAoAlerts = () => {
             strategy: formData.strategy,
             maxDrop: formData.maxDrop,
             maxDropFromLevel07: formData.maxDropFromLevel07,
-            maxProfit: formData.maxProfit,
+            maxProfit: profitsInput.length > 0 ? profitsInput.map(p => p.value).join(', ') : formData.maxProfit,
             comment: formData.comment,
             screenshot: screenshotPreview || undefined,
             isScam: formData.isScam || false
@@ -104,6 +111,7 @@ export const AiAoAlerts = () => {
             comment: ''
         })
         setScreenshotPreview(null)
+        setProfitsInput([])
     }
 
     const handleSaveAll = async () => {
@@ -148,6 +156,7 @@ export const AiAoAlerts = () => {
             const alertData = {
                 ...formData,
                 signalDate: commonDate,
+                maxProfit: profitsInput.length > 0 ? profitsInput.map(p => p.value).join(', ') : formData.maxProfit,
                 screenshot: screenshotPreview || formData.screenshot
             }
             if (editingAlert) {
@@ -182,8 +191,8 @@ export const AiAoAlerts = () => {
 
     const truncateAddress = (address: string) => {
         if (!address) return '-'
-        if (address.length <= 16) return address
-        return `${address.slice(0, 6)}...${address.slice(-6)}`
+        if (address.length <= 7) return address
+        return `${address.slice(0, 3)}...${address.slice(-3)}`
     }
 
     const copyToClipboard = async (text: string, id: string) => {
@@ -222,17 +231,6 @@ export const AiAoAlerts = () => {
         return isNaN(num) ? 0 : num
     }
 
-    const parseMarketCap = (value: string | undefined): number => {
-        if (!value) return 0
-        const cleaned = value.toUpperCase().replace(/[^0-9.]/g, '')
-        const num = parseFloat(cleaned)
-        if (isNaN(num)) return 0
-        if (value.toUpperCase().includes('K')) return num * 1000
-        if (value.toUpperCase().includes('M')) return num * 1000000
-        if (value.toUpperCase().includes('B')) return num * 1000000000
-        return num
-    }
-
     const resetFilters = () => {
         setSpecificDate('')
         setDateFrom('')
@@ -241,8 +239,6 @@ export const AiAoAlerts = () => {
         setMaxDrop('')
         setMinProfit('')
         setMaxProfit('')
-        setMinMc('')
-        setMaxMc('')
     }
 
     const filteredAlerts = useMemo(() => {
@@ -260,7 +256,7 @@ export const AiAoAlerts = () => {
             const maxVal = parseFloat(maxDrop)
             if (!isNaN(maxVal)) result = result.filter(a => parseValue(a.maxDrop) <= maxVal)
         }
-        
+
         if (minProfit) {
             const minVal = parseFloat(minProfit)
             if (!isNaN(minVal)) result = result.filter(a => parseValue(a.maxProfit) >= minVal)
@@ -268,18 +264,6 @@ export const AiAoAlerts = () => {
         if (maxProfit) {
             const maxVal = parseFloat(maxProfit)
             if (!isNaN(maxVal)) result = result.filter(a => parseValue(a.maxProfit) <= maxVal)
-        }
-        
-        if (minMc || maxMc) {
-            const mcStr = alerts[0]?.marketCap?.toLowerCase() || ''
-            let mcVal = 0
-            if (mcStr.includes('k')) mcVal = parseFloat(mcStr) * 1000
-            else if (mcStr.includes('m')) mcVal = parseFloat(mcStr) * 1000000
-            else if (mcStr.includes('b')) mcVal = parseFloat(mcStr) * 1000000000
-            else mcVal = parseFloat(mcStr)
-
-            if (minMc && mcVal > 0) result = result.filter(a => parseMarketCap(a.marketCap) >= parseFloat(minMc) * 1000000)
-            if (maxMc && mcVal > 0) result = result.filter(a => parseMarketCap(a.marketCap) <= parseFloat(maxMc) * 1000000)
         }
 
         result.sort((a, b) => {
@@ -292,7 +276,7 @@ export const AiAoAlerts = () => {
             return sortOrder === 'asc' ? comparison : -comparison
         })
         return result
-    }, [alerts, specificDate, dateFrom, dateTo, minDrop, maxDrop, minProfit, maxProfit, minMc, maxMc, sortBy, sortOrder])
+    }, [alerts, specificDate, dateFrom, dateTo, minDrop, maxDrop, minProfit, maxProfit, sortBy, sortOrder])
 
     const stats = useMemo(() => {
         const total = filteredAlerts.length
@@ -334,58 +318,87 @@ export const AiAoAlerts = () => {
         if (fileInputRef.current) fileInputRef.current.value = ''
     }
 
+    const getStrategyConfig = (strategy: TriggerStrategy) => {
+        switch (strategy) {
+            case 'Фиба': return { color: 'bg-indigo-500/20 text-indigo-400', icon: Activity, label: 'Фиба' }
+            case 'Market Entry': return { color: 'bg-blue-500/20 text-blue-400', icon: Activity, label: 'ME' }
+        }
+    }
+
+    const getStrategyLabel = (strategy: string): string => {
+        switch (strategy) {
+            case 'Фиба': return 'Fibo'
+            case 'Market Entry': return 'ME'
+            default: return strategy
+        }
+    }
+
+    const formatDateForDisplay = (dateStr: string) => {
+        if (!dateStr) return '-'
+        const parts = dateStr.split('-')
+        if (parts.length !== 3) return dateStr
+        const year = parts[0].slice(-2)
+        return `${parts[2]}.${parts[1]}.${year}`
+    }
+
     return (
-        <div className={`min-h-screen p-6 lg:p-8 ${theme === 'dark' ? 'bg-[#0a0e14]' : 'bg-gray-50'}`}>
-            <div className="max-w-7xl mx-auto">
+        <>
+            <div className="space-y-6">
                 {/* Header */}
-                <div className="flex items-center justify-between mb-8">
-                    <div className="flex items-center gap-4">
-                        <div className={`p-3 rounded-2xl ${theme === 'dark' ? 'bg-white/10 border-white/20' : 'bg-blue-500/10 border-blue-500/30'} shadow-inner`}>
-                            <Activity className={`w-8 h-8 ${theme === 'dark' ? 'text-white' : 'text-blue-500'}`} />
-                        </div>
-                        <div className="flex flex-col">
-                            <h1 className={`text-3xl font-black ${headingColor}`}>AI AO ALERTS</h1>
-                            <p className={`text-sm ${subTextColor}`}>Сигналы от AI AO</p>
-                        </div>
+                <div className={`relative overflow-hidden rounded-3xl border ${cardBorder} ${cardShadow} ${cardBg}`}>
+                    <div className="absolute inset-0 pointer-events-none">
+                        <div className="absolute -left-16 -bottom-10 w-80 h-80 bg-blue-500/10 blur-3xl"></div>
+                        <div className={`absolute inset-0 ${theme === 'dark' ? 'bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.05),transparent_45%)]' : 'bg-[radial-gradient(circle_at_50%_0%,rgba(59,130,246,0.05),transparent_45%)]'}`}></div>
                     </div>
 
-                    {/* Stats */}
-                    <div className="flex items-center gap-6">
-                        <div className="flex items-center gap-2">
-                            <div className={`w-2 h-2 rounded-full ${stats.total > 0 ? 'bg-emerald-500' : 'bg-gray-500'}`}></div>
-                            <span className={`text-sm font-medium ${subTextColor}`}>Всего сигналов: <span className={`font-bold ${headingColor}`}>{stats.total}</span></span>
+                    <div className="relative p-6 sm:p-8 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-6">
+                        <div className="flex items-center gap-4">
+                            <div className={`p-3 rounded-2xl ${theme === 'dark' ? 'bg-white/10 border-white/20' : 'bg-blue-500/10 border-blue-500/30'} shadow-inner`}>
+                                <Activity className={`w-8 h-8 ${theme === 'dark' ? 'text-white' : 'text-blue-500'}`} />
+                            </div>
+                            <div className="flex flex-col">
+                                <h1 className={`text-3xl font-black ${headingColor}`}>AI AO ALERTS</h1>
+                                <p className={`text-sm ${subTextColor}`}>Сигналы от AI AO</p>
+                            </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <TrendingUp className="w-4 h-4 text-emerald-500" />
-                            <span className={`text-sm font-medium ${subTextColor}`}>Профит: <span className={`font-bold text-emerald-500`}>+{stats.totalProfit.toFixed(1)}</span></span>
+
+                        {/* Stats */}
+                        <div className="flex items-center gap-6">
+                            <div className="flex items-center gap-2">
+                                <div className={`w-2 h-2 rounded-full ${stats.total > 0 ? 'bg-emerald-500' : 'bg-gray-500'}`}></div>
+                                <span className={`text-sm font-medium ${subTextColor}`}>Всего сигналов: <span className={`font-bold ${headingColor}`}>{stats.total}</span></span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <TrendingUpIcon className="w-4 h-4 text-emerald-500" />
+                                <span className={`text-sm font-medium ${subTextColor}`}>Профит: <span className={`font-bold text-emerald-500`}>+{stats.totalProfit.toFixed(1)}</span></span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <TrendingDownIcon className="w-4 h-4 text-rose-500" />
+                                <span className={`text-sm font-medium ${subTextColor}`}>Просадка: <span className={`font-bold text-rose-500`}>-{stats.totalDrop.toFixed(1)}%</span></span>
+                            </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <TrendingDown className="w-4 h-4 text-rose-500" />
-                            <span className={`text-sm font-medium ${subTextColor}`}>Просадка: <span className={`font-bold text-rose-500`}>-{stats.totalDrop.toFixed(1)}%</span></span>
-                        </div>
-                    </div>
 
-                    <div className="flex flex-wrap items-center gap-3">
-                        <button onClick={copyTableToClipboard} disabled={filteredAlerts.length === 0} className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 border ${theme === 'dark' ? 'bg-white/5 border-white/10 hover:bg-white/10 text-gray-300' : 'bg-gray-100 border-gray-200 hover:bg-gray-200 text-gray-700'} disabled:opacity-50`}>
-                            {isCopyingTable ? <><Check className="w-4 h-4 text-green-500" /><span>Скопировано</span></> : <><Copy className="w-4 h-4" /><span>Копировать</span></>}
-                        </button>
-
-                        <button onClick={() => setShowFilters(!showFilters)} className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 border ${showFilters ? 'bg-blue-500 border-blue-500 text-white' : theme === 'dark' ? 'bg-white/5 border-white/10 hover:bg-white/10 text-gray-300' : 'bg-gray-100 border-gray-200 hover:bg-gray-100 text-gray-700'}`}>
-                            <Filter className="w-4 h-4" /><span>Фильтры</span>
-                        </button>
-
-                        {(specificDate || dateFrom || dateTo || minDrop || maxDrop || minProfit || maxProfit || minMc || maxMc) && (
-                            <button onClick={resetFilters} className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 border ${theme === 'dark' ? 'bg-white/5 border-white/10 text-white' : 'bg-gray-100 border-gray-200 text-gray-900'}`}>
-                                <RotateCcw size={14} className="text-gray-500 transition-transform duration-300" />
-                                <span>Сброс</span>
+                        <div className="flex flex-wrap items-center gap-3">
+                            <button onClick={copyTableToClipboard} disabled={filteredAlerts.length === 0} className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 border ${theme === 'dark' ? 'bg-white/5 border-white/10 hover:bg-white/10 text-gray-300' : 'bg-gray-100 border-gray-200 hover:bg-gray-200 text-gray-700'} disabled:opacity-50`}>
+                                {isCopyingTable ? <><Check className="w-4 h-4 text-green-500" /><span>Скопировано</span></> : <><Copy className="w-4 h-4" /><span>Копировать</span></>}
                             </button>
-                        )}
 
-                        {isAdmin && (
-                            <button onClick={() => { setEditingAlert(null); setAlertsToAdd([]); setFormData({ signalDate: new Date().toISOString().split('T')[0], signalTime: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }), marketCap: '', address: '', strategy: 'Market Entry', maxDrop: '', maxProfit: '', comment: '', isScam: false }); setScreenshotPreview(null); setShowModal(true) }} className="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-semibold transition-colors flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20">
-                                <Plus className="w-4 h-4" /><span>Добавить</span>
+                            <button onClick={() => setShowFilters(!showFilters)} className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 border ${showFilters ? 'bg-blue-500 border-blue-500 text-white' : theme === 'dark' ? 'bg-white/5 border-white/10 hover:bg-white/10 text-gray-300' : 'bg-gray-100 border-gray-200 hover:bg-gray-100 text-gray-700'}`}>
+                                <Filter className="w-4 h-4" /><span>Фильтры</span>
                             </button>
-                        )}
+
+                            {(specificDate || dateFrom || dateTo || minDrop || maxDrop || minProfit || maxProfit) && (
+                                <button onClick={resetFilters} className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 border ${theme === 'dark' ? 'bg-white/5 border-white/10 text-white' : 'bg-gray-100 border-gray-200 text-gray-900'}`}>
+                                    <RotateCcw className="w-4 h-4" /><span>Сброс</span>
+                                </button>
+                            )}
+
+                            {isAdmin && (
+                                <button onClick={() => { setEditingAlert(null); setAlertsToAdd([]); setFormData({ signalDate: new Date().toISOString().split('T')[0], signalTime: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }), marketCap: '', address: '', strategy: 'Market Entry', maxDrop: '', maxProfit: '', comment: '', isScam: false }); setScreenshotPreview(null); setProfitsInput([]); setShowModal(true) }} className="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-semibold transition-colors flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20">
+                                    <Plus className="w-4 h-4" /><span>Добавить</span>
+                                </button>
+                            )}
+                        </div>
                     </div>
                 </div>
 
@@ -405,11 +418,11 @@ export const AiAoAlerts = () => {
                                 </div>
                             </div>
                             <button onClick={resetFilters} className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${theme === 'dark' ? 'hover:bg-white/5 text-gray-400 hover:text-white' : 'hover:bg-gray-100 text-gray-500 hover:text-gray-900'}`}>
-                                <RotateCcw size={14} className="ml-auto" />Сбросить
+                                <RotateCcw size={14} />Сбросить
                             </button>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-y-6 gap-x-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-y-6 gap-x-4">
                             <PremiumInput label="Дата" type="date" icon={Calendar} placeholder="Выберите дату..." value={specificDate} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSpecificDate(e.target.value)} theme={theme} />
 
                             <div className="grid grid-cols-2 gap-2">
@@ -419,7 +432,7 @@ export const AiAoAlerts = () => {
 
                             <PremiumInput label="Мин. Профит" icon={TrendingUp} placeholder="10" value={minProfit} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMinProfit(e.target.value)} theme={theme} />
 
-                            <PremiumSelect value={sortBy} options={[{ value: 'date', label: 'По дате' }, { value: 'drop', label: 'По падению' }, { value: 'profit', label: 'По профиту' }]} onChange={(val: string) => setSortBy(val as SortField)} theme={theme} />
+                            <PremiumSelect theme={theme} value={sortBy} options={[{ value: 'date', label: 'По дате' }, { value: 'drop', label: 'По падению' }, { value: 'profit', label: 'По профиту' }]} onChange={(val: string) => setSortBy(val as SortField)} />
 
                             <div className="space-y-1.5">
                                 <label className={`text-[10px] font-bold uppercase tracking-wider ml-1 opacity-50 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Направление</label>
@@ -433,58 +446,106 @@ export const AiAoAlerts = () => {
                 )}
 
                 {/* Table */}
-                <div className={`${cardBg} ${cardBorder} ${cardShadow} rounded-3xl overflow-hidden`}>
+                <div className={`relative overflow-hidden rounded-3xl border ${cardBorder} ${cardShadow} ${cardBg}`}>
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>
                                 <tr className={`border-b ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-gray-50'}`}>
-                                    <th className={`p-4 text-[10px] font-bold uppercase tracking-wider ${subTextColor} text-center`}>Дата</th>
-                                    <th className={`p-4 text-[10px] font-bold uppercase tracking-wider ${subTextColor} text-center`}>Время</th>
-                                    <th className={`p-4 text-[10px] font-bold uppercase tracking-wider ${subTextColor} text-center`}>MC</th>
-                                    <th className={`p-4 text-[10px] font-bold uppercase tracking-wider ${subTextColor} text-center`}>Адрес</th>
-                                    <th className={`p-4 text-[10px] font-bold uppercase tracking-wider ${subTextColor} text-center`}>Стратегия</th>
-                                    <th className={`p-4 text-[10px] font-bold uppercase tracking-wider ${subTextColor} text-center`}>Drop</th>
-                                    <th className={`p-4 text-[10px] font-bold uppercase tracking-wider ${subTextColor} text-center`}>Drop 0.7</th>
-                                    <th className={`p-4 text-[10px] font-bold uppercase tracking-wider ${subTextColor} text-center`}>Профит</th>
-                                    <th className={`p-4 text-[10px] font-bold uppercase tracking-wider ${subTextColor} text-center`}>Коммент</th>
-                                    {isAdmin && <th className={`p-4 text-[10px] font-bold uppercase tracking-wider ${subTextColor} text-center`}></th>}
+                                    <th className={`p-1.5 sm:p-2 text-[10px] sm:text-xs uppercase tracking-wider font-semibold ${subTextColor} text-center w-8 border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>#</th>
+                                    <th className={`p-1.5 sm:p-2 text-[10px] sm:text-xs uppercase tracking-wider font-semibold ${subTextColor} text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>Дата</th>
+                                    <th className={`p-1.5 sm:p-2 text-[10px] sm:text-xs uppercase tracking-wider font-semibold ${subTextColor} text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>Время</th>
+                                    <th className={`p-1.5 sm:p-2 text-[10px] sm:text-xs uppercase tracking-wider font-semibold ${subTextColor} text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>Стратегия</th>
+                                    <th className={`p-1.5 sm:p-2 text-[10px] sm:text-xs uppercase tracking-wider font-semibold ${subTextColor} text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>MC</th>
+                                    <th className={`p-1.5 sm:p-2 text-[10px] sm:text-xs uppercase tracking-wider font-semibold ${subTextColor} text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>Адрес</th>
+                                    <th className={`p-1.5 sm:p-2 text-[10px] sm:text-xs uppercase tracking-wider font-semibold ${subTextColor} text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>Drop</th>
+                                    <th className={`p-1.5 sm:p-2 text-[10px] sm:text-xs uppercase tracking-wider font-semibold ${subTextColor} text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>Drop 0.7</th>
+                                    <th className={`p-1.5 sm:p-2 text-[10px] sm:text-xs uppercase tracking-wider font-semibold ${subTextColor} text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>Профит</th>
+                                    <th className={`p-1.5 sm:p-2 text-[10px] sm:text-xs uppercase tracking-wider font-semibold ${subTextColor} text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>Коммент</th>
+                                    <th className={`p-1.5 sm:p-2 text-[10px] sm:text-xs uppercase tracking-wider font-semibold ${subTextColor} text-center`}>Автор</th>
+                                    <th className={`p-1.5 sm:p-2 text-[10px] sm:text-xs uppercase tracking-wider font-semibold ${subTextColor} text-center`}>📷</th>
+                                    {isAdmin && <th className={`p-1.5 sm:p-2 text-[10px] sm:text-xs uppercase tracking-wider font-semibold ${subTextColor} text-center`}>⚙</th>}
                                 </tr>
                             </thead>
-                            <tbody className={`divide-y ${theme === 'dark' ? 'divide-white/10' : 'divide-gray-100'}`}>
+                            <tbody className={`divide-y ${theme === 'dark' ? 'divide-white/5' : 'divide-gray-100'}`}>
                                 {loading ? (
-                                    <tr>
-                                        <td colSpan={10} className={`p-8 text-center ${subTextColor}`}>Загрузка...</td>
-                                    </tr>
+                                    <tr><td colSpan={isAdmin ? 13 : 12} className="p-8 text-center text-gray-500">Загрузка...</td></tr>
                                 ) : filteredAlerts.length === 0 ? (
-                                    <tr>
-                                        <td colSpan={10} className={`p-8 text-center ${subTextColor}`}>Сигналы не найдены</td>
-                                    </tr>
+                                    <tr><td colSpan={isAdmin ? 13 : 12} className="p-8 text-center text-gray-500">Сигналы не найдены</td></tr>
                                 ) : (
-                                    filteredAlerts.map((alert) => (
-                                        <tr key={alert.id} className={`group transition-colors ${theme === 'dark' ? 'hover:bg-white/5' : 'hover:bg-gray-50'}`}>
-                                            <td className={`p-4 text-sm font-semibold ${headingColor} text-center`}>{alert.signalDate}</td>
-                                            <td className={`p-4 text-sm font-mono ${subTextColor} text-center`}>{alert.signalTime}</td>
-                                            <td className={`p-4 text-sm font-mono font-bold ${headingColor} text-center`}>{alert.marketCap || '-'}</td>
-                                            <td className={`p-4 text-sm font-mono ${subTextColor} text-center`}>
-                                                <button onClick={() => copyToClipboard(alert.address, alert.id)} className="flex items-center justify-center gap-1 hover:text-blue-400 transition-colors">
-                                                    {truncateAddress(alert.address)}
-                                                    {copyingId === alert.id ? <Check size={12} className="ml-auto" /> : <Copy size={12} />}
-                                                </button>
+                                    filteredAlerts.map((alert: AiAlert, index: number) => (
+                                        <tr key={alert.id} className={`${theme === 'dark' ? 'hover:bg-white/5' : 'hover:bg-gray-50'} transition-colors ${alert.isScam ? 'bg-red-500/10' : ''}`}>
+                                            <td className={`p-1.5 sm:p-2 text-center whitespace-nowrap border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
+                                                <div className={`font-mono text-[10px] sm:text-xs font-bold ${subTextColor}`}>{index + 1}</div>
                                             </td>
-                                            <td className={`p-4 text-sm font-semibold ${subTextColor} text-center`}>{alert.strategy || 'Market Entry'}</td>
-                                            <td className={`p-4 text-sm font-mono font-bold ${alert.maxDrop && parseFloat(alert.maxDrop.replace('%', '').replace('X', '').replace('x', '')) < 0 ? 'text-emerald-500' : 'text-rose-500'} text-center`}>
-                                                {alert.maxDrop || '-'}
+                                            <td className={`p-1.5 sm:p-2 whitespace-nowrap text-center border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
+                                                <div className={`font-mono font-medium text-[10px] sm:text-xs ${headingColor}`}>{formatDateForDisplay(alert.signalDate)}</div>
                                             </td>
-                                            <td className={`p-4 text-sm font-mono font-bold ${subTextColor} text-center`}>{alert.maxDropFromLevel07 || '-'}</td>
-                                            <td className={`p-4 text-sm font-mono font-bold ${alert.maxProfit && parseFloat(alert.maxProfit.replace('%', '').replace('X', '').replace('x', '').replace('+', '')) > 0 ? 'text-emerald-500' : headingColor} text-center`}>
-                                                {alert.maxProfit || '-'}
+                                            <td className={`p-1.5 sm:p-2 whitespace-nowrap text-center border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
+                                                <div className={`font-mono text-[10px] sm:text-xs ${headingColor}`}>{alert.signalTime}</div>
                                             </td>
-                                            <td className={`p-4 text-sm ${subTextColor} max-w-xs truncate text-center`}>{alert.comment || '-'}</td>
+                                            <td className={`p-1.5 sm:p-2 text-center border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
+                                                {alert.isScam ? (
+                                                    <span className="text-red-500 font-bold text-[10px]">СКАМ</span>
+                                                ) : alert.strategy ? (
+                                                    <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${getStrategyConfig(alert.strategy as TriggerStrategy).color}`}>
+                                                        {getStrategyLabel(alert.strategy)}
+                                                    </span>
+                                                ) : '-'}
+                                            </td>
+                                            <td className={`p-1.5 sm:p-2 text-center border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
+                                                <div className={`font-mono text-[10px] sm:text-xs ${headingColor}`}>{alert.marketCap || '-'}</div>
+                                            </td>
+                                            <td className={`p-1.5 sm:p-2 text-center border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
+                                                <div className="flex items-center justify-center gap-1">
+                                                    <a href={`https://gmgn.ai/sol/token/${alert.address}`} target="_blank" rel="noopener noreferrer" className={`font-mono text-[10px] ${theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-500'} cursor-pointer`} title={alert.address}>
+                                                        {truncateAddress(alert.address)}
+                                                    </a>
+                                                    <button onClick={() => copyToClipboard(alert.address, alert.id)} className={`p-1 rounded hover:bg-white/10 transition-colors ${subTextColor}`}>
+                                                        {copyingId === alert.id ? <Check className="w-3 h-3 text-green-500" /> : <Copy className="w-3 h-3" />}
+                                                    </button>
+                                                </div>
+                                            </td>
+                                            <td className={`p-1.5 sm:p-2 text-center border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
+                                                <span className={`font-mono text-[10px] sm:text-xs ${alert.maxDrop && alert.maxDrop.startsWith('-') ? 'text-red-500' : headingColor}`}>
+                                                    {alert.maxDrop || '-'}
+                                                </span>
+                                            </td>
+                                            <td className={`p-1.5 sm:p-2 text-center border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
+                                                <span className={`font-mono text-[10px] sm:text-xs ${alert.maxDropFromLevel07 && alert.maxDropFromLevel07.startsWith('-') ? 'text-red-500' : headingColor}`}>
+                                                    {alert.maxDropFromLevel07 || '-'}
+                                                </span>
+                                            </td>
+                                            <td className={`p-1.5 sm:p-2 text-center border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
+                                                <span className="font-mono text-[10px] sm:text-xs text-green-500 font-bold">
+                                                    {alert.maxProfit || '-'}
+                                                </span>
+                                            </td>
+                                            <td className={`p-1.5 sm:p-2 text-center border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
+                                                <div className={`text-[10px] ${headingColor} break-words whitespace-pre-wrap max-w-[200px]`}>
+                                                    {alert.comment || '-'}
+                                                </div>
+                                            </td>
+                                            <td className={`p-1.5 sm:p-2 text-center border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
+                                                <UserNickname userId={alert.createdBy} className="text-[10px] font-medium" />
+                                            </td>
+                                            <td className={`p-1.5 sm:p-2 text-center border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
+                                                {alert.screenshot ? (
+                                                    <button onClick={() => setPreviewImage(alert.screenshot || null)} className={`text-[10px] ${subTextColor} hover:text-blue-500 transition-colors cursor-pointer`} title="Просмотр фото">
+                                                        📷
+                                                    </button>
+                                                ) : (
+                                                    <span className={`text-[10px] ${subTextColor}`}>—</span>
+                                                )}
+                                            </td>
                                             {isAdmin && (
-                                                <td className="p-4">
-                                                    <div className="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                        <button onClick={() => handleEdit(alert)} className="p-2 rounded-lg bg-blue-500/10 text-blue-500 hover:bg-blue-500/20 transition-colors"><Edit size={14} /></button>
-                                                        <button onClick={() => handleDelete(alert.id)} className="p-2 rounded-lg bg-rose-500/10 text-rose-500 hover:bg-rose-500/20 transition-colors"><Trash2 size={14} /></button>
+                                                <td className={`p-1.5 sm:p-2 text-center last:border-r-0`}>
+                                                    <div className="flex items-center justify-center gap-0.5">
+                                                        <button onClick={() => handleEdit(alert)} className={`p-1 rounded-lg hover:bg-white/10 transition-colors ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}>
+                                                            <Edit className="w-3 h-3" />
+                                                        </button>
+                                                        <button onClick={() => handleDelete(alert.id)} className="p-1 rounded-lg hover:bg-red-500/10 text-red-500 transition-colors">
+                                                            <Trash2 size={16} className="w-3 h-3" />
+                                                        </button>
                                                     </div>
                                                 </td>
                                             )}
@@ -521,8 +582,8 @@ export const AiAoAlerts = () => {
                                     <PremiumInput label="Market Cap" icon={Coins} placeholder="Напр. 300K или 1.5M" value={formData.marketCap || ''} onChange={(e) => setFormData({ ...formData, marketCap: e.target.value })} theme={theme} />
 
                                     <div className="grid grid-cols-2 gap-4">
-                                        <PremiumInput label="Max Drop" icon={TrendingDown} placeholder="-16%" value={formData.maxDrop || ''} onChange={(e) => setFormData({ ...formData, maxDrop: e.target.value })} theme={theme} />
-                                        <PremiumInput label="Max Drop (0.7)" icon={TrendingDown} placeholder="-5%" value={formData.maxDropFromLevel07 || ''} onChange={(e) => setFormData({ ...formData, maxDropFromLevel07: e.target.value })} theme={theme} />
+                                        <PremiumInput label="Max Drop" icon={TrendingDown} placeholder="Напр. -16%" value={formData.maxDrop || ''} onChange={(e) => setFormData({ ...formData, maxDrop: e.target.value })} theme={theme} />
+                                        <PremiumInput label="Max Drop (0.7)" icon={TrendingDown} placeholder="Напр. -5%" value={formData.maxDropFromLevel07 || ''} onChange={(e) => setFormData({ ...formData, maxDropFromLevel07: e.target.value })} theme={theme} />
                                     </div>
 
                                     <div className="space-y-1.5">
@@ -531,10 +592,10 @@ export const AiAoAlerts = () => {
                                             <FileText className="absolute left-3 top-3 w-4 h-4 text-gray-500" />
                                             <textarea
                                                 rows={3}
-                                                placeholder="Дополнительные детали..."
+                                                placeholder="Заметки по сигналу..."
                                                 value={formData.comment || ''}
                                                 onChange={(e) => setFormData({ ...formData, comment: e.target.value })}
-                                                className={`w-full pl-10 pr-4 py-3 rounded-xl border outline-none transition-all text-sm resize-none ${theme === 'dark' ? 'bg-black/20 border-white/5 text-white focus:border-blue-500/50' : 'bg-gray-50 border-gray-100 text-gray-900 focus:border-blue-500/30'}`}
+                                                className={`w-full pl-10 pr-4 py-3 rounded-xl border outline-none transition-all text-sm resize-none ${theme === 'dark' ? 'bg-black/30 border-white/10 focus:border-blue-500/50' : 'bg-gray-50 border-gray-200 focus:border-blue-500/30'}`}
                                             />
                                         </div>
                                     </div>
@@ -547,55 +608,41 @@ export const AiAoAlerts = () => {
 
                                 {/* Right Column */}
                                 <div className="space-y-6">
-                                    <div className="space-y-1.5">
-                                        <label className={`text-[10px] font-bold uppercase tracking-wider ml-1 ${subTextColor}`}>Стратегия</label>
-                                        <select value={formData.strategy || 'Market Entry'} onChange={(e) => setFormData({ ...formData, strategy: e.target.value as 'Фиба' | 'Market Entry' })} className={`w-full px-4 py-3 rounded-xl border outline-none transition-all text-sm font-semibold appearance-none cursor-pointer ${theme === 'dark' ? 'bg-black/20 border-white/5 text-white focus:border-blue-500/50' : 'bg-gray-50 border-gray-100 text-gray-900 focus:border-blue-500/30'}`}>
-                                            <option value="Market Entry">Market Entry</option>
-                                            <option value="Фиба">Фиба</option>
-                                        </select>
-                                    </div>
+                                    <MultiStrategySelector
+                                        strategies={formData.strategy ? [formData.strategy as TriggerStrategy] : []}
+                                        profits={profitsInput}
+                                        onChange={(strategies, profits) => {
+                                            setFormData({ ...formData, strategy: strategies[0] || 'Market Entry' })
+                                            setProfitsInput(profits)
+                                        }}
+                                        theme={theme}
+                                        color="bg-blue-500"
+                                    />
 
                                     <div className="space-y-1.5">
                                         <label className={`text-[10px] font-bold uppercase tracking-wider ml-1 ${subTextColor}`}>Contract Address</label>
                                         <div className="relative">
                                             <Hash className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
-                                            <input type="text" placeholder="Введите адрес контракта..." value={formData.address || ''} onChange={(e) => setFormData({ ...formData, address: e.target.value })} className={`w-full pl-10 pr-4 py-3 rounded-xl border outline-none transition-all text-sm font-mono ${theme === 'dark' ? 'bg-black/20 border-white/5 text-white focus:border-blue-500/50' : 'bg-gray-50 border-gray-100 text-gray-900 focus:border-blue-500/30'}`} />
+                                            <input type="text" placeholder="0x..." value={formData.address || ''} onChange={(e) => setFormData({ ...formData, address: e.target.value })} className={`w-full pl-10 pr-4 py-2.5 rounded-xl border outline-none transition-all text-sm font-mono ${theme === 'dark' ? 'bg-black/30 border-white/10 focus:border-blue-500/50' : 'bg-gray-50 border-gray-200 focus:border-blue-500/30'}`} />
                                         </div>
                                     </div>
 
                                     <div className="space-y-1.5">
-                                        <label className={`text-[10px] font-bold uppercase tracking-wider ml-1 ${subTextColor}`}>Max Profit</label>
-                                        <div className="relative">
-                                            <TrendingUp className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
-                                            <input type="text" placeholder="Напр. +28% или X3" value={formData.maxProfit || ''} onChange={(e) => setFormData({ ...formData, maxProfit: e.target.value })} className={`w-full pl-10 pr-4 py-3 rounded-xl border outline-none transition-all text-sm font-mono ${theme === 'dark' ? 'bg-black/20 border-white/5 text-white focus:border-blue-500/50' : 'bg-gray-50 border-gray-100 text-gray-900 focus:border-blue-500/30'}`} />
-                                        </div>
-                                    </div>
-
-                                    <div className="space-y-2">
-                                        <label className={`text-[10px] font-bold tracking-wider ml-1 ${subTextColor}`}>Скриншот графика</label>
-                                        <div onClick={() => fileInputRef.current?.click()} className={`group relative h-32 rounded-2xl border-2 border-dashed transition-all cursor-pointer overflow-hidden flex flex-col items-center justify-center gap-2 ${screenshotPreview ? 'border-blue-500/50 bg-blue-500/5' : 'border-white/10 hover:border-blue-500/30 hover:bg-white/5'}`}>
+                                        <label className={`text-[10px] font-bold uppercase tracking-wider ml-1 ${subTextColor}`}>Скриншот / Фото</label>
+                                        <div className={`relative group cursor-pointer rounded-2xl border-2 border-dashed transition-all ${theme === 'dark' ? 'bg-black/30 border-white/10 hover:border-white/20' : 'bg-gray-50 border-gray-300 hover:border-gray-400'}`}>
                                             {screenshotPreview ? (
-                                                <>
-                                                    <img src={screenshotPreview} alt="Preview" className="absolute inset-0 w-full h-full object-cover opacity-40" />
-                                                    <div className="relative z-10 flex flex-col items-center gap-1">
-                                                        <Check className="w-8 h-8 text-blue-500" />
-                                                        <span className="text-xs font-bold text-blue-500 uppercase tracking-widest">Фото загружено</span>
-                                                    </div>
-                                                    <button type="button" onClick={(e) => { e.stopPropagation(); removeScreenshot() }} className="absolute top-2 right-2 p-1.5 rounded-lg bg-rose-500 text-white shadow-lg hover:scale-110 transition-transform"><X className="w-4 h-4" /></button>
-                                                </>
+                                                <div className="relative p-2 aspect-video">
+                                                    <img src={screenshotPreview} alt="Preview" className="w-full h-full object-cover rounded-xl" />
+                                                    <button type="button" onClick={removeScreenshot} className="absolute top-4 right-4 p-1.5 rounded-full bg-red-500 text-white shadow-lg hover:scale-110 transition-transform"><X size={16} /></button>
+                                                </div>
                                             ) : (
-                                                <>
-                                                    <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                                        <ImageIcon className="w-5 h-5 text-gray-500" />
-                                                    </div>
-                                                    <div className="text-center">
-                                                        <p className={`text-xs font-bold ${headingColor}`}>Нажмите для загрузки</p>
-                                                        <p className={`text-[10px] ${subTextColor} opacity-70`}>PNG, JPG до 5MB</p>
-                                                    </div>
-                                                </>
+                                                <label className="flex flex-col items-center justify-center p-8 cursor-pointer gap-3">
+                                                    <Upload className="w-8 h-8 text-gray-500 group-hover:text-blue-500 transition-colors" />
+                                                    <span className="text-sm font-bold text-gray-500 group-hover:text-blue-500 transition-colors">Загрузить изображение</span>
+                                                    <input ref={fileInputRef} type="file" accept="image/*" onChange={handleScreenshotChange} className="hidden" />
+                                                </label>
                                             )}
                                         </div>
-                                        <input ref={fileInputRef} type="file" accept="image/*" onChange={handleScreenshotChange} className="hidden" />
                                     </div>
                                 </div>
                             </div>
@@ -615,11 +662,49 @@ export const AiAoAlerts = () => {
                                     <button onClick={handleSubmit} className="w-full py-4 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-black flex items-center justify-center gap-2 transition-all shadow-lg shadow-emerald-500/20"><Save className="w-5 h-5" />Сохранить изменения</button>
                                 </div>
                             )}
+
+                            {/* Preview */}
+                            {!editingAlert && alertsToAdd.length > 0 && (
+                                <div className="mt-8 space-y-4">
+                                    <div className="flex items-center gap-2"><FileText size={16} className="text-blue-500" /><h4 className="text-sm font-black uppercase tracking-tight">Подготовленные сигналы</h4></div>
+                                    <div className={`rounded-2xl border ${theme === 'dark' ? 'bg-black/20 border-white/5' : 'bg-gray-50 border-gray-100'} overflow-hidden`}>
+                                        <table className="w-full text-left">
+                                            <thead>
+                                                <tr className="border-b border-white/5 text-[10px] font-bold uppercase tracking-wider text-gray-500">
+                                                    <th className="p-4">Дата</th><th className="p-4">Время</th><th className="p-4">Market Cap</th><th className="p-4">Стратегия</th><th className="p-4 w-10"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-white/5">
+                                                {alertsToAdd.map((alert, idx) => (
+                                                    <tr key={idx} className="group hover:bg-white/5 transition-colors">
+                                                        <td className="p-4 text-xs font-mono font-bold">{alert.signalDate}</td>
+                                                        <td className="p-4 text-xs font-mono">{alert.signalTime}</td>
+                                                        <td className="p-4 text-xs font-bold text-green-500">{alert.marketCap || '-'}</td>
+                                                        <td className="p-4">
+                                                            <span className={`px-2 py-1 rounded text-[10px] font-bold ${getStrategyConfig(alert.strategy as TriggerStrategy).color}`}>
+                                                                {getStrategyLabel(alert.strategy || '')}
+                                                            </span>
+                                                        </td>
+                                                        <td className="p-4"><button onClick={() => setAlertsToAdd(alertsToAdd.filter((_, i) => i !== idx))} className="p-1.5 rounded-lg hover:bg-red-500/20 text-red-500 opacity-0 group-hover:opacity-100 transition-all"><Trash2 size={14} /></button></td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
             )}
-        </div>
+
+            {/* Preview Modal */}
+            {previewImage && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-md p-4 cursor-zoom-out" onClick={() => setPreviewImage(null)}>
+                    <img src={previewImage} alt="Preview" className="max-w-full max-h-[90vh] object-contain rounded-2xl" />
+                </div>
+            )}
+        </>
     )
 }
 
@@ -654,7 +739,7 @@ const PremiumSelect: React.FC<PremiumSelectProps> = ({ value, options, onChange,
         <div className="relative" ref={containerRef}>
             <div className="flex flex-col space-y-1.5">
                 <label className={`text-[10px] font-bold uppercase tracking-wider ml-1 opacity-50 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Сортировать по</label>
-                <button type="button" onClick={() => setIsOpen(!isOpen)} className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl border text-sm font-bold transition-all shadow-sm ${theme === 'dark' ? 'bg-white/5 border-white/5 text-white hover:bg-white/10 hover:border-white/10 active:scale-95' : 'bg-white border-gray-200 text-gray-900 hover:bg-gray-50 active:scale-95'}`}>
+                <button type="button" onClick={() => setIsOpen(!isOpen)} className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl border text-sm font-bold transition-all shadow-sm ${theme === 'dark' ? 'bg-white/5 border-white/5 text-white hover:bg-white/10 active:scale-95' : 'bg-white border-gray-200 text-gray-900 hover:bg-gray-50 active:scale-95'}`}>
                     <span className="truncate">{selectedOption?.label}</span>
                     <ChevronDown size={14} className={`text-gray-500 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
                 </button>
