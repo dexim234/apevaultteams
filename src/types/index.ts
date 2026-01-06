@@ -167,18 +167,14 @@ export type NftSignalType = 'buy' | 'sell' | 'mint'
 export type StakingAction = 'enter' | 'exit' | 'rebalance'
 
 export interface MemecoinSignalFields {
-  coinName: string
-  ticker: string
   network: Network
   contract?: string
-  signalType: CallSentiment
-  reason: string
+  holdPlan: 'flip' | 'short' | 'medium' | 'long'
   entryCap: string
   targets: string
   stopLoss?: string
+  trailingPercent?: string
   riskLevel: CallRiskLevel
-  risks: string
-  holdPlan: 'flip' | 'short' | 'medium' | 'long'
   liquidityLocked?: boolean
   traderComment?: string
 }

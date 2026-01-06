@@ -167,7 +167,7 @@ export const CallPage = () => {
     const d = getDetails(call)
     switch (call.category) {
       case 'memecoins':
-        return d.coinName || d.ticker || 'Мемкоин'
+        return d.contract ? `${d.contract.slice(0, 6)}...${d.contract.slice(-4)}` : 'Мемкоин'
       case 'futures':
         return d.pair || 'Фьючерс'
       case 'nft':
@@ -193,8 +193,7 @@ export const CallPage = () => {
       call.category,
       call.status,
       call.comment,
-      d.coinName,
-      d.ticker,
+      d.contract,
       d.pair,
       d.reason,
       d.targets,

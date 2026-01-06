@@ -999,7 +999,6 @@ export const getCalls = async (filters?: {
 
     const sentiment =
       (data.sentiment as Call['sentiment']) ||
-      details.memecoins?.signalType ||
       (details.futures?.direction === 'long' ? 'buy' : details.futures?.direction === 'short' ? 'sell' : undefined)
 
     return {

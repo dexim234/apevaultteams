@@ -12,7 +12,7 @@ import type {
   Network,
 } from '@/types'
 import { TEAM_MEMBERS } from '@/types'
-import { Sparkles, Rocket, LineChart, Image, Coins, Shield, Target, Info, MapPin, TrendingUp, AlertTriangle, Settings, MessageSquare, Eye, X, Check, Hash, Globe2, Wand2, Clock3, Link2, Activity, Gauge, Timer, ScrollText, Building2, CalendarClock, Percent, Octagon, Network as NetworkIcon } from 'lucide-react'
+import { Sparkles, Rocket, LineChart, Image, Coins, Shield, Target, Info, MapPin, TrendingUp, AlertTriangle, Settings, MessageSquare, Eye, X, Check, Globe2, Wand2, Clock3, Link2, Activity, Gauge, Timer, ScrollText, Building2, CalendarClock, Percent, Octagon, Network as NetworkIcon, Copy } from 'lucide-react'
 
 interface CallFormProps {
   onSuccess?: () => void
@@ -64,10 +64,11 @@ const CATEGORY_META: Record<CallCategory, { label: string; gradient: string; ico
 
 const CATEGORY_SECTIONS: Record<CallCategory, Record<string, SectionConfig>> = {
   memecoins: {
-    basic: { title: 'Основная информация', icon: <Info className="w-4 h-4" />, description: 'Базовые данные о монете' },
-    entry: { title: 'Зоны входа', icon: <MapPin className="w-4 h-4" />, description: 'Условия для входа в позицию' },
-    targets: { title: 'Цели и риски', icon: <TrendingUp className="w-4 h-4" />, description: 'План прибыли и управления рисками' },
-    additional: { title: 'Дополнительно', icon: <Settings className="w-4 h-4" />, description: 'Дополнительные настройки и комментарии' },
+    basic: { title: 'Контракт и сеть', icon: <Link2 className="w-4 h-4" />, description: 'Адрес токена и блокчейн' },
+    strategy: { title: 'Стратегия', icon: <TrendingUp className="w-4 h-4" />, description: 'Тип торговой стратегии' },
+    entry: { title: 'Зона входа', icon: <MapPin className="w-4 h-4" />, description: 'Условия для входа в позицию' },
+    targets: { title: 'Цели и риски', icon: <Target className="w-4 h-4" />, description: 'План прибыли и стоп-лосс' },
+    additional: { title: 'Комментарий', icon: <MessageSquare className="w-4 h-4" />, description: 'Дополнительные заметки' },
   },
   futures: {
     basic: { title: 'Основная информация', icon: <Info className="w-4 h-4" />, description: 'Данные о паре и направлении' },
@@ -110,41 +111,30 @@ const CATEGORY_SECTIONS: Record<CallCategory, Record<string, SectionConfig>> = {
 
 const CATEGORY_FIELDS: Record<CallCategory, FieldConfig[]> = {
   memecoins: [
-    { key: 'coinName', label: 'Название монеты', placeholder: 'PEPE', section: 'basic' },
-    { key: 'ticker', label: 'Тикер', placeholder: 'PEPE', section: 'basic' },
+    { key: 'contract', label: 'Адрес (контракт)', placeholder: '0x... или адрес токена', section: 'basic' },
     { key: 'network', label: 'Сеть', type: 'select', options: networkOptions, section: 'basic' },
-    { key: 'contract', label: 'Контракт', placeholder: '0x...', section: 'basic' },
     {
-      key: 'signalType', label: 'Тип сигнала', type: 'select', options: [
-        { value: 'buy', label: 'Buy' },
-        { value: 'sell', label: 'Sell' },
-        { value: 'hold', label: 'Hold' },
-        { value: 'alert', label: 'Alert' },
-      ], section: 'basic'
+      key: 'holdPlan', label: 'Тип стратегии', type: 'select', options: [
+        { value: 'flip', label: 'Флип' },
+        { value: 'short', label: 'Краткосрок' },
+        { value: 'medium', label: 'Среднесрок' },
+        { value: 'long', label: 'Дальнесрок' },
+      ], section: 'strategy'
     },
-    { key: 'reason', label: 'Причина входа', placeholder: 'Хайп, крупные покупки, листинг...', type: 'textarea', section: 'entry' },
     { key: 'entryCap', label: 'Зона входа в капитализации', placeholder: '10M-15M', section: 'entry' },
-    { key: 'targets', label: 'Цели (TP1/TP2/TP3)', placeholder: '20M / 30M / 50M', section: 'targets' },
+    { key: 'targets', label: 'Цели', placeholder: '20M / 30M / 50M', section: 'targets' },
     { key: 'stopLoss', label: 'Стоп-лосс', placeholder: '5M или -25%', section: 'targets' },
+    { key: 'trailingPercent', label: 'Процент трейлинга', placeholder: 'например: 5% или 10%', section: 'targets' },
     {
-      key: 'riskLevel', label: 'Риск-уровень', type: 'select', options: [
+      key: 'riskLevel', label: 'Риск уровень', type: 'select', options: [
         { value: 'low', label: 'Низкий' },
         { value: 'medium', label: 'Средний' },
         { value: 'high', label: 'Высокий' },
         { value: 'ultra', label: 'Ультра-высокий' },
       ], section: 'targets'
     },
-    { key: 'risks', label: 'Риски', placeholder: 'Разворот тренда, низкая ликвидность', type: 'textarea', section: 'targets' },
-    {
-      key: 'holdPlan', label: 'План удержания', type: 'select', options: [
-        { value: 'flip', label: 'Флип' },
-        { value: 'short', label: 'Краткосрок' },
-        { value: 'medium', label: 'Среднесрок' },
-        { value: 'long', label: 'Дальнесрок' },
-      ], section: 'additional'
-    },
-    { key: 'liquidityLocked', label: 'Залочена ли ликвидность', type: 'checkbox', section: 'additional' },
-    { key: 'traderComment', label: 'Комментарий трейдера', type: 'textarea', placeholder: 'Доп. наблюдения, планы', section: 'additional' },
+    { key: 'liquidityLocked', label: 'Отметка о ликвидности', type: 'checkbox', section: 'targets' },
+    { key: 'traderComment', label: 'Комментарий трейдера', type: 'textarea', placeholder: 'Доп. наблюдения, планы...', section: 'additional' },
   ],
   futures: [
     { key: 'pair', label: 'Пара', placeholder: 'BTC/USDT', section: 'basic' },
@@ -321,18 +311,14 @@ const CATEGORY_FIELDS: Record<CallCategory, FieldConfig[]> = {
 
 const buildEmptyDetails = (): FormDetailsState => ({
   memecoins: {
-    coinName: '',
-    ticker: '',
     network: 'solana',
     contract: '',
-    signalType: 'buy',
-    reason: '',
+    holdPlan: 'short',
     entryCap: '',
     targets: '',
     stopLoss: '',
+    trailingPercent: '',
     riskLevel: 'medium',
-    risks: '',
-    holdPlan: 'short',
     liquidityLocked: false,
     traderComment: '',
   },
@@ -555,7 +541,7 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory }: C
     const d = getDetails(call)
     switch (call.category) {
       case 'memecoins':
-        return d.coinName || d.ticker || 'Мемкоин'
+        return d.contract ? `${d.contract.slice(0, 6)}...${d.contract.slice(-4)}` : 'Мемкоин'
       case 'futures':
         return d.pair || 'Фьючерс'
       case 'nft':
@@ -620,15 +606,14 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory }: C
 
     switch (call.category) {
       case 'memecoins':
-        addMetric('Монета', d.coinName, <Coins className="w-4 h-4" />)
-        addMetric('Тикер', shortenValue(d.ticker, 8), <Hash className="w-4 h-4" />)
+        addMetric('Контракт', shortenValue(d.contract, 20), <Link2 className="w-4 h-4" />)
         addMetric('Сеть', d.network ? String(d.network).toUpperCase() : '', <Globe2 className="w-4 h-4" />)
-        addMetric('Тип сигнала', d.signalType ? d.signalType.toUpperCase() : '', <Wand2 className="w-4 h-4" />)
+        addMetric('Стратегия', d.holdPlan === 'flip' ? 'Флип' : d.holdPlan === 'short' ? 'Краткосрок' : d.holdPlan === 'medium' ? 'Среднесрок' : 'Дальнесрок', <TrendingUp className="w-4 h-4" />)
         addMetric('Зона входа', d.entryCap, <MapPin className="w-4 h-4" />)
         addMetric('Цели', d.targets, <Target className="w-4 h-4" />)
-        addMetric('SL', d.stopLoss, <Octagon className="w-4 h-4" />)
-        addMetric('План', d.holdPlan, <Clock3 className="w-4 h-4" />)
-        addMetric('Ликвидность', d.liquidityLocked ? 'Залочена' : '', <Shield className="w-4 h-4" />)
+        addMetric('Стоп-лосс', d.stopLoss, <Octagon className="w-4 h-4" />)
+        addMetric('Трейлинг', d.trailingPercent, <Percent className="w-4 h-4" />)
+        addMetric('Ликвидность', d.liquidityLocked ? 'Залочена' : 'Не залочена', <Shield className="w-4 h-4" />)
         break
       case 'futures':
         addMetric('Пара', d.pair, <Activity className="w-4 h-4" />)
@@ -857,13 +842,27 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory }: C
     }
 
     return (
-      <input
-        type="text"
-        value={value || ''}
-        onChange={(e) => updateField(field.key, e.target.value)}
-        className={common}
-        placeholder={field.placeholder}
-      />
+      <div className="relative">
+        <input
+          type="text"
+          value={value || ''}
+          onChange={(e) => updateField(field.key, e.target.value)}
+          className={common}
+          placeholder={field.placeholder}
+        />
+        {field.key === 'contract' && value && (
+          <button
+            type="button"
+            onClick={() => {
+              navigator.clipboard.writeText(String(value))
+            }}
+            className={`absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-lg transition-colors ${theme === 'dark' ? 'hover:bg-gray-600 text-gray-300' : 'hover:bg-gray-200 text-gray-600'}`}
+            title="Скопировать контракт"
+          >
+            <Copy className="w-4 h-4" />
+          </button>
+        )}
+      </div>
     )
   }
 
