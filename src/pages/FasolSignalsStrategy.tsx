@@ -735,7 +735,7 @@ export const FasolSignalsStrategy = () => {
                                         </div>
                                     </div>
 
-                                    <div className="grid grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <div className="space-y-1.5">
                                             <label className="text-[10px] font-bold uppercase tracking-wider opacity-50 ml-1">Max Drop от сигнала (%)</label>
                                             <div className="relative">
@@ -752,28 +752,9 @@ export const FasolSignalsStrategy = () => {
                                         </div>
                                     </div>
 
-                                    <div className="grid grid-cols-2 gap-6">
-                                        <div className="space-y-1.5">
-                                            <label className="text-[10px] font-bold uppercase tracking-wider opacity-50 ml-1">Комментарий</label>
-                                            <textarea placeholder="Заметки по сигналу..." value={formData.comment || ''} onChange={e => setFormData({ ...formData, comment: e.target.value })} rows={5} className={`w-full p-4 rounded-2xl border outline-none text-sm font-semibold transition-all resize-none h-full min-h-[120px] ${theme === 'dark' ? 'bg-black/30 border-white/10 focus:border-purple-500/50' : 'bg-gray-50 border-gray-200 focus:border-purple-500/30'}`} />
-                                        </div>
-                                        <div className="space-y-1.5">
-                                            <label className="text-[10px] font-bold uppercase tracking-wider opacity-50 ml-1">Скриншот / Фото</label>
-                                            <div className={`relative group cursor-pointer rounded-2xl border-2 border-dashed transition-all h-full min-h-[120px] ${theme === 'dark' ? 'bg-black/30 border-white/10 hover:border-white/20' : 'bg-gray-50 border-gray-300 hover:border-gray-400'}`}>
-                                                {screenshotPreview ? (
-                                                    <div className="relative p-2 h-full">
-                                                        <img src={screenshotPreview} alt="Preview" className="w-full h-full object-cover rounded-xl" />
-                                                        <button type="button" onClick={removeScreenshot} className="absolute top-4 right-4 p-1.5 rounded-full bg-red-500 text-white shadow-lg hover:scale-110 transition-transform"><X size={16} /></button>
-                                                    </div>
-                                                ) : (
-                                                    <label className="flex flex-col items-center justify-center p-4 cursor-pointer gap-2 h-full">
-                                                        <Upload className="w-8 h-8 text-gray-500 group-hover:text-purple-500 transition-colors" />
-                                                        <span className="text-sm font-bold text-gray-500 group-hover:text-purple-500 transition-colors text-center">Загрузить изображение</span>
-                                                        <input ref={fileInputRef} type="file" accept="image/*" onChange={handleScreenshotChange} className="hidden" />
-                                                    </label>
-                                                )}
-                                            </div>
-                                        </div>
+                                    <div className="space-y-1.5">
+                                        <label className="text-[10px] font-bold uppercase tracking-wider opacity-50 ml-1">Комментарий</label>
+                                        <textarea placeholder="Заметки по сигналу..." value={formData.comment || ''} onChange={e => setFormData({ ...formData, comment: e.target.value })} rows={4} className={`w-full p-4 rounded-2xl border outline-none text-sm font-semibold transition-all resize-none ${theme === 'dark' ? 'bg-black/30 border-white/10 focus:border-purple-500/50' : 'bg-gray-50 border-gray-200 focus:border-purple-500/30'}`} />
                                     </div>
 
                                     <button
@@ -786,7 +767,7 @@ export const FasolSignalsStrategy = () => {
                                         </div>
                                         <div className="text-left">
                                             <h4 className="text-sm font-bold">SCAM ALERT</h4>
-                                            <p className="text-[10px] opacity-70">Пометить этот сигнал как мошенничество</p>
+                                            <p className="text-[10px] opacity-70">Пометить этот сигнал как скам/мошенничество</p>
                                         </div>
                                     </button>
                                 </div>
@@ -806,6 +787,24 @@ export const FasolSignalsStrategy = () => {
                                         <div className="relative flex items-center">
                                             <FileText size={14} className="absolute left-3 text-gray-400 pointer-events-none" />
                                             <input placeholder="0x..." value={formData.address || ''} onChange={e => setFormData({ ...formData, address: e.target.value })} className={`w-full pl-10 pr-4 py-2.5 rounded-xl border outline-none text-sm font-semibold transition-all ${theme === 'dark' ? 'bg-black/30 border-white/10 focus:border-purple-500/50' : 'bg-gray-50 border-gray-200 focus:border-purple-500/30'}`} />
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-1.5">
+                                        <label className="text-[10px] font-bold uppercase tracking-wider opacity-50 ml-1">Скриншот / Фото</label>
+                                        <div className={`relative group cursor-pointer rounded-2xl border-2 border-dashed transition-all ${theme === 'dark' ? 'bg-black/30 border-white/10 hover:border-white/20' : 'bg-gray-50 border-gray-300 hover:border-gray-400'}`}>
+                                            {screenshotPreview ? (
+                                                <div className="relative p-2 aspect-video">
+                                                    <img src={screenshotPreview} alt="Preview" className="w-full h-full object-cover rounded-xl" />
+                                                    <button type="button" onClick={removeScreenshot} className="absolute top-4 right-4 p-1.5 rounded-full bg-red-500 text-white shadow-lg hover:scale-110 transition-transform"><X size={16} /></button>
+                                                </div>
+                                            ) : (
+                                                <label className="flex flex-col items-center justify-center p-8 cursor-pointer gap-3">
+                                                    <Upload className="w-8 h-8 text-gray-500 group-hover:text-purple-500 transition-colors" />
+                                                    <span className="text-sm font-bold text-gray-500 group-hover:text-purple-500 transition-colors">Загрузить изображение</span>
+                                                    <input ref={fileInputRef} type="file" accept="image/*" onChange={handleScreenshotChange} className="hidden" />
+                                                </label>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
