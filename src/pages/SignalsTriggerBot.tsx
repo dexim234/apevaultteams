@@ -441,6 +441,31 @@ export const SignalsTriggerBot = () => {
         setEditingAlert(alert)
         setFormData(alert)
         setCommonDate(alert.signalDate || '')
+        setScreenshotPreview(alert.screenshot || null)
+        // Загружаем strategies и profits
+        setFormData(prev => ({ ...prev, strategies: alert.strategies || [] }))
+        setProfitsInput(alert.profits || [])
+        setShowModal(true)
+    }
+
+    // Редактировать подготовленный сигнал в списке
+    const handleEditPreparedAlert = (index: number) => {
+        const alert = alertsToAdd[index]
+        setFormData({
+            signalDate: commonDate,
+            signalTime: alert.signalTime || '',
+            marketCap: alert.marketCap || '',
+            address: alert.address || '',
+            strategies: alert.strategies || [],
+            maxDropFromSignal: alert.maxDropFromSignal || '',
+            maxDropFromLevel07: alert.maxDropFromLevel07 || '',
+            profits: alert.profits || [],
+            comment: alert.comment || '',
+            isScam: alert.isScam || false
+        })
+        setProfitsInput(alert.profits || [])
+        setScreenshotPreview(alert.screenshot || null)
+        setAlertsToAdd(alertsToAdd.filter((_, i) => i !== index))
         setShowModal(true)
     }
 
@@ -1352,7 +1377,7 @@ export const SignalsTriggerBot = () => {
                                             </thead>
                                             <tbody className={`divide-y ${theme === 'dark' ? 'divide-white/5' : 'divide-gray-100'}`}>
                                                 {alertsToAdd.map((alert, index) => (
-                                                    <tr key={index} className="hover:bg-white/5 transition-colors">
+                                                    <tr key={index} className="group hover:bg-white/5 transition-colors">
                                                         <td className={`p-4 font-mono font-bold ${headingColor}`}>{alert.signalTime}</td>
                                                         <td className={`p-4 font-mono ${subTextColor}`}>{truncateAddress(alert.address || '')}</td>
                                                         <td className={`p-4 font-mono ${headingColor}`}>{alert.marketCap || '-'}</td>
@@ -1366,12 +1391,20 @@ export const SignalsTriggerBot = () => {
                                                             </div>
                                                         </td>
                                                         <td className="p-4 text-right">
-                                                            <button
-                                                                onClick={() => setAlertsToAdd(alertsToAdd.filter((_, i) => i !== index))}
-                                                                className="p-2 rounded-lg hover:bg-rose-500/10 text-rose-500 transition-colors"
-                                                            >
-                                                                <Trash2 className="w-4 h-4" />
-                                                            </button>
+                                                            <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                                <button
+                                                                    onClick={() => handleEditPreparedAlert(index)}
+                                                                    className="p-2 rounded-lg hover:bg-blue-500/10 text-blue-500 transition-colors"
+                                                                >
+                                                                    <Edit className="w-4 h-4" />
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => setAlertsToAdd(alertsToAdd.filter((_, i) => i !== index))}
+                                                                    className="p-2 rounded-lg hover:bg-rose-500/10 text-rose-500 transition-colors"
+                                                                >
+                                                                    <Trash2 className="w-4 h-4" />
+                                                                </button>
+                                                            </div>
                                                         </td>
                                                     </tr>
                                                 ))}
@@ -1528,10 +1561,4 @@ const PremiumSelect: React.FC<PremiumSelectProps> = ({ value, options, onChange,
                     </div>
                 </div>
             )}
-        </div>
-    );
-};
-
-export default SignalsTriggerBot
-
-
+  

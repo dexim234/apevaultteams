@@ -313,6 +313,61 @@ export const AiAoAlerts = () => {
         setFormData(alert)
         setCommonDate(alert.signalDate)
         setScreenshotPreview(alert.screenshot || null)
+        // Загружаем strategies
+        setStrategies(alert.strategies || [])
+        // Парсим profits из maxProfit если есть
+        if (alert.maxProfit && alert.strategies && alert.strategies.length > 0) {
+            const profits: AiAoProfit[] = []
+            alert.strategies.forEach(strategy => {
+                // Ищем значение для каждой стратегии
+                const match = alert.maxProfit?.match(new RegExp(`${strategy}:\\s*([^,]+)`))
+                if (match) {
+                    profits.push({ strategy, value: match[1].trim() })
+                } else {
+                    profits.push({ strategy, value: '' })
+                }
+            })
+            setProfitsInput(profits)
+        } else {
+            setProfitsInput([])
+        }
+        setShowModal(true)
+    }
+
+    // Редактировать подготовленный сигнал в списке
+    const handleEditPreparedAlert = (index: number) => {
+        const alert = alertsToAdd[index]
+        setFormData({
+            signalDate: commonDate,
+            signalTime: alert.signalTime || '',
+            marketCap: alert.marketCap || '',
+            address: alert.address || '',
+            strategies: [],
+            maxDrop: alert.maxDrop || '',
+            maxDropFromLevel07: alert.maxDropFromLevel07 || '',
+            maxProfit: alert.maxProfit || '',
+            comment: alert.comment || '',
+            isScam: alert.isScam || false
+        })
+        setStrategies(alert.strategies || [])
+        // Парсим profits
+        if (alert.maxProfit && alert.strategies && alert.strategies.length > 0) {
+            const profits: AiAoProfit[] = []
+            alert.strategies.forEach(strategy => {
+                const match = alert.maxProfit?.match(new RegExp(`${strategy}:\\s*([^,]+)`))
+                if (match) {
+                    profits.push({ strategy, value: match[1].trim() })
+                } else {
+                    profits.push({ strategy, value: '' })
+                }
+            })
+            setProfitsInput(profits)
+        } else {
+            setProfitsInput([])
+        }
+        setScreenshotPreview(alert.screenshot || null)
+        // Удаляем из списка редактируемый сигнал
+        setAlertsToAdd(alertsToAdd.filter((_, i) => i !== index))
         setShowModal(true)
     }
 
@@ -691,7 +746,7 @@ export const AiAoAlerts = () => {
                                                     <th className="p-4">Market Cap</th>
                                                     <th className="p-4">Стратегии</th>
                                                     <th className="p-4">Профит</th>
-                                                    <th className="p-4 w-10"></th>
+                                                    <th className="p-4 w-20"></th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-white/5">
@@ -725,7 +780,16 @@ export const AiAoAlerts = () => {
                                                                 {alert.maxProfit || '-'}
                                                             </span>
                                                         </td>
-                                                        <td className="p-4"><button onClick={() => setAlertsToAdd(alertsToAdd.filter((_, i) => i !== idx))} className="p-1.5 rounded-lg hover:bg-red-500/20 text-red-500 opacity-0 group-hover:opacity-100 transition-all"><Trash2 size={14} /></button></td>
+                                                        <td className="p-4">
+                                                            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all">
+                                                                <button onClick={() => handleEditPreparedAlert(idx)} className="p-1.5 rounded-lg hover:bg-blue-500/20 text-blue-500 transition-colors">
+                                                                    <Edit size={14} />
+                                                                </button>
+                                                                <button onClick={() => setAlertsToAdd(alertsToAdd.filter((_, i) => i !== idx))} className="p-1.5 rounded-lg hover:bg-red-500/20 text-red-500 transition-colors">
+                                                                    <Trash2 size={14} />
+                                                                </button>
+                                                            </div>
+                                                        </td>
                                                     </tr>
                                                 ))}
                                             </tbody>
