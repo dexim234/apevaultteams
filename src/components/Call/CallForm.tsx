@@ -995,9 +995,9 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory }: C
           'bg-cyan-500/10'
         }`} />
         
-        <div className="flex">
+        <div className="flex min-h-[200px]">
           {/* Vertical Progress Bar - Left Side */}
-          <div className="w-1.5 flex-shrink-0 h-full" style={{
+          <div className="w-1.5 flex-shrink-0 relative" style={{
             background: category === 'memecoins' ? 'linear-gradient(180deg, #10b981, #14b8a6)' :
               category === 'polymarket' ? 'linear-gradient(180deg, #f43f5e, #fb7185)' :
               category === 'nft' ? 'linear-gradient(180deg, #a855f7, #d946ef)' :
@@ -1006,7 +1006,7 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory }: C
               category === 'staking' ? 'linear-gradient(180deg, #8b5cf6, #a78bfa)' :
               'linear-gradient(180deg, #06b6d4, #3b82f6)'
           }}>
-            <div className="w-full bg-black/10" style={{ height: `${100 - progress.percentage}%` }} />
+            <div className="absolute inset-0 bg-black/20" style={{ height: `${100 - progress.percentage}%` }} />
           </div>
           
           <div className="flex-1 p-5">

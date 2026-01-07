@@ -699,21 +699,37 @@ export const CallPage = () => {
           </div>
           
           <div className={`relative ${bgColor} rounded-3xl shadow-2xl shadow-black/50 border ${borderColor} max-w-4xl w-full max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-300`}>
-            {/* Header gradient accent */}
-            <div className="h-1.5 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500" />
-            
+            {/* Header gradient accent - dynamic based on category */}
+            <div className={`h-1.5 transition-all duration-300 ${
+              formCategory === 'memecoins' ? 'bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500' :
+              formCategory === 'polymarket' ? 'bg-gradient-to-r from-rose-500 via-red-500 to-orange-500' :
+              formCategory === 'nft' ? 'bg-gradient-to-r from-purple-500 via-pink-500 to-rose-500' :
+              formCategory === 'futures' ? 'bg-gradient-to-r from-blue-500 via-indigo-500 to-cyan-500' :
+              formCategory === 'spot' ? 'bg-gradient-to-r from-amber-500 via-orange-500 to-yellow-500' :
+              formCategory === 'staking' ? 'bg-gradient-to-r from-violet-500 via-purple-500 to-indigo-500' :
+              'bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-500'
+            }`} />
+
             <div className="flex flex-col h-full">
               <div className={`p-5 flex items-center justify-between sticky top-0 z-20 ${bgColor} border-b ${borderColor}`}>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#4E6E49] to-emerald-600 flex items-center justify-center text-white shadow-lg shadow-emerald-500/30">
-                    <Rocket className="w-5 h-5" />
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-lg transition-all duration-300 ${
+                    formCategory === 'memecoins' ? 'bg-gradient-to-br from-emerald-500 to-teal-600 shadow-emerald-500/30' :
+                    formCategory === 'polymarket' ? 'bg-gradient-to-br from-rose-500 to-red-600 shadow-rose-500/30' :
+                    formCategory === 'nft' ? 'bg-gradient-to-br from-purple-500 to-pink-600 shadow-purple-500/30' :
+                    formCategory === 'futures' ? 'bg-gradient-to-br from-blue-500 to-indigo-600 shadow-blue-500/30' :
+                    formCategory === 'spot' ? 'bg-gradient-to-br from-amber-500 to-orange-600 shadow-amber-500/30' :
+                    formCategory === 'staking' ? 'bg-gradient-to-br from-violet-500 to-purple-600 shadow-violet-500/30' :
+                    'bg-gradient-to-br from-cyan-500 to-blue-600 shadow-cyan-500/30'
+                  }`}>
+                    {CATEGORY_META[formCategory].icon}
                   </div>
                   <div>
                     <h2 className={`text-xl font-bold ${textColor}`}>
                       {editingCall ? 'Редактировать сигнал' : 'Новый сигнал'}
                     </h2>
                     <p className={`text-xs ${subtleColor}`}>
-                      {editingCall ? 'Измените данные сигнала' : 'Создайте качественный сигнал'}
+                      {editingCall ? 'Измените данные сигнала' : `Создайте сигнал: ${CATEGORY_META[formCategory].label}`}
                     </p>
                   </div>
                 </div>
