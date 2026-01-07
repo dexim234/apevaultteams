@@ -1419,7 +1419,9 @@ export const SignalsTriggerBot = () => {
                     </div>
                 </div>
             )}
-        </>
+        </div>
+    );
+};      </>
     )
 }
 
@@ -1463,7 +1465,7 @@ const PremiumInput: React.FC<PremiumInputProps> = ({ icon: Icon, label, placehol
         </div>
     );
 };
-
+  
 interface PremiumSelectProps {
     value: string;
     options: { value: string; label: string }[];
