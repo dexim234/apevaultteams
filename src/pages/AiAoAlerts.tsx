@@ -3,8 +3,8 @@ import { useThemeStore } from '@/store/themeStore'
 import { useAuthStore } from '@/store/authStore'
 import { useAdminStore } from '@/store/adminStore'
 import { getAiAlerts, addAiAlert, updateAiAlert, deleteAiAlert } from '@/services/firestoreService'
-import { AiAlert, TriggerStrategy } from '@/types'
-import { Plus, Edit, Trash2, Save, X, Copy, Check, Filter, ArrowUp, ArrowDown, RotateCcw, Calendar, Hash, Coins, TrendingDown, TrendingUp, Activity, Clock, FileText, AlertTriangle, ChevronDown, Upload, TrendingUp as TrendingUpIcon, TrendingDown as TrendingDownIcon } from 'lucide-react'
+import { AiAlert, AiAoStrategy, AiAoProfit } from '@/types'
+import { Plus, Edit, Trash2, Save, X, Copy, Check, Filter, ArrowUp, ArrowDown, RotateCcw, Calendar as CalendarIcon, Hash, Coins, TrendingDown, TrendingUp, Activity, Clock, FileText, AlertTriangle, ChevronDown, Upload, TrendingUp as TrendingUpIcon, TrendingDown as TrendingDownIcon } from 'lucide-react'
 import { MultiStrategySelector } from '@/components/Management/MultiStrategySelector'
 import { UserNickname } from '@/components/UserNickname'
 
@@ -48,7 +48,7 @@ export const AiAoAlerts = () => {
         signalTime: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }),
         marketCap: '',
         address: '',
-        strategy: 'Market Entry',
+        strategies: [],
         maxDrop: '',
         maxDropFromLevel07: '',
         maxProfit: '',
@@ -58,7 +58,8 @@ export const AiAoAlerts = () => {
 
     const [alertsToAdd, setAlertsToAdd] = useState<Partial<AiAlert>[]>([])
     const [commonDate, setCommonDate] = useState(new Date().toISOString().split('T')[0])
-    const [profitsInput, setProfitsInput] = useState<{ strategy: TriggerStrategy, value: string }[]>([])
+    const [strategies, setStrategies] = useState<AiAoStrategy[]>([])
+    const [profitsInput, setProfitsInput] = useState<AiAoProfit[]>([])
     const fileInputRef = useRef<HTMLInputElement>(null)
     const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null)
 
@@ -73,26 +74,31 @@ export const AiAoAlerts = () => {
         setLoading(false)
     }
 
+    // Add current form to the list
     const handleAddToList = () => {
         if (!formData.address) {
-            alert('Введите адрес токена')
+            alert('Укажите адрес токена')
             return
         }
 
-        if (!formData.isScam && (!formData.strategy || formData.strategy.length === 0)) {
+        if (!formData.isScam && strategies.length === 0) {
             alert('Выберите стратегию или отметьте как скам')
             return
         }
+
+        const profitsText = profitsInput.length > 0
+            ? profitsInput.map(p => `${p.strategy}: ${p.value}`).join(', ')
+            : formData.maxProfit
 
         const newAlert: Partial<AiAlert> = {
             signalDate: commonDate,
             signalTime: formData.signalTime,
             marketCap: formData.marketCap,
             address: formData.address,
-            strategy: formData.strategy,
+            strategies: strategies.length > 0 ? strategies : undefined,
             maxDrop: formData.maxDrop,
             maxDropFromLevel07: formData.maxDropFromLevel07,
-            maxProfit: profitsInput.length > 0 ? profitsInput.map(p => p.value).join(', ') : formData.maxProfit,
+            maxProfit: profitsText || undefined,
             comment: formData.comment,
             screenshot: screenshotPreview || undefined,
             isScam: formData.isScam || false
@@ -104,13 +110,13 @@ export const AiAoAlerts = () => {
             signalTime: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }),
             marketCap: '',
             address: '',
-            strategy: 'Market Entry',
+            strategies: [],
             maxDrop: '',
-            maxDropFromLevel07: '',
             maxProfit: '',
             comment: ''
         })
         setScreenshotPreview(null)
+        setStrategies([])
         setProfitsInput([])
     }
 
@@ -136,13 +142,16 @@ export const AiAoAlerts = () => {
                 signalTime: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }),
                 marketCap: '',
                 address: '',
-                strategy: 'Market Entry',
+                strategies: [],
                 maxDrop: '',
+                maxDropFromLevel07: '',
                 maxProfit: '',
                 comment: '',
                 isScam: false
             })
             setScreenshotPreview(null)
+            setStrategies([])
+            setProfitsInput([])
             setShowModal(false)
             await loadAlerts()
         } catch (error: any) {
@@ -153,10 +162,15 @@ export const AiAoAlerts = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         try {
+            const profitsText = profitsInput.length > 0
+                ? profitsInput.map(p => `${p.strategy}: ${p.value}`).join(', ')
+                : formData.maxProfit
+
             const alertData = {
                 ...formData,
                 signalDate: commonDate,
-                maxProfit: profitsInput.length > 0 ? profitsInput.map(p => p.value).join(', ') : formData.maxProfit,
+                strategies: strategies.length > 0 ? strategies : formData.strategies,
+                maxProfit: profitsText || undefined,
                 screenshot: screenshotPreview || formData.screenshot
             }
             if (editingAlert) {
@@ -176,13 +190,15 @@ export const AiAoAlerts = () => {
                 signalTime: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }),
                 marketCap: '',
                 address: '',
-                strategy: 'Market Entry',
+                strategies: [],
                 maxDrop: '',
                 maxProfit: '',
                 comment: '',
                 isScam: false
             })
             setScreenshotPreview(null)
+            setStrategies([])
+            setProfitsInput([])
             await loadAlerts()
         } catch (error: any) {
             console.error('Error saving alert:', error)
@@ -318,18 +334,10 @@ export const AiAoAlerts = () => {
         if (fileInputRef.current) fileInputRef.current.value = ''
     }
 
-    const getStrategyConfig = (strategy: TriggerStrategy) => {
+    const getStrategyConfig = (strategy: AiAoStrategy) => {
         switch (strategy) {
             case 'Фиба': return { color: 'bg-indigo-500/20 text-indigo-400', icon: Activity, label: 'Фиба' }
             case 'Market Entry': return { color: 'bg-blue-500/20 text-blue-400', icon: Activity, label: 'ME' }
-        }
-    }
-
-    const getStrategyLabel = (strategy: string): string => {
-        switch (strategy) {
-            case 'Фиба': return 'Fibo'
-            case 'Market Entry': return 'ME'
-            default: return strategy
         }
     }
 
@@ -394,7 +402,7 @@ export const AiAoAlerts = () => {
                             )}
 
                             {isAdmin && (
-                                <button onClick={() => { setEditingAlert(null); setAlertsToAdd([]); setFormData({ signalDate: new Date().toISOString().split('T')[0], signalTime: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }), marketCap: '', address: '', strategy: 'Market Entry', maxDrop: '', maxProfit: '', comment: '', isScam: false }); setScreenshotPreview(null); setProfitsInput([]); setShowModal(true) }} className="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-semibold transition-colors flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20">
+                                <button onClick={() => { setEditingAlert(null); setAlertsToAdd([]); setFormData({ signalDate: new Date().toISOString().split('T')[0], signalTime: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }), marketCap: '', address: '', strategies: [], maxDrop: '', maxProfit: '', comment: '', isScam: false }); setScreenshotPreview(null); setProfitsInput([]); setShowModal(true) }} className="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-semibold transition-colors flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20">
                                     <Plus className="w-4 h-4" /><span>Добавить</span>
                                 </button>
                             )}
@@ -409,13 +417,9 @@ export const AiAoAlerts = () => {
 
                         <div className="flex items-center justify-between border-b border-white/5 pb-4">
                             <div className="flex items-center gap-3">
-                                <div className={`p-2 rounded-xl ${theme === 'dark' ? 'bg-blue-500/10 text-blue-400' : 'bg-blue-50 text-blue-600'}`}>
-                                    <Filter size={18} />
-                                </div>
-                                <div>
-                                    <h3 className={`text-sm font-bold uppercase tracking-tight ${headingColor}`}>Параметры фильтрации</h3>
-                                    <p className={`text-[10px] ${subTextColor}`}>Настройте отображение сигналов</p>
-                                </div>
+                                <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center pointer-events-none transition-transform group-focus-within/input:scale-110"><CalendarIcon size={14} className={theme === 'dark' ? 'text-gray-500' : 'text-gray-400'} /></div>
+                                <label className={`text-[10px] font-bold uppercase tracking-wider ml-1 opacity-50 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Дата</label>
+                                <input type="date" placeholder="Выберите дату..." value={specificDate} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSpecificDate(e.target.value)} className={`w-full px-4 py-2.5 pl-10 rounded-xl border text-sm font-semibold transition-all outline-none shadow-sm ${theme === 'dark' ? 'bg-white/5 border-white/5 text-white placeholder:text-gray-600 focus:bg-white/10 focus:border-white/20 focus:ring-4 focus:ring-white/5' : 'bg-white border-gray-200 text-gray-900 placeholder:text-gray-400 focus:border-blue-500/30 focus:ring-4 focus:ring-blue-500/5 hover:border-gray-300'}`} />
                             </div>
                             <button onClick={resetFilters} className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${theme === 'dark' ? 'hover:bg-white/5 text-gray-400 hover:text-white' : 'hover:bg-gray-100 text-gray-500 hover:text-gray-900'}`}>
                                 <RotateCcw size={14} />Сбросить
@@ -423,7 +427,7 @@ export const AiAoAlerts = () => {
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-y-6 gap-x-4">
-                            <PremiumInput label="Дата" type="date" icon={Calendar} placeholder="Выберите дату..." value={specificDate} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSpecificDate(e.target.value)} theme={theme} />
+                            <PremiumInput label="Дата" type="date" icon={CalendarIcon} placeholder="Выберите дату..." value={specificDate} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSpecificDate(e.target.value)} theme={theme} />
 
                             <div className="grid grid-cols-2 gap-2">
                                 <PremiumInput label="Мин. Drop" icon={TrendingDown} placeholder="-50" value={minDrop} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMinDrop(e.target.value)} theme={theme} />
@@ -435,8 +439,8 @@ export const AiAoAlerts = () => {
                             <PremiumSelect theme={theme} value={sortBy} options={[{ value: 'date', label: 'По дате' }, { value: 'drop', label: 'По падению' }, { value: 'profit', label: 'По профиту' }]} onChange={(val: string) => setSortBy(val as SortField)} />
 
                             <div className="space-y-1.5">
-                                <label className={`text-[10px] font-bold uppercase tracking-wider ml-1 opacity-50 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Направление</label>
-                                <button onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')} className={`w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-bold transition-all shadow-sm ${theme === 'dark' ? 'bg-white/5 border-white/10 text-white hover:bg-white/10 active:scale-95' : 'bg-white border-gray-200 text-gray-900 hover:bg-gray-50 active:scale-95'}`}>
+                                <label className={`text-[10px] font-bold uppercase tracking-wider ml-1 ${subTextColor}`}>Направление</label>
+                                <button onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')} className={`w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-bold transition-all shadow-sm ${theme === 'dark' ? 'bg-white/5 text-white hover:bg-white/10 active:scale-95' : 'bg-white border-gray-200 text-gray-900 hover:bg-gray-50 active:scale-95'}`}>
                                     {sortOrder === 'asc' ? <ArrowUp size={16} className="text-blue-500" /> : <ArrowDown size={16} className="text-blue-500" />}
                                     <span>{sortOrder === 'asc' ? 'По возрастанию' : 'По убыванию'}</span>
                                 </button>
@@ -452,18 +456,18 @@ export const AiAoAlerts = () => {
                             <thead>
                                 <tr className={`border-b ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-gray-50'}`}>
                                     <th className={`p-1.5 sm:p-2 text-[10px] sm:text-xs uppercase tracking-wider font-semibold ${subTextColor} text-center w-8 border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>#</th>
-                                    <th className={`p-1.5 sm:p-2 text-[10px] sm:text-xs uppercase tracking-wider font-semibold ${subTextColor} text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>Дата</th>
-                                    <th className={`p-1.5 sm:p-2 text-[10px] sm:text-xs uppercase tracking-wider font-semibold ${subTextColor} text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>Время</th>
-                                    <th className={`p-1.5 sm:p-2 text-[10px] sm:text-xs uppercase tracking-wider font-semibold ${subTextColor} text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>Стратегия</th>
-                                    <th className={`p-1.5 sm:p-2 text-[10px] sm:text-xs uppercase tracking-wider font-semibold ${subTextColor} text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>MC</th>
-                                    <th className={`p-1.5 sm:p-2 text-[10px] sm:text-xs uppercase tracking-wider font-semibold ${subTextColor} text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>Адрес</th>
-                                    <th className={`p-1.5 sm:p-2 text-[10px] sm:text-xs uppercase tracking-wider font-semibold ${subTextColor} text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>Drop</th>
-                                    <th className={`p-1.5 sm:p-2 text-[10px] sm:text-xs uppercase tracking-wider font-semibold ${subTextColor} text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>Drop 0.7</th>
-                                    <th className={`p-1.5 sm:p-2 text-[10px] sm:text-xs uppercase tracking-wider font-semibold ${subTextColor} text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>Профит</th>
-                                    <th className={`p-1.5 sm:p-2 text-[10px] sm:text-xs uppercase tracking-wider font-semibold ${subTextColor} text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>Коммент</th>
-                                    <th className={`p-1.5 sm:p-2 text-[10px] sm:text-xs uppercase tracking-wider font-semibold ${subTextColor} text-center`}>Автор</th>
-                                    <th className={`p-1.5 sm:p-2 text-[10px] sm:text-xs uppercase tracking-wider font-semibold ${subTextColor} text-center`}>📷</th>
-                                    {isAdmin && <th className={`p-1.5 sm:p-2 text-[10px] sm:text-xs uppercase tracking-wider font-semibold ${subTextColor} text-center`}>⚙</th>}
+                                    <th className={`p-1.5 sm:p-2 text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>Дата</th>
+                                    <th className={`p-1.5 sm:p-2 text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>Время</th>
+                                    <th className={`p-1.5 sm:p-2 text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>Стратегия</th>
+                                    <th className={`p-1.5 sm:p-2 text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>MC</th>
+                                    <th className={`p-1.5 sm:p-2 text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>Адрес</th>
+                                    <th className={`p-1.5 sm:p-2 text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>Drop</th>
+                                    <th className={`p-1.5 sm:p-2 text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>Drop 0.7</th>
+                                    <th className={`p-1.5 sm:p-2 text-center`}>Профит</th>
+                                    <th className={`p-1.5 sm:p-2 text-center`}>Коммент</th>
+                                    <th className={`p-1.5 sm:p-2 text-center`}>Автор</th>
+                                    <th className={`p-1.5 sm:p-2 text-center`}>📷</th>
+                                    {isAdmin && <th className={`p-1.5 sm:p-2 text-center`}>⚙</th>}
                                 </tr>
                             </thead>
                             <tbody className={`divide-y ${theme === 'dark' ? 'divide-white/5' : 'divide-gray-100'}`}>
@@ -486,49 +490,60 @@ export const AiAoAlerts = () => {
                                             <td className={`p-1.5 sm:p-2 text-center border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
                                                 {alert.isScam ? (
                                                     <span className="text-red-500 font-bold text-[10px]">СКАМ</span>
-                                                ) : alert.strategy ? (
-                                                    <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${getStrategyConfig(alert.strategy as TriggerStrategy).color}`}>
-                                                        {getStrategyLabel(alert.strategy)}
-                                                    </span>
-                                                ) : '-'}
+                                                ) : alert.strategies && alert.strategies.length > 0 ? (
+                                                    <div className="flex flex-wrap gap-0.5 justify-center">
+                                                        {alert.strategies.map(s => {
+                                                            const conf = getStrategyConfig(s)
+                                                            const Icon = conf.icon
+                                                            return (
+                                                                <span key={s} className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-bold ${conf.color}`}>
+                                                                    <Icon size={10} />
+                                                                    {conf.label}
+                                                                </span>
+                                                            )
+                                                        })}
+                                                    </div>
+                                                ) : (
+                                                    <span className={`text-[10px] ${subTextColor}`}>-</span>
+                                                )}
                                             </td>
-                                            <td className={`p-1.5 sm:p-2 text-center border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
+                                            <td className={`p-1.5 sm:p-2 text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>
                                                 <div className={`font-mono text-[10px] sm:text-xs ${headingColor}`}>{alert.marketCap || '-'}</div>
                                             </td>
-                                            <td className={`p-1.5 sm:p-2 text-center border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
+                                            <td className={`p-1.5 sm:p-2 text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>
                                                 <div className="flex items-center justify-center gap-1">
                                                     <a href={`https://gmgn.ai/sol/token/${alert.address}`} target="_blank" rel="noopener noreferrer" className={`font-mono text-[10px] ${theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-500'} cursor-pointer`} title={alert.address}>
                                                         {truncateAddress(alert.address)}
                                                     </a>
                                                     <button onClick={() => copyToClipboard(alert.address, alert.id)} className={`p-1 rounded hover:bg-white/10 transition-colors ${subTextColor}`}>
-                                                        {copyingId === alert.id ? <Check className="w-3 h-3 text-green-500" /> : <Copy className="w-3 h-3" />}
+                                                        {copyingId === alert.id ? <Check size={12} className="text-green-500" /> : <Copy size={12} />}
                                                     </button>
                                                 </div>
                                             </td>
-                                            <td className={`p-1.5 sm:p-2 text-center border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
+                                            <td className={`p-1.5 sm:p-2 text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>
                                                 <span className={`font-mono text-[10px] sm:text-xs ${alert.maxDrop && alert.maxDrop.startsWith('-') ? 'text-red-500' : headingColor}`}>
                                                     {alert.maxDrop || '-'}
                                                 </span>
                                             </td>
-                                            <td className={`p-1.5 sm:p-2 text-center border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
+                                            <td className={`p-1.5 sm:p-2 text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>
                                                 <span className={`font-mono text-[10px] sm:text-xs ${alert.maxDropFromLevel07 && alert.maxDropFromLevel07.startsWith('-') ? 'text-red-500' : headingColor}`}>
                                                     {alert.maxDropFromLevel07 || '-'}
                                                 </span>
                                             </td>
-                                            <td className={`p-1.5 sm:p-2 text-center border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
+                                            <td className={`p-1.5 sm:p-2 text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>
                                                 <span className="font-mono text-[10px] sm:text-xs text-green-500 font-bold">
                                                     {alert.maxProfit || '-'}
                                                 </span>
                                             </td>
-                                            <td className={`p-1.5 sm:p-2 text-center border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
+                                            <td className={`p-1.5 sm:p-2 text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>
                                                 <div className={`text-[10px] ${headingColor} break-words whitespace-pre-wrap max-w-[200px]`}>
                                                     {alert.comment || '-'}
                                                 </div>
                                             </td>
-                                            <td className={`p-1.5 sm:p-2 text-center border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
+                                            <td className={`p-1.5 sm:p-2 text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>
                                                 <UserNickname userId={alert.createdBy} className="text-[10px] font-medium" />
                                             </td>
-                                            <td className={`p-1.5 sm:p-2 text-center border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
+                                            <td className={`p-1.5 sm:p-2 text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>
                                                 {alert.screenshot ? (
                                                     <button onClick={() => setPreviewImage(alert.screenshot || null)} className={`text-[10px] ${subTextColor} hover:text-blue-500 transition-colors cursor-pointer`} title="Просмотр фото">
                                                         📷
@@ -541,10 +556,10 @@ export const AiAoAlerts = () => {
                                                 <td className={`p-1.5 sm:p-2 text-center last:border-r-0`}>
                                                     <div className="flex items-center justify-center gap-0.5">
                                                         <button onClick={() => handleEdit(alert)} className={`p-1 rounded-lg hover:bg-white/10 transition-colors ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}>
-                                                            <Edit className="w-3 h-3" />
+                                                            <Edit size={12} />
                                                         </button>
                                                         <button onClick={() => handleDelete(alert.id)} className="p-1 rounded-lg hover:bg-red-500/10 text-red-500 transition-colors">
-                                                            <Trash2 size={16} className="w-3 h-3" />
+                                                            <Trash2 size={16} />
                                                         </button>
                                                     </div>
                                                 </td>
@@ -575,7 +590,7 @@ export const AiAoAlerts = () => {
                                 {/* Left Column */}
                                 <div className="space-y-6">
                                     <div className="grid grid-cols-2 gap-4">
-                                        <PremiumInput label="Дата сигнала" type="date" icon={Calendar} value={commonDate} onChange={(e) => setCommonDate(e.target.value)} theme={theme} />
+                                        <PremiumInput label="Дата сигнала" type="date" icon={CalendarIcon} value={commonDate} onChange={(e) => setCommonDate(e.target.value)} theme={theme} />
                                         <PremiumInput label="Время (UTC)" type="time" icon={Clock} value={formData.signalTime || ''} onChange={(e) => setFormData({ ...formData, signalTime: e.target.value })} theme={theme} />
                                     </div>
 
@@ -609,11 +624,11 @@ export const AiAoAlerts = () => {
                                 {/* Right Column */}
                                 <div className="space-y-6">
                                     <MultiStrategySelector
-                                        strategies={formData.strategy ? [formData.strategy as TriggerStrategy] : []}
+                                        strategies={strategies}
                                         profits={profitsInput}
-                                        onChange={(strategies, profits) => {
-                                            setFormData({ ...formData, strategy: strategies[0] || 'Market Entry' })
-                                            setProfitsInput(profits)
+                                        onChange={(newStrategies, newProfits) => {
+                                            setStrategies(newStrategies)
+                                            setProfitsInput(newProfits)
                                         }}
                                         theme={theme}
                                         color="bg-blue-500"
@@ -671,7 +686,12 @@ export const AiAoAlerts = () => {
                                         <table className="w-full text-left">
                                             <thead>
                                                 <tr className="border-b border-white/5 text-[10px] font-bold uppercase tracking-wider text-gray-500">
-                                                    <th className="p-4">Дата</th><th className="p-4">Время</th><th className="p-4">Market Cap</th><th className="p-4">Стратегия</th><th className="p-4 w-10"></th>
+                                                    <th className="p-4">Дата</th>
+                                                    <th className="p-4">Время</th>
+                                                    <th className="p-4">Market Cap</th>
+                                                    <th className="p-4">Стратегии</th>
+                                                    <th className="p-4">Профит</th>
+                                                    <th className="p-4 w-10"></th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-white/5">
@@ -681,8 +701,28 @@ export const AiAoAlerts = () => {
                                                         <td className="p-4 text-xs font-mono">{alert.signalTime}</td>
                                                         <td className="p-4 text-xs font-bold text-green-500">{alert.marketCap || '-'}</td>
                                                         <td className="p-4">
-                                                            <span className={`px-2 py-1 rounded text-[10px] font-bold ${getStrategyConfig(alert.strategy as TriggerStrategy).color}`}>
-                                                                {getStrategyLabel(alert.strategy || '')}
+                                                            <div className="flex flex-wrap gap-0.5">
+                                                                {alert.strategies && alert.strategies.length > 0 ? (
+                                                                    alert.strategies.map(s => {
+                                                                        const conf = getStrategyConfig(s)
+                                                                        const Icon = conf.icon
+                                                                        return (
+                                                                            <span key={s} className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-bold ${conf.color}`}>
+                                                                                <Icon size={10} />
+                                                                                {conf.label}
+                                                                            </span>
+                                                                        )
+                                                                    })
+                                                                ) : alert.isScam ? (
+                                                                    <span className="text-red-500 font-bold text-[10px]">СКАМ</span>
+                                                                ) : (
+                                                                    <span className={`text-[10px] ${subTextColor}`}>-</span>
+                                                                )}
+                                                            </div>
+                                                        </td>
+                                                        <td className="p-4">
+                                                            <span className="font-mono text-xs text-green-500 font-bold">
+                                                                {alert.maxProfit || '-'}
                                                             </span>
                                                         </td>
                                                         <td className="p-4"><button onClick={() => setAlertsToAdd(alertsToAdd.filter((_, i) => i !== idx))} className="p-1.5 rounded-lg hover:bg-red-500/20 text-red-500 opacity-0 group-hover:opacity-100 transition-all"><Trash2 size={14} /></button></td>
@@ -715,7 +755,7 @@ const PremiumInput: React.FC<PremiumInputProps> = ({ icon: Icon, label, placehol
     <div className="space-y-1.5 group/input">
         {label && <label className={`text-[10px] font-bold uppercase tracking-wider ml-1 opacity-50 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{label}</label>}
         <div className="relative">
-            {Icon && <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center pointer-events-none transition-transform group-focus-within/input:scale-110"><Icon size={14} className={theme === 'dark' ? 'text-gray-500' : 'text-gray-400'} /></div>}
+            {CalendarIcon && <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center pointer-events-none transition-transform group-focus-within/input:scale-110"><CalendarIcon size={14} className={theme === 'dark' ? 'text-gray-500' : 'text-gray-400'} /></div>}
             <input type={type} value={value} onChange={onChange} placeholder={placeholder} className={`w-full px-4 py-2.5 ${Icon ? 'pl-10' : ''} rounded-xl border text-sm font-semibold transition-all outline-none shadow-sm ${theme === 'dark' ? 'bg-white/5 border-white/5 text-white placeholder:text-gray-600 focus:bg-white/10 focus:border-white/20 focus:ring-4 focus:ring-white/5' : 'bg-white border-gray-200 text-gray-900 placeholder:text-gray-400 focus:border-blue-500/30 focus:ring-4 focus:ring-blue-500/5 hover:border-gray-300'}`} />
         </div>
     </div>
@@ -726,6 +766,7 @@ const PremiumSelect: React.FC<PremiumSelectProps> = ({ value, options, onChange,
     const [isOpen, setIsOpen] = useState(false)
     const containerRef = useRef<HTMLDivElement>(null)
     const selectedOption = options.find(o => o.value === value)
+    const subTextColor = theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -738,8 +779,8 @@ const PremiumSelect: React.FC<PremiumSelectProps> = ({ value, options, onChange,
     return (
         <div className="relative" ref={containerRef}>
             <div className="flex flex-col space-y-1.5">
-                <label className={`text-[10px] font-bold uppercase tracking-wider ml-1 opacity-50 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Сортировать по</label>
-                <button type="button" onClick={() => setIsOpen(!isOpen)} className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl border text-sm font-bold transition-all shadow-sm ${theme === 'dark' ? 'bg-white/5 border-white/5 text-white hover:bg-white/10 active:scale-95' : 'bg-white border-gray-200 text-gray-900 hover:bg-gray-50 active:scale-95'}`}>
+                <label className={`text-[10px] font-bold uppercase tracking-wider ml-1 ${subTextColor}`}>Сортировать по</label>
+                <button type="button" onClick={() => setIsOpen(!isOpen)} className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl border text-sm font-bold transition-all shadow-sm ${theme === 'dark' ? 'bg-white/5 text-white hover:bg-white/10 active:scale-95' : 'bg-white border-gray-200 text-gray-900 hover:bg-gray-50 active:scale-95'}`}>
                     <span className="truncate">{selectedOption?.label}</span>
                     <ChevronDown size={14} className={`text-gray-500 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
                 </button>
