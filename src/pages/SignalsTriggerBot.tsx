@@ -1394,7 +1394,10 @@ export const SignalsTriggerBot = () => {
                     </div>
                 </div>
             )}
-
+        </div>
+    );
+};
+  
             {/* Image Preview Modal */}
             {previewImage && (
                 <div
@@ -1421,10 +1424,8 @@ export const SignalsTriggerBot = () => {
             )}
         </div>
     );
-};      </>
-    )
-}
-
+};
+  
 // --- Premium Helper Components ---
 
 interface PremiumInputProps {
