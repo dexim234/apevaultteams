@@ -37,14 +37,59 @@ import { useScrollLock } from '@/hooks/useScrollLock'
 type StatusFilter = 'all' | 'active' | 'completed' | 'cancelled' | 'reviewed'
 type RiskFilter = 'all' | CallRiskLevel
 
-const CATEGORY_META: Record<CallCategory, { label: string; gradient: string; chip: string; icon: JSX.Element }> = {
-  memecoins: { label: 'Мемкоины', gradient: 'from-emerald-400 to-teal-500', chip: 'bg-emerald-500/10 text-emerald-600', icon: <Rocket className="w-5 h-5 text-white" /> },
-  futures: { label: 'Фьючерсы', gradient: 'from-blue-400 to-indigo-500', chip: 'bg-blue-500/10 text-blue-600', icon: <LineChart className="w-5 h-5 text-white" /> },
-  nft: { label: 'NFT', gradient: 'from-purple-400 to-pink-500', chip: 'bg-purple-500/10 text-purple-600', icon: <Image className="w-5 h-5 text-white" /> },
-  spot: { label: 'Спот', gradient: 'from-amber-400 to-orange-500', chip: 'bg-amber-500/10 text-amber-600', icon: <Coins className="w-5 h-5 text-white" /> },
-  airdrop: { label: 'AirDrop', gradient: 'from-cyan-400 to-blue-500', chip: 'bg-cyan-500/10 text-cyan-600', icon: <Sparkles className="w-5 h-5 text-white" /> },
-  polymarket: { label: 'Polymarket', gradient: 'from-rose-400 to-red-500', chip: 'bg-rose-500/10 text-rose-600', icon: <Gauge className="w-5 h-5 text-white" /> },
-  staking: { label: 'Стейкинг', gradient: 'from-violet-400 to-purple-500', chip: 'bg-violet-500/10 text-violet-600', icon: <Shield className="w-5 h-5 text-white" /> },
+const CATEGORY_ORDER: CallCategory[] = ['memecoins', 'polymarket', 'nft', 'staking', 'spot', 'futures', 'airdrop']
+
+// Updated CATEGORY_META with cardGradient
+const CATEGORY_META: Record<CallCategory, { label: string; gradient: string; chip: string; icon: JSX.Element; cardGradient: string }> = {
+  memecoins: { 
+    label: 'Мемкоины', 
+    gradient: 'from-emerald-400 to-teal-500', 
+    chip: 'bg-emerald-500/10 text-emerald-600', 
+    icon: <Rocket className="w-5 h-5 text-white" />,
+    cardGradient: 'from-emerald-500/20 via-teal-500/10 to-transparent'
+  },
+  futures: { 
+    label: 'Фьючерсы', 
+    gradient: 'from-blue-400 to-indigo-500', 
+    chip: 'bg-blue-500/10 text-blue-600', 
+    icon: <LineChart className="w-5 h-5 text-white" />,
+    cardGradient: 'from-blue-500/20 via-indigo-500/10 to-transparent'
+  },
+  nft: { 
+    label: 'NFT', 
+    gradient: 'from-purple-400 to-pink-500', 
+    chip: 'bg-purple-500/10 text-purple-600', 
+    icon: <Image className="w-5 h-5 text-white" />,
+    cardGradient: 'from-purple-500/20 via-pink-500/10 to-transparent'
+  },
+  spot: { 
+    label: 'Спот', 
+    gradient: 'from-amber-400 to-orange-500', 
+    chip: 'bg-amber-500/10 text-amber-600', 
+    icon: <Coins className="w-5 h-5 text-white" />,
+    cardGradient: 'from-amber-500/20 via-orange-500/10 to-transparent'
+  },
+  airdrop: { 
+    label: 'AirDrop', 
+    gradient: 'from-cyan-400 to-blue-500', 
+    chip: 'bg-cyan-500/10 text-cyan-600', 
+    icon: <Sparkles className="w-5 h-5 text-white" />,
+    cardGradient: 'from-cyan-500/20 via-blue-500/10 to-transparent'
+  },
+  polymarket: { 
+    label: 'Polymarket', 
+    gradient: 'from-rose-400 to-red-500', 
+    chip: 'bg-rose-500/10 text-rose-600', 
+    icon: <Gauge className="w-5 h-5 text-white" />,
+    cardGradient: 'from-rose-500/20 via-red-500/10 to-transparent'
+  },
+  staking: { 
+    label: 'Стейкинг', 
+    gradient: 'from-violet-400 to-purple-500', 
+    chip: 'bg-violet-500/10 text-violet-600', 
+    icon: <Shield className="w-5 h-5 text-white" />,
+    cardGradient: 'from-violet-500/20 via-purple-500/10 to-transparent'
+  },
 }
 
 const riskBadges: Record<CallRiskLevel, string> = {
@@ -245,18 +290,13 @@ export const CallPage = () => {
   // Prepare options for custom selectors
   const categoryOptions = [
     { value: 'all', label: 'Все сферы', icon: <Activity size={14} /> },
-    ...(Object.keys(CATEGORY_META) as CallCategory[]).map(cat => ({
+    ...CATEGORY_ORDER.map(cat => ({
       value: cat,
       label: CATEGORY_META[cat].label,
-      icon: CATEGORY_META[cat].icon, // using the icon from META which is white, might need adjustment logic in selector or here
+      icon: CATEGORY_META[cat].icon,
       chip: CATEGORY_META[cat].chip
     }))
   ]
-
-  // Fix icon color for dropdown if needed, but CustomSelect handles rendering. 
-  // The icons in CATEGORY_META are styled with 'text-white' for the cards. 
-  // For dropdowns, we might want them to adapt. 
-  // But let's stick to the structure first.
 
   const riskOptions = [
     { value: 'all', label: 'Любой риск', icon: <ShieldAlert size={14} /> },
@@ -267,7 +307,7 @@ export const CallPage = () => {
   ]
 
   const traderOptions = [
-    { value: 'all', label: 'Все трейдеры', icon: <User size={14} /> },
+    { value: 'all', label: 'Все трейдеры', icon: <User size={16} /> },
     ...TEAM_MEMBERS.map(t => ({
       value: t.id,
       label: t.name,
@@ -304,9 +344,11 @@ export const CallPage = () => {
       {/* Category Cards - Horizontal Scroll */}
       <div className="px-4 sm:px-6 lg:px-8 mb-6">
         <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide">
-          {(Object.keys(CATEGORY_META) as CallCategory[]).map((cat) => {
+          {CATEGORY_ORDER.map((cat) => {
             const meta = CATEGORY_META[cat]
             const stats = categoryStats[cat]
+            const progress = stats.total > 0 ? Math.round((stats.active / stats.total) * 100) : 0
+            
             return (
               <button
                 key={cat}
@@ -315,13 +357,13 @@ export const CallPage = () => {
                   setFormCategory(cat)
                   setShowForm(true)
                 }}
-                className="flex-shrink-0 min-w-[200px] p-0.5 rounded-2xl transition-all relative group overflow-hidden"
+                className="flex-shrink-0 min-w-[200px] rounded-2xl transition-all relative group overflow-hidden"
               >
-                {/* Gradient Border Background */}
-                <div className={`absolute inset-0 bg-gradient-to-br ${meta.gradient} opacity-40 group-hover:opacity-100 transition-opacity`} />
-
+                {/* Gradient Background */}
+                <div className={`absolute inset-0 bg-gradient-to-br ${meta.cardGradient} border-2 border-transparent group-hover:border-white/20 rounded-2xl transition-all`} />
+                
                 {/* Content Container */}
-                <div className={`relative h-full px-5 py-4 rounded-[14px] flex flex-col items-center justify-center gap-2 ${theme === 'dark' ? 'bg-[#10141c]' : 'bg-white'
+                <div className={`relative h-full px-5 py-4 rounded-[14px] flex flex-col items-center justify-center gap-2 ${theme === 'dark' ? 'bg-[#10141c]/90' : 'bg-white/90'
                   }`}>
                   {/* Header: Icon & Label Centered */}
                   <div className="flex flex-col items-center gap-2">
@@ -331,17 +373,22 @@ export const CallPage = () => {
                     <span className={`text-sm font-bold ${textColor} text-center`}>{meta.label}</span>
                   </div>
 
-                  {/* Stats Row: Active & Total */}
-                  <div className="flex items-center justify-between w-full mt-1 px-1 gap-2">
-                    <div className="flex items-center gap-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                      <span className="text-[10px] font-bold text-emerald-500">
-                        +{stats?.active || 0} АКТИВ
+                  {/* Progress Bar */}
+                  <div className="w-full mt-2">
+                    <div className="flex items-center justify-between w-full mb-1">
+                      <span className={`text-[10px] font-bold ${textColor}`}>
+                        {stats.active}/{stats.total}
+                      </span>
+                      <span className={`text-[10px] font-medium ${subtleColor}`}>
+                        {progress}%
                       </span>
                     </div>
-                    <span className={`text-[10px] font-medium ${subtleColor}`}>
-                      Всего: {stats?.total || 0}
-                    </span>
+                    <div className="w-full h-1.5 bg-gray-700/50 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full bg-gradient-to-r ${meta.gradient} rounded-full transition-all duration-500`}
+                        style={{ width: `${progress}%` }}
+                      />
+                    </div>
                   </div>
                 </div>
               </button>
