@@ -414,34 +414,17 @@ export const AiAoAlerts = () => {
                         <div className={`absolute inset-0 ${theme === 'dark' ? 'bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.05),transparent_45%)]' : 'bg-[radial-gradient(circle_at_50%_0%,rgba(59,130,246,0.05),transparent_45%)]'}`}></div>
                     </div>
 
-                    <div className="relative p-6 sm:p-8 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-6">
+                    <div className="relative p-6 sm:p-8 flex flex-col lg:flex-row items-center justify-between gap-6">
+                        {/* Left: Icon + Title */}
                         <div className="flex items-center gap-4">
                             <div className={`p-3 rounded-2xl ${theme === 'dark' ? 'bg-white/10 border-white/20' : 'bg-blue-500/10 border-blue-500/30'} shadow-inner`}>
                                 <Activity className={`w-8 h-8 ${theme === 'dark' ? 'text-white' : 'text-blue-500'}`} />
                             </div>
-                            <div className="flex flex-col">
-                                <h1 className={`text-3xl font-black ${headingColor}`}>AI AO ALERTS</h1>
-                                <p className={`text-sm ${subTextColor}`}>Сигналы от AI AO</p>
-                            </div>
+                            <h1 className={`text-3xl font-black ${headingColor} whitespace-nowrap`}>AI AO ALERTS</h1>
                         </div>
 
-                        {/* Stats */}
-                        <div className="flex items-center gap-6">
-                            <div className="flex items-center gap-2">
-                                <div className={`w-2 h-2 rounded-full ${stats.total > 0 ? 'bg-emerald-500' : 'bg-gray-500'}`}></div>
-                                <span className={`text-sm font-medium ${subTextColor}`}>Всего сигналов: <span className={`font-bold ${headingColor}`}>{stats.total}</span></span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <TrendingUpIcon className="w-4 h-4 text-emerald-500" />
-                                <span className={`text-sm font-medium ${subTextColor}`}>Профит: <span className={`font-bold text-emerald-500`}>+{stats.totalProfit.toFixed(1)}</span></span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <TrendingDownIcon className="w-4 h-4 text-rose-500" />
-                                <span className={`text-sm font-medium ${subTextColor}`}>Просадка: <span className={`font-bold text-rose-500`}>-{stats.totalDrop.toFixed(1)}%</span></span>
-                            </div>
-                        </div>
-
-                        <div className="flex flex-wrap items-center gap-3">
+                        {/* Center: Buttons */}
+                        <div className="flex flex-wrap items-center justify-center gap-3">
                             <button onClick={copyTableToClipboard} disabled={filteredAlerts.length === 0} className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 border ${theme === 'dark' ? 'bg-white/5 border-white/10 hover:bg-white/10 text-gray-300' : 'bg-gray-100 border-gray-200 hover:bg-gray-200 text-gray-700'} disabled:opacity-50`}>
                                 {isCopyingTable ? <><Check className="w-4 h-4 text-green-500" /><span>Скопировано</span></> : <><Copy className="w-4 h-4" /><span>Копировать</span></>}
                             </button>
@@ -461,6 +444,22 @@ export const AiAoAlerts = () => {
                                     <Plus className="w-4 h-4" /><span>Добавить</span>
                                 </button>
                             )}
+                        </div>
+
+                        {/* Right: Stats vertical */}
+                        <div className="flex flex-col items-end gap-2 min-w-[140px]">
+                            <div className="flex items-center gap-2">
+                                <div className={`w-2 h-2 rounded-full ${stats.total > 0 ? 'bg-emerald-500' : 'bg-gray-500'}`}></div>
+                                <span className={`text-sm font-medium ${subTextColor}`}>Всего сигналов: <span className={`font-bold ${headingColor}`}>{stats.total}</span></span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <TrendingUpIcon className="w-4 h-4 text-emerald-500" />
+                                <span className={`text-sm font-medium ${subTextColor}`}>Профит: <span className={`font-bold text-emerald-500`}>+{stats.totalProfit.toFixed(1)}</span></span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <TrendingDownIcon className="w-4 h-4 text-rose-500" />
+                                <span className={`text-sm font-medium ${subTextColor}`}>Просадка: <span className={`font-bold text-rose-500`}>-{stats.totalDrop.toFixed(1)}%</span></span>
+                            </div>
                         </div>
                     </div>
                 </div>
