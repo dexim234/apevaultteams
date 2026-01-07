@@ -153,7 +153,8 @@ export const FasolSignalsStrategy = () => {
                 maxDropFromLevel07: '',
                 profits: [],
                 comment: '',
-                isScam: false
+                isScam: false,
+                setup: 'One'
             })
             setScreenshotPreview(null)
             setProfitsInput([])
@@ -376,6 +377,8 @@ export const FasolSignalsStrategy = () => {
         setEditingAlert(alert)
         setFormData(alert)
         setCommonDate(alert.signalDate || '')
+        setProfitsInput(alert.profits || [])
+        setScreenshotPreview(alert.screenshot || null)
         setShowModal(true)
     }
 

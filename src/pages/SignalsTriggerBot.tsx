@@ -441,6 +441,8 @@ export const SignalsTriggerBot = () => {
         setEditingAlert(alert)
         setFormData(alert)
         setCommonDate(alert.signalDate || '')
+        setProfitsInput(alert.profits || [])
+        setScreenshotPreview(alert.screenshot || null)
         setShowModal(true)
     }
 
@@ -1528,10 +1530,4 @@ const PremiumSelect: React.FC<PremiumSelectProps> = ({ value, options, onChange,
                     </div>
                 </div>
             )}
-        </div>
-    );
-};
-
-export default SignalsTriggerBot
-
-
+  
