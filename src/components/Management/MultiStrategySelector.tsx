@@ -1,23 +1,23 @@
-import { TriggerStrategy, TriggerProfit } from '@/types'
+import { AiAoStrategy, AiAoProfit } from '@/types'
 import { Check } from 'lucide-react'
 
 interface MultiStrategySelectorProps {
-    strategies: TriggerStrategy[]
-    profits: TriggerProfit[]
-    onChange: (strategies: TriggerStrategy[], profits: TriggerProfit[]) => void
+    strategies: AiAoStrategy[]
+    profits: AiAoProfit[]
+    onChange: (strategies: AiAoStrategy[], profits: AiAoProfit[]) => void
     theme: string
     color?: string
 }
 
 export const MultiStrategySelector: React.FC<MultiStrategySelectorProps> = ({ strategies: selectedStrategies, profits, onChange, theme, color = 'bg-purple-600' }) => {
-    const availableStrategies: { value: TriggerStrategy; label: string }[] = [
+    const availableStrategies: { value: AiAoStrategy; label: string }[] = [
         { value: 'Фиба', label: 'Fibo Strategy' },
         { value: 'Market Entry', label: 'Market Entry' }
     ]
 
-    const toggleStrategy = (strategy: TriggerStrategy) => {
-        let newStrategies: TriggerStrategy[]
-        let newProfits: TriggerProfit[] = [...profits]
+    const toggleStrategy = (strategy: AiAoStrategy) => {
+        let newStrategies: AiAoStrategy[]
+        let newProfits: AiAoProfit[] = [...profits]
 
         if (selectedStrategies.includes(strategy)) {
             newStrategies = selectedStrategies.filter(s => s !== strategy)
@@ -28,9 +28,9 @@ export const MultiStrategySelector: React.FC<MultiStrategySelectorProps> = ({ st
         onChange(newStrategies, newProfits)
     }
 
-    const updateProfitValue = (strategy: TriggerStrategy, value: string) => {
+    const updateProfitValue = (strategy: AiAoStrategy, value: string) => {
         const existingIdx = profits.findIndex(p => p.strategy === strategy)
-        let newProfits: TriggerProfit[]
+        let newProfits: AiAoProfit[]
         if (existingIdx >= 0) {
             newProfits = profits.map((p, idx) => idx === existingIdx ? { ...p, value } : p)
         } else {

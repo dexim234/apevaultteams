@@ -3,7 +3,7 @@ import { useThemeStore } from '@/store/themeStore'
 import { useAuthStore } from '@/store/authStore'
 import { useAdminStore } from '@/store/adminStore'
 import { getFasolTriggerAlerts, addFasolTriggerAlert, updateFasolTriggerAlert, deleteFasolTriggerAlert } from '@/services/firestoreService'
-import { FasolTriggerAlert, TriggerStrategy, TriggerProfit } from '@/types'
+import { FasolTriggerAlert, AiAoStrategy, AiAoProfit } from '@/types'
 import { Plus, Edit, Trash2, Save, X, Copy, Check, Table, Filter, ArrowUp, ArrowDown, RotateCcw, Activity, Target, TrendingUp, Calendar, ChevronDown, TrendingDown, Clock, AlertTriangle, FileText, Upload } from 'lucide-react'
 import { MultiStrategySelector } from '../components/Management/MultiStrategySelector'
 import { UserNickname } from '../components/UserNickname'
@@ -63,7 +63,7 @@ export const FasolSignalsStrategy = () => {
 
     const [alertsToAdd, setAlertsToAdd] = useState<Partial<FasolTriggerAlert>[]>([])
     const [commonDate, setCommonDate] = useState(new Date().toISOString().split('T')[0])
-    const [profitsInput, setProfitsInput] = useState<{ strategy: TriggerStrategy, value: string }[]>([])
+    const [profitsInput, setProfitsInput] = useState<AiAoProfit[]>([])
     const fileInputRef = useRef<HTMLInputElement>(null)
     const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null)
 
@@ -379,7 +379,7 @@ export const FasolSignalsStrategy = () => {
         setShowModal(true)
     }
 
-    const getStrategyConfig = (strategy: TriggerStrategy) => {
+    const getStrategyConfig = (strategy: AiAoStrategy) => {
         switch (strategy) {
             case 'Фиба': return { color: 'bg-indigo-500/20 text-indigo-400', icon: Activity, label: 'Фиба' }
             case 'Market Entry': return { color: 'bg-purple-500/20 text-purple-400', icon: Target, label: 'ME' }
@@ -404,7 +404,7 @@ export const FasolSignalsStrategy = () => {
         if (fileInputRef.current) fileInputRef.current.value = ''
     }
 
-    const getProfitDisplay = (profits: TriggerProfit[] | undefined) => {
+    const getProfitDisplay = (profits: AiAoProfit[] | undefined) => {
         if (!profits || profits.length === 0) return '-'
         return profits.map(p => `${p.strategy}: ${p.value || '-'}`).join(', ')
     }
