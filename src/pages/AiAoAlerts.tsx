@@ -426,7 +426,7 @@ export const AiAoAlerts = () => {
                         {/* Center: Buttons */}
                         <div className="flex flex-wrap items-center justify-center gap-3">
                             <button onClick={copyTableToClipboard} disabled={filteredAlerts.length === 0} className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 border ${theme === 'dark' ? 'bg-white/5 border-white/10 hover:bg-white/10 text-gray-300' : 'bg-gray-100 border-gray-200 hover:bg-gray-200 text-gray-700'} disabled:opacity-50`}>
-                                {isCopyingTable ? <><Check className="w-4 h-4 text-green-500" /><span>Скопировано</span></> : <><Copy className="w-4 h-4" /><span>Копировать</span></>}
+                                {isCopyingTable ? <><Check className="w-4 h-4 text-green-500" /><span>Скопировано</span></> : <><Copy className="w-4 h-4" /><span>Копировать ({stats.total})</span></>}
                             </button>
 
                             <button onClick={() => setShowFilters(!showFilters)} className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 border ${showFilters ? 'bg-blue-500 border-blue-500 text-white' : theme === 'dark' ? 'bg-white/5 border-white/10 hover:bg-white/10 text-gray-300' : 'bg-gray-100 border-gray-200 hover:bg-gray-100 text-gray-700'}`}>

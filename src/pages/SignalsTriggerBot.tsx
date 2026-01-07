@@ -572,7 +572,7 @@ export const SignalsTriggerBot = () => {
                                 className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-semibold transition-colors flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20"
                             >
                                 <Plus className="w-4 h-4" />
-                                <span>Добавить сигнал</span>
+                                <span>Добавить</span>
                             </button>
                         </div>
 
