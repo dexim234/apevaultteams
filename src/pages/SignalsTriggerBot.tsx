@@ -31,7 +31,7 @@ export const SignalsTriggerBot = () => {
     const [editingAlert, setEditingAlert] = useState<TriggerAlert | null>(null)
     const [copyingId, setCopyingId] = useState<string | null>(null)
     const [isCopyingTable, setIsCopyingTable] = useState(false)
-    const [previewImage, setPreviewImage] = useState<string | null>(null)
+    // const [previewImage, setPreviewImage] = useState<string | null>(null)
 
     // Filter states
     const [showFilters, setShowFilters] = useState(false)
@@ -922,7 +922,7 @@ export const SignalsTriggerBot = () => {
                                                         <td className={`p-1.5 sm:p-2 whitespace-nowrap text-center border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
                                                             {alert.screenshot ? (
                                                                 <button
-                                                                    onClick={() => setPreviewImage(alert.screenshot || null)}
+                                                                    // onClick={() => setPreviewImage(alert.screenshot || null)}
                                                                     className={`text-[10px] ${subTextColor} hover:text-amber-500 transition-colors cursor-pointer`}
                                                                     title="Просмотр фото"
                                                                 >
@@ -1037,7 +1037,7 @@ export const SignalsTriggerBot = () => {
                                             <td className={`p-1.5 sm:p-2 whitespace-nowrap text-center border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
                                                 {alert.screenshot ? (
                                                     <button
-                                                        onClick={() => setPreviewImage(alert.screenshot || null)}
+                                                        // onClick={() => setPreviewImage(alert.screenshot || null)}
                                                         className={`text-[10px] ${subTextColor} hover:text-amber-500 transition-colors cursor-pointer`}
                                                         title="Просмотр фото"
                                                     >
@@ -1394,13 +1394,10 @@ export const SignalsTriggerBot = () => {
                     </div>
                 </div>
             )}
-        </div>
+        </>
     );
 };
-        </div>
-    );
-};
-  
+
 // --- Premium Helper Components ---
 
 interface PremiumInputProps {
@@ -1508,4 +1505,6 @@ const PremiumSelect: React.FC<PremiumSelectProps> = ({ value, options, onChange,
                     </div>
                 </div>
             )}
-  
+          </div>
+    );
+};
