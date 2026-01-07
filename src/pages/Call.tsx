@@ -359,27 +359,19 @@ export const CallPage = () => {
                 }}
                 className="flex-shrink-0 min-w-[200px] rounded-2xl transition-all relative group"
               >
-                {/* Colored Border Background */}
-                <div className={`absolute inset-0 rounded-2xl transition-all duration-300 ${
-                  cat === 'memecoins' ? 'bg-emerald-500/20 border-2 border-emerald-500 group-hover:border-emerald-400 group-hover:bg-emerald-500/30' :
-                  cat === 'polymarket' ? 'bg-rose-500/20 border-2 border-rose-500 group-hover:border-rose-400 group-hover:bg-rose-500/30' :
-                  cat === 'nft' ? 'bg-purple-500/20 border-2 border-purple-500 group-hover:border-purple-400 group-hover:bg-purple-500/30' :
-                  cat === 'futures' ? 'bg-blue-500/20 border-2 border-blue-500 group-hover:border-blue-400 group-hover:bg-blue-500/30' :
-                  cat === 'spot' ? 'bg-amber-500/20 border-2 border-amber-500 group-hover:border-amber-400 group-hover:bg-amber-500/30' :
-                  cat === 'staking' ? 'bg-violet-500/20 border-2 border-violet-500 group-hover:border-violet-400 group-hover:bg-violet-500/30' :
-                  'bg-cyan-500/20 border-2 border-cyan-500 group-hover:border-cyan-400 group-hover:bg-cyan-500/30'
+                {/* Colored Border */}
+                <div className={`absolute inset-0 rounded-2xl border-2 transition-all duration-300 ${
+                  cat === 'memecoins' ? 'border-emerald-500 group-hover:border-emerald-400' :
+                  cat === 'polymarket' ? 'border-rose-500 group-hover:border-rose-400' :
+                  cat === 'nft' ? 'border-purple-500 group-hover:border-purple-400' :
+                  cat === 'futures' ? 'border-blue-500 group-hover:border-blue-400' :
+                  cat === 'spot' ? 'border-amber-500 group-hover:border-amber-400' :
+                  cat === 'staking' ? 'border-violet-500 group-hover:border-violet-400' :
+                  'border-cyan-500 group-hover:border-cyan-400'
                 }`} />
                 
-                {/* Content Container - with colored background matching category */}
-                <div className={`relative h-full px-5 py-4 rounded-[14px] flex flex-col items-center justify-center gap-2 ${
-                  cat === 'memecoins' ? 'bg-emerald-500/10' :
-                  cat === 'polymarket' ? 'bg-rose-500/10' :
-                  cat === 'nft' ? 'bg-purple-500/10' :
-                  cat === 'futures' ? 'bg-blue-500/10' :
-                  cat === 'spot' ? 'bg-amber-500/10' :
-                  cat === 'staking' ? 'bg-violet-500/10' :
-                  'bg-cyan-500/10'
-                }`}>
+                {/* Content Container - transparent */}
+                <div className="relative h-full px-5 py-4 rounded-[14px] flex flex-col items-center justify-center gap-2">
                   {/* Header: Icon & Label Centered */}
                   <div className="flex flex-col items-center gap-2">
                     <div className={`p-2 rounded-xl bg-gradient-to-br ${meta.gradient} bg-opacity-10`}>

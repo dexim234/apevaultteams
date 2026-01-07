@@ -517,6 +517,47 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory }: C
   const subtleColor = subtle
   const bgColor = theme === 'dark' ? 'bg-[#121212]' : 'bg-white'
 
+  // Category-based colors for form elements (except text)
+  const categoryFormColor = category === 'memecoins' ? '#10b981' :
+    category === 'polymarket' ? '#f43f5e' :
+    category === 'nft' ? '#a855f7' :
+    category === 'futures' ? '#3b82f6' :
+    category === 'spot' ? '#f59e0b' :
+    category === 'staking' ? '#8b5cf6' :
+    '#06b6d4'
+
+  const categoryFormBorder = category === 'memecoins' ? 'border-emerald-500/50 focus:border-emerald-500' :
+    category === 'polymarket' ? 'border-rose-500/50 focus:border-rose-500' :
+    category === 'nft' ? 'border-purple-500/50 focus:border-purple-500' :
+    category === 'futures' ? 'border-blue-500/50 focus:border-blue-500' :
+    category === 'spot' ? 'border-amber-500/50 focus:border-amber-500' :
+    category === 'staking' ? 'border-violet-500/50 focus:border-violet-500' :
+    'border-cyan-500/50 focus:border-cyan-500'
+
+  const categoryFormRing = category === 'memecoins' ? 'focus:ring-emerald-500/30' :
+    category === 'polymarket' ? 'focus:ring-rose-500/30' :
+    category === 'nft' ? 'focus:ring-purple-500/30' :
+    category === 'futures' ? 'focus:ring-blue-500/30' :
+    category === 'spot' ? 'focus:ring-amber-500/30' :
+    category === 'staking' ? 'focus:ring-violet-500/30' :
+    'focus:ring-cyan-500/30'
+
+  const categoryFormBg = category === 'memecoins' ? 'bg-emerald-500/5' :
+    category === 'polymarket' ? 'bg-rose-500/5' :
+    category === 'nft' ? 'bg-purple-500/5' :
+    category === 'futures' ? 'bg-blue-500/5' :
+    category === 'spot' ? 'bg-amber-500/5' :
+    category === 'staking' ? 'bg-violet-500/5' :
+    'bg-cyan-500/5'
+
+  const categoryFormBgHover = category === 'memecoins' ? 'hover:bg-emerald-500/10' :
+    category === 'polymarket' ? 'hover:bg-rose-500/10' :
+    category === 'nft' ? 'hover:bg-purple-500/10' :
+    category === 'futures' ? 'hover:bg-blue-500/10' :
+    category === 'spot' ? 'hover:bg-amber-500/10' :
+    category === 'staking' ? 'hover:bg-violet-500/10' :
+    'hover:bg-cyan-500/10'
+
   const updateField = (key: string, value: any) => {
     setDetails((prev) => ({
       ...prev,
@@ -741,7 +782,7 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory }: C
   const renderField = (field: FieldConfig) => {
     const activePayload = (details as any)[category] || {}
     const value = activePayload[field.key]
-    const common = `w-full px-4 py-2 rounded-lg border ${borderColor} ${inputBg} ${textColor} focus:outline-none focus:ring-2 focus:ring-[#4E6E49]`
+    const common = `w-full px-4 py-2 rounded-lg border ${borderColor} ${inputBg} ${textColor} focus:outline-none focus:ring-2 ${categoryFormRing} ${categoryFormBorder}`
 
     if (field.type === 'textarea') {
       return (
@@ -767,10 +808,15 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory }: C
                 key={opt.value}
                 type="button"
                 onClick={() => updateField(field.key, opt.value)}
-                className={`px-3 py-3 sm:py-2 rounded-lg border-2 text-sm font-medium transition-all duration-300 min-h-[44px] sm:min-h-[40px] hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#4E6E49]/30 ${isSelected
-                  ? 'border-[#4E6E49] bg-gradient-to-r from-[#4E6E49] to-emerald-600 text-white shadow-md shadow-emerald-300/30 scale-[1.02] ring-2 ring-[#4E6E49]/20'
+                className={`px-3 py-3 sm:py-2 rounded-lg border-2 text-sm font-medium transition-all duration-300 min-h-[44px] sm:min-h-[40px] hover:shadow-md focus:outline-none focus:ring-2 ${categoryFormRing} ${isSelected
+                  ? `text-white shadow-md scale-[1.02]`
                   : `border-gray-200 dark:border-gray-700 ${theme === 'dark' ? 'text-gray-300 hover:border-gray-600 hover:bg-gray-800' : 'text-gray-700 hover:border-gray-400 hover:bg-gray-50'} active:scale-95 hover:-translate-y-0.5`
                   }`}
+                style={isSelected ? {
+                  borderColor: categoryFormColor,
+                  background: `linear-gradient(135deg, ${categoryFormColor}, ${categoryFormColor}dd)`,
+                  boxShadow: `0 4px 14px ${categoryFormColor}40`
+                } : {}}
               >
                 {opt.label}
               </button>
@@ -782,12 +828,13 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory }: C
 
     if (field.type === 'checkbox') {
       return (
-        <label className="inline-flex items-center gap-3 cursor-pointer select-none p-3 sm:p-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600 transition-all duration-200 min-h-[48px] sm:min-h-[44px] hover:shadow-sm">
+        <label className={`inline-flex items-center gap-3 cursor-pointer select-none p-3 sm:p-3 rounded-lg border ${borderColor} ${categoryFormBgHover} ${categoryFormBg} transition-all duration-200 min-h-[48px] sm:min-h-[44px] hover:shadow-sm`}>
           <input
             type="checkbox"
             checked={!!value}
             onChange={(e) => updateField(field.key, e.target.checked)}
-            className="accent-[#4E6E49] w-5 h-5 sm:w-4 sm:h-4"
+            className="w-5 h-5 sm:w-4 sm:h-4 rounded border-gray-300 dark:border-gray-600"
+            style={{ accentColor: categoryFormColor }}
           />
           <span className={`font-medium ${textColor} text-sm sm:text-base`}>{field.label}</span>
         </label>
@@ -829,12 +876,35 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory }: C
       )}
 
       {/* Category Selection - Enhanced Design */}
-      <div className={`relative rounded-2xl border ${borderColor} ${theme === 'dark' ? 'bg-gray-900/50' : 'bg-white'} p-5 overflow-hidden`}>
-        {/* Gradient accent bar */}
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500" />
-        
+      <div className={`relative rounded-2xl border ${borderColor} ${categoryFormBg} ${theme === 'dark' ? 'bg-gray-900/50' : 'bg-white'} p-5 overflow-hidden`}>
+        {/* Gradient accent bar - dynamic based on category */}
+        <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${
+          category === 'memecoins' ? 'from-emerald-500 via-teal-500 to-cyan-500' :
+          category === 'polymarket' ? 'from-rose-500 via-red-500 to-orange-500' :
+          category === 'nft' ? 'from-purple-500 via-pink-500 to-rose-500' :
+          category === 'futures' ? 'from-blue-500 via-indigo-500 to-cyan-500' :
+          category === 'spot' ? 'from-amber-500 via-orange-500 to-yellow-500' :
+          category === 'staking' ? 'from-violet-500 via-purple-500 to-indigo-500' :
+          'from-cyan-500 via-blue-500 to-indigo-500'
+        }`} />
+
         <div className="flex items-center gap-3 mb-5">
-          <div className="w-11 h-11 rounded-xl flex items-center justify-center text-white shadow-lg shadow-emerald-500/30" style={{ background: 'linear-gradient(135deg, #4E6E49, #10b981)' }}>
+          <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-white shadow-lg`} style={{ 
+            background: category === 'memecoins' ? 'linear-gradient(135deg, #10b981, #14b8a6)' :
+              category === 'polymarket' ? 'linear-gradient(135deg, #f43f5e, #fb7185)' :
+              category === 'nft' ? 'linear-gradient(135deg, #a855f7, #d946ef)' :
+              category === 'futures' ? 'linear-gradient(135deg, #3b82f6, #6366f1)' :
+              category === 'spot' ? 'linear-gradient(135deg, #f59e0b, #f97316)' :
+              category === 'staking' ? 'linear-gradient(135deg, #8b5cf6, #a78bfa)' :
+              'linear-gradient(135deg, #06b6d4, #3b82f6)',
+            boxShadow: category === 'memecoins' ? '0 4px 15px rgba(16, 185, 129, 0.3)' :
+              category === 'polymarket' ? '0 4px 15px rgba(244, 63, 94, 0.3)' :
+              category === 'nft' ? '0 4px 15px rgba(168, 85, 247, 0.3)' :
+              category === 'futures' ? '0 4px 15px rgba(59, 130, 246, 0.3)' :
+              category === 'spot' ? '0 4px 15px rgba(245, 158, 11, 0.3)' :
+              category === 'staking' ? '0 4px 15px rgba(139, 92, 246, 0.3)' :
+              '0 4px 15px rgba(6, 182, 212, 0.3)'
+          }}>
             <Target className="w-5 h-5" />
           </div>
           <div>
@@ -847,38 +917,51 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory }: C
           {(Object.keys(CATEGORY_META) as CallCategory[]).map((cat) => {
             const meta = CATEGORY_META[cat]
             const isSelected = category === cat
+            const catColor = cat === 'memecoins' ? '#10b981' :
+              cat === 'polymarket' ? '#f43f5e' :
+              cat === 'nft' ? '#a855f7' :
+              cat === 'futures' ? '#3b82f6' :
+              cat === 'spot' ? '#f59e0b' :
+              cat === 'staking' ? '#8b5cf6' :
+              '#06b6d4'
             return (
               <button
                 key={cat}
                 type="button"
                 onClick={() => setCategory(cat)}
                 className={`relative p-4 rounded-xl border-2 transition-all duration-300 group overflow-hidden ${isSelected
-                  ? 'border-[#4E6E49] shadow-lg shadow-emerald-500/20 scale-[1.02]'
+                  ? `shadow-lg scale-[1.02]`
                   : `border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-lg hover:-translate-y-0.5`
                   }`}
+                style={isSelected ? {
+                  borderColor: catColor,
+                  boxShadow: `0 4px 15px ${catColor}30`
+                } : {}}
               >
                 {/* Gradient background for selected */}
                 {isSelected && (
-                  <div className="absolute inset-0 bg-gradient-to-br from-[#4E6E49]/10 via-emerald-500/5 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" style={{ background: `radial-gradient(circle at center, ${catColor}15 0%, transparent 70%)` }} />
                 )}
-                
-                {/* Hover gradient */}
-                <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/0 to-cyan-500/0 group-hover:from-emerald-500/5 group-hover:to-cyan-500/5 transition-all duration-300" />
                 
                 <div className="relative flex flex-col items-center gap-2.5 text-center">
                   <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 ${isSelected 
-                    ? 'bg-gradient-to-br from-[#4E6E49] to-emerald-600 text-white shadow-md' 
-                    : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 group-hover:bg-gray-200 dark:group-hover:bg-gray-700'}`}>
+                    ? 'text-white shadow-md' 
+                    : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 group-hover:bg-gray-200 dark:group-hover:bg-gray-700'}`}
+                    style={isSelected ? {
+                      background: `linear-gradient(135deg, ${catColor}, ${catColor}dd)`
+                    } : {}}
+                  >
                     <div className="w-5 h-5">
                       {meta.icon}
                     </div>
                   </div>
                   <div className="w-full">
-                    <span className={`text-sm font-bold block transition-colors ${isSelected ? 'text-[#4E6E49]' : textColor}`}>
+                    <span className={`text-sm font-bold block transition-colors ${isSelected ? '' : textColor}`}
+                      style={isSelected ? { color: catColor } : {}}>
                       {meta.label}
                     </span>
                     {isSelected && (
-                      <span className="text-[10px] text-emerald-500 font-medium">Выбрано</span>
+                      <span className="text-[10px] font-medium" style={{ color: catColor }}>Выбрано</span>
                     )}
                   </div>
                 </div>
@@ -889,13 +972,36 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory }: C
       </div>
 
       {/* Signal Details - Enhanced Card */}
-      <div className={`relative rounded-2xl border ${borderColor} ${theme === 'dark' ? 'bg-gray-900/50' : 'bg-white'} p-5 overflow-hidden`}>
-        {/* Decorative gradient accent */}
-        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-emerald-500/5 to-transparent rounded-full blur-2xl" />
+      <div className={`relative rounded-2xl border ${borderColor} ${categoryFormBg} ${theme === 'dark' ? 'bg-gray-900/50' : 'bg-white'} p-5 overflow-hidden`}>
+        {/* Decorative gradient accent - dynamic based on category */}
+        <div className={`absolute top-0 right-0 w-32 h-32 rounded-full blur-2xl ${
+          category === 'memecoins' ? 'bg-emerald-500/10' :
+          category === 'polymarket' ? 'bg-rose-500/10' :
+          category === 'nft' ? 'bg-purple-500/10' :
+          category === 'futures' ? 'bg-blue-500/10' :
+          category === 'spot' ? 'bg-amber-500/10' :
+          category === 'staking' ? 'bg-violet-500/10' :
+          'bg-cyan-500/10'
+        }`} />
         
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 relative">
           <div className="flex items-center gap-3">
-            <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-white shadow-lg shadow-emerald-500/30`} style={{ background: 'linear-gradient(135deg, #4E6E49, #10b981)' }}>
+            <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-white shadow-lg`} style={{ 
+              background: category === 'memecoins' ? 'linear-gradient(135deg, #10b981, #14b8a6)' :
+                category === 'polymarket' ? 'linear-gradient(135deg, #f43f5e, #fb7185)' :
+                category === 'nft' ? 'linear-gradient(135deg, #a855f7, #d946ef)' :
+                category === 'futures' ? 'linear-gradient(135deg, #3b82f6, #6366f1)' :
+                category === 'spot' ? 'linear-gradient(135deg, #f59e0b, #f97316)' :
+                category === 'staking' ? 'linear-gradient(135deg, #8b5cf6, #a78bfa)' :
+                'linear-gradient(135deg, #06b6d4, #3b82f6)',
+              boxShadow: category === 'memecoins' ? '0 4px 15px rgba(16, 185, 129, 0.3)' :
+                category === 'polymarket' ? '0 4px 15px rgba(244, 63, 94, 0.3)' :
+                category === 'nft' ? '0 4px 15px rgba(168, 85, 247, 0.3)' :
+                category === 'futures' ? '0 4px 15px rgba(59, 130, 246, 0.3)' :
+                category === 'spot' ? '0 4px 15px rgba(245, 158, 11, 0.3)' :
+                category === 'staking' ? '0 4px 15px rgba(139, 92, 246, 0.3)' :
+                '0 4px 15px rgba(6, 182, 212, 0.3)'
+            }}>
               <ScrollText className="w-5 h-5" />
             </div>
             <div>
@@ -907,7 +1013,7 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory }: C
           {/* Enhanced Progress */}
           <div className="flex items-center gap-3">
             <div className="text-right">
-              <div className="text-2xl font-bold ${progress.percentage === 100 ? 'text-emerald-500' : textColor}">
+              <div className={`text-2xl font-bold ${progress.percentage === 100 ? 'text-emerald-500' : textColor}`}>
                 {progress.percentage}%
               </div>
               <p className={`text-xs ${subtle}`}>заполнено</p>
@@ -922,16 +1028,17 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory }: C
                   strokeWidth="3"
                 />
                 <path
-                  className={`${progress.percentage === 100 ? 'text-emerald-500' : 'text-[#4E6E49]'}`}
+                  className={progress.percentage === 100 ? 'text-emerald-500' : ''}
                   strokeDasharray={`${progress.percentage}, 100`}
                   d="M8.86 23.86a12 12 0 0 1-4.93-9.86A12 12 0 0 1 18 2.14a12 12 0 0 1 9.86 4.93"
                   fill="none"
-                  stroke="currentColor"
+                  stroke={categoryFormColor}
                   strokeWidth="3"
                   strokeLinecap="round"
                 />
               </svg>
-              <div className={`absolute inset-0 flex items-center justify-center ${progress.percentage === 100 ? 'text-emerald-500' : 'text-[#4E6E49]'}`}>
+              <div className={`absolute inset-0 flex items-center justify-center ${progress.percentage === 100 ? 'text-emerald-500' : ''}`}
+                style={{ color: progress.percentage === 100 ? '#10b981' : categoryFormColor }}>
                 {progress.percentage === 100 ? (
                   <Check className="w-5 h-5" />
                 ) : (
@@ -945,8 +1052,17 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory }: C
         {/* Progress bar */}
         <div className={`h-1.5 rounded-full overflow-hidden mb-6 ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-100'}`}>
           <div 
-            className="h-full rounded-full transition-all duration-500 ease-out bg-gradient-to-r from-[#4E6E49] via-emerald-500 to-cyan-500"
-            style={{ width: `${progress.percentage}%` }}
+            className="h-full rounded-full transition-all duration-500 ease-out"
+            style={{ 
+              width: `${progress.percentage}%`,
+              background: category === 'memecoins' ? 'linear-gradient(90deg, #10b981, #14b8a6)' :
+                category === 'polymarket' ? 'linear-gradient(90deg, #f43f5e, #fb7185)' :
+                category === 'nft' ? 'linear-gradient(90deg, #a855f7, #d946ef)' :
+                category === 'futures' ? 'linear-gradient(90deg, #3b82f6, #6366f1)' :
+                category === 'spot' ? 'linear-gradient(90deg, #f59e0b, #f97316)' :
+                category === 'staking' ? 'linear-gradient(90deg, #8b5cf6, #a78bfa)' :
+                'linear-gradient(90deg, #06b6d4, #3b82f6)'
+            }}
           />
         </div>
 
@@ -962,7 +1078,7 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory }: C
               >
                 {/* Section header with accent */}
                 <div className="flex items-center gap-3 pb-3 border-b border-gray-200/50 dark:border-gray-700/50">
-                  <div className={`p-2 rounded-lg ${theme === 'dark' ? 'bg-gray-800 text-emerald-400' : 'bg-gray-100 text-emerald-600'}`}>
+                  <div className={`p-2 rounded-lg ${categoryFormBg} ${categoryFormBorder.split(' ')[0]}`}>
                     {sectionConfig.icon}
                   </div>
                   <div className="flex-1">
@@ -971,7 +1087,7 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory }: C
                       <p className={`text-xs ${subtle}`}>{sectionConfig.description}</p>
                     )}
                   </div>
-                  <div className={`h-px flex-1 bg-gradient-to-r from-transparent via-[#4E6E49]/30 to-transparent`} />
+                  <div className={`h-px flex-1 bg-gradient-to-r from-transparent ${categoryFormColor}30 to-transparent`} />
                 </div>
                 
                 <div className="grid grid-cols-1 gap-4">
@@ -1008,12 +1124,16 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory }: C
           <button
             type="submit"
             disabled={loading || progress.percentage < 100}
-            className={`flex-1 py-3.5 rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 ${loading 
+            className={`flex-1 py-3.5 rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-2 shadow-lg ${loading 
               ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
               : progress.percentage === 100
-                ? 'bg-gradient-to-r from-[#4E6E49] to-emerald-600 text-white hover:shadow-xl hover:shadow-emerald-500/30 hover:scale-[1.01] active:scale-[0.98]'
+                ? 'text-white hover:shadow-xl hover:scale-[1.01] active:scale-[0.98]'
                 : 'bg-gray-300 text-gray-500 cursor-not-allowed'
               }`}
+            style={progress.percentage === 100 && !loading ? {
+              background: `linear-gradient(135deg, ${categoryFormColor}, ${categoryFormColor}dd)`,
+              boxShadow: `0 4px 15px ${categoryFormColor}40`
+            } : {}}
           >
             {loading ? (
               <>
