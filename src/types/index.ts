@@ -183,45 +183,36 @@ export interface FuturesSignalFields {
   pair: string
   direction: FuturesDirection
   leverage: string
-  entryPrice?: string
   entryZone: string
   targets: string
   stopLoss: string
-  signalStyle: FuturesSignalType
-  positionSize: string
-  reason: string
-  timeframe: '1m' | '5m' | '15m' | '1h' | '4h'
-  risks: string
-  riskLevel?: CallRiskLevel
+  riskLevel: CallRiskLevel
+  reason?: string
+  risks?: string
+  traderComment?: string
 }
 
 export interface NftSignalFields {
-  collectionLink: string
   nftLink: string
-  marketplace: string
   network: Network
-  entryPrice: string
-  rarity?: string
-  signalType: NftSignalType
-  reason: string
-  holdingHorizon: 'flip' | 'short' | 'medium' | 'long'
-  minLiquidity: string
-  targetPrice: string
-  traderComment?: string
+  rarity: string
+  targets: string
+  riskLevel: CallRiskLevel
+  reason?: string
   risks?: string
+  traderComment?: string
 }
 
 export interface SpotSignalFields {
   coin: string
-  entryCap: string
+  entryZone: string
   targets: string
-  stopLoss?: string
+  stopLoss: string
   holdingHorizon: 'short' | 'medium' | 'long'
-  reason: string
-  positionSize: string
-  risks: string
+  riskLevel: CallRiskLevel
+  reason?: string
+  risks?: string
   traderComment?: string
-  riskLevel?: CallRiskLevel
 }
 
 export interface PolymarketSignalFields {
@@ -232,7 +223,6 @@ export interface PolymarketSignalFields {
   reason: string
   eventDeadline: string
   riskLevel: CallRiskLevel
-  maxStake: string
   risks: string
   targetPlan: string
 }
@@ -240,11 +230,11 @@ export interface PolymarketSignalFields {
 export interface StakingSignalFields {
   coin: string
   platform: string
-  term: 'flexible' | '30d' | '90d' | 'fixed'
+  term: 'flexible' | '30d' | '90d' | '180d' | '365d' | 'fixed'
+  fixedTermCustom?: string
   apy: string
   minDeposit: string
   protocolRisk: CallRiskLevel
-  action: StakingAction
   reason: string
   risks: string
   traderComment?: string
