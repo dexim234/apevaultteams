@@ -4,7 +4,7 @@ import { useAuthStore } from '@/store/authStore'
 import { useAdminStore } from '@/store/adminStore'
 import { getTriggerAlerts, addTriggerAlert, updateTriggerAlert, deleteTriggerAlert } from '@/services/firestoreService'
 import { TriggerAlert, TriggerStrategy, TriggerProfit } from '@/types'
-import { Plus, Edit, Trash2, Save, X, Copy, Check, Table, Filter, ArrowUp, ArrowDown, RotateCcw, Zap, Activity, Target, Search, Calendar, ChevronDown, Hash, Coins, TrendingDown, TrendingUp, Clock, FileText, AlertTriangle, Upload, XCircle } from 'lucide-react'
+import { Plus, Edit, Trash2, Save, X, Copy, Check, Table, Filter, ArrowUp, ArrowDown, RotateCcw, Zap, Activity, Target, Search, Calendar, ChevronDown, Hash, Coins, TrendingDown, TrendingUp, Clock, FileText, AlertTriangle, Upload, XCircle, TrendingUp as TrendingUpIcon, TrendingDown as TrendingDownIcon } from 'lucide-react'
 import { MultiStrategySelector } from '../components/Management/MultiStrategySelector'
 import { UserNickname } from '../components/UserNickname'
 
@@ -427,6 +427,16 @@ export const SignalsTriggerBot = () => {
         return specificDate || dateFrom || dateTo || minDrop || maxDrop || minProfit || maxProfit || minMc || maxMc || strategyFilter !== 'all' || showScamOnly || sortBy !== 'date' || sortOrder !== 'desc'
     }, [specificDate, dateFrom, dateTo, minDrop, maxDrop, minProfit, maxProfit, minMc, maxMc, strategyFilter, showScamOnly, sortBy, sortOrder])
 
+    const stats = useMemo(() => {
+        const total = filteredAlerts.length
+        const totalProfit = filteredAlerts.reduce((sum, a) => {
+            if (!a.profits || a.profits.length === 0) return sum
+            return sum + a.profits.reduce((pSum, p) => pSum + parseValue(p.value), 0)
+        }, 0)
+        const totalDrop = filteredAlerts.reduce((sum, a) => sum + Math.abs(parseValue(a.maxDropFromSignal || '')), 0)
+        return { total, totalProfit, totalDrop }
+    }, [filteredAlerts])
+
     const handleDelete = async (id: string) => {
         if (!confirm('Удалить алерт?')) return
         try {
@@ -496,18 +506,15 @@ export const SignalsTriggerBot = () => {
                         <div className={`absolute inset-0 ${theme === 'dark' ? 'bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.05),transparent_45%)]' : 'bg-[radial-gradient(circle_at_50%_0%,rgba(245,158,11,0.05),transparent_45%)]'}`}></div>
                     </div>
 
-                    <div className="relative p-6 sm:p-8 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-6">
+                    <div className="relative p-6 sm:p-8 flex flex-col lg:flex-row items-center justify-between gap-6">
                         <div className="flex items-center gap-4">
                             <div className={`p-3 rounded-2xl ${theme === 'dark' ? 'bg-white/10 border-white/20' : 'bg-amber-500/10 border-amber-500/30'} shadow-inner`}>
                                 <Zap className={`w-8 h-8 ${theme === 'dark' ? 'text-white' : 'text-amber-500'}`} />
                             </div>
-                            <div className="flex flex-col">
-                                <h1 className={`text-3xl font-black ${headingColor}`}>Signals Trigger Bot</h1>
-                                <p className={`text-sm ${subTextColor}`}>Trading Signals (Independent)</p>
-                            </div>
+                            <h1 className={`text-3xl font-black ${headingColor} whitespace-nowrap`}>Signals Trigger Bot</h1>
                         </div>
 
-                        <div className="flex flex-wrap items-center gap-3">
+                        <div className="flex flex-wrap items-center justify-center gap-3">
                             <button
                                 onClick={handleCopyTable}
                                 disabled={filteredAlerts.length === 0}
@@ -567,6 +574,22 @@ export const SignalsTriggerBot = () => {
                                 <Plus className="w-4 h-4" />
                                 <span>Добавить сигнал</span>
                             </button>
+                        </div>
+
+                        {/* Right: Stats vertical */}
+                        <div className="flex flex-col items-end gap-2 min-w-[140px]">
+                            <div className="flex items-center gap-2">
+                                <div className={`w-2 h-2 rounded-full ${filteredAlerts.length > 0 ? 'bg-emerald-500' : 'bg-gray-500'}`}></div>
+                                <span className={`text-sm font-medium ${subTextColor}`}>Всего сигналов: <span className={`font-bold ${headingColor}`}>{filteredAlerts.length}</span></span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <TrendingUpIcon size={16} className="text-emerald-500" />
+                                <span className={`text-sm font-medium ${subTextColor}`}>Профит: <span className={`font-bold text-emerald-500`}>+{stats.totalProfit.toFixed(1)}</span></span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <TrendingDownIcon size={16} className="text-rose-500" />
+                                <span className={`text-sm font-medium ${subTextColor}`}>Просадка: <span className={`font-bold text-rose-500`}>-{stats.totalDrop.toFixed(1)}%</span></span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -769,10 +792,6 @@ export const SignalsTriggerBot = () => {
                         </div>
                     </div>
                 )}
-
-                <div className={`text-sm ${subTextColor} pt-2`}>
-                    Показано сигналов: <span className={headingColor}>{filteredAlerts.length}</span> из <span className={headingColor}>{alerts.length}</span>
-                </div>
 
                 {/* Table */}
                 <div className={`relative overflow-hidden rounded-3xl border ${cardBorder} ${cardShadow} ${cardBg}`}>
