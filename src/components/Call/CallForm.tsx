@@ -972,9 +972,20 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory }: C
       </div>
 
       {/* Signal Details - Enhanced Card */}
-      <div className={`relative rounded-2xl border ${borderColor} ${categoryFormBg} ${theme === 'dark' ? 'bg-gray-900/50' : 'bg-white'} p-5 overflow-hidden`}>
+      <div className={`relative rounded-2xl border ${borderColor} ${categoryFormBg} ${theme === 'dark' ? 'bg-gray-900/50' : 'bg-white'} overflow-hidden`}>
+        {/* Top accent bar - dynamic color */}
+        <div className={`h-1 w-full transition-all duration-300`} style={{
+          background: category === 'memecoins' ? 'linear-gradient(90deg, #10b981, #14b8a6)' :
+            category === 'polymarket' ? 'linear-gradient(90deg, #f43f5e, #fb7185)' :
+            category === 'nft' ? 'linear-gradient(90deg, #a855f7, #d946ef)' :
+            category === 'futures' ? 'linear-gradient(90deg, #3b82f6, #6366f1)' :
+            category === 'spot' ? 'linear-gradient(90deg, #f59e0b, #f97316)' :
+            category === 'staking' ? 'linear-gradient(90deg, #8b5cf6, #a78bfa)' :
+            'linear-gradient(90deg, #06b6d4, #3b82f6)'
+        }} />
+
         {/* Decorative gradient accent - dynamic based on category */}
-        <div className={`absolute top-0 right-0 w-32 h-32 rounded-full blur-2xl ${
+        <div className={`absolute top-0 right-0 w-32 h-32 rounded-full blur-2xl opacity-50 ${
           category === 'memecoins' ? 'bg-emerald-500/10' :
           category === 'polymarket' ? 'bg-rose-500/10' :
           category === 'nft' ? 'bg-purple-500/10' :
@@ -984,128 +995,89 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory }: C
           'bg-cyan-500/10'
         }`} />
         
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 relative">
-          <div className="flex items-center gap-3">
-            <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-white shadow-lg`} style={{ 
-              background: category === 'memecoins' ? 'linear-gradient(135deg, #10b981, #14b8a6)' :
-                category === 'polymarket' ? 'linear-gradient(135deg, #f43f5e, #fb7185)' :
-                category === 'nft' ? 'linear-gradient(135deg, #a855f7, #d946ef)' :
-                category === 'futures' ? 'linear-gradient(135deg, #3b82f6, #6366f1)' :
-                category === 'spot' ? 'linear-gradient(135deg, #f59e0b, #f97316)' :
-                category === 'staking' ? 'linear-gradient(135deg, #8b5cf6, #a78bfa)' :
-                'linear-gradient(135deg, #06b6d4, #3b82f6)',
-              boxShadow: category === 'memecoins' ? '0 4px 15px rgba(16, 185, 129, 0.3)' :
-                category === 'polymarket' ? '0 4px 15px rgba(244, 63, 94, 0.3)' :
-                category === 'nft' ? '0 4px 15px rgba(168, 85, 247, 0.3)' :
-                category === 'futures' ? '0 4px 15px rgba(59, 130, 246, 0.3)' :
-                category === 'spot' ? '0 4px 15px rgba(245, 158, 11, 0.3)' :
-                category === 'staking' ? '0 4px 15px rgba(139, 92, 246, 0.3)' :
-                '0 4px 15px rgba(6, 182, 212, 0.3)'
-            }}>
-              <ScrollText className="w-5 h-5" />
-            </div>
-            <div>
-              <p className={`text-lg font-bold ${textColor}`}>{CATEGORY_META[category].label}</p>
-              <p className={`text-xs ${subtle}`}>Заполните детали сигнала</p>
-            </div>
+        <div className="flex">
+          {/* Vertical Progress Bar - Left Side */}
+          <div className="w-1.5 flex-shrink-0 h-full" style={{
+            background: category === 'memecoins' ? 'linear-gradient(180deg, #10b981, #14b8a6)' :
+              category === 'polymarket' ? 'linear-gradient(180deg, #f43f5e, #fb7185)' :
+              category === 'nft' ? 'linear-gradient(180deg, #a855f7, #d946ef)' :
+              category === 'futures' ? 'linear-gradient(180deg, #3b82f6, #6366f1)' :
+              category === 'spot' ? 'linear-gradient(180deg, #f59e0b, #f97316)' :
+              category === 'staking' ? 'linear-gradient(180deg, #8b5cf6, #a78bfa)' :
+              'linear-gradient(180deg, #06b6d4, #3b82f6)'
+          }}>
+            <div className="w-full bg-black/10" style={{ height: `${100 - progress.percentage}%` }} />
           </div>
           
-          {/* Enhanced Progress */}
-          <div className="flex items-center gap-3">
-            <div className="text-right">
-              <div className={`text-2xl font-bold ${progress.percentage === 100 ? 'text-emerald-500' : textColor}`}>
-                {progress.percentage}%
+          <div className="flex-1 p-5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 relative">
+              <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-300`} style={{
+                  background: `linear-gradient(135deg, ${categoryFormColor}, ${categoryFormColor}dd)`,
+                  boxShadow: `0 4px 12px ${categoryFormColor}40`
+                }}>
+                  <ScrollText className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <p className={`text-lg font-bold ${textColor}`}>{CATEGORY_META[category].label}</p>
+                  <p className={`text-xs ${subtle}`}>Заполните детали сигнала</p>
+                </div>
               </div>
-              <p className={`text-xs ${subtle}`}>заполнено</p>
-            </div>
-            <div className="w-14 h-14 relative">
-              <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                <path
-                  className={`${theme === 'dark' ? 'text-gray-700' : 'text-gray-200'}`}
-                  d="M8.86 23.86a12 12 0 0 1-4.93-9.86A12 12 0 0 1 18 2.14a12 12 0 0 1 9.86 4.93"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="3"
-                />
-                <path
-                  className={progress.percentage === 100 ? 'text-emerald-500' : ''}
-                  strokeDasharray={`${progress.percentage}, 100`}
-                  d="M8.86 23.86a12 12 0 0 1-4.93-9.86A12 12 0 0 1 18 2.14a12 12 0 0 1 9.86 4.93"
-                  fill="none"
-                  stroke={categoryFormColor}
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                />
-              </svg>
-              <div className={`absolute inset-0 flex items-center justify-center ${progress.percentage === 100 ? 'text-emerald-500' : ''}`}
-                style={{ color: progress.percentage === 100 ? '#10b981' : categoryFormColor }}>
-                {progress.percentage === 100 ? (
-                  <Check className="w-5 h-5" />
-                ) : (
-                  <span className="text-xs font-bold">{progress.filled}</span>
+
+              {/* Progress percentage */}
+              <div className="flex items-center gap-2">
+                <span className={`text-sm font-semibold ${progress.percentage === 100 ? 'text-emerald-500' : ''}`}
+                  style={{ color: progress.percentage === 100 ? '#10b981' : categoryFormColor }}>
+                  {progress.percentage}%
+                </span>
+                {progress.percentage === 100 && (
+                  <Check className="w-4 h-4 text-emerald-500" />
                 )}
               </div>
             </div>
-          </div>
-        </div>
 
-        {/* Progress bar */}
-        <div className={`h-1.5 rounded-full overflow-hidden mb-6 ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-100'}`}>
-          <div 
-            className="h-full rounded-full transition-all duration-500 ease-out"
-            style={{ 
-              width: `${progress.percentage}%`,
-              background: category === 'memecoins' ? 'linear-gradient(90deg, #10b981, #14b8a6)' :
-                category === 'polymarket' ? 'linear-gradient(90deg, #f43f5e, #fb7185)' :
-                category === 'nft' ? 'linear-gradient(90deg, #a855f7, #d946ef)' :
-                category === 'futures' ? 'linear-gradient(90deg, #3b82f6, #6366f1)' :
-                category === 'spot' ? 'linear-gradient(90deg, #f59e0b, #f97316)' :
-                category === 'staking' ? 'linear-gradient(90deg, #8b5cf6, #a78bfa)' :
-                'linear-gradient(90deg, #06b6d4, #3b82f6)'
-            }}
-          />
-        </div>
+            <div className="space-y-5">
+              {Object.entries(CATEGORY_SECTIONS[category]).map(([sectionKey, sectionConfig]) => {
+                const sectionFields = CATEGORY_FIELDS[category].filter(field => field.section === sectionKey)
+                if (sectionFields.length === 0) return null
 
-        <div className="space-y-6">
-          {Object.entries(CATEGORY_SECTIONS[category]).map(([sectionKey, sectionConfig]) => {
-            const sectionFields = CATEGORY_FIELDS[category].filter(field => field.section === sectionKey)
-            if (sectionFields.length === 0) return null
-
-            return (
-              <div
-                key={sectionKey}
-                className="relative space-y-4"
-              >
-                {/* Section header with accent */}
-                <div className="flex items-center gap-3 pb-3 border-b border-gray-200/50 dark:border-gray-700/50">
-                  <div className={`p-2 rounded-lg ${categoryFormBg} ${categoryFormBorder.split(' ')[0]}`}>
-                    {sectionConfig.icon}
-                  </div>
-                  <div className="flex-1">
-                    <h3 className={`text-base font-bold ${textColor}`}>{sectionConfig.title}</h3>
-                    {sectionConfig.description && (
-                      <p className={`text-xs ${subtle}`}>{sectionConfig.description}</p>
-                    )}
-                  </div>
-                  <div className={`h-px flex-1 bg-gradient-to-r from-transparent ${categoryFormColor}30 to-transparent`} />
-                </div>
-                
-                <div className="grid grid-cols-1 gap-4">
-                  {sectionFields.map((field) => (
-                    <div key={field.key} className="space-y-2">
-                      {field.type !== 'checkbox' && (
-                        <label className={`text-sm font-semibold ${textColor} flex items-center gap-2`}>
-                          {field.label}
-                          {field.required && <span className="text-red-500">*</span>}
-                        </label>
-                      )}
-                      {renderField(field)}
+                return (
+                  <div
+                    key={sectionKey}
+                    className="relative space-y-4"
+                  >
+                    {/* Section header with accent */}
+                    <div className="flex items-center gap-3 pb-3 border-b border-gray-200/50 dark:border-gray-700/50">
+                      <div className={`p-2 rounded-lg ${categoryFormBg} ${categoryFormBorder.split(' ')[0]}`}>
+                        {sectionConfig.icon}
+                      </div>
+                      <div className="flex-1">
+                        <h3 className={`text-base font-bold ${textColor}`}>{sectionConfig.title}</h3>
+                        {sectionConfig.description && (
+                          <p className={`text-xs ${subtle}`}>{sectionConfig.description}</p>
+                        )}
+                      </div>
+                      <div className={`h-px flex-1 bg-gradient-to-r from-transparent ${categoryFormColor}30 to-transparent`} />
                     </div>
-                  ))}
-                </div>
-              </div>
-            )
-          })}
+
+                    <div className="grid grid-cols-1 gap-4">
+                      {sectionFields.map((field) => (
+                        <div key={field.key} className="space-y-2">
+                          {field.type !== 'checkbox' && (
+                            <label className={`text-sm font-semibold ${textColor} flex items-center gap-2`}>
+                              {field.label}
+                              {field.required && <span className="text-red-500">*</span>}
+                            </label>
+                          )}
+                          {renderField(field)}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
         </div>
 
         {/* Enhanced Action Buttons */}
@@ -1182,12 +1154,23 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory }: C
             </div>
             
             <div className={`relative ${bgColor} rounded-3xl shadow-2xl shadow-black/50 border ${borderColor} max-w-2xl w-full max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-300`}>
-              {/* Header gradient */}
-              <div className={`h-2 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500`} />
-              
+              {/* Header gradient - dynamic based on category */}
+              <div className={`h-2 transition-all duration-300`} style={{
+                background: category === 'memecoins' ? 'linear-gradient(90deg, #10b981, #14b8a6)' :
+                  category === 'polymarket' ? 'linear-gradient(90deg, #f43f5e, #fb7185)' :
+                  category === 'nft' ? 'linear-gradient(90deg, #a855f7, #d946ef)' :
+                  category === 'futures' ? 'linear-gradient(90deg, #3b82f6, #6366f1)' :
+                  category === 'spot' ? 'linear-gradient(90deg, #f59e0b, #f97316)' :
+                  category === 'staking' ? 'linear-gradient(90deg, #8b5cf6, #a78bfa)' :
+                  'linear-gradient(90deg, #06b6d4, #3b82f6)'
+              }} />
+
               <div className="p-6 flex items-center justify-between sticky top-0 z-10 ${bgColor} border-b ${borderColor}">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#4E6E49] to-emerald-600 flex items-center justify-center text-white shadow-lg shadow-emerald-500/30">
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-lg transition-all duration-300`} style={{
+                    background: `linear-gradient(135deg, ${categoryFormColor}, ${categoryFormColor}dd)`,
+                    boxShadow: `0 4px 15px ${categoryFormColor}40`
+                  }}>
                     <Eye className="w-5 h-5" />
                   </div>
                   <div>
