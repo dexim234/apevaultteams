@@ -847,75 +847,38 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory }: C
           {(Object.keys(CATEGORY_META) as CallCategory[]).map((cat) => {
             const meta = CATEGORY_META[cat]
             const isSelected = category === cat
-            
-            // Цвет обводки для каждой категории
-            const categoryBorderColor = cat === 'memecoins' ? 'border-emerald-500' :
-              cat === 'polymarket' ? 'border-rose-500' :
-              cat === 'nft' ? 'border-purple-500' :
-              cat === 'futures' ? 'border-blue-500' :
-              cat === 'spot' ? 'border-amber-500' :
-              cat === 'staking' ? 'border-violet-500' :
-              'border-cyan-500'
-            
-            // Цвет тени для выбранной категории
-            const categoryShadow = cat === 'memecoins' ? 'shadow-emerald-500/20' :
-              cat === 'polymarket' ? 'shadow-rose-500/20' :
-              cat === 'nft' ? 'shadow-purple-500/20' :
-              cat === 'futures' ? 'shadow-blue-500/20' :
-              cat === 'spot' ? 'shadow-amber-500/20' :
-              cat === 'staking' ? 'shadow-violet-500/20' :
-              'shadow-cyan-500/20'
-            
-            // Цвет градиента фона
-            const categoryGradient = cat === 'memecoins' ? 'from-emerald-500/10 via-emerald-500/5 to-transparent' :
-              cat === 'polymarket' ? 'from-rose-500/10 via-rose-500/5 to-transparent' :
-              cat === 'nft' ? 'from-purple-500/10 via-purple-500/5 to-transparent' :
-              cat === 'futures' ? 'from-blue-500/10 via-blue-500/5 to-transparent' :
-              cat === 'spot' ? 'from-amber-500/10 via-amber-500/5 to-transparent' :
-              cat === 'staking' ? 'from-violet-500/10 via-violet-500/5 to-transparent' :
-              'from-cyan-500/10 via-cyan-500/5 to-transparent'
-            
-            // Цвет иконки и текста
-            const categoryTextColor = cat === 'memecoins' ? 'text-emerald-600 dark:text-emerald-400' :
-              cat === 'polymarket' ? 'text-rose-600 dark:text-rose-400' :
-              cat === 'nft' ? 'text-purple-600 dark:text-purple-400' :
-              cat === 'futures' ? 'text-blue-600 dark:text-blue-400' :
-              cat === 'spot' ? 'text-amber-600 dark:text-amber-400' :
-              cat === 'staking' ? 'text-violet-600 dark:text-violet-400' :
-              'text-cyan-600 dark:text-cyan-400'
-            
             return (
               <button
                 key={cat}
                 type="button"
                 onClick={() => setCategory(cat)}
                 className={`relative p-4 rounded-xl border-2 transition-all duration-300 group overflow-hidden ${isSelected
-                  ? `${categoryBorderColor} shadow-lg ${categoryShadow} scale-[1.02]`
+                  ? 'border-[#4E6E49] shadow-lg shadow-emerald-500/20 scale-[1.02]'
                   : `border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-lg hover:-translate-y-0.5`
                   }`}
               >
                 {/* Gradient background for selected */}
                 {isSelected && (
-                  <div className={`absolute inset-0 bg-gradient-to-br ${categoryGradient}`} />
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#4E6E49]/10 via-emerald-500/5 to-transparent" />
                 )}
                 
                 {/* Hover gradient */}
-                <div className="absolute inset-0 bg-gradient-to-br from-transparent to-transparent group-hover:from-white/5 group-hover:to-white/5 dark:group-hover:from-white/5 dark:group-hover:to-transparent transition-all duration-300" />
+                <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/0 to-cyan-500/0 group-hover:from-emerald-500/5 group-hover:to-cyan-500/5 transition-all duration-300" />
                 
                 <div className="relative flex flex-col items-center gap-2.5 text-center">
                   <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 ${isSelected 
-                    ? `bg-gradient-to-br ${meta.gradient} text-white shadow-md` 
+                    ? 'bg-gradient-to-br from-[#4E6E49] to-emerald-600 text-white shadow-md' 
                     : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 group-hover:bg-gray-200 dark:group-hover:bg-gray-700'}`}>
                     <div className="w-5 h-5">
                       {meta.icon}
                     </div>
                   </div>
                   <div className="w-full">
-                    <span className={`text-sm font-bold block transition-colors ${isSelected ? categoryTextColor : textColor}`}>
+                    <span className={`text-sm font-bold block transition-colors ${isSelected ? 'text-[#4E6E49]' : textColor}`}>
                       {meta.label}
                     </span>
                     {isSelected && (
-                      <span className={`text-[10px] font-medium ${categoryTextColor}`}>Выбрано</span>
+                      <span className="text-[10px] text-emerald-500 font-medium">Выбрано</span>
                     )}
                   </div>
                 </div>
