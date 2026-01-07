@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from 'react'
+import { useState, useEffect, useRef, useMemo, type ReactNode } from 'react'
 import { useThemeStore } from '@/store/themeStore'
 import { useAuthStore } from '@/store/authStore'
 import { useAdminStore } from '@/store/adminStore'
@@ -530,6 +530,140 @@ export const AiAoAlerts = () => {
                                     <tr><td colSpan={isAdmin ? 13 : 12} className="p-8 text-center text-gray-500">Загрузка...</td></tr>
                                 ) : filteredAlerts.length === 0 ? (
                                     <tr><td colSpan={isAdmin ? 13 : 12} className="p-8 text-center text-gray-500">Сигналы не найдены</td></tr>
+                                ) : sortBy === 'date' ? (
+                                    (() => {
+                                        const groupedAlerts: { [key: string]: AiAlert[] } = {}
+                                        filteredAlerts.forEach((alert: AiAlert) => {
+                                            const dateKey = alert.signalDate
+                                            if (!groupedAlerts[dateKey]) {
+                                                groupedAlerts[dateKey] = []
+                                            }
+                                            groupedAlerts[dateKey].push(alert)
+                                        })
+
+                                        const dates = Object.keys(groupedAlerts).sort().reverse()
+                                        const rows: React.ReactNode[] = []
+
+                                        dates.forEach((dateKey, dateIndex) => {
+                                            const dateAlerts = groupedAlerts[dateKey]
+
+                                            if (dateIndex > 0) {
+                                                rows.push(
+                                                    <tr key={`separator-${dateKey}`}>
+                                                        <td colSpan={isAdmin ? 13 : 12} className="py-1">
+                                                            <div className={`h-px ${theme === 'dark' ? 'bg-white/10' : 'bg-gray-200'}`}></div>
+                                                        </td>
+                                                    </tr>
+                                                )
+                                            }
+
+                                            rows.push(
+                                                <tr key={`header-${dateKey}`} className={`${theme === 'dark' ? 'bg-white/5' : 'bg-gray-50'}`}>
+                                                    <td colSpan={isAdmin ? 13 : 12} className="p-2 px-3">
+                                                        <span className={`text-xs sm:text-sm font-semibold ${subTextColor}`}>
+                                                            {formatDateForDisplay(dateKey)}
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            )
+
+                                            dateAlerts.forEach((alert: AiAlert) => {
+                                                const globalIndex = filteredAlerts.indexOf(alert) + 1
+                                                rows.push(
+                                                    <tr key={alert.id} className={`${theme === 'dark' ? 'hover:bg-white/5' : 'hover:bg-gray-50'} transition-colors ${alert.isScam ? 'bg-red-500/10' : ''}`}>
+                                                        <td className={`p-1.5 sm:p-2 text-center whitespace-nowrap border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
+                                                            <div className={`font-mono text-[10px] sm:text-xs font-bold ${subTextColor}`}>{globalIndex}</div>
+                                                        </td>
+                                                        <td className={`p-1.5 sm:p-2 whitespace-nowrap text-center border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
+                                                            <div className={`font-mono font-medium text-[10px] sm:text-xs ${headingColor}`}>{formatDateForDisplay(alert.signalDate)}</div>
+                                                        </td>
+                                                        <td className={`p-1.5 sm:p-2 whitespace-nowrap text-center border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
+                                                            <div className={`font-mono text-[10px] sm:text-xs ${headingColor}`}>{alert.signalTime}</div>
+                                                        </td>
+                                                        <td className={`p-1.5 sm:p-2 text-center border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'} last:border-r-0`}>
+                                                            {alert.isScam ? (
+                                                                <span className="text-red-500 font-bold text-[10px]">СКАМ</span>
+                                                            ) : alert.strategies && alert.strategies.length > 0 ? (
+                                                                <div className="flex flex-wrap gap-0.5 justify-center">
+                                                                    {alert.strategies.map(s => {
+                                                                        const conf = getStrategyConfig(s)
+                                                                        const Icon = conf.icon
+                                                                        return (
+                                                                            <span key={s} className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-bold ${conf.color}`}>
+                                                                                <Icon size={10} />
+                                                                                {conf.label}
+                                                                            </span>
+                                                                        )
+                                                                    })}
+                                                                </div>
+                                                            ) : (
+                                                                <span className={`text-[10px] ${subTextColor}`}>-</span>
+                                                            )}
+                                                        </td>
+                                                        <td className={`p-1.5 sm:p-2 text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>
+                                                            <div className={`font-mono text-[10px] sm:text-xs ${headingColor}`}>{alert.marketCap || '-'}</div>
+                                                        </td>
+                                                        <td className={`p-1.5 sm:p-2 text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>
+                                                            <div className="flex items-center justify-center gap-1">
+                                                                <a href={`https://gmgn.ai/sol/token/${alert.address}`} target="_blank" rel="noopener noreferrer" className={`font-mono text-[10px] ${theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-500'} cursor-pointer`} title={alert.address}>
+                                                                    {truncateAddress(alert.address)}
+                                                                </a>
+                                                                <button onClick={() => copyToClipboard(alert.address, alert.id)} className={`p-1 rounded hover:bg-white/10 transition-colors ${subTextColor}`}>
+                                                                    {copyingId === alert.id ? <Check size={12} className="text-green-500" /> : <Copy size={12} />}
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                        <td className={`p-1.5 sm:p-2 text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>
+                                                            <span className={`font-mono text-[10px] sm:text-xs ${alert.maxDrop && alert.maxDrop.startsWith('-') ? 'text-red-500' : headingColor}`}>
+                                                                {alert.maxDrop || '-'}
+                                                            </span>
+                                                        </td>
+                                                        <td className={`p-1.5 sm:p-2 text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>
+                                                            <span className={`font-mono text-[10px] sm:text-xs ${alert.maxDropFromLevel07 && alert.maxDropFromLevel07.startsWith('-') ? 'text-red-500' : headingColor}`}>
+                                                                {alert.maxDropFromLevel07 || '-'}
+                                                            </span>
+                                                        </td>
+                                                        <td className={`p-1.5 sm:p-2 text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>
+                                                            <span className="font-mono text-[10px] sm:text-xs text-green-500 font-bold">
+                                                                {alert.maxProfit || '-'}
+                                                            </span>
+                                                        </td>
+                                                        <td className={`p-1.5 sm:p-2 text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>
+                                                            <div className={`text-[10px] ${headingColor} break-words whitespace-pre-wrap max-w-[200px]`}>
+                                                                {alert.comment || '-'}
+                                                            </div>
+                                                        </td>
+                                                        <td className={`p-1.5 sm:p-2 text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>
+                                                            <UserNickname userId={alert.createdBy} className="text-[10px] font-medium" />
+                                                        </td>
+                                                        <td className={`p-1.5 sm:p-2 text-center border-r ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'} last:border-r-0`}>
+                                                            {alert.screenshot ? (
+                                                                <button onClick={() => setPreviewImage(alert.screenshot || null)} className={`text-[10px] ${subTextColor} hover:text-blue-500 transition-colors cursor-pointer`} title="Просмотр фото">
+                                                                    📷
+                                                                </button>
+                                                            ) : (
+                                                                <span className={`text-[10px] ${subTextColor}`}>—</span>
+                                                            )}
+                                                        </td>
+                                                        {isAdmin && (
+                                                            <td className={`p-1.5 sm:p-2 text-center last:border-r-0`}>
+                                                                <div className="flex items-center justify-center gap-0.5">
+                                                                    <button onClick={() => handleEdit(alert)} className={`p-1 rounded-lg hover:bg-white/10 transition-colors ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}>
+                                                                        <Edit size={12} />
+                                                                    </button>
+                                                                    <button onClick={() => handleDelete(alert.id)} className="p-1 rounded-lg hover:bg-red-500/10 text-red-500 transition-colors">
+                                                                        <Trash2 size={16} />
+                                                                    </button>
+                                                                </div>
+                                                            </td>
+                                                        )}
+                                                    </tr>
+                                                )
+                                            })
+                                        })
+
+                                        return rows
+                                    })()
                                 ) : (
                                     filteredAlerts.map((alert: AiAlert, index: number) => (
                                         <tr key={alert.id} className={`${theme === 'dark' ? 'hover:bg-white/5' : 'hover:bg-gray-50'} transition-colors ${alert.isScam ? 'bg-red-500/10' : ''}`}>
@@ -843,7 +977,7 @@ const PremiumSelect: React.FC<PremiumSelectProps> = ({ value, options, onChange,
     return (
         <div className="relative" ref={containerRef}>
             <div className="flex flex-col space-y-1.5">
-                <label className={`text-[10px] font-bold uppercase tracking-wider ml-1 ${subTextColor}`}>Сортировать по</label>
+                <label className={`text-[10px] font-bold tracking-wider ml-1 ${subTextColor}`}>Сортировать по</label>
                 <button type="button" onClick={() => setIsOpen(!isOpen)} className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl border text-sm font-bold transition-all shadow-sm ${theme === 'dark' ? 'bg-white/5 text-white hover:bg-white/10 active:scale-95' : 'bg-white border-gray-200 text-gray-900 hover:bg-gray-50 active:scale-95'}`}>
                     <span className="truncate">{selectedOption?.label}</span>
                     <ChevronDown size={14} className={`text-gray-500 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
