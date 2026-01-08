@@ -367,7 +367,9 @@ export const CallPage = () => {
                 className="flex-shrink-0 min-w-[200px] transition-all relative group bg-transparent"
               >
                 {/* Colored Border with category gradient */}
-                <div className={`absolute inset-0 rounded-2xl border-2 bg-gradient-to-r ${catGradient} opacity-100`} style={{ mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)', maskComposite: 'exclude', WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)', WebkitMaskComposite: 'xor', padding: '0px' }} />
+                <div className={`absolute inset-0 rounded-2xl p-[1.5px] bg-gradient-to-r ${catGradient}`}>
+                  <div className="h-full w-full rounded-[11px] bg-transparent" />
+                </div>
 
                 {/* Content Container - transparent */}
                 <div className="relative h-full px-5 py-4 flex flex-col items-center justify-center gap-2 bg-transparent">
