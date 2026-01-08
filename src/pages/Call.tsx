@@ -368,7 +368,7 @@ export const CallPage = () => {
               >
                 {/* Colored Border with category gradient */}
                 <div className={`absolute inset-0 rounded-2xl p-[1.5px] bg-gradient-to-r ${catGradient}`}>
-                  <div className={`h-full w-full rounded-[11px] ${cardBg}`} />
+                  <div className="h-full w-full rounded-[11px] bg-transparent" />
                 </div>
 
                 {/* Content Container - transparent */}
