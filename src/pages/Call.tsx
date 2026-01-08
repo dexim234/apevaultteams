@@ -43,11 +43,11 @@ const CATEGORY_ORDER: CallCategory[] = ['memecoins', 'polymarket', 'nft', 'staki
 const CATEGORY_META: Record<CallCategory, { label: string; gradient: string; gradientDark: string; chip: string; icon: JSX.Element; cardGradient: string }> = {
   memecoins: { 
     label: 'Мемкоины', 
-    gradient: 'from-emerald-400 to-teal-500', 
-    gradientDark: 'from-emerald-600 to-teal-500',
-    chip: 'bg-emerald-500/10 text-emerald-600', 
+    gradient: 'from-emerald-400 via-teal-500 to-cyan-400',
+    gradientDark: 'from-emerald-500 via-teal-600 to-cyan-500',
+    chip: 'bg-emerald-500/10 text-emerald-400',
     icon: <Rocket className="w-5 h-5 text-white" />,
-    cardGradient: 'from-emerald-500/20 via-teal-500/10 to-transparent'
+    cardGradient: 'from-emerald-500/20 via-teal-400/10 to-cyan-500/5'
   },
   futures: { 
     label: 'Фьючерсы', 
