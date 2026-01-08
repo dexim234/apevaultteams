@@ -373,7 +373,7 @@ export const CallPage = () => {
                 <div className="relative h-full px-5 py-4 flex flex-col items-center justify-center gap-2">
                   {/* Header: Icon & Label Centered */}
                   <div className="flex flex-col items-center gap-2">
-                    <div className={`p-2 rounded-xl bg-gradient-to-br ${catGradient} bg-opacity-10`}>
+                    <div className={`p-2 rounded-xl bg-gradient-to-br ${catGradient}`}>
                       {meta.icon}
                     </div>
                     <span className={`text-sm font-bold ${textColor} text-center`}>{meta.label}</span>

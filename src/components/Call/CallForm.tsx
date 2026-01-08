@@ -585,7 +585,9 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory, cat
     return (
       <div className={`rounded-2xl border ${borderColor} ${theme === 'dark' ? 'bg-gray-900/60' : 'bg-white'}`}>
         <div className={`flex items-center gap-2 px-4 py-3 border-b ${borderColor} ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-50'}`}>
-          <Sparkles className="w-4 h-4 text-amber-500" />
+          <div className={`p-1.5 rounded-lg bg-gradient-to-br ${catGradient} text-white`}>
+            <Sparkles className="w-3.5 h-3.5" />
+          </div>
           <p className={`text-sm font-semibold ${textColor}`}>Ключевые метрики</p>
           <span className={`ml-auto text-[11px] font-semibold px-3 py-1 rounded-full ${riskBadges[risk]}`}>
             Риск: {risk}
@@ -609,7 +611,7 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory, cat
       </div>
     )
   }
-
+            
   // Generate preview call object
   const generatePreviewCall = (): Call => {
     const activePayload = (details as any)[category]
@@ -1019,6 +1021,14 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory, cat
                         </div>
                       )}
                     </div>
+                  </div>
+
+                  {/* Category Header with Icon */}
+                  <div className="px-5 py-4 flex items-center gap-3">
+                    <div className={`p-2.5 rounded-xl bg-gradient-to-br ${getCategoryGradient(category, theme)} text-white shadow-lg`}>
+                      {CATEGORY_META[category].icon}
+                    </div>
+                    <span className={`text-lg font-bold ${textColor}`}>{CATEGORY_META[category].label}</span>
                   </div>
 
                   <div className="relative p-5 space-y-5">
