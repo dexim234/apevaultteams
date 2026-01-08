@@ -269,23 +269,6 @@ export const CallPage = () => {
     return true
   })
 
-  const categoryStats = useMemo(() => {
-    return calls.reduce<Record<CallCategory, { total: number; active: number }>>((acc, call) => {
-      if (!acc[call.category]) acc[call.category] = { total: 0, active: 0 }
-      acc[call.category].total += 1
-      if (call.status === 'active') acc[call.category].active += 1
-      return acc
-    }, {
-      memecoins: { total: 0, active: 0 },
-      futures: { total: 0, active: 0 },
-      nft: { total: 0, active: 0 },
-      spot: { total: 0, active: 0 },
-      airdrop: { total: 0, active: 0 },
-      polymarket: { total: 0, active: 0 },
-      staking: { total: 0, active: 0 },
-    })
-  }, [calls])
-
   const totals = useMemo(() => ({
     total: calls.length,
     active: calls.filter((c) => c.status === 'active').length,
