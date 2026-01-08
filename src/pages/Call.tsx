@@ -366,20 +366,16 @@ export const CallPage = () => {
                 }}
                 className="flex-shrink-0 min-w-[200px] transition-all relative group"
               >
-                {/* Outer container with gradient border */}
+                {/* Gradient border using border-image */}
                 <div
-                  className="absolute inset-0 rounded-2xl"
+                  className="absolute inset-0 rounded-2xl border-[1.5px] border-transparent"
                   style={{
-                    padding: '1.5px',
-                    background: catGradient.includes('via-') 
+                    borderImageSource: catGradient.includes('via-') 
                       ? `linear-gradient(to right, ${catGradient.match(/from-([^\s]+)/)?.[1]}, ${catGradient.match(/via-([^\s]+)/)?.[1]}, ${catGradient.match(/to-([^\s]+)/)?.[1]})`
                       : `linear-gradient(to right, ${catGradient.match(/from-([^\s]+)/)?.[1]}, ${catGradient.match(/to-([^\s]+)/)?.[1]})`,
-                    borderRadius: 'inherit',
+                    borderImageSlice: 1,
                   }}
                 />
-
-                {/* Inner container - fully transparent, covers the border's inner area */}
-                <div className="absolute inset-[1.5px] rounded-[11px] bg-transparent pointer-events-none" />
 
                 {/* Content Container */}
                 <div className="relative h-full px-5 py-4 flex flex-col items-center justify-center gap-2">
