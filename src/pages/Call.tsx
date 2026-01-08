@@ -366,10 +366,10 @@ export const CallPage = () => {
                 }}
                 className="flex-shrink-0 w-[200px] h-[140px] transition-all relative group"
               >
-                {/* Gradient border wrapper */}
-                <div className={`absolute inset-0 rounded-2xl p-[1.5px] border-0 bg-gradient-to-br ${catGradient}`}>
-                  {/* Transparent inner container with padding */}
-                  <div className="w-full h-full rounded-[13px] bg-transparent p-4 flex flex-col items-center justify-between">
+                {/* Gradient border via pseudo-element */}
+                <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${catGradient} p-[1.5px] before:content-[''] before:absolute before:inset-[1.5px] before:rounded-[11px] before:bg-transparent`}>
+                  {/* Content container */}
+                  <div className="relative w-full h-full rounded-[11px] bg-transparent p-4 flex flex-col items-center justify-between">
                     {/* Header: Icon & Label Centered */}
                     <div className="flex flex-col items-center gap-2">
                       <div className={`p-2 rounded-xl bg-gradient-to-br ${catGradient} text-white`}>
