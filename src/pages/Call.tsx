@@ -364,14 +364,15 @@ export const CallPage = () => {
                   setFormCategory(cat)
                   setShowForm(true)
                 }}
-                className="flex-shrink-0 min-w-[200px] transition-all relative group bg-transparent"
+                className="flex-shrink-0 min-w-[200px] transition-all relative group bg-[transparent]"
               >
-                {/* Colored Border with category gradient */}
+                {/* Outer container with gradient border */}
                 <div className={`absolute inset-0 rounded-2xl p-[1.5px] bg-gradient-to-r ${catGradient}`}>
-                  <div className="h-full w-full rounded-[11px] bg-transparent" />
+                  {/* Inner container clears the center for transparent background */}
+                  <div className="h-full w-full rounded-[11px] bg-[transparent]" />
                 </div>
 
-                {/* Content Container - transparent */}
+                {/* Content Container */}
                 <div className="relative h-full px-5 py-4 flex flex-col items-center justify-center gap-2 bg-transparent">
                   {/* Header: Icon & Label Centered */}
                   <div className="flex flex-col items-center gap-2">
