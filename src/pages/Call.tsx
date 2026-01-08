@@ -366,7 +366,7 @@ export const CallPage = () => {
                 }}
                 className="flex-shrink-0 min-w-[200px] transition-all relative group"
               >
-                {/* Gradient border with transparent center using mask */}
+                {/* Outer container with gradient border */}
                 <div
                   className="absolute inset-0 rounded-2xl"
                   style={{
@@ -374,14 +374,14 @@ export const CallPage = () => {
                     background: catGradient.includes('via-') 
                       ? `linear-gradient(to right, ${catGradient.match(/from-([^\s]+)/)?.[1]}, ${catGradient.match(/via-([^\s]+)/)?.[1]}, ${catGradient.match(/to-([^\s]+)/)?.[1]})`
                       : `linear-gradient(to right, ${catGradient.match(/from-([^\s]+)/)?.[1]}, ${catGradient.match(/to-([^\s]+)/)?.[1]})`,
-                    mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-                    maskComposite: 'exclude',
-                    WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-                    WebkitMaskComposite: 'xor',
+                    borderRadius: 'inherit',
                   }}
                 />
 
-                {/* Content Container - fully transparent */}
+                {/* Inner container - fully transparent, covers the border's inner area */}
+                <div className="absolute inset-[1.5px] rounded-[11px] bg-transparent pointer-events-none" />
+
+                {/* Content Container */}
                 <div className="relative h-full px-5 py-4 flex flex-col items-center justify-center gap-2">
                   {/* Header: Icon & Label Centered */}
                   <div className="flex flex-col items-center gap-2">
