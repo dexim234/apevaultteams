@@ -335,10 +335,19 @@ export const CallPage = () => {
         <div className="mb-3">
           <h3 className={`text-sm font-semibold ${subtleColor}`}>Создать сигнал</h3>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
+        <div className="grid grid-cols-2 gap-2">
           {CATEGORY_ORDER.map((cat) => {
             const meta = CATEGORY_META[cat]
             const catGradient = theme === 'dark' ? meta.gradientDark : meta.gradient
+            const borderColorCat: Record<CallCategory, string> = {
+              memecoins: 'border-emerald-500/40',
+              futures: 'border-blue-500/40',
+              nft: 'border-purple-500/40',
+              spot: 'border-amber-500/40',
+              airdrop: 'border-gray-500/40',
+              polymarket: 'border-rose-500/40',
+              staking: 'border-emerald-500/40',
+            }
             return (
               <button
                 key={cat}
@@ -347,11 +356,11 @@ export const CallPage = () => {
                   setFormCategory(cat)
                   setShowForm(true)
                 }}
-                className={`flex items-center gap-2 px-3 py-2.5 rounded-lg border ${borderColor} transition-all ${
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg border ${borderColorCat[cat]} transition-all ${
                   theme === 'dark' ? 'bg-white/5 hover:bg-white/10' : 'bg-gray-50 hover:bg-gray-100'
                 }`}
               >
-                <div className={`w-8 h-8 rounded-lg flex items-center justify-center bg-gradient-to-br ${catGradient} text-white shadow-md`}>
+                <div className={`w-10 h-10 rounded-lg flex items-center justify-center bg-gradient-to-br ${catGradient} text-white shadow-md shrink-0`}>
                   {meta.icon}
                 </div>
                 <span className={`text-sm font-medium truncate ${textColor}`}>
