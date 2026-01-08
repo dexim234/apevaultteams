@@ -781,7 +781,7 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory, cat
                 type="button"
                 onClick={() => updateField(field.key, opt.value)}
                 className={`px-3 py-3 sm:py-2 rounded-lg border-2 text-sm font-medium transition-all duration-300 min-h-[44px] sm:min-h-[40px] hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#4E6E49]/30 ${isSelected
-                  ? 'border-[#4E6E49] bg-gradient-to-r from-[#4E6E49] to-emerald-600 text-white shadow-md shadow-emerald-300/30 scale-[1.02] ring-2 ring-[#4E6E49]/20'
+                  ? `border-[${CATEGORY_META[category].gradient.split(' ')[0].replace('from-', '')}] bg-gradient-to-r ${CATEGORY_META[category].gradient} text-white shadow-md shadow-${CATEGORY_META[category].gradient.split(' ')[0].replace('from-', '').split('-')[0]}-500/30 scale-[1.02] ring-2 ring-${CATEGORY_META[category].gradient.split(' ')[0].replace('from-', '').split('-')[0]}-500/20`
                   : `border-gray-200 dark:border-gray-700 ${theme === 'dark' ? 'text-gray-300 hover:border-gray-600 hover:bg-gray-800' : 'text-gray-700 hover:border-gray-400 hover:bg-gray-50'} active:scale-95 hover:-translate-y-0.5`
                   }`}
               >
@@ -866,13 +866,13 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory, cat
                 type="button"
                 onClick={() => setCategory(cat)}
                 className={`relative p-4 rounded-xl border-2 transition-all duration-300 group overflow-hidden ${isSelected
-                  ? 'border-[#4E6E49] shadow-lg shadow-emerald-500/20 scale-[1.02]'
+                  ? `border-[${meta.gradient.split(' ')[0].replace('from-', '')}] shadow-lg shadow-${meta.gradient.split(' ')[0].replace('from-', '').split('-')[0]}-500/20 scale-[1.02]`
                   : `border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-lg hover:-translate-y-0.5`
                   }`}
               >
                 {/* Gradient background for selected */}
                 {isSelected && (
-                  <div className="absolute inset-0 bg-gradient-to-br from-[#4E6E49]/10 via-emerald-500/5 to-transparent" />
+                  <div className={`absolute inset-0 bg-gradient-to-br ${meta.gradient.replace('from-', 'from-').replace(' to-', ' to-')} opacity-10`} />
                 )}
                 
                 {/* Hover gradient */}
@@ -880,18 +880,18 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory, cat
                 
                 <div className="relative flex flex-col items-center gap-2.5 text-center">
                   <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 ${isSelected 
-                    ? 'bg-gradient-to-br from-[#4E6E49] to-emerald-600 text-white shadow-md' 
+                    ? `bg-gradient-to-br ${meta.gradient} text-white shadow-md` 
                     : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 group-hover:bg-gray-200 dark:group-hover:bg-gray-700'}`}>
                     <div className="w-5 h-5">
                       {meta.icon}
                     </div>
                   </div>
                   <div className="w-full">
-                    <span className={`text-sm font-bold block transition-colors ${isSelected ? 'text-[#4E6E49]' : textColor}`}>
+                    <span className={`text-sm font-bold block transition-colors ${isSelected ? `bg-gradient-to-r ${meta.gradient} bg-clip-text text-transparent` : textColor}`}>
                       {meta.label}
                     </span>
                     {isSelected && (
-                      <span className="text-[10px] text-emerald-500 font-medium">Выбрано</span>
+                      <span className={`text-[10px] bg-gradient-to-r ${meta.gradient} bg-clip-text text-transparent font-medium`}>Выбрано</span>
                     )}
                   </div>
                 </div>
@@ -917,43 +917,6 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory, cat
               <p className={`text-xs ${subtle}`}>Заполните детали сигнала</p>
             </div>
           </div>
-          
-          {/* Enhanced Progress */}
-          <div className="flex items-center gap-3">
-            <div className="text-right">
-              <div className="text-2xl font-bold ${progress.percentage === 100 ? 'text-emerald-500' : textColor}">
-                {progress.percentage}%
-              </div>
-              <p className={`text-xs ${subtle}`}>заполнено</p>
-            </div>
-            <div className="w-14 h-14 relative">
-              <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                <path
-                  className={`${theme === 'dark' ? 'text-gray-700' : 'text-gray-200'}`}
-                  d="M8.86 23.86a12 12 0 0 1-4.93-9.86A12 12 0 0 1 18 2.14a12 12 0 0 1 9.86 4.93"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="3"
-                />
-                <path
-                  className={`${progress.percentage === 100 ? 'text-emerald-500' : 'text-[#4E6E49]'}`}
-                  strokeDasharray={`${progress.percentage}, 100`}
-                  d="M8.86 23.86a12 12 0 0 1-4.93-9.86A12 12 0 0 1 18 2.14a12 12 0 0 1 9.86 4.93"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                />
-              </svg>
-              <div className={`absolute inset-0 flex items-center justify-center ${progress.percentage === 100 ? 'text-emerald-500' : 'text-[#4E6E49]'}`}>
-                {progress.percentage === 100 ? (
-                  <Check className="w-5 h-5" />
-                ) : (
-                  <span className="text-xs font-bold">{progress.filled}</span>
-                )}
-              </div>
-            </div>
-          </div>
         </div>
 
         <div className="space-y-6">
@@ -968,7 +931,7 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory, cat
               >
                 {/* Section header with accent */}
                 <div className="flex items-center gap-3 pb-3 border-b border-gray-200/50 dark:border-gray-700/50">
-                  <div className={`p-2 rounded-lg ${theme === 'dark' ? 'bg-gray-800 text-emerald-400' : 'bg-gray-100 text-emerald-600'}`}>
+                  <div className={`p-2 rounded-lg bg-gradient-to-br ${CATEGORY_META[category].gradient} text-white`}>
                     {sectionConfig.icon}
                   </div>
                   <div className="flex-1">
@@ -977,7 +940,7 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory, cat
                       <p className={`text-xs ${subtle}`}>{sectionConfig.description}</p>
                     )}
                   </div>
-                  <div className={`h-px flex-1 bg-gradient-to-r from-transparent via-[#4E6E49]/30 to-transparent`} />
+                  <div className={`h-px flex-1 bg-gradient-to-r from-transparent ${CATEGORY_META[category].gradient.replace('from-', 'via-')} to-transparent opacity-30`} />
                 </div>
                 
                 <div className="grid grid-cols-1 gap-4">
