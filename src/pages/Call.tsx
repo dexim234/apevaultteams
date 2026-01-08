@@ -364,16 +364,25 @@ export const CallPage = () => {
                   setFormCategory(cat)
                   setShowForm(true)
                 }}
-                className="flex-shrink-0 min-w-[200px] transition-all relative group bg-[transparent]"
+                className="flex-shrink-0 min-w-[200px] transition-all relative group"
               >
-                {/* Outer container with gradient border */}
-                <div className={`absolute inset-0 rounded-2xl p-[1.5px] bg-gradient-to-r ${catGradient}`}>
-                  {/* Inner container clears the center for transparent background */}
-                  <div className="h-full w-full rounded-[11px] bg-[transparent]" />
-                </div>
+                {/* Gradient border with transparent center using mask */}
+                <div
+                  className="absolute inset-0 rounded-2xl"
+                  style={{
+                    padding: '1.5px',
+                    background: catGradient.includes('via-') 
+                      ? `linear-gradient(to right, ${catGradient.match(/from-([^\s]+)/)?.[1]}, ${catGradient.match(/via-([^\s]+)/)?.[1]}, ${catGradient.match(/to-([^\s]+)/)?.[1]})`
+                      : `linear-gradient(to right, ${catGradient.match(/from-([^\s]+)/)?.[1]}, ${catGradient.match(/to-([^\s]+)/)?.[1]})`,
+                    mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+                    maskComposite: 'exclude',
+                    WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+                    WebkitMaskComposite: 'xor',
+                  }}
+                />
 
-                {/* Content Container */}
-                <div className="relative h-full px-5 py-4 flex flex-col items-center justify-center gap-2 bg-transparent">
+                {/* Content Container - fully transparent */}
+                <div className="relative h-full px-5 py-4 flex flex-col items-center justify-center gap-2">
                   {/* Header: Icon & Label Centered */}
                   <div className="flex flex-col items-center gap-2">
                     <div className={`p-2 rounded-xl bg-gradient-to-br ${catGradient} text-white`}>
