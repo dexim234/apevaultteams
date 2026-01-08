@@ -59,8 +59,8 @@ const CATEGORY_META: Record<CallCategory, { label: string; gradient: string; gra
   nft: { label: 'NFT', gradient: 'from-purple-300 to-pink-300', gradientDark: 'from-purple-600 to-pink-500', icon: <Image className="w-5 h-5" />, pastelBg: 'bg-purple-50', pastelBorder: 'border-purple-100', pastelText: 'text-purple-800' },
   spot: { label: 'Спот', gradient: 'from-amber-300 to-orange-300', gradientDark: 'from-amber-600 to-orange-500', icon: <Coins className="w-5 h-5" />, pastelBg: 'bg-amber-50', pastelBorder: 'border-amber-100', pastelText: 'text-amber-800' },
   polymarket: { label: 'Polymarket', gradient: 'from-rose-300 to-red-300', gradientDark: 'from-rose-600 to-red-500', icon: <Target className="w-5 h-5" />, pastelBg: 'bg-rose-50', pastelBorder: 'border-rose-100', pastelText: 'text-rose-800' },
-  staking: { label: 'Стейкинг', gradient: 'from-cyan-300 to-blue-300', gradientDark: 'from-cyan-600 to-blue-500', icon: <Shield className="w-5 h-5" />, pastelBg: 'bg-cyan-50', pastelBorder: 'border-cyan-100', pastelText: 'text-cyan-800' },
-  airdrop: { label: 'AirDrop', gradient: 'from-blue-300 to-indigo-400', gradientDark: 'from-blue-600 to-indigo-500', icon: <Sparkles className="w-5 h-5" />, pastelBg: 'bg-blue-50', pastelBorder: 'border-blue-100', pastelText: 'text-blue-800' },
+  staking: { label: 'Стейкинг', gradient: 'from-emerald-300 to-green-400', gradientDark: 'from-emerald-600 to-green-500', icon: <Shield className="w-5 h-5" />, pastelBg: 'bg-emerald-50', pastelBorder: 'border-emerald-100', pastelText: 'text-emerald-800' },
+  airdrop: { label: 'AirDrop', gradient: 'from-amber-300 to-yellow-400', gradientDark: 'from-amber-600 to-yellow-500', icon: <Sparkles className="w-5 h-5" />, pastelBg: 'bg-amber-50', pastelBorder: 'border-amber-100', pastelText: 'text-amber-800' },
 }
 
 // Helper to get appropriate gradient based on theme
