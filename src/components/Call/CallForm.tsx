@@ -1000,6 +1000,14 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory, cat
                   <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-emerald-500/5 to-transparent rounded-full blur-xl" />
                   
                   <div className={`relative px-5 py-4 flex flex-wrap items-center justify-between gap-3 border-b ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-white/70 bg-white/70'}`}>
+                    {/* Category with Icon */}
+                    <div className="flex items-center gap-2">
+                      <div className={`p-1.5 rounded-lg bg-gradient-to-br ${getCategoryGradient(category, theme)} text-white`}>
+                        {CATEGORY_META[category].icon}
+                      </div>
+                      <span className={`text-sm font-bold ${textColor}`}>{CATEGORY_META[category].label}</span>
+                    </div>
+                    
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className={`px-3 py-1.5 rounded-full text-xs font-bold bg-emerald-500/15 text-emerald-500 border border-emerald-500/30`}>
                         Активен
@@ -1014,22 +1022,20 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory, cat
                       </span>
                       {trader && (
                         <div className="flex items-center gap-2 px-2 py-1 rounded-lg border border-white/10 bg-black/5 dark:bg-white/5">
-                          <div className="w-7 h-7 rounded-full bg-gradient-to-r from-[#4E6E49] to-emerald-600 text-white flex items-center justify-center text-xs font-bold">
-                            {trader.name[0]}
-                          </div>
+                          {trader.avatar ? (
+                            <img src={trader.avatar} className="w-7 h-7 rounded-full object-cover" alt={trader.name} />
+                          ) : (
+                            <div className="w-7 h-7 rounded-full bg-gradient-to-r from-[#4E6E49] to-emerald-600 text-white flex items-center justify-center text-xs font-bold">
+                              {trader.name[0]}
+                            </div>
+                          )}
                           <span className={`text-xs font-medium ${subtleColor}`}>{trader.name}</span>
                         </div>
                       )}
                     </div>
                   </div>
 
-                  {/* Category Header with Icon */}
-                  <div className="px-5 py-4 flex items-center gap-3">
-                    <div className={`p-2.5 rounded-xl bg-gradient-to-br ${getCategoryGradient(category, theme)} text-white shadow-lg`}>
-                      {CATEGORY_META[category].icon}
-                    </div>
-                    <span className={`text-lg font-bold ${textColor}`}>{CATEGORY_META[category].label}</span>
-                  </div>
+                  {/* Category Header with Icon - REMOVED, moved above */}
 
                   <div className="relative p-5 space-y-5">
                     {/* Metrics */}
