@@ -555,29 +555,6 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory, cat
     return undefined
   }
 
-  // Calculate form completion progress
-  const getFormProgress = () => {
-    const categoryFields = CATEGORY_FIELDS[category]
-    const requiredFields = categoryFields.filter(field => field.required)
-    const activePayload = (details as any)[category] || {}
-
-    let filledRequired = 0
-    requiredFields.forEach(field => {
-      const value = activePayload[field.key]
-      if (value !== undefined && value !== null && value !== '') {
-        filledRequired++
-      }
-    })
-
-    return {
-      filled: filledRequired,
-      total: requiredFields.length,
-      percentage: requiredFields.length > 0 ? Math.round((filledRequired / requiredFields.length) * 100) : 100
-    }
-  }
-
-  const progress = getFormProgress()
-
   // Copy renderCategoryMetrics from Call.tsx
   const renderCategoryMetrics = (call: Call) => {
     const d = getDetails(call)
