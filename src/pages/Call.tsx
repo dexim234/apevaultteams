@@ -366,21 +366,10 @@ export const CallPage = () => {
                 }}
                 className="flex-shrink-0 min-w-[200px] transition-all relative group"
               >
-                {/* Gradient border using border-image */}
-                <div
-                  className="absolute inset-0 rounded-2xl border-[1.5px]"
-                  style={{
-                    borderImageSource: `linear-gradient(to right, ${
-                      catGradient.includes('via-') 
-                        ? `${catGradient.match(/from-([^\s]+)/)?.[1]}, ${catGradient.match(/via-([^\s]+)/)?.[1]}, ${catGradient.match(/to-([^\s]+)/)?.[1]}`
-                        : `${catGradient.match(/from-([^\s]+)/)?.[1]}, ${catGradient.match(/to-([^\s]+)/)?.[1]}`
-                    })`,
-                    borderImageSlice: 1,
-                  }}
-                />
-
-                {/* Content Container */}
-                <div className="relative h-full px-5 py-4 flex flex-col items-center justify-center gap-2">
+                {/* Gradient border wrapper */}
+                <div className={`absolute inset-0 rounded-2xl p-[1.5px] border-0 bg-gradient-to-br ${catGradient}`}>
+                  {/* Transparent inner container */}
+                  <div className="relative w-full h-full rounded-[13px] bg-transparent">
                   {/* Header: Icon & Label Centered */}
                   <div className="flex flex-col items-center gap-2">
                     <div className={`p-2 rounded-xl bg-gradient-to-br ${catGradient} text-white`}>
