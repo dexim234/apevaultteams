@@ -1,4 +1,3 @@
-// Signals HUB page redesigned to match reference image
 import { useState, useEffect, useMemo, type JSX } from 'react'
 import { useThemeStore } from '@/store/themeStore'
 import { CallForm } from '@/components/Call/CallForm'
@@ -340,7 +339,7 @@ export const CallPage = () => {
               setFormCategory(categoryFilter !== 'all' ? categoryFilter : 'memecoins')
               setShowForm(true)
             }}
-            className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-white shadow-lg transition-all hover:scale-105 active:scale-95 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500`}
+            className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-white shadow-lg transition-all hover:scale-105 active:scale-95 bg-gradient-to-r ${CATEGORY_META[formCategory].gradient} hover:opacity-90`}
           >
             <Plus size={18} />
             <span>Call</span>
@@ -355,6 +354,7 @@ export const CallPage = () => {
             const meta = CATEGORY_META[cat]
             const stats = categoryStats[cat]
             const progress = stats.total > 0 ? Math.round((stats.active / stats.total) * 100) : 0
+            const catGradient = theme === 'dark' ? meta.gradientDark : meta.gradient
             
             return (
               <button
@@ -366,22 +366,14 @@ export const CallPage = () => {
                 }}
                 className="flex-shrink-0 min-w-[200px] rounded-2xl transition-all relative group"
               >
-                {/* Colored Border */}
-                <div className={`absolute inset-0 rounded-2xl border-2 transition-all duration-300 ${
-                  cat === 'memecoins' ? 'border-emerald-500 group-hover:border-emerald-400' :
-                  cat === 'polymarket' ? 'border-rose-500 group-hover:border-rose-400' :
-                  cat === 'nft' ? 'border-purple-500 group-hover:border-purple-400' :
-                  cat === 'futures' ? 'border-blue-500 group-hover:border-blue-400' :
-                  cat === 'spot' ? 'border-amber-500 group-hover:border-amber-400' :
-                  cat === 'staking' ? 'border-emerald-500 group-hover:border-emerald-400' :
-                  'border-gray-500 group-hover:border-gray-400'
-                }`} />
-                
+                {/* Colored Border with category gradient */}
+                <div className={`absolute inset-0 rounded-2xl border-2 transition-all duration-300 bg-gradient-to-r ${catGradient} opacity-100 group-hover:opacity-100`} style={{ mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)', maskComposite: 'exclude', WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)', WebkitMaskComposite: 'xor', padding: '2px' }} />
+
                 {/* Content Container - transparent */}
                 <div className="relative h-full px-5 py-4 rounded-[14px] flex flex-col items-center justify-center gap-2">
                   {/* Header: Icon & Label Centered */}
                   <div className="flex flex-col items-center gap-2">
-                    <div className={`p-2 rounded-xl bg-gradient-to-br ${meta.gradient} bg-opacity-10`}>
+                    <div className={`p-2 rounded-xl bg-gradient-to-br ${catGradient} bg-opacity-10`}>
                       {meta.icon}
                     </div>
                     <span className={`text-sm font-bold ${textColor} text-center`}>{meta.label}</span>
@@ -399,7 +391,7 @@ export const CallPage = () => {
                     </div>
                     <div className="w-full h-1.5 bg-gray-700/50 rounded-full overflow-hidden">
                       <div
-                        className={`h-full bg-gradient-to-r ${meta.gradient} rounded-full transition-all duration-500`}
+                        className={`h-full bg-gradient-to-r ${catGradient} rounded-full transition-all duration-500`}
                         style={{ width: `${progress}%` }}
                       />
                     </div>

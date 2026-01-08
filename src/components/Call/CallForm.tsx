@@ -985,10 +985,10 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory, cat
           <button
             type="submit"
             disabled={loading || progress.percentage < 100}
-            className={`flex-1 py-3.5 rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 ${loading 
+            className={`flex-1 py-3.5 rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-2 shadow-lg ${loading
               ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
               : progress.percentage === 100
-                ? 'bg-gradient-to-r from-[#4E6E49] to-emerald-600 text-white hover:shadow-xl hover:shadow-emerald-500/30 hover:scale-[1.01] active:scale-[0.98]'
+                ? `bg-gradient-to-r ${getCategoryGradient(category, theme)} text-white hover:shadow-xl hover:scale-[1.01] active:scale-[0.98]`
                 : 'bg-gray-300 text-gray-500 cursor-not-allowed'
               }`}
           >
@@ -1040,7 +1040,7 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory, cat
             
             <div className={`relative ${bgColor} rounded-3xl shadow-2xl shadow-black/50 border ${borderColor} max-w-2xl w-full max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-300`}>
               {/* Header gradient */}
-              <div className={`h-2 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500`} />
+              <div className={`h-2 bg-gradient-to-r ${getCategoryGradient(category, theme)}`} />
               
               <div className="p-6 flex items-center justify-between sticky top-0 z-10 ${bgColor} border-b ${borderColor}">
                 <div className="flex items-center gap-3">
@@ -1137,7 +1137,7 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory, cat
                     }}
                     disabled={progress.percentage < 100}
                     className={`flex-1 py-3.5 rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-2 shadow-lg ${progress.percentage === 100
-                      ? 'bg-gradient-to-r from-[#4E6E49] to-emerald-600 text-white hover:shadow-xl shadow-emerald-500/30'
+                      ? `bg-gradient-to-r ${getCategoryGradient(category, theme)} text-white hover:shadow-xl`
                       : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                       }`}
                   >
