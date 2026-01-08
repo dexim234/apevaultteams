@@ -60,7 +60,7 @@ const CATEGORY_META: Record<CallCategory, { label: string; gradient: string; gra
   spot: { label: 'Спот', gradient: 'from-amber-300 to-orange-300', gradientDark: 'from-amber-600 to-orange-500', icon: <Coins className="w-5 h-5" />, pastelBg: 'bg-amber-50', pastelBorder: 'border-amber-100', pastelText: 'text-amber-800' },
   polymarket: { label: 'Polymarket', gradient: 'from-rose-300 to-red-300', gradientDark: 'from-rose-600 to-red-500', icon: <Target className="w-5 h-5" />, pastelBg: 'bg-rose-50', pastelBorder: 'border-rose-100', pastelText: 'text-rose-800' },
   staking: { label: 'Стейкинг', gradient: 'from-emerald-300 to-green-400', gradientDark: 'from-emerald-600 to-green-500', icon: <Shield className="w-5 h-5" />, pastelBg: 'bg-emerald-50', pastelBorder: 'border-emerald-100', pastelText: 'text-emerald-800' },
-  airdrop: { label: 'AirDrop', gradient: 'from-amber-300 to-yellow-400', gradientDark: 'from-amber-600 to-yellow-500', icon: <Sparkles className="w-5 h-5" />, pastelBg: 'bg-amber-50', pastelBorder: 'border-amber-100', pastelText: 'text-amber-800' },
+  airdrop: { label: 'AirDrop', gradient: 'from-gray-300 to-gray-400', gradientDark: 'from-gray-500 to-gray-400', icon: <Sparkles className="w-5 h-5" />, pastelBg: 'bg-gray-50', pastelBorder: 'border-gray-100', pastelText: 'text-gray-800' },
 }
 
 // Helper to get appropriate gradient based on theme
@@ -82,7 +82,7 @@ const categoryTone: Record<CallCategory, { border: string; bg: string; text: str
   spot: { border: 'border-amber-500/30', bg: 'bg-amber-500/5', text: 'text-amber-400', chipBg: 'bg-amber-500/20' },
   polymarket: { border: 'border-rose-500/30', bg: 'bg-rose-500/5', text: 'text-rose-400', chipBg: 'bg-rose-500/20' },
   staking: { border: 'border-cyan-500/30', bg: 'bg-cyan-500/5', text: 'text-cyan-400', chipBg: 'bg-cyan-500/20' },
-  airdrop: { border: 'border-indigo-500/30', bg: 'bg-indigo-500/5', text: 'text-indigo-400', chipBg: 'bg-indigo-500/20' },
+  airdrop: { border: 'border-gray-500/30', bg: 'bg-gray-500/5', text: 'text-gray-400', chipBg: 'bg-gray-500/20' },
 }
 
 // Helper functions for preview

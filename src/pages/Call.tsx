@@ -40,10 +40,11 @@ type RiskFilter = 'all' | CallRiskLevel
 const CATEGORY_ORDER: CallCategory[] = ['memecoins', 'polymarket', 'nft', 'staking', 'spot', 'futures', 'airdrop']
 
 // Updated CATEGORY_META with cardGradient
-const CATEGORY_META: Record<CallCategory, { label: string; gradient: string; chip: string; icon: JSX.Element; cardGradient: string }> = {
+const CATEGORY_META: Record<CallCategory, { label: string; gradient: string; gradientDark: string; chip: string; icon: JSX.Element; cardGradient: string }> = {
   memecoins: { 
     label: 'Мемкоины', 
     gradient: 'from-emerald-400 to-teal-500', 
+    gradientDark: 'from-emerald-600 to-teal-500',
     chip: 'bg-emerald-500/10 text-emerald-600', 
     icon: <Rocket className="w-5 h-5 text-white" />,
     cardGradient: 'from-emerald-500/20 via-teal-500/10 to-transparent'
@@ -51,6 +52,7 @@ const CATEGORY_META: Record<CallCategory, { label: string; gradient: string; chi
   futures: { 
     label: 'Фьючерсы', 
     gradient: 'from-blue-400 to-indigo-500', 
+    gradientDark: 'from-blue-600 to-indigo-500',
     chip: 'bg-blue-500/10 text-blue-600', 
     icon: <LineChart className="w-5 h-5 text-white" />,
     cardGradient: 'from-blue-500/20 via-indigo-500/10 to-transparent'
@@ -58,6 +60,7 @@ const CATEGORY_META: Record<CallCategory, { label: string; gradient: string; chi
   nft: { 
     label: 'NFT', 
     gradient: 'from-purple-400 to-pink-500', 
+    gradientDark: 'from-purple-600 to-pink-500',
     chip: 'bg-purple-500/10 text-purple-600', 
     icon: <Image className="w-5 h-5 text-white" />,
     cardGradient: 'from-purple-500/20 via-pink-500/10 to-transparent'
@@ -65,30 +68,34 @@ const CATEGORY_META: Record<CallCategory, { label: string; gradient: string; chi
   spot: { 
     label: 'Спот', 
     gradient: 'from-amber-400 to-orange-500', 
+    gradientDark: 'from-amber-600 to-orange-500',
     chip: 'bg-amber-500/10 text-amber-600', 
     icon: <Coins className="w-5 h-5 text-white" />,
     cardGradient: 'from-amber-500/20 via-orange-500/10 to-transparent'
   },
   airdrop: { 
     label: 'AirDrop', 
-    gradient: 'from-cyan-400 to-blue-500', 
-    chip: 'bg-cyan-500/10 text-cyan-600', 
+    gradient: 'from-gray-300 to-gray-400', 
+    gradientDark: 'from-gray-400 to-gray-300',
+    chip: 'bg-gray-500/10 text-gray-600', 
     icon: <Sparkles className="w-5 h-5 text-white" />,
-    cardGradient: 'from-cyan-500/20 via-blue-500/10 to-transparent'
+    cardGradient: 'from-gray-500/20 via-gray-400/10 to-transparent'
   },
   polymarket: { 
     label: 'Polymarket', 
     gradient: 'from-rose-400 to-red-500', 
+    gradientDark: 'from-rose-600 to-red-500',
     chip: 'bg-rose-500/10 text-rose-600', 
     icon: <Gauge className="w-5 h-5 text-white" />,
     cardGradient: 'from-rose-500/20 via-red-500/10 to-transparent'
   },
   staking: { 
     label: 'Стейкинг', 
-    gradient: 'from-violet-400 to-purple-500', 
-    chip: 'bg-violet-500/10 text-violet-600', 
+    gradient: 'from-emerald-400 to-green-500', 
+    gradientDark: 'from-emerald-600 to-green-500',
+    chip: 'bg-emerald-500/10 text-emerald-600', 
     icon: <Shield className="w-5 h-5 text-white" />,
-    cardGradient: 'from-violet-500/20 via-purple-500/10 to-transparent'
+    cardGradient: 'from-emerald-500/20 via-green-500/10 to-transparent'
   },
 }
 
@@ -366,8 +373,8 @@ export const CallPage = () => {
                   cat === 'nft' ? 'border-purple-500 group-hover:border-purple-400' :
                   cat === 'futures' ? 'border-blue-500 group-hover:border-blue-400' :
                   cat === 'spot' ? 'border-amber-500 group-hover:border-amber-400' :
-                  cat === 'staking' ? 'border-violet-500 group-hover:border-violet-400' :
-                  'border-cyan-500 group-hover:border-cyan-400'
+                  cat === 'staking' ? 'border-emerald-500 group-hover:border-emerald-400' :
+                  'border-gray-500 group-hover:border-gray-400'
                 }`} />
                 
                 {/* Content Container - transparent */}
@@ -706,8 +713,9 @@ export const CallPage = () => {
               formCategory === 'nft' ? 'bg-gradient-to-r from-purple-500 via-pink-500 to-rose-500' :
               formCategory === 'futures' ? 'bg-gradient-to-r from-blue-500 via-indigo-500 to-cyan-500' :
               formCategory === 'spot' ? 'bg-gradient-to-r from-amber-500 via-orange-500 to-yellow-500' :
-              formCategory === 'staking' ? 'bg-gradient-to-r from-violet-500 via-purple-500 to-indigo-500' :
-              'bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-500'
+              formCategory === 'staking' ? 'bg-gradient-to-r from-emerald-500 via-green-500 to-emerald-400' :
+              formCategory === 'airdrop' ? 'bg-gradient-to-r from-gray-400 via-gray-300 to-gray-200' :
+              'bg-gradient-to-r from-gray-400 via-gray-300 to-gray-200'
             }`} />
 
             <div className="flex flex-col h-full">
@@ -719,8 +727,9 @@ export const CallPage = () => {
                     formCategory === 'nft' ? 'bg-gradient-to-br from-purple-500 to-pink-600 shadow-purple-500/30' :
                     formCategory === 'futures' ? 'bg-gradient-to-br from-blue-500 to-indigo-600 shadow-blue-500/30' :
                     formCategory === 'spot' ? 'bg-gradient-to-br from-amber-500 to-orange-600 shadow-amber-500/30' :
-                    formCategory === 'staking' ? 'bg-gradient-to-br from-violet-500 to-purple-600 shadow-violet-500/30' :
-                    'bg-gradient-to-br from-cyan-500 to-blue-600 shadow-cyan-500/30'
+                    formCategory === 'staking' ? 'bg-gradient-to-br from-emerald-500 to-green-600 shadow-emerald-500/30' :
+                    formCategory === 'airdrop' ? 'bg-gradient-to-br from-gray-400 to-gray-300 shadow-gray-400/30' :
+                    'bg-gradient-to-br from-gray-400 to-gray-300 shadow-gray-400/30'
                   }`}>
                     {CATEGORY_META[formCategory].icon}
                   </div>
