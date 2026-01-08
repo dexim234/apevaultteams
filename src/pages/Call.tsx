@@ -529,7 +529,7 @@ export const CallPage = () => {
             <p className={subtleColor}>Попробуйте изменить фильтры</p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {filteredCalls.map((call) => {
               const meta = CATEGORY_META[call.category]
               const details = getDetails(call)
