@@ -364,13 +364,13 @@ export const CallPage = () => {
                   setFormCategory(cat)
                   setShowForm(true)
                 }}
-                className="flex-shrink-0 min-w-[200px] rounded-2xl transition-all relative group"
+                className="flex-shrink-0 min-w-[200px] transition-all relative group"
               >
                 {/* Colored Border with category gradient */}
-                <div className={`absolute inset-0 rounded-2xl border-2 transition-all duration-300 bg-gradient-to-r ${catGradient} opacity-100 group-hover:opacity-100`} style={{ mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)', maskComposite: 'exclude', WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)', WebkitMaskComposite: 'xor', padding: '2px' }} />
+                <div className={`absolute inset-0 rounded-2xl border-2 bg-gradient-to-r ${catGradient} opacity-100`} style={{ mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)', maskComposite: 'exclude', WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)', WebkitMaskComposite: 'xor', padding: '2px' }} />
 
                 {/* Content Container - transparent */}
-                <div className="relative h-full px-5 py-4 rounded-[14px] flex flex-col items-center justify-center gap-2">
+                <div className="relative h-full px-5 py-4 flex flex-col items-center justify-center gap-2">
                   {/* Header: Icon & Label Centered */}
                   <div className="flex flex-col items-center gap-2">
                     <div className={`p-2 rounded-xl bg-gradient-to-br ${catGradient} bg-opacity-10`}>

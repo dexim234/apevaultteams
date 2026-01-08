@@ -984,12 +984,10 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory, cat
           
           <button
             type="submit"
-            disabled={loading || progress.percentage < 100}
+            disabled={loading}
             className={`flex-1 py-3.5 rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-2 shadow-lg ${loading
               ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
-              : progress.percentage === 100
-                ? `bg-gradient-to-r ${getCategoryGradient(category, theme)} text-white hover:shadow-xl hover:scale-[1.01] active:scale-[0.98]`
-                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              : `bg-gradient-to-r ${getCategoryGradient(category, theme)} text-white hover:shadow-xl hover:scale-[1.01] active:scale-[0.98]`
               }`}
           >
             {loading ? (
@@ -1044,7 +1042,7 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory, cat
               
               <div className="p-6 flex items-center justify-between sticky top-0 z-10 ${bgColor} border-b ${borderColor}">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#4E6E49] to-emerald-600 flex items-center justify-center text-white shadow-lg shadow-emerald-500/30">
+                  <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${getCategoryGradient(category, theme)} flex items-center justify-center text-white shadow-lg`}>
                     <Eye className="w-5 h-5" />
                   </div>
                   <div>
@@ -1135,10 +1133,10 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory, cat
                       const form = document.querySelector('form') as HTMLFormElement
                       form?.requestSubmit()
                     }}
-                    disabled={progress.percentage < 100}
-                    className={`flex-1 py-3.5 rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-2 shadow-lg ${progress.percentage === 100
-                      ? `bg-gradient-to-r ${getCategoryGradient(category, theme)} text-white hover:shadow-xl`
-                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    disabled={loading}
+                    className={`flex-1 py-3.5 rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-2 shadow-lg ${loading
+                      ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                      : `bg-gradient-to-r ${getCategoryGradient(category, theme)} text-white hover:shadow-xl`
                       }`}
                   >
                     <Check className="w-4 h-4" />
