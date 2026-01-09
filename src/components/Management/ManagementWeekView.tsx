@@ -436,13 +436,14 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
   }
 
   const headingColor = theme === 'dark' ? 'text-white' : 'text-gray-900'
-  const statusTone = {
-    dayoff: 'bg-orange-500/10 text-orange-500 border border-orange-500/20',
-    sick: 'bg-purple-500/10 text-purple-500 border border-purple-500/20',
-    vacation: 'bg-blue-500/10 text-blue-500 border border-blue-500/20',
-    absence: 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20',
-    truancy: 'bg-red-500/10 text-red-500 border border-red-500/20',
-    internship: 'bg-green-500/10 text-green-500 border border-green-500/20',
+  // Статусы: выходной - зеленый, больничный - фиолетовый, отпуск - синий, отсутствие - оранжевый, прогул - красный, стажировка - желтый
+  const statusMeta = {
+    dayoff: { label: 'Выходной', tone: 'bg-green-500/10 text-green-500 border border-green-500/20' },
+    sick: { label: 'Больничный', tone: 'bg-purple-500/10 text-purple-500 border border-purple-500/20' },
+    vacation: { label: 'Отпуск', tone: 'bg-blue-500/10 text-blue-500 border border-blue-500/20' },
+    absence: { label: 'Отсутствие', tone: 'bg-orange-500/10 text-orange-500 border border-orange-500/20' },
+    truancy: { label: 'Прогул', tone: 'bg-red-500/10 text-red-500 border border-red-500/20' },
+    internship: { label: 'Стажировка', tone: 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20' },
   } as const
 
   const SLOT_CATEGORY_COLORS: Record<SlotCategory, { bg: string; text: string; border: string }> = {
@@ -540,12 +541,12 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
                   return (
                     <div
                       key={status.id}
-                      className={`relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 rounded-2xl border-2 transition-all duration-300 hover:shadow-xl backdrop-blur text-center sm:text-left ring-1 ring-inset ring-black/5 dark:ring-white/5 ${statusTone[status.type]}`}
+                      className={`relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 rounded-2xl border-2 transition-all duration-300 hover:shadow-xl backdrop-blur text-center sm:text-left ring-1 ring-inset ring-black/5 dark:ring-white/5 ${statusMeta[status.type]?.tone || ''}`}
                     >
                       <div className="flex flex-col sm:flex-row sm:items-center gap-2 justify-center sm:justify-start w-full">
                         <span className="font-semibold text-base sm:text-lg">{displayName}</span>
                         <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/70 dark:bg-white/10 text-xs sm:text-sm font-semibold">
-                          {status.type === 'dayoff' ? 'Выходной' : status.type === 'sick' ? 'Больничный' : status.type === 'vacation' ? 'Отпуск' : status.type === 'absence' ? 'Отсутствие' : status.type === 'truancy' ? 'Прогул' : 'Стажировка'}
+                          {statusMeta[status.type]?.label || status.type}
                           {status.comment && (
                             <div className="relative group/statuscomm ml-1">
                               <Info className="w-3.5 h-3.5 opacity-60 hover:opacity-100 cursor-help" />
@@ -757,8 +758,8 @@ export const ManagementWeekView = ({ selectedUserId, slotFilter, onEditSlot, onE
                 })}
 
                 {daySlots.length === 0 && dayStatuses.length === 0 && dateStr === formatDate(today, 'yyyy-MM-dd') && (
-                  <div className={`rounded-lg px-3 py-2 text-xs font-semibold ring-1 ring-inset ring-black/5 dark:ring-white/10 ${statusTone.absence}`}>
-                    Прогул
+                  <div className={`rounded-lg px-3 py-2 text-xs font-semibold ring-1 ring-inset ring-black/5 dark:ring-white/10 ${statusMeta.absence.tone}`}>
+                    Отсутствие
                   </div>
                 )}
                 {daySlots.length === 0 && dayStatuses.length === 0 && dateStr !== formatDate(today, 'yyyy-MM-dd') && (
