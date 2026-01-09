@@ -114,7 +114,8 @@ export const RestrictionForm = ({ onClose, onSave }: RestrictionFormProps) => {
     dayoff: 'Выходные',
     sick: 'Больничные',
     vacation: 'Отпуска',
-    absence: 'Прогулы',
+    absence: 'Отсутствие',
+    truancy: 'Прогулы',
     internship: 'Стажировка',
     all: 'Всё',
   }

@@ -237,6 +237,7 @@ export const Profile = () => {
           sickDays,
           vacationDays,
           absenceDays,
+          truancyDays,
           internshipDays,
           poolAmount,
           lastUpdated: new Date().toISOString(),

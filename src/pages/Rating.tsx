@@ -157,6 +157,7 @@ export const Rating = () => {
           sickDays,
           vacationDays,
           absenceDays,
+          truancyDays,
           internshipDays,
           poolAmount,
           lastUpdated: new Date().toISOString(),

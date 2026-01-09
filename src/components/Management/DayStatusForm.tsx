@@ -11,7 +11,7 @@ import { DayStatus, TEAM_MEMBERS } from '@/types'
 import { useScrollLock } from '@/hooks/useScrollLock'
 
 interface DayStatusFormProps {
-  type?: 'dayoff' | 'sick' | 'vacation' | 'absence' | 'internship'
+  type?: 'dayoff' | 'sick' | 'vacation' | 'absence' | 'truancy' | 'internship'
   status?: DayStatus | null
   onClose: () => void
   onSave: () => void
@@ -30,7 +30,7 @@ export const DayStatusForm = ({ type, status, onClose, onSave }: DayStatusFormPr
   const [endDate, setEndDate] = useState(status?.endDate || initialDate)
   const [isMultiDay, setIsMultiDay] = useState(!!status?.endDate)
   const [comment, setComment] = useState(status?.comment || '')
-  const [selectedType, setSelectedType] = useState<'dayoff' | 'sick' | 'vacation' | 'absence' | 'internship' | null>(type || status?.type || null)
+  const [selectedType, setSelectedType] = useState<'dayoff' | 'sick' | 'vacation' | 'absence' | 'truancy' | 'internship' | null>(type || status?.type || null)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [dateMode, setDateMode] = useState<'single' | 'range' | 'multiple'>('single')
@@ -127,7 +127,7 @@ export const DayStatusForm = ({ type, status, onClose, onSave }: DayStatusFormPr
 
   const getMemberName = (userId: string) => getUserNicknameSync(userId)
 
-  const getDatePayloads = (currentType: 'dayoff' | 'sick' | 'vacation' | 'absence' | 'internship'): { date: string; endDate?: string }[] => {
+  const getDatePayloads = (currentType: 'dayoff' | 'sick' | 'vacation' | 'absence' | 'truancy' | 'internship'): { date: string; endDate?: string }[] => {
     if (adminBulkMode) {
       if (dateMode === 'range') {
         if (rangeStart && rangeEnd) {
@@ -199,7 +199,7 @@ export const DayStatusForm = ({ type, status, onClose, onSave }: DayStatusFormPr
     return [payload]
   }
 
-  const validateStatus = async (targetUserId: string, startDate: string, endDateValue: string | undefined, currentType: 'dayoff' | 'sick' | 'vacation' | 'absence' | 'internship'): Promise<string | null> => {
+  const validateStatus = async (targetUserId: string, startDate: string, endDateValue: string | undefined, currentType: 'dayoff' | 'sick' | 'vacation' | 'absence' | 'truancy' | 'internship'): Promise<string | null> => {
     // Админ может ставить любые даты без ограничений
     if (isAdmin) return null
 
@@ -417,11 +417,12 @@ export const DayStatusForm = ({ type, status, onClose, onSave }: DayStatusFormPr
   }
 
   const typeColors = {
-    dayoff: 'bg-yellow-500',
+    dayoff: 'bg-orange-500',
     sick: 'bg-purple-500',
-    vacation: 'bg-orange-500',
-    absence: 'bg-red-500',
-    internship: 'bg-blue-500',
+    vacation: 'bg-blue-500',
+    absence: 'bg-yellow-500',
+    truancy: 'bg-red-500',
+    internship: 'bg-green-500',
   }
 
 
@@ -434,7 +435,7 @@ export const DayStatusForm = ({ type, status, onClose, onSave }: DayStatusFormPr
   const selectedNames = selectedUserIds.map((id) => getMemberName(id)).join(', ')
 
   const steps = [
-    { label: 'Тип', detail: selectedType ? (selectedType === 'dayoff' ? 'Выходной' : selectedType === 'sick' ? 'Больничный' : selectedType === 'vacation' ? 'Отпуск' : selectedType === 'absence' ? 'Отсутствие' : 'Стажировка') : 'Не выбран', done: !!selectedType, anchor: '#type' },
+    { label: 'Тип', detail: selectedType ? (selectedType === 'dayoff' ? 'Выходной' : selectedType === 'sick' ? 'Больничный' : selectedType === 'vacation' ? 'Отпуск' : selectedType === 'absence' ? 'Отсутствие' : selectedType === 'truancy' ? 'Прогул' : 'Стажировка') : 'Не выбран', done: !!selectedType, anchor: '#type' },
     { label: 'Members', detail: selectedNames || 'Не выбрано', done: selectedUserIds.length > 0 || !!status, anchor: '#members' },
     { label: 'Даты', detail: previewDates.slice(0, 2).join(' · '), done: previewDates.length > 0, anchor: '#dates' },
     { label: 'Комментарий', detail: comment ? 'Заполнен' : 'Необязателен', done: !!comment, anchor: '#notes' },
@@ -447,11 +448,12 @@ export const DayStatusForm = ({ type, status, onClose, onSave }: DayStatusFormPr
     { value: 'multiple', label: 'Конкретные даты', hint: 'Точечный выбор', icon: '◎' },
   ]
 
-  const nounByType: Record<'dayoff' | 'sick' | 'vacation' | 'absence' | 'internship', string> = {
+  const nounByType: Record<'dayoff' | 'sick' | 'vacation' | 'absence' | 'truancy' | 'internship', string> = {
     dayoff: 'выходной',
     sick: 'больничный',
     vacation: 'отпуск',
     absence: 'отсутствие',
+    truancy: 'прогул',
     internship: 'стажировка',
   }
 
@@ -592,6 +594,7 @@ export const DayStatusForm = ({ type, status, onClose, onSave }: DayStatusFormPr
                       ...(isAdmin
                         ? [
                             { key: 'absence', label: 'Отсутствие', icon: '🚫' },
+                            { key: 'truancy', label: 'Прогул', icon: '⚠️' },
                             { key: 'internship', label: 'Стажировка', icon: '🎓' },
                           ]
                         : []),
