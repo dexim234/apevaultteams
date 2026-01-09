@@ -170,6 +170,9 @@ export const Profile = () => {
         const absenceDays = monthStatuses
           .filter((s: any) => s.type === 'absence')
           .reduce((sum: number, s: any) => sum + countDaysInPeriod(s.date, s.endDate, monthStart, monthEnd), 0)
+        const truancyDays = monthStatuses
+          .filter((s: any) => s.type === 'truancy')
+          .reduce((sum: number, s: any) => sum + countDaysInPeriod(s.date, s.endDate, monthStart, monthEnd), 0)
         const internshipDays = monthStatuses
           .filter((s: any) => s.type === 'internship')
           .reduce((sum: number, s: any) => sum + countDaysInPeriod(s.date, s.endDate, monthStart, monthEnd), 0)

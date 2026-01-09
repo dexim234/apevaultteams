@@ -90,6 +90,9 @@ export const Rating = () => {
         const absenceDays = monthStatuses
           .filter(s => s.type === 'absence')
           .reduce((sum, s) => sum + countDaysInPeriod(s.date, s.endDate, monthStart, monthEnd), 0)
+        const truancyDays = monthStatuses
+          .filter(s => s.type === 'truancy')
+          .reduce((sum, s) => sum + countDaysInPeriod(s.date, s.endDate, monthStart, monthEnd), 0)
         const internshipDays = monthStatuses
           .filter(s => s.type === 'internship')
           .reduce((sum, s) => sum + countDaysInPeriod(s.date, s.endDate, monthStart, monthEnd), 0)
