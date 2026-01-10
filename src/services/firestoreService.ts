@@ -1725,12 +1725,13 @@ export const getUserById = async (userId: string): Promise<User | null> => {
 // User Management Functions
 export const getAllUsers = async (): Promise<User[]> => {
   const usersRef = collection(db, 'users')
-  const q = query(usersRef, orderBy('name', 'asc'))
-  const snapshot = await getDocs(q)
-  return snapshot.docs.map((docSnap) => ({
+  const snapshot = await getDocs(usersRef)
+  // Sort in memory to avoid composite index requirement
+  const users = snapshot.docs.map((docSnap) => ({
     id: docSnap.id,
     ...docSnap.data(),
   } as User))
+  return users.sort((a, b) => a.name.localeCompare(b.name))
 }
 
 export const addUser = async (user: Omit<User, 'id'>): Promise<string> => {

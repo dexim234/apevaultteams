@@ -98,7 +98,10 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
     { path: '/earnings', label: 'AVF Profit', icon: DollarSign, feature: 'earnings' },
     { path: '/rating', label: 'AVF Score', icon: TrendingUp, feature: 'rating' },
     { path: '/about', label: 'AVF INFO', icon: Info, feature: 'about' },
-    ...(isAdmin ? [{ path: '/approvals', label: 'AVF Check', icon: CheckCircle2, feature: 'admin' }] : []),
+    ...(isAdmin ? [
+      { path: '/approvals', label: 'AVF Check', icon: CheckCircle2, feature: 'admin' },
+      { path: '/admin', label: 'AVF Admin', icon: Shield, feature: 'admin' },
+    ] : []),
   ]
 
   const mobileFuncSubItems = funcsSubItems.filter(item =>
