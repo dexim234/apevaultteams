@@ -5,6 +5,7 @@ export interface User {
   login: string
   password: string
   avatar?: string // Путь к изображению аватара
+  role?: string
 }
 
 // Slot types

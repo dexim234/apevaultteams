@@ -1,18 +1,16 @@
-import React from 'react'
 import { Task, TASK_CATEGORIES, TASK_STATUSES } from '@/types'
 import { useUsers } from '@/hooks/useUsers'
 import { formatDate } from '@/utils/dateUtils'
-import { ArrowRight, Clock, MoreHorizontal, Pencil, Trash2, CheckCircle2 } from 'lucide-react'
+import { Clock, Pencil, Trash2 } from 'lucide-react'
 import { useThemeStore } from '@/store/themeStore'
 
 interface TaskTableProps {
   tasks: Task[]
   onEdit: (task: Task) => void
   onDelete: (taskId: string) => void
-  onStatusChange?: (taskId: string, newStatus: Task['status']) => void
 }
 
-export const TaskTable: React.FC<TaskTableProps> = ({ tasks, onEdit, onDelete, onStatusChange }) => {
+export const TaskTable = ({ tasks, onEdit, onDelete }: TaskTableProps) => {
   const { theme } = useThemeStore()
   const { users } = useUsers()
 
@@ -20,10 +18,6 @@ export const TaskTable: React.FC<TaskTableProps> = ({ tasks, onEdit, onDelete, o
   const getUserName = (userId: string) => {
     const user = getUser(userId)
     return user ? user.name : 'Unknown'
-  }
-  const getUserAvatar = (userId: string) => {
-    const user = getUser(userId)
-    return user?.avatar || null
   }
 
   const getStatusColor = (status: string) => {
@@ -71,8 +65,8 @@ export const TaskTable: React.FC<TaskTableProps> = ({ tasks, onEdit, onDelete, o
           </thead>
           <tbody className="divide-y divide-white/5">
             {tasks.map((task) => (
-              <tr 
-                key={task.id} 
+              <tr
+                key={task.id}
                 className={`group transition-colors ${theme === 'dark' ? 'hover:bg-white/[0.02]' : 'hover:bg-gray-50'}`}
               >
                 <td className={`px-6 py-4 text-xs font-mono opacity-50 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
@@ -86,9 +80,9 @@ export const TaskTable: React.FC<TaskTableProps> = ({ tasks, onEdit, onDelete, o
                     <div className="flex items-center gap-2 text-xs text-gray-500">
                       <Clock className="w-3 h-3" />
                       {task.dueDate ? (
-                         <span>
-                           Дедлайн: {formatDate(new Date(task.dueDate), 'd MMM')} {task.dueTime ? `, ${task.dueTime}` : ''}
-                         </span>
+                        <span>
+                          Дедлайн: {formatDate(new Date(task.dueDate), 'd MMM')} {task.dueTime ? `, ${task.dueTime}` : ''}
+                        </span>
                       ) : (
                         <span>Без дедлайна</span>
                       )}
@@ -102,12 +96,12 @@ export const TaskTable: React.FC<TaskTableProps> = ({ tasks, onEdit, onDelete, o
                 </td>
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-2">
-                     <div className="w-6 h-6 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-[10px] text-white font-bold">
-                        {getUserName(task.mainExecutor || task.assignedTo[0]).charAt(0)}
-                     </div>
-                     <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                        {getUserName(task.mainExecutor || task.assignedTo[0])}
-                     </span>
+                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-[10px] text-white font-bold">
+                      {getUserName(task.mainExecutor || task.assignedTo[0]).charAt(0)}
+                    </div>
+                    <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                      {getUserName(task.mainExecutor || task.assignedTo[0])}
+                    </span>
                   </div>
                 </td>
                 <td className="px-6 py-4 text-center">
@@ -118,13 +112,13 @@ export const TaskTable: React.FC<TaskTableProps> = ({ tasks, onEdit, onDelete, o
                 </td>
                 <td className="px-6 py-4 text-right">
                   <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button 
+                    <button
                       onClick={() => onEdit(task)}
                       className={`p-2 rounded-lg transition-colors ${theme === 'dark' ? 'hover:bg-white/10 text-gray-400 hover:text-white' : 'hover:bg-gray-100 text-gray-500 hover:text-gray-900'}`}
                     >
                       <Pencil className="w-4 h-4" />
                     </button>
-                    <button 
+                    <button
                       onClick={() => onDelete(task.id)}
                       className={`p-2 rounded-lg transition-colors ${theme === 'dark' ? 'hover:bg-red-500/20 text-gray-400 hover:text-red-400' : 'hover:bg-red-50 text-gray-500 hover:text-red-600'}`}
                     >

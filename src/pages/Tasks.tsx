@@ -1,15 +1,15 @@
 // Tasks page - task manager
-import React, { useState, useEffect } from 'react'
+// Tasks page - task manager
+import { useState, useEffect } from 'react'
 import { useThemeStore } from '@/store/themeStore'
 import { useAuthStore } from '@/store/authStore'
 import { TaskForm } from '@/components/Tasks/TaskForm'
 import { TaskFilters } from '@/components/Tasks/TaskFilters'
 import { TaskTable } from '@/components/Tasks/TaskTable'
 import { getTasks, deleteTask } from '@/services/firestoreService'
-import { Task, TaskCategory, TaskStatus, TASK_STATUSES } from '@/types'
+import { Task, TaskCategory, TaskStatus } from '@/types'
 import { CheckSquare, LayoutGrid, Plus, Calendar, Zap, Layers, CheckCircle2, Archive, Timer } from 'lucide-react'
 import { formatDate } from '@/utils/dateUtils'
-import { useUsers } from '@/hooks/useUsers'
 
 export const Tasks = () => {
   const { theme } = useThemeStore()
@@ -24,7 +24,6 @@ export const Tasks = () => {
   const [selectedUsers, setSelectedUsers] = useState<string[]>([])
 
   const headingColor = theme === 'dark' ? 'text-white' : 'text-gray-900'
-  const cardBg = theme === 'dark' ? 'bg-[#151a21]/50' : 'bg-white'
 
   useEffect(() => {
     loadTasks()
@@ -111,7 +110,7 @@ export const Tasks = () => {
     .filter(t => t.status !== 'completed' && t.status !== 'closed' && t.dueDate)
     .sort((a, b) => new Date(`${a.dueDate}T${a.dueTime}`).getTime() - new Date(`${b.dueDate}T${b.dueTime}`).getTime())[0]
 
-  const StatCard = ({ title, value, sub, icon: Icon, colorClass, delay }: any) => (
+  const StatCard = ({ title, value, sub, icon: Icon, colorClass }: any) => (
     <div className={`relative overflow-hidden rounded-xl p-6 ${theme === 'dark' ? 'bg-[#151a21]/50 border-white/5' : 'bg-white border-gray-100'} border shadow-sm transition-all hover:-translate-y-1 duration-300`}>
       <div className="relative z-10 flex flex-col h-full justify-between">
         <div className="flex justify-between items-start mb-2">
