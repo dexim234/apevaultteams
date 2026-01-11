@@ -396,8 +396,8 @@ export const Rating = () => {
             <div
               key={idx}
               className={`relative overflow-hidden rounded-2xl p-5 border transition-all duration-300 hover:shadow-lg group ${theme === 'dark'
-                  ? `${item.bgClass} ${item.borderClass} hover:border-opacity-50`
-                  : 'bg-white border-gray-100 hover:border-emerald-500/20'
+                ? `${item.bgClass} ${item.borderClass} hover:border-opacity-50`
+                : 'bg-white border-gray-100 hover:border-emerald-500/20'
                 }`}
             >
               <div className="flex justify-between items-start mb-4">
@@ -706,10 +706,10 @@ export const Rating = () => {
                         <button
                           onClick={() => canManage && handleEditReferral(referral)}
                           className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition ${!canManage
-                              ? 'opacity-40 cursor-not-allowed'
-                              : theme === 'dark'
-                                ? 'border-white/20 bg-white/10 text-white hover:bg-white/20'
-                                : 'border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100'
+                            ? 'opacity-40 cursor-not-allowed'
+                            : theme === 'dark'
+                              ? 'border-white/20 bg-white/10 text-white hover:bg-white/20'
+                              : 'border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100'
                             }`}
                           disabled={!canManage}
                         >
@@ -776,13 +776,11 @@ export const Rating = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-2 gap-6">
               {sortedRatings.map((rating, index) => {
-                const memberName = getMemberNameById(rating.userId)
                 return (
                   <RatingCard
                     key={rating.userId}
                     rating={rating}
-                    memberName={memberName}
-                    rank={index + 1}
+                    place={{ rank: index + 1 }}
                   />
                 )
               })}
