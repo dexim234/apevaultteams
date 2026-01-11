@@ -1,808 +1,829 @@
-// Rating page
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, type JSX } from 'react'
 import { useThemeStore } from '@/store/themeStore'
-import { useAuthStore } from '@/store/authStore'
-import { useAdminStore } from '@/store/adminStore'
-import { RatingCard } from '@/components/Rating/RatingCard'
-import { ReferralForm } from '@/components/Rating/ReferralForm'
-import { getRatingData, getEarnings, getDayStatuses, getReferrals, getWorkSlots, deleteReferral, addApprovalRequest, getLatestUserActivities, getUserActivitiesLast24Hours } from '@/services/firestoreService'
-import { getLastNDaysRange, getWeekRange, formatDate, calculateHours, countDaysInPeriod } from '@/utils/dateUtils'
-import { calculateRating, getRatingBreakdown } from '@/utils/ratingUtils'
-import { getUserNicknameAsync, clearAllNicknameCache, getUserNicknameSync } from '@/utils/userUtils'
-import { RatingData, Referral, UserActivity } from '@/types'
+import { CallForm } from '@/components/Call/CallForm'
+import { CustomSelect } from '@/components/Call/CustomSelect'
+import { getCalls, deleteCall, updateCall } from '@/services/firestoreService'
+import type { Call, CallCategory, CallRiskLevel } from '@/types'
 import { useUsers } from '@/hooks/useUsers'
-import { TrendingUp, Users, Award, Target, Calendar, Activity, UserPlus, BarChart3 } from 'lucide-react'
+import {
+  X,
+  Edit,
+  Trash2,
+  Check,
+  Search,
+  Sparkles,
+  Copy,
+  Shield,
+  Rocket,
+  LineChart,
+  Image,
+  Coins,
+  AlertTriangle,
+  Activity,
+  TrendingUp,
+  Gauge,
+  Plus,
+  User,
+  Zap,
+  ShieldAlert,
+  CheckCircle2,
+  XCircle,
+  History
+} from 'lucide-react'
+import { useAuthStore } from '@/store/authStore'
+import { useScrollLock } from '@/hooks/useScrollLock'
 
-export const Rating = () => {
+type StatusFilter = 'all' | 'active' | 'completed' | 'cancelled' | 'reviewed'
+type RiskFilter = 'all' | CallRiskLevel
+
+const CATEGORY_ORDER: CallCategory[] = ['memecoins', 'polymarket', 'nft', 'staking', 'spot', 'futures', 'airdrop']
+
+// Updated CATEGORY_META with cardGradient
+const CATEGORY_META: Record<CallCategory, { label: string; gradient: string; gradientDark: string; chip: string; icon: JSX.Element; cardGradient: string }> = {
+  memecoins: { 
+    label: 'Мемкоины', 
+    gradient: 'from-emerald-400 via-teal-500 to-cyan-400',
+    gradientDark: 'from-emerald-500 via-teal-600 to-cyan-500',
+    chip: 'bg-emerald-500/10 text-emerald-400',
+    icon: <Rocket className="w-5 h-5 text-white" />,
+    cardGradient: 'from-emerald-500/20 via-teal-400/10 to-cyan-500/5'
+  },
+  futures: { 
+    label: 'Фьючерсы', 
+    gradient: 'from-blue-400 to-indigo-500', 
+    gradientDark: 'from-blue-600 to-indigo-500',
+    chip: 'bg-blue-500/10 text-blue-600', 
+    icon: <LineChart className="w-5 h-5 text-white" />,
+    cardGradient: 'from-blue-500/20 via-indigo-500/10 to-transparent'
+  },
+  nft: { 
+    label: 'NFT', 
+    gradient: 'from-purple-400 to-pink-500', 
+    gradientDark: 'from-purple-600 to-pink-500',
+    chip: 'bg-purple-500/10 text-purple-600', 
+    icon: <Image className="w-5 h-5 text-white" />,
+    cardGradient: 'from-purple-500/20 via-pink-500/10 to-transparent'
+  },
+  spot: { 
+    label: 'Спот', 
+    gradient: 'from-amber-400 to-orange-500', 
+    gradientDark: 'from-amber-600 to-orange-500',
+    chip: 'bg-amber-500/10 text-amber-600', 
+    icon: <Coins className="w-5 h-5 text-white" />,
+    cardGradient: 'from-amber-500/20 via-orange-500/10 to-transparent'
+  },
+  airdrop: { 
+    label: 'AirDrop', 
+    gradient: 'from-gray-300 to-gray-400', 
+    gradientDark: 'from-gray-400 to-gray-300',
+    chip: 'bg-gray-500/10 text-gray-600', 
+    icon: <Sparkles className="w-5 h-5 text-white" />,
+    cardGradient: 'from-gray-500/20 via-gray-400/10 to-transparent'
+  },
+  polymarket: { 
+    label: 'Polymarket', 
+    gradient: 'from-rose-400 to-red-500', 
+    gradientDark: 'from-rose-600 to-red-500',
+    chip: 'bg-rose-500/10 text-rose-600', 
+    icon: <Gauge className="w-5 h-5 text-white" />,
+    cardGradient: 'from-rose-500/20 via-red-500/10 to-transparent'
+  },
+  staking: { 
+    label: 'Стейкинг', 
+    gradient: 'from-emerald-400 to-green-500', 
+    gradientDark: 'from-emerald-600 to-green-500',
+    chip: 'bg-emerald-500/10 text-emerald-600', 
+    icon: <Shield className="w-5 h-5 text-white" />,
+    cardGradient: 'from-emerald-500/20 via-green-500/10 to-transparent'
+  },
+}
+
+const riskBadges: Record<CallRiskLevel, string> = {
+  low: 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20',
+  medium: 'bg-blue-500/10 text-blue-600 border border-blue-500/20',
+  high: 'bg-amber-500/10 text-amber-600 border border-amber-500/20',
+  ultra: 'bg-red-500/10 text-red-600 border border-red-500/20',
+}
+
+const riskLabels: Record<CallRiskLevel, string> = {
+  low: 'Low Risk',
+  medium: 'Medium Risk',
+  high: 'High Risk',
+  ultra: 'Ultra Risk',
+}
+
+export const CallPage = () => {
   const { theme } = useThemeStore()
   const { user } = useAuthStore()
-  const { isAdmin } = useAdminStore()
-  const { users: allMembers, loading: usersLoading } = useUsers()
-  type RatingWithBreakdown = RatingData & { breakdown?: ReturnType<typeof getRatingBreakdown> }
-  const [ratings, setRatings] = useState<RatingWithBreakdown[]>([])
+  const isAdmin = user?.id === '1'
+  const [calls, setCalls] = useState<Call[]>([])
   const [loading, setLoading] = useState(true)
-  const [referrals, setReferrals] = useState<Referral[]>([])
-  const [showReferralForm, setShowReferralForm] = useState(false)
-  const [activeReferral, setActiveReferral] = useState<Referral | null>(null)
-  const [userActivities, setUserActivities] = useState<UserActivity[]>([])
-  const [activities24h, setActivities24h] = useState<UserActivity[]>([])
+  const [showForm, setShowForm] = useState(false)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [deleteCallId, setDeleteCallId] = useState<string | null>(null)
+  const [cancelCallId, setCancelCallId] = useState<string | null>(null)
+  const [editingCall, setEditingCall] = useState<Call | null>(null)
+  const [formCategory, setFormCategory] = useState<CallCategory>('memecoins')
+  const [showCategorySelector, setShowCategorySelector] = useState(true)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [statusFilter] = useState<StatusFilter>('all')
+  const [categoryFilter, setCategoryFilter] = useState<'all' | CallCategory>('all')
+  const [riskFilter, setRiskFilter] = useState<RiskFilter>('all')
+  const [traderFilter, setTraderFilter] = useState<'all' | string>('all')
+
+  useScrollLock(showForm || showDeleteModal || !!cancelCallId)
 
   useEffect(() => {
-    loadRatings()
+    loadCalls()
   }, [])
 
-  const loadRatings = async () => {
+  const loadCalls = async () => {
     setLoading(true)
     try {
-      // Для рейтинга считаем за неделю и за месяц
-      const weekRange = getWeekRange()
-      const weekStart = formatDate(weekRange.start, 'yyyy-MM-dd')
-      const weekEnd = formatDate(weekRange.end, 'yyyy-MM-dd')
-
-      const monthRange = getLastNDaysRange(30)
-      const monthStart = formatDate(monthRange.start, 'yyyy-MM-dd')
-      const monthEnd = formatDate(monthRange.end, 'yyyy-MM-dd')
-      const monthIsoStart = monthRange.start.toISOString()
-      const monthIsoEnd = monthRange.end.toISOString()
-
-      const ninetyDayRange = getLastNDaysRange(90)
-      const ninetyDayStart = formatDate(ninetyDayRange.start, 'yyyy-MM-dd')
-      const ninetyDayEnd = formatDate(ninetyDayRange.end, 'yyyy-MM-dd')
-
-      const currentReferrals = await getReferrals(undefined, monthIsoStart, monthIsoEnd)
-      setReferrals(currentReferrals)
-      const allRatings: (RatingData & { breakdown?: ReturnType<typeof getRatingBreakdown> })[] = []
-
-      for (const member of allMembers) {
-        // Данные для рейтинга
-        const weekEarnings = await getEarnings(member.id, weekStart, weekEnd)
-        // Если у записи несколько участников, сумма делится поровну между ними
-        const weeklyEarnings = weekEarnings.reduce((sum, e) => {
-          const participantCount = e.participants && e.participants.length > 0 ? e.participants.length : 1
-          return sum + (e.amount / participantCount)
-        }, 0)
-
-        const monthEarnings = await getEarnings(member.id, monthStart, monthEnd)
-        // Если у записи несколько участников, сумма делится поровну между ними
-        const totalEarnings = monthEarnings.reduce((sum, e) => {
-          const participantCount = e.participants && e.participants.length > 0 ? e.participants.length : 1
-          return sum + (e.amount / participantCount)
-        }, 0)
-        const poolAmount = monthEarnings.reduce((sum, e) => {
-          const participantCount = e.participants && e.participants.length > 0 ? e.participants.length : 1
-          return sum + (e.poolAmount / participantCount)
-        }, 0)
-
-        const statuses = await getDayStatuses(member.id)
-        // Filter statuses that overlap with the month period
-        const monthStatuses = statuses.filter(s => {
-          const statusStart = s.date
-          const statusEnd = s.endDate || s.date
-          return statusStart <= monthEnd && statusEnd >= monthStart
-        })
-        // Count days, not just status count (for multi-day statuses)
-        const daysOff = monthStatuses
-          .filter(s => s.type === 'dayoff')
-          .reduce((sum, s) => sum + countDaysInPeriod(s.date, s.endDate, monthStart, monthEnd), 0)
-        const sickDays = monthStatuses
-          .filter(s => s.type === 'sick')
-          .reduce((sum, s) => sum + countDaysInPeriod(s.date, s.endDate, monthStart, monthEnd), 0)
-        const vacationDays = monthStatuses
-          .filter(s => s.type === 'vacation')
-          .reduce((sum, s) => sum + countDaysInPeriod(s.date, s.endDate, monthStart, monthEnd), 0)
-        const absenceDays = monthStatuses
-          .filter(s => s.type === 'absence')
-          .reduce((sum, s) => sum + countDaysInPeriod(s.date, s.endDate, monthStart, monthEnd), 0)
-        const truancyDays = monthStatuses
-          .filter(s => s.type === 'truancy')
-          .reduce((sum, s) => sum + countDaysInPeriod(s.date, s.endDate, monthStart, monthEnd), 0)
-        const internshipDays = monthStatuses
-          .filter(s => s.type === 'internship')
-          .reduce((sum, s) => sum + countDaysInPeriod(s.date, s.endDate, monthStart, monthEnd), 0)
-
-        // Недельные выходные и больничные
-        const weekStatuses = statuses.filter(s => {
-          const statusStart = s.date
-          const statusEnd = s.endDate || s.date
-          return statusStart <= weekEnd && statusEnd >= weekStart
-        })
-
-        const weeklyDaysOff = weekStatuses
-          .filter(s => s.type === 'dayoff')
-          .reduce((sum, s) => sum + countDaysInPeriod(s.date, s.endDate, weekStart, weekEnd), 0)
-        const weeklySickDays = weekStatuses
-          .filter(s => s.type === 'sick')
-          .reduce((sum, s) => sum + countDaysInPeriod(s.date, s.endDate, weekStart, weekEnd), 0)
-
-        // Отпуск за 90 дней
-        const ninetyDayStatuses = statuses.filter(s => {
-          const statusStart = s.date
-          const statusEnd = s.endDate || s.date
-          return statusStart <= ninetyDayEnd && statusEnd >= ninetyDayStart
-        })
-
-        const ninetyDayVacationDays = ninetyDayStatuses
-          .filter(s => s.type === 'vacation')
-          .reduce((sum, s) => sum + countDaysInPeriod(s.date, s.endDate, ninetyDayStart, ninetyDayEnd), 0)
-
-        const slots = await getWorkSlots(member.id)
-        const weekSlots = slots.filter(s => s.date >= weekStart && s.date <= weekEnd)
-        const weeklyHours = weekSlots.reduce((sum, slot) => sum + calculateHours(slot.slots), 0)
-
-        // Для статистики используем общее количество из ratings
-        const existingRatings = await getRatingData(member.id)
-        const ratingData = existingRatings[0] || {
-          userId: member.id,
-          earnings: 0,
-          messages: 0,
-          initiatives: 0,
-          signals: 0,
-          profitableSignals: 0,
-          referrals: 0,
-          daysOff: 0,
-          sickDays: 0,
-          vacationDays: 0,
-          absenceDays: 0,
-          internshipDays: 0,
-          poolAmount: 0,
-          rating: 0,
-          lastUpdated: new Date().toISOString(),
-        }
-
-        const userReferrals = currentReferrals.filter((referral) => referral.ownerId === member.id).length
-
-        const updatedData: Omit<RatingData, 'rating'> = {
-          userId: member.id,
-          earnings: totalEarnings,
-          messages: ratingData.messages || 0,
-          initiatives: ratingData.initiatives || 0,
-          signals: ratingData.signals || 0,
-          profitableSignals: ratingData.profitableSignals || 0,
-          referrals: userReferrals,
-          daysOff,
-          sickDays,
-          vacationDays,
-          absenceDays,
-          truancyDays,
-          internshipDays,
-          poolAmount,
-          lastUpdated: new Date().toISOString(),
-        }
-
-        const rating = calculateRating(updatedData, weeklyHours, weeklyEarnings, weeklyDaysOff, weeklySickDays, ninetyDayVacationDays)
-        const breakdown = getRatingBreakdown(updatedData, weeklyHours, weeklyEarnings, weeklyDaysOff, weeklySickDays, ninetyDayVacationDays)
-
-        allRatings.push({
-          ...updatedData,
-          rating,
-          breakdown,
-        })
-      }
-
-      // Sort by rating
-      allRatings.sort((a, b) => b.rating - a.rating)
-      setRatings(allRatings)
-
-      // Load user activities
-      const activities = await getLatestUserActivities()
-      setUserActivities(activities)
-
-      // Load activities for last 24 hours
-      const activitiesLast24h = await getUserActivitiesLast24Hours()
-      setActivities24h(activitiesLast24h)
+      const fetchedCalls = await getCalls()
+      setCalls(fetchedCalls)
     } catch (error) {
-      console.error('Error loading ratings:', error)
+      console.error('Error loading calls:', error)
+      setCalls([])
     } finally {
       setLoading(false)
     }
   }
 
-  const teamKPD = ratings.reduce((sum, r) => sum + r.rating, 0) / (ratings.length || 1)
-  const headingColor = theme === 'dark' ? 'text-white' : 'text-gray-900'
+  const textColor = theme === 'dark' ? 'text-white' : 'text-gray-900'
+  const bgColor = theme === 'dark' ? 'bg-[#0a0a0a]' : 'bg-white'
+  const subtleColor = theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+  const borderColor = theme === 'dark' ? 'border-white/10' : 'border-gray-100'
+  const cardBg = theme === 'dark' ? 'bg-white/5 backdrop-blur-md' : 'bg-white'
 
-  const getRecommendations = (r: typeof sortedRatings[number]) => {
-    if (!r.breakdown) return ['Недостаточно данных — обновите статистику.']
-    const tips: string[] = []
-    if (r.breakdown.weeklyHoursPoints < 25) tips.push('Дотяни рабочие часы до 20+ в неделю (25%).')
-    if (r.breakdown.weeklyEarningsPoints < 30) tips.push('Увеличь недельный доход до 6000+ ₽ (30%).')
-    if (r.breakdown.referralsPoints < 30) tips.push('Добавь рефералов: до +30% (6 человек).')
-    if (r.breakdown.daysOffPoints <= 0) tips.push('Выходные: <2 дней в неделю для +5%.')
-    if (r.breakdown.sickDaysPoints <= 0) tips.push('Больничные: <3 дней в неделю И ≤9 дней в месяц для +5%.')
-    if (r.breakdown.vacationDaysPoints <= 0) tips.push('Отпуск: <12 дней в месяц И ≤30 дней за 90 дней для +10%.')
-    return tips.length ? tips : ['Отлично! Держи текущий темп.']
+  const handleSuccess = () => {
+    setShowForm(false)
+    setEditingCall(null)
+    loadCalls()
   }
 
-  const sortedRatings = useMemo<RatingWithBreakdown[]>(() => {
-    return [...ratings].sort((a, b) => b.rating - a.rating)
-  }, [ratings])
-
-  const ratingOverview = useMemo(() => {
-    if (!ratings.length) {
-      return { top: 0, median: 0, count: 0, high: 0 }
-    }
-    const sorted = [...ratings].sort((a, b) => b.rating - a.rating)
-    const top = sorted[0]?.rating || 0
-    const median = sorted[Math.floor((sorted.length - 1) / 2)]?.rating || top
-    const high = sorted.filter((r) => r.rating >= 80).length
-    return { top, median, count: sorted.length, high }
-  }, [ratings])
-
-  const topMember = sortedRatings[0]
-  const topMemberName = topMember ? getUserNicknameSync(topMember.userId) : '—'
-  const todayLabel = new Date().toLocaleDateString('ru-RU')
-
-  const getMemberNameById = (id: string) => {
-    // Use sync version for immediate display, will be updated when cache is populated
-    return getUserNicknameSync(id) || '—'
+  const handleCancel = () => {
+    setShowForm(false)
+    setEditingCall(null)
   }
 
-  // Load custom nicknames on mount
-  useEffect(() => {
-    const loadCustomNicknames = async () => {
-      clearAllNicknameCache()
-      for (const member of allMembers) {
-        await getUserNicknameAsync(member.id)
-      }
+  const handleUpdateStatus = async (callId: string, status: 'active' | 'completed' | 'cancelled') => {
+    try {
+      await updateCall(callId, { status })
+      await loadCalls()
+    } catch (error) {
+      console.error('Error updating status:', error)
+      alert('Ошибка при обновлении статуса')
     }
-    if (!usersLoading) {
-      loadCustomNicknames()
-    }
-  }, [allMembers, usersLoading])
-
-  // Listen for nickname updates and reload nicknames
-  useEffect(() => {
-    const handleNicknameUpdate = async (event: Event) => {
-      const customEvent = event as CustomEvent<{ userId: string }>
-      const { userId } = customEvent.detail || {}
-      if (userId) {
-        // Reload nickname for the updated user
-        await getUserNicknameAsync(userId)
-        // Force component re-render by updating state
-        setRatings(prev => [...prev])
-      } else {
-        // Reload all nicknames if userId not specified
-        clearAllNicknameCache()
-        for (const member of allMembers) {
-          await getUserNicknameAsync(member.id)
-        }
-        setRatings(prev => [...prev])
-      }
-    }
-
-    window.addEventListener('nicknameUpdated', handleNicknameUpdate)
-    return () => {
-      window.removeEventListener('nicknameUpdated', handleNicknameUpdate)
-    }
-  }, [allMembers])
-
-  const handleAddReferral = () => {
-    setActiveReferral(null)
-    setShowReferralForm(true)
   }
 
-  const handleEditReferral = (referral: Referral) => {
-    setActiveReferral(referral)
-    setShowReferralForm(true)
+  const handleEdit = (call: Call) => {
+    setEditingCall(call)
+    setFormCategory(call.category)
+    setShowForm(true)
   }
 
-  const handleDeleteReferral = async (referral: Referral) => {
-    const canManage = isAdmin || referral.ownerId === user?.id
-    if (!canManage) return
-    if (isAdmin) {
-      await deleteReferral(referral.id)
-    } else {
-      await addApprovalRequest({
-        entity: 'referral',
-        action: 'delete',
-        authorId: user?.id || referral.ownerId,
-        targetUserId: referral.ownerId,
-        before: referral,
-        after: null,
-      })
+  const handleDeleteClick = (callId: string) => {
+    setDeleteCallId(callId)
+    setShowDeleteModal(true)
+  }
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteCallId) return
+    try {
+      await deleteCall(deleteCallId)
+      setShowDeleteModal(false)
+      setDeleteCallId(null)
+      loadCalls()
+    } catch (error) {
+      console.error('Error deleting call:', error)
+      alert('Ошибка при удалении сигнала')
     }
-    await loadRatings()
   }
 
-  const statCards = [
-    {
-      label: 'Средний КПД команды',
-      value: `${teamKPD.toFixed(1)}%`,
-      note: 'за текущую неделю',
-      icon: <TrendingUp className="w-5 h-5 text-emerald-400" />,
-      bgClass: 'bg-emerald-500/5',
-      borderClass: 'border-emerald-500/20'
-    },
-    {
-      label: 'Лидер недели',
-      value: topMemberName,
-      note: topMember ? `${topMember.rating.toFixed(1)}%` : '—',
-      icon: <Award className="w-5 h-5 text-amber-400" />,
-      bgClass: 'bg-amber-500/5',
-      borderClass: 'border-amber-500/20'
-    },
-    {
-      label: 'Участников 80%+',
-      value: `${ratingOverview.high}`,
-      note: 'высокий уровень',
-      icon: <Target className="w-5 h-5 text-blue-400" />,
-      bgClass: 'bg-blue-500/5',
-      borderClass: 'border-blue-500/20'
-    },
-    {
-      label: 'Всего участников',
-      value: `${ratings.length}`,
-      note: 'в рейтинге',
-      icon: <Users className="w-5 h-5 text-purple-400" />,
-      bgClass: 'bg-purple-500/5',
-      borderClass: 'border-purple-500/20'
-    },
-    {
-      label: 'Медиана рейтинга',
-      value: `${ratingOverview.median.toFixed(1)}%`,
-      note: 'средний показатель',
-      icon: <BarChart3 className="w-5 h-5 text-indigo-400" />,
-      bgClass: 'bg-indigo-500/5',
-      borderClass: 'border-indigo-500/20'
-    },
-    {
-      label: 'Рефералы за 30 дней',
-      value: `${referrals.length}`,
-      note: 'новые участники',
-      icon: <UserPlus className="w-5 h-5 text-pink-400" />,
-      bgClass: 'bg-pink-500/5',
-      borderClass: 'border-pink-500/20'
-    },
-    {
-      label: 'Обновление данных',
-      value: todayLabel,
-      note: 'автообновление',
-      icon: <Calendar className="w-5 h-5 text-cyan-400" />,
-      bgClass: 'bg-cyan-500/5',
-      borderClass: 'border-cyan-500/20'
-    },
-    {
-      label: 'Активность команды',
-      value: `${activities24h.length}`,
-      note: 'сессий за 24ч',
-      icon: <Activity className="w-5 h-5 text-teal-400" />,
-      bgClass: 'bg-teal-500/5',
-      borderClass: 'border-teal-500/20'
-    },
+  const handleCancelConfirm = async () => {
+    if (!cancelCallId) return
+    try {
+      await updateCall(cancelCallId, { status: 'cancelled' })
+      setCancelCallId(null)
+      loadCalls()
+    } catch (error) {
+      console.error('Error cancelling call:', error)
+      alert('Ошибка при отмене сигнала')
+    }
+  }
+
+  const getDetails = (call: Call) => (call.details as any)?.[call.category] || {}
+
+  const getPrimaryTitle = (call: Call) => {
+    const d = getDetails(call)
+    switch (call.category) {
+      case 'memecoins':
+        return d.contract ? `${d.contract.slice(0, 6)}...${d.contract.slice(-4)}` : 'Мемкоин'
+      case 'futures':
+        return d.pair || 'Фьючерс'
+      case 'nft':
+        return d.collectionLink || 'NFT коллекция'
+      case 'spot':
+        return d.coin || 'Спот'
+      case 'polymarket':
+        return d.event || 'Polymarket событие'
+      case 'staking':
+        return d.coin || 'Стейкинг'
+      case 'airdrop':
+        return d.projectName || 'AirDrop'
+      default:
+        return 'Сигнал'
+    }
+  }
+
+  const getRiskLevel = (call: Call): CallRiskLevel => call.riskLevel || getDetails(call).riskLevel || getDetails(call).protocolRisk || 'medium'
+
+  const composeSearchString = (call: Call) => {
+    const d = getDetails(call)
+    const base = [
+      call.category,
+      call.status,
+      call.comment,
+      d.contract,
+      d.pair,
+      d.reason,
+      d.targets,
+      d.event,
+      d.marketplace,
+      d.platform,
+      d.entryCap,
+      d.entryZone,
+      d.network,
+    ]
+    return base.filter(Boolean).join(' ').toLowerCase()
+  }
+
+  const filteredCalls = calls.filter((call) => {
+    if (statusFilter !== 'all' && call.status !== statusFilter) return false
+    if (categoryFilter !== 'all' && call.category !== categoryFilter) return false
+    if (riskFilter !== 'all' && getRiskLevel(call) !== riskFilter) return false
+    if (traderFilter !== 'all' && call.userId !== traderFilter) return false
+    if (searchQuery.trim()) {
+      return composeSearchString(call).includes(searchQuery.toLowerCase())
+    }
+    return true
+  })
+
+  const totals = useMemo(() => ({
+    total: calls.length,
+    active: calls.filter((c) => c.status === 'active').length,
+    completed: calls.filter((c) => c.status === 'completed').length,
+    cancelled: calls.filter((c) => c.status === 'cancelled').length,
+  }), [calls])
+
+  // Prepare options for custom selectors
+  const categoryOptions = [
+    { value: 'all', label: 'Все сферы', icon: <Activity size={14} /> },
+    ...CATEGORY_ORDER.map(cat => ({
+      value: cat,
+      label: CATEGORY_META[cat].label,
+      icon: CATEGORY_META[cat].icon,
+      chip: CATEGORY_META[cat].chip
+    }))
+  ]
+
+  const riskOptions = [
+    { value: 'all', label: 'Любой риск', icon: <ShieldAlert size={14} /> },
+    { value: 'low', label: 'Low Risk', icon: <Shield size={14} />, chip: riskBadges['low'] },
+    { value: 'medium', label: 'Medium Risk', icon: <Shield size={14} />, chip: riskBadges['medium'] },
+    { value: 'high', label: 'High Risk', icon: <AlertTriangle size={14} />, chip: riskBadges['high'] },
+    { value: 'ultra', label: 'Ultra Risk', icon: <Zap size={14} />, chip: riskBadges['ultra'] },
+  ]
+
+  // Get all users for trader options
+  const { users: allMembers } = useUsers()
+  
+  const traderOptions = [
+    { value: 'all', label: 'Все трейдеры', icon: <User size={16} /> },
+    ...allMembers.map(t => ({
+      value: t.id,
+      label: t.name,
+      meta: t.login,
+      icon: t.avatar ? <img src={t.avatar} className="w-full h-full object-cover rounded-full" /> : <User size={10} />,
+    }))
   ]
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="space-y-6">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-emerald-500/10 rounded-2xl border border-emerald-500/20">
-              <TrendingUp className="w-8 h-8 text-emerald-500" />
-            </div>
-            <div>
-              <h1 className={`text-2xl md:text-3xl font-black tracking-tight ${headingColor}`}>
-                AVF Rating
-              </h1>
-              <p className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                Рейтинг эффективности команды ApeVault Frontier
-              </p>
-            </div>
+    <div className="space-y-6 pb-20">
+      {/* Mobile Header */}
+      <div className="sm:hidden px-4 py-4 border-b" style={{ borderColor: theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }}>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <Activity className="w-7 h-7 text-emerald-500" />
+            <h1 className={`text-xl font-bold ${textColor}`}>AVF HUB</h1>
           </div>
-        </div>
-
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {statCards.map((item, idx) => (
-            <div
-              key={idx}
-              className={`relative overflow-hidden rounded-2xl p-5 border transition-all duration-300 hover:shadow-lg group ${theme === 'dark'
-                ? `${item.bgClass} ${item.borderClass} hover:border-opacity-50`
-                : 'bg-white border-gray-100 hover:border-emerald-500/20'
-                }`}
-            >
-              <div className="flex justify-between items-start mb-4">
-                <span className={`text-[10px] font-bold uppercase tracking-wider ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                  {item.label}
-                </span>
-                <div className={`p-2 rounded-xl transition-colors ${theme === 'dark' ? 'bg-white/5 group-hover:bg-white/10' : 'bg-gray-100 group-hover:bg-gray-200'}`}>
-                  {item.icon}
-                </div>
-              </div>
-              <div className="space-y-1">
-                <div className={`text-2xl font-black tracking-tight ${headingColor}`}>
-                  {item.value}
-                </div>
-                <div className={`text-[11px] font-medium ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>
-                  {item.note}
-                </div>
-              </div>
-            </div>
-          ))}
+          <button
+            onClick={() => {
+              setEditingCall(null)
+              setFormCategory('memecoins')
+              setShowCategorySelector(true)
+              setShowForm(true)
+            }}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-lg font-bold text-white shadow-lg transition-all hover:scale-105 active:scale-95 bg-emerald-500 hover:bg-emerald-600"
+          >
+            <Plus size={16} />
+            <span>Call</span>
+          </button>
         </div>
       </div>
 
-      {/* Recommendations Section */}
-      <div className={`rounded-2xl p-6 border ${theme === 'dark' ? 'bg-[#0b1015] border-white/5' : 'bg-white border-gray-100'} shadow-xl`}>
-        <div className="flex items-center gap-3 mb-6">
-          <div className="p-2 bg-emerald-500/10 rounded-xl">
-            <Target className="w-5 h-5 text-emerald-400" />
+      {/* Desktop Header */}
+      <div className="hidden sm:block px-4 sm:px-6 lg:px-8 py-6">
+        <div className="flex flex-row items-center justify-between gap-4 mb-2">
+          <div className="flex items-center gap-3">
+            <Activity className="w-8 h-8 text-emerald-500" />
+            <h1 className={`text-3xl font-bold ${textColor}`}>AVF HUB</h1>
           </div>
-          <div>
-            <h3 className={`text-lg font-black tracking-tight ${headingColor}`}>Рекомендации по улучшению</h3>
-            <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Персональные советы для каждого участника</p>
-          </div>
-        </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-          {sortedRatings.map((r) => {
-            const recs = getRecommendations(r)
-            const userName = getMemberNameById(r.userId)
-            const bandClass =
-              r.rating >= 80
-                ? 'bg-emerald-500'
-                : r.rating >= 60
-                  ? 'bg-blue-500'
-                  : r.rating >= 40
-                    ? 'bg-amber-500'
-                    : 'bg-rose-500'
-            const bandText =
-              r.rating >= 80 ? 'Эталон' : r.rating >= 60 ? 'Уверенно' : r.rating >= 40 ? 'В пути' : 'Зона роста'
 
+          <button
+            onClick={() => {
+              setEditingCall(null)
+              setFormCategory('memecoins')
+              setShowCategorySelector(true)
+              setShowForm(true)
+            }}
+            className="flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-white shadow-lg transition-all hover:scale-105 active:scale-95 bg-emerald-500 hover:bg-emerald-600"
+          >
+            <Plus size={18} />
+            <span>Call</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Category Quick Actions - Open Form */}
+      <div className="px-4 sm:px-6 lg:px-8 mb-6">
+        <div className="mb-3">
+          <h3 className={`text-sm font-semibold ${subtleColor}`}>Создать сигнал</h3>
+        </div>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
+          {CATEGORY_ORDER.map((cat) => {
+            const meta = CATEGORY_META[cat]
+            const catGradient = theme === 'dark' ? meta.gradientDark : meta.gradient
+            const borderColorCat: Record<CallCategory, string> = {
+              memecoins: 'border-emerald-500/40',
+              futures: 'border-blue-500/40',
+              nft: 'border-purple-500/40',
+              spot: 'border-amber-500/40',
+              airdrop: 'border-gray-500/40',
+              polymarket: 'border-rose-500/40',
+              staking: 'border-emerald-500/40',
+            }
+            const bgGradientCat: Record<CallCategory, string> = {
+              memecoins: 'from-emerald-500/15 via-teal-500/5 to-cyan-500/5',
+              futures: 'from-blue-500/15 via-indigo-500/5 to-transparent',
+              nft: 'from-purple-500/15 via-pink-500/5 to-transparent',
+              spot: 'from-amber-500/15 via-orange-500/5 to-transparent',
+              airdrop: 'from-gray-400/15 via-gray-300/5 to-transparent',
+              polymarket: 'from-rose-500/15 via-red-500/5 to-transparent',
+              staking: 'from-emerald-500/15 via-green-500/5 to-transparent',
+            }
             return (
-              <div key={r.userId} className={`rounded-xl border p-4 space-y-3 ${theme === 'dark' ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-200'}`}>
-                <div className="flex items-center justify-between gap-2">
-                  <div className="min-w-0">
-                    <p className={`text-xs uppercase tracking-wider font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{bandText}</p>
-                    <h4 className={`text-lg font-bold ${headingColor} truncate`}>{userName}</h4>
-                  </div>
-                  <div className="text-right">
-                    <div className={`text-2xl font-black ${headingColor}`}>{r.rating.toFixed(1)}%</div>
-                  </div>
+              <button
+                key={cat}
+                onClick={() => {
+                  setEditingCall(null)
+                  setFormCategory(cat)
+                  setShowCategorySelector(false)
+                  setShowForm(true)
+                }}
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg border ${borderColorCat[cat]} bg-gradient-to-br ${bgGradientCat[cat]} transition-all hover:scale-[1.02]`}
+              >
+                <div className={`w-10 h-10 rounded-lg flex items-center justify-center bg-gradient-to-br ${catGradient} text-white shadow-md shrink-0`}>
+                  {meta.icon}
                 </div>
-                <div className={`w-full rounded-full h-2 overflow-hidden ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-200'}`}>
-                  <div
-                    className={`h-full ${bandClass}`}
-                    style={{ width: `${Math.min(r.rating, 100)}%` }}
-                  />
-                </div>
-                <ul className={`space-y-1 text-sm ${theme === 'dark' ? 'text-white/80' : 'text-gray-600'}`}>
-                  {recs.map((tip, idx) => (
-                    <li key={idx} className="flex items-start gap-2">
-                      <span className="text-xs mt-0.5">•</span>
-                      <span>{tip}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+                <span className={`text-sm font-medium truncate ${textColor}`}>
+                  {meta.label}
+                </span>
+              </button>
             )
           })}
         </div>
       </div>
 
-      {/* Activity Section */}
-      <div className={`rounded-2xl p-6 border ${theme === 'dark' ? 'bg-[#0b1015] border-white/5' : 'bg-white border-gray-100'} shadow-xl`}>
-        <div className="flex items-center gap-3 mb-6">
-          <div className="p-2 bg-blue-500/10 rounded-xl">
-            <Activity className="w-5 h-5 text-blue-400" />
-          </div>
-          <div>
-            <h3 className={`text-lg font-black tracking-tight ${headingColor}`}>Активность на сайте</h3>
-            <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Последняя активность участников</p>
-          </div>
-        </div>
-        {userActivities.length > 0 ? (
-          <div className={`overflow-auto rounded-xl border ${theme === 'dark' ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-200'}`}>
-            <table className={`min-w-[800px] w-full text-sm ${theme === 'dark' ? 'text-white/90' : 'text-gray-900'}`}>
-              <thead className={`text-left ${theme === 'dark' ? 'bg-white/5 text-white/70' : 'bg-gray-100 text-gray-600'}`}>
-                <tr>
-                  <th className="py-3 px-4 font-semibold">Участник</th>
-                  <th className="py-3 px-4 font-semibold">Последний вход</th>
-                  <th className="py-3 px-4 font-semibold">Браузер</th>
-                  <th className="py-3 px-4 font-semibold">Время на сайте</th>
-                  <th className="py-3 px-4 font-semibold">Выход</th>
-                  <th className="py-3 px-4 font-semibold">Статус</th>
-                </tr>
-              </thead>
-              <tbody>
-                {allMembers.map((member) => {
-                  const activity = userActivities.find((a) => a.userId === member.id)
-                  const formatSessionDuration = (seconds?: number): string => {
-                    if (!seconds) return '—'
-                    const hours = Math.floor(seconds / 3600)
-                    const minutes = Math.floor((seconds % 3600) / 60)
-                    const secs = seconds % 60
-                    if (hours > 0) {
-                      return `${hours}ч ${minutes}м ${secs}с`
-                    } else if (minutes > 0) {
-                      return `${minutes}м ${secs}с`
-                    } else {
-                      return `${secs}с`
-                    }
-                  }
-                  const formatDateTime = (isoString: string): string => {
-                    try {
-                      const date = new Date(isoString)
-                      return formatDate(date, 'dd.MM.yyyy HH:mm')
-                    } catch {
-                      return isoString
-                    }
-                  }
-
-                  return (
-                    <tr
-                      key={member.id}
-                      className={`border-t transition-colors ${theme === 'dark' ? 'border-white/10 hover:bg-white/5' : 'border-gray-200 hover:bg-gray-100'}`}
-                    >
-                      <td className={`py-3 px-4 font-semibold whitespace-nowrap ${headingColor}`}>{getUserNicknameSync(member.id)}</td>
-                      <td className={`py-3 px-4 whitespace-nowrap ${theme === 'dark' ? 'text-white/80' : 'text-gray-600'}`}>
-                        {activity ? formatDateTime(activity.loginAt) : '—'}
-                      </td>
-                      <td className={`py-3 px-4 whitespace-nowrap ${theme === 'dark' ? 'text-white/80' : 'text-gray-600'}`}>
-                        {activity?.browser || '—'}
-                      </td>
-                      <td className={`py-3 px-4 whitespace-nowrap ${theme === 'dark' ? 'text-white/80' : 'text-gray-600'}`}>
-                        {activity ? formatSessionDuration(activity.sessionDuration) : '—'}
-                      </td>
-                      <td className={`py-3 px-4 whitespace-nowrap ${theme === 'dark' ? 'text-white/80' : 'text-gray-600'}`}>
-                        {activity?.logoutAt ? formatDateTime(activity.logoutAt) : activity?.isActive ? 'Активен' : '—'}
-                      </td>
-                      <td className="py-3 px-4 whitespace-nowrap">
-                        {activity?.isActive ? (
-                          <span className="px-2 py-1 rounded-lg text-xs font-semibold bg-emerald-500/20 text-emerald-200 border border-emerald-400/30">
-                            Онлайн
-                          </span>
-                        ) : (
-                          <span className="px-2 py-1 rounded-lg text-xs font-semibold bg-gray-500/20 text-gray-300 border border-gray-400/30">
-                            Офлайн
-                          </span>
-                        )}
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <div className={`rounded-xl border p-4 ${theme === 'dark' ? 'bg-white/5 border-white/10 text-white/70' : 'bg-gray-50 border-gray-200 text-gray-500'}`}>
-            Данные об активности пока отсутствуют.
-          </div>
-        )}
-
-        {/* 24h Stats */}
-        <div className="mt-6">
-          <h4 className={`text-base font-bold ${headingColor} mb-4`}>Статистика за последние 24 часа</h4>
-          {activities24h.length > 0 ? (
-            <div className={`overflow-auto rounded-xl border ${theme === 'dark' ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-200'}`}>
-              <table className={`min-w-[700px] w-full text-sm ${theme === 'dark' ? 'text-white/90' : 'text-gray-900'}`}>
-                <thead className={`text-left ${theme === 'dark' ? 'bg-white/5 text-white/70' : 'bg-gray-100 text-gray-600'}`}>
-                  <tr>
-                    <th className="py-3 px-4 font-semibold">Участник</th>
-                    <th className="py-3 px-4 font-semibold">Входов</th>
-                    <th className="py-3 px-4 font-semibold">Общее время</th>
-                    <th className="py-3 px-4 font-semibold">Среднее время сессии</th>
-                    <th className="py-3 px-4 font-semibold">Последний вход</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {allMembers.map((member) => {
-                    const memberActivities = activities24h.filter((a) => a.userId === member.id)
-
-                    const formatSessionDuration = (seconds?: number): string => {
-                      if (!seconds) return '—'
-                      const hours = Math.floor(seconds / 3600)
-                      const minutes = Math.floor((seconds % 3600) / 60)
-                      const secs = seconds % 60
-                      if (hours > 0) {
-                        return `${hours}ч ${minutes}м ${secs}с`
-                      } else if (minutes > 0) {
-                        return `${minutes}м ${secs}с`
-                      } else {
-                        return `${secs}с`
-                      }
-                    }
-
-                    const formatDateTime = (isoString: string): string => {
-                      try {
-                        const date = new Date(isoString)
-                        return formatDate(date, 'dd.MM.yyyy HH:mm')
-                      } catch {
-                        return isoString
-                      }
-                    }
-
-                    // Calculate statistics
-                    const totalSessions = memberActivities.length
-                    const totalDuration = memberActivities.reduce((sum, a) => {
-                      return sum + (a.sessionDuration || 0)
-                    }, 0)
-                    const avgDuration = totalSessions > 0 ? Math.floor(totalDuration / totalSessions) : 0
-
-                    // Get latest activity
-                    const latestActivity = memberActivities.length > 0
-                      ? memberActivities.reduce((latest, current) => {
-                        return new Date(current.loginAt) > new Date(latest.loginAt) ? current : latest
-                      })
-                      : null
-
-                    return (
-                      <tr
-                        key={member.id}
-                        className={`border-t transition-colors ${theme === 'dark' ? 'border-white/10 hover:bg-white/5' : 'border-gray-200 hover:bg-gray-100'}`}
-                      >
-                        <td className={`py-3 px-4 font-semibold whitespace-nowrap ${headingColor}`}>{getUserNicknameSync(member.id)}</td>
-                        <td className={`py-3 px-4 whitespace-nowrap text-center ${theme === 'dark' ? 'text-white/80' : 'text-gray-600'}`}>
-                          {totalSessions > 0 ? totalSessions : '—'}
-                        </td>
-                        <td className={`py-3 px-4 whitespace-nowrap ${theme === 'dark' ? 'text-white/80' : 'text-gray-600'}`}>
-                          {totalDuration > 0 ? formatSessionDuration(totalDuration) : '—'}
-                        </td>
-                        <td className={`py-3 px-4 whitespace-nowrap ${theme === 'dark' ? 'text-white/80' : 'text-gray-600'}`}>
-                          {avgDuration > 0 ? formatSessionDuration(avgDuration) : '—'}
-                        </td>
-                        <td className={`py-3 px-4 whitespace-nowrap ${theme === 'dark' ? 'text-white/80' : 'text-gray-600'}`}>
-                          {latestActivity ? formatDateTime(latestActivity.loginAt) : '—'}
-                        </td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <div className={`rounded-xl border p-4 ${theme === 'dark' ? 'bg-white/5 border-white/10 text-white/70' : 'bg-gray-50 border-gray-200 text-gray-500'}`}>
-              За последние 24 часа активности не зафиксировано.
-            </div>
-          )}
+      {/* Search Bar */}
+      <div className="px-4 sm:px-6 lg:px-8 mb-6">
+        <div className={`relative rounded-xl border ${borderColor} ${cardBg} shadow-xl`}>
+          <Search className={`absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 ${subtleColor}`} />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Поиск по тикеру, событию, сети или причине..."
+            className={`w-full pl-12 pr-4 py-3 bg-transparent ${textColor} placeholder:${subtleColor} focus:outline-none`}
+          />
         </div>
       </div>
 
-      {/* Referrals Section */}
-      <div className={`rounded-2xl p-6 border ${theme === 'dark' ? 'bg-[#0b1015] border-white/5' : 'bg-white border-gray-100'} shadow-xl`}>
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-pink-500/10 rounded-xl">
-              <UserPlus className="w-5 h-5 text-pink-400" />
-            </div>
-            <div>
-              <h3 className={`text-lg font-black tracking-tight ${headingColor}`}>Рефералы</h3>
-              <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Всего: {referrals.length}</p>
-            </div>
+      {/* Filters */}
+      <div className="px-4 sm:px-6 lg:px-8 mb-6">
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Custom Selectors */}
+          <div className="w-full sm:w-auto min-w-[200px]">
+            <CustomSelect
+              value={categoryFilter}
+              onChange={(val) => setCategoryFilter(val as any)}
+              options={categoryOptions}
+              placeholder="Все сферы"
+              icon={<Activity size={16} />}
+            />
           </div>
-          <button
-            onClick={handleAddReferral}
-            className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm transition-all shadow-lg shadow-emerald-500/20 hover:scale-105 active:scale-95"
-          >
-            <UserPlus className="w-4 h-4" />
-            <span>Добавить реферала</span>
-          </button>
-        </div>
 
-        {referrals.length ? (
-          <div className={`overflow-auto rounded-xl border ${theme === 'dark' ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-200'}`}>
-            <table className={`min-w-[820px] w-full text-sm ${theme === 'dark' ? 'text-white/90' : 'text-gray-900'}`}>
-              <thead className={`text-left ${theme === 'dark' ? 'bg-white/5 text-white/70' : 'bg-gray-100 text-gray-600'}`}>
-                <tr>
-                  <th className="py-3 px-4 font-semibold">Кто привел</th>
-                  <th className="py-3 px-4 font-semibold">Код</th>
-                  <th className="py-3 px-4 font-semibold">Имя</th>
-                  <th className="py-3 px-4 font-semibold">Комментарий</th>
-                  <th className="py-3 px-4 font-semibold text-right">Действия</th>
-                </tr>
-              </thead>
-              <tbody>
-                {referrals.map((referral) => {
-                  const ownerName = getMemberNameById(referral.ownerId)
-                  const canManage = isAdmin || referral.ownerId === user?.id
-                  return (
-                    <tr
-                      key={referral.id}
-                      className={`border-t transition-colors ${theme === 'dark' ? 'border-white/10 hover:bg-white/5' : 'border-gray-200 hover:bg-gray-100'}`}
-                    >
-                      <td className={`py-3 px-4 font-semibold whitespace-nowrap ${headingColor}`}>{ownerName}</td>
-                      <td className={`py-3 px-4 whitespace-nowrap ${theme === 'dark' ? 'text-white/80' : 'text-gray-600'}`}>{referral.referralId}</td>
-                      <td className={`py-3 px-4 ${theme === 'dark' ? 'text-white/80' : 'text-gray-600'}`}>{referral.name}</td>
-                      <td className={`py-3 px-4 ${theme === 'dark' ? 'text-white/70' : 'text-gray-500'}`}>{referral.comment || '—'}</td>
-                      <td className="py-3 px-4 text-right whitespace-nowrap flex items-center justify-end gap-2">
-                        <button
-                          onClick={() => canManage && handleEditReferral(referral)}
-                          className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition ${!canManage
-                            ? 'opacity-40 cursor-not-allowed'
-                            : theme === 'dark'
-                              ? 'border-white/20 bg-white/10 text-white hover:bg-white/20'
-                              : 'border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100'
-                            }`}
-                          disabled={!canManage}
-                        >
-                          Редактировать
-                        </button>
-                        <button
-                          onClick={() => canManage && handleDeleteReferral(referral)}
-                          className={`px-3 py-1.5 rounded-lg text-xs font-semibold border border-rose-300/60 bg-rose-500/20 text-rose-50 transition ${!canManage ? 'opacity-40 cursor-not-allowed' : 'hover:bg-rose-500/30'}`}
-                          disabled={!canManage}
-                        >
-                          Удалить
-                        </button>
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
+          <div className="w-full sm:w-auto min-w-[180px]">
+            <CustomSelect
+              value={riskFilter}
+              onChange={(val) => setRiskFilter(val as any)}
+              options={riskOptions}
+              placeholder="Любой риск"
+              icon={<ShieldAlert size={16} />}
+            />
           </div>
-        ) : (
-          <div className={`rounded-xl border p-4 ${theme === 'dark' ? 'bg-white/5 border-white/10 text-white/70' : 'bg-gray-50 border-gray-200 text-gray-500'}`}>
-            Пока нет рефералов.
+
+          <div className="w-full sm:w-auto min-w-[220px]">
+            <CustomSelect
+              value={traderFilter}
+              onChange={(val) => setTraderFilter(val)}
+              options={traderOptions}
+              placeholder="Все трейдеры"
+              searchable={true}
+              icon={<User size={16} />}
+            />
           </div>
-        )}
+        </div>
       </div>
 
-      {/* Rating Cards Section */}
-      <div className={`rounded-2xl p-6 border ${theme === 'dark' ? 'bg-[#0b1015] border-white/5' : 'bg-white border-gray-100'} shadow-xl`}>
-        <div className="flex items-center gap-3 mb-6">
-          <div className="p-2 bg-emerald-500/10 rounded-xl">
-            <BarChart3 className="w-5 h-5 text-emerald-400" />
+      {/* Statistics Cards */}
+      <div className="px-4 sm:px-6 lg:px-8 mb-8">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+          {/* Total Signals */}
+          <div className={`p-4 rounded-xl border ${borderColor} ${cardBg} shadow-xl`}>
+            <div className="flex items-center justify-between mb-2">
+              <span className={`text-xs uppercase tracking-wider ${subtleColor}`}>Всего сигналов</span>
+              <TrendingUp className="w-4 h-4 text-emerald-500" />
+            </div>
+            <p className={`text-3xl font-bold ${textColor}`}>{totals.total}</p>
+            <p className="text-xs text-emerald-500 mt-1 flex items-center gap-1">
+              <Rocket size={12} />
+              <span>Растем</span>
+            </p>
           </div>
-          <div>
-            <h3 className={`text-lg font-black tracking-tight ${headingColor}`}>Детальная статистика</h3>
-            <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Карточки участников с полными данными</p>
+
+          {/* Active */}
+          <div className={`p-4 rounded-xl border ${borderColor} ${cardBg} shadow-xl`}>
+            <div className="flex items-center justify-between mb-2">
+              <span className={`text-xs uppercase tracking-wider ${subtleColor}`}>Активные</span>
+              <Activity className="w-4 h-4 text-emerald-500" />
+            </div>
+            <p className={`text-3xl font-bold ${textColor}`}>{totals.active}</p>
+            <div className="w-full h-1 bg-gray-800 rounded-full mt-2 overflow-hidden">
+              <div
+                className="h-full bg-emerald-500 rounded-full transition-all duration-1000"
+                style={{ width: `${totals.total > 0 ? (totals.active / totals.total) * 100 : 0}%` }}
+              />
+            </div>
+          </div>
+
+          {/* Completed */}
+          <div className={`p-4 rounded-xl border ${borderColor} ${cardBg} shadow-xl`}>
+            <div className="flex items-center justify-between mb-2">
+              <span className={`text-xs uppercase tracking-wider ${subtleColor}`}>Завершенные</span>
+              <Check className="w-4 h-4 text-blue-500" />
+            </div>
+            <p className={`text-3xl font-bold ${textColor}`}>{totals.completed}</p>
+          </div>
+
+          {/* Cancelled */}
+          <div className={`p-4 rounded-xl border ${borderColor} ${cardBg} shadow-xl`}>
+            <div className="flex items-center justify-between mb-2">
+              <span className={`text-xs uppercase tracking-wider ${subtleColor}`}>Отмененные</span>
+              <X className="w-4 h-4 text-red-500" />
+            </div>
+            <p className={`text-3xl font-bold ${textColor}`}>{totals.cancelled}</p>
           </div>
         </div>
+      </div>
 
+      {/* Signals Feed Header */}
+      <div className="px-4 sm:px-6 lg:px-8 mb-4">
+        <div className="flex items-center justify-between">
+          <h2 className={`text-xl font-bold ${textColor}`}>Лента сигналов</h2>
+          <p className={`text-sm ${subtleColor}`}>
+            Показано {filteredCalls.length} из {totals.active} активных
+          </p>
+        </div>
+      </div>
+
+      {/* Signals List */}
+      <div className="px-4 sm:px-6 lg:px-8">
         {loading ? (
-          <div className={`rounded-xl p-12 text-center border border-dashed ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-gray-50'}`}>
-            <div className="flex flex-col items-center gap-4">
-              <div className="w-10 h-10 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin" />
-              <p className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Загрузка рейтинга...</p>
-            </div>
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-4 border-emerald-500 border-t-transparent mx-auto mb-4"></div>
+            <p className={subtleColor}>Загрузка сигналов...</p>
+          </div>
+        ) : filteredCalls.length === 0 ? (
+          <div className="text-center py-12">
+            <Sparkles className={`w-16 h-16 mx-auto mb-4 ${subtleColor}`} />
+            <p className={`text-xl font-bold ${textColor} mb-2`}>Нет сигналов</p>
+            <p className={subtleColor}>Попробуйте изменить фильтры</p>
           </div>
         ) : (
-          <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-              {[
-                { label: 'Топ-1', value: sortedRatings[0]?.rating ? `${sortedRatings[0].rating.toFixed(1)}%` : '—' },
-                { label: 'Средний рейтинг', value: `${teamKPD.toFixed(1)}%` },
-                { label: 'Медиана', value: `${ratingOverview.median.toFixed(1)}%` },
-                { label: 'Участников', value: sortedRatings.length },
-              ].map((item) => (
-                <div
-                  key={item.label}
-                  className={`rounded-xl border px-4 py-3 ${theme === 'dark' ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-200'}`}
-                >
-                  <p className={`text-[11px] uppercase tracking-wide font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{item.label}</p>
-                  <p className={`text-2xl font-black ${headingColor}`}>{item.value}</p>
-                </div>
-              ))}
-            </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {filteredCalls.map((call) => {
+              const meta = CATEGORY_META[call.category]
+              const details = getDetails(call)
+              const risk = getRiskLevel(call)
+              const trader = allMembers.find(t => t.id === call.userId)
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-2 gap-6">
-              {sortedRatings.map((rating, index) => {
-                return (
-                  <RatingCard
-                    key={rating.userId}
-                    rating={rating}
-                    place={{ rank: index + 1 }}
-                  />
-                )
-              })}
-            </div>
-          </>
+              return (
+                <div
+                  key={call.id}
+                  className={`p-4 rounded-xl border ${borderColor} ${cardBg} shadow-lg hover:shadow-xl transition-all group`}
+                >
+                  <div className={`flex items-start justify-between gap-4 ${call.status !== 'active' ? 'opacity-60' : ''}`}>
+                    {/* Left: Icon & Title */}
+                    <div className="flex items-start gap-3 flex-1">
+                      <div className={`p-2.5 rounded-xl bg-gradient-to-br ${meta.gradient} bg-opacity-10 text-white shrink-0`}>
+                        {meta.icon}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
+                          <h3 className={`font-bold ${textColor} truncate`}>{getPrimaryTitle(call)}</h3>
+                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${riskBadges[risk]}`}>
+                            {riskLabels[risk]}
+                          </span>
+                          <span className={`px-2 py-0.5 rounded text-[10px] font-medium border ${borderColor} ${subtleColor}`}>
+                            {meta.label}
+                          </span>
+                          {call.status === 'completed' && (
+                            <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-500 px-2 py-0.5 rounded-full">
+                              <CheckCircle2 className="w-3 h-3" />
+                              Завершен
+                            </span>
+                          )}
+                          {call.status === 'cancelled' && (
+                            <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider bg-rose-500/10 text-rose-500 px-2 py-0.5 rounded-full">
+                              <XCircle className="w-3 h-3" />
+                              Отменен
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Metrics Grid */}
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-y-2 gap-x-6 mt-3 max-w-3xl">
+                          {details.entryPrice && (
+                            <div className="flex flex-col">
+                              <span className={`text-[10px] uppercase font-bold tracking-wider ${subtleColor} mb-0.5`}>Вход</span>
+                              <span className={`text-sm font-medium ${textColor}`}>{details.entryPrice}</span>
+                            </div>
+                          )}
+                          {details.targets && (
+                            <div className="flex flex-col">
+                              <span className={`text-[10px] uppercase font-bold tracking-wider ${subtleColor} mb-0.5`}>Цель</span>
+                              <span className="text-sm font-medium text-emerald-500">{details.targets}</span>
+                            </div>
+                          )}
+                          {details.stopLoss && (
+                            <div className="flex flex-col">
+                              <span className={`text-[10px] uppercase font-bold tracking-wider ${subtleColor} mb-0.5`}>Стоп</span>
+                              <span className="text-sm font-medium text-rose-500">{details.stopLoss}</span>
+                            </div>
+                          )}
+                          {trader && (
+                            <div className="flex flex-col">
+                              <span className={`text-[10px] uppercase font-bold tracking-wider ${subtleColor} mb-0.5`}>Автор</span>
+                              <div className="flex items-center gap-1.5">
+                                {trader.avatar ? (
+                                  <img src={trader.avatar} className="w-4 h-4 rounded-full object-cover" />
+                                ) : (
+                                  <div className="w-4 h-4 rounded-full bg-emerald-500 text-[8px] flex items-center justify-center text-white">{trader.name[0]}</div>
+                                )}
+                                <span className={`text-sm font-medium ${textColor}`}>{trader.name}</span>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Right: Actions */}
+                    <div className="flex items-center gap-1 sm:gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                      {/* Copy Signal */}
+                      <button
+                        onClick={() => {
+                          const text = `🚀 ${meta.label}: ${getPrimaryTitle(call)}\n` +
+                            (details.entryPrice ? `📍 Вход: ${details.entryPrice}\n` : '') +
+                            (details.targets ? `🎯 Цели: ${details.targets}\n` : '') +
+                            (details.stopLoss ? `🛑 Стоп: ${details.stopLoss}\n` : '') +
+                            (details.contract ? `📝 CA: ${details.contract}\n` : '') +
+                            (details.link ? `🔗 Ссылка: ${details.link}\n` : '') +
+                            `👤 Трейдер: ${trader?.name || 'Admin'}`
+                          navigator.clipboard.writeText(text)
+                        }}
+                        className={`p-2 rounded-lg transition-colors ${theme === 'dark' ? 'hover:bg-emerald-500/20 text-emerald-400 hover:text-emerald-300' : 'hover:bg-emerald-50 text-emerald-600 hover:text-emerald-700'}`}
+                        title="Копировать сигнал"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
+
+                      {/* Status Actions (Author or Admin) */}
+                      {(isAdmin || user?.id === call.userId) && call.status === 'active' && (
+                        <>
+                          <button
+                            onClick={() => handleUpdateStatus(call.id, 'completed')}
+                            className={`p-2 rounded-lg transition-colors ${theme === 'dark' ? 'hover:bg-emerald-500/20 text-emerald-400' : 'hover:bg-emerald-50 text-emerald-600'}`}
+                            title="Завершить (Цели достигнуты)"
+                          >
+                            <CheckCircle2 className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleUpdateStatus(call.id, 'cancelled')}
+                            className={`p-2 rounded-lg transition-colors ${theme === 'dark' ? 'hover:bg-rose-500/20 text-rose-400' : 'hover:bg-rose-50 text-rose-600'}`}
+                            title="Отменить сигнал"
+                          >
+                            <XCircle className="w-4 h-4" />
+                          </button>
+                        </>
+                      )}
+
+                      {/* Restore Action (Author or Admin) */}
+                      {(isAdmin || user?.id === call.userId) && call.status !== 'active' && (
+                        <button
+                          onClick={() => handleUpdateStatus(call.id, 'active')}
+                          className={`p-2 rounded-lg transition-colors ${theme === 'dark' ? 'hover:bg-blue-500/20 text-blue-400' : 'hover:bg-blue-50 text-blue-600'}`}
+                          title="Вернуть в работу"
+                        >
+                          <History className="w-4 h-4" />
+                        </button>
+                      )}
+
+                      {/* Edit (Author or Admin) */}
+                      {(isAdmin || user?.id === call.userId) && (
+                        <button
+                          onClick={() => handleEdit(call)}
+                          className={`p-2 rounded-lg transition-colors ${theme === 'dark' ? 'hover:bg-white/10 text-gray-400 hover:text-white' : 'hover:bg-gray-100 text-gray-500 hover:text-gray-900'}`}
+                          title="Редактировать"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+                      )}
+
+                      {/* Delete (Admin Only) */}
+                      {isAdmin && (
+                        <button
+                          onClick={() => handleDeleteClick(call.id)}
+                          className={`p-2 rounded-lg transition-colors ${theme === 'dark' ? 'hover:bg-red-500/20 text-red-400' : 'hover:bg-red-50 text-red-600'}`}
+                          title="Удалить"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
         )}
       </div>
 
-      {/* Form Overlay */}
-      {showReferralForm && (
-        <ReferralForm
-          referral={activeReferral}
-          onClose={() => {
-            setShowReferralForm(false)
-            setActiveReferral(null)
-          }}
-          onSave={() => {
-            setShowReferralForm(false)
-            setActiveReferral(null)
-            loadRatings()
-          }}
-        />
+      {/* Form Modal */}
+      {showForm && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-xl z-[70] flex items-start sm:items-center justify-center p-4 overflow-y-auto">
+          {/* Decorative background elements */}
+          <div className="fixed inset-0 overflow-hidden pointer-events-none">
+            <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl animate-pulse" />
+            <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-teal-500/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '0.5s' }} />
+          </div>
+          
+          <div className={`relative ${bgColor} rounded-3xl shadow-2xl shadow-black/50 border ${borderColor} max-w-4xl w-full max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-300`}>
+            {/* Header gradient accent - dynamic based on category */}
+            <div className={`h-1.5 transition-all duration-300 ${
+              formCategory === 'memecoins' ? 'bg-gradient-to-r from-teal-400 via-cyan-500 to-emerald-400' :
+              formCategory === 'polymarket' ? 'bg-gradient-to-r from-rose-500 via-red-500 to-orange-500' :
+              formCategory === 'nft' ? 'bg-gradient-to-r from-purple-500 via-pink-500 to-rose-500' :
+              formCategory === 'futures' ? 'bg-gradient-to-r from-blue-500 via-indigo-500 to-cyan-500' :
+              formCategory === 'spot' ? 'bg-gradient-to-r from-amber-500 via-orange-500 to-yellow-500' :
+              formCategory === 'staking' ? 'bg-gradient-to-r from-emerald-500 via-green-500 to-emerald-400' :
+              formCategory === 'airdrop' ? 'bg-gradient-to-r from-gray-400 via-gray-300 to-gray-200' :
+              'bg-gradient-to-r from-gray-400 via-gray-300 to-gray-200'
+            }`} />
+
+            <div className="flex flex-col h-full">
+              <div className={`p-5 flex items-center justify-between sticky top-0 z-20 ${bgColor} border-b ${borderColor}`}>
+                <div className="flex items-center gap-3">
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-lg transition-all duration-300 ${
+                    formCategory === 'memecoins' ? 'bg-gradient-to-br from-teal-400 to-emerald-500 shadow-teal-400/30' :
+                    formCategory === 'polymarket' ? 'bg-gradient-to-br from-rose-500 to-red-600 shadow-rose-500/30' :
+                    formCategory === 'nft' ? 'bg-gradient-to-br from-purple-500 to-pink-600 shadow-purple-500/30' :
+                    formCategory === 'futures' ? 'bg-gradient-to-br from-blue-500 to-indigo-600 shadow-blue-500/30' :
+                    formCategory === 'spot' ? 'bg-gradient-to-br from-amber-500 to-orange-600 shadow-amber-500/30' :
+                    formCategory === 'staking' ? 'bg-gradient-to-br from-emerald-500 to-green-600 shadow-emerald-500/30' :
+                    formCategory === 'airdrop' ? 'bg-gradient-to-br from-gray-400 to-gray-300 shadow-gray-400/30' :
+                    'bg-gradient-to-br from-gray-400 to-gray-300 shadow-gray-400/30'
+                  }`}>
+                    {CATEGORY_META[formCategory].icon}
+                  </div>
+                  <div>
+                    <h2 className={`text-xl font-bold ${textColor}`}>
+                      {editingCall ? 'Редактировать сигнал' : 'Новый сигнал'}
+                    </h2>
+                    <p className={`text-xs ${subtleColor}`}>
+                      {editingCall ? 'Измените данные сигнала' : `Создайте сигнал: ${CATEGORY_META[formCategory].label}`}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={handleCancel}
+                  className={`p-2.5 rounded-xl transition-all duration-200 ${theme === 'dark' ? 'hover:bg-gray-800 text-gray-400 hover:text-white' : 'hover:bg-gray-100 text-gray-500 hover:text-gray-900'}`}
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="px-6 pb-6 pt-4 overflow-y-auto flex-1 max-h-[calc(90vh-80px)]">
+                <CallForm
+                  callToEdit={editingCall}
+                  onSuccess={handleSuccess}
+                  onCancel={handleCancel}
+                  initialCategory={formCategory}
+                  category={formCategory}
+                  onCategoryChange={setFormCategory}
+                  showCategorySelector={showCategorySelector}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[70] flex items-start sm:items-center justify-center p-4 overflow-y-auto overscroll-contain">
+          <div className={`${bgColor} rounded-2xl shadow-2xl border ${borderColor} max-w-md w-full animate-in zoom-in-95 duration-200`}>
+            <div className="p-6 space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="p-3 rounded-full bg-red-500/10 text-red-500">
+                  <AlertTriangle className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className={`text-xl font-bold ${textColor}`}>Удалить сигнал?</h3>
+                  <p className={subtleColor}>Это действие нельзя отменить</p>
+                </div>
+              </div>
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={() => { setShowDeleteModal(false); setDeleteCallId(null) }}
+                  className={`flex-1 px-4 py-3 rounded-xl border ${borderColor} font-medium ${theme === 'dark' ? 'text-white hover:bg-white/5' : 'text-gray-800 hover:bg-gray-50'}`}
+                >
+                  Отмена
+                </button>
+                <button
+                  onClick={handleDeleteConfirm}
+                  className="flex-1 px-4 py-3 rounded-xl bg-red-600 text-white font-bold hover:bg-red-700 shadow-lg shadow-red-600/20"
+                >
+                  Удалить
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Cancel Confirmation Modal */}
+      {cancelCallId && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[70] flex items-start sm:items-center justify-center p-4 overflow-y-auto overscroll-contain">
+          <div className={`${bgColor} rounded-2xl shadow-2xl border ${borderColor} max-w-md w-full`}>
+            <div className="p-6 space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="p-3 rounded-full bg-amber-500/10 text-amber-500">
+                  <AlertTriangle className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className={`text-xl font-bold ${textColor}`}>Отменить сигнал?</h3>
+                  <p className={subtleColor}>Статус станет «Отменен», запись останется в списке.</p>
+                </div>
+              </div>
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={() => setCancelCallId(null)}
+                  className={`flex-1 px-4 py-3 rounded-xl border ${borderColor} font-medium ${theme === 'dark' ? 'text-white hover:bg-white/5' : 'text-gray-800 hover:bg-gray-50'}`}
+                >
+                  Отмена
+                </button>
+                <button
+                  onClick={handleCancelConfirm}
+                  className="flex-1 px-4 py-3 rounded-xl bg-amber-500 text-white font-bold hover:bg-amber-600 shadow-lg shadow-amber-500/20"
+                >
+                  Отменить
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )
