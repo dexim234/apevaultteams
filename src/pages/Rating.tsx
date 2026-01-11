@@ -9,7 +9,7 @@ import { getRatingData, getEarnings, getDayStatuses, getReferrals, getWorkSlots,
 import { getLastNDaysRange, getWeekRange, formatDate, calculateHours, countDaysInPeriod } from '@/utils/dateUtils'
 import { calculateRating, getRatingBreakdown } from '@/utils/ratingUtils'
 import { getUserNicknameAsync, clearAllNicknameCache, getUserNicknameSync } from '@/utils/userUtils'
-import { RatingData, Referral } from '@/types'
+import { RatingData, Referral, Earnings, DayStatus } from '@/types'
 import { useUsers } from '@/hooks/useUsers'
 import { TrendingUp, Users, Award, Target, Calendar, UserPlus, BarChart3 } from 'lucide-react'
 
@@ -56,18 +56,18 @@ export const RatingPage = () => {
         // Данные для рейтинга
         const weekEarnings = await getEarnings(member.id, weekStart, weekEnd)
         // Если у записи несколько участников, сумма делится поровну между ними
-        const weeklyEarnings = weekEarnings.reduce((sum, e) => {
+        const weeklyEarnings = weekEarnings.reduce((sum: number, e: Earnings) => {
           const participantCount = e.participants && e.participants.length > 0 ? e.participants.length : 1
           return sum + (e.amount / participantCount)
         }, 0)
 
         const monthEarnings = await getEarnings(member.id, monthStart, monthEnd)
         // Если у записи несколько участников, сумма делится поровну между ними
-        const totalEarnings = monthEarnings.reduce((sum, e) => {
+        const totalEarnings = monthEarnings.reduce((sum: number, e: Earnings) => {
           const participantCount = e.participants && e.participants.length > 0 ? e.participants.length : 1
           return sum + (e.amount / participantCount)
         }, 0)
-        const poolAmount = monthEarnings.reduce((sum, e) => {
+        const poolAmount = monthEarnings.reduce((sum: number, e: Earnings) => {
           const participantCount = e.participants && e.participants.length > 0 ? e.participants.length : 1
           return sum + (e.poolAmount / participantCount)
         }, 0)
@@ -82,22 +82,22 @@ export const RatingPage = () => {
         // Count days, not just status count (for multi-day statuses)
         const daysOff = monthStatuses
           .filter(s => s.type === 'dayoff')
-          .reduce((sum, s) => sum + countDaysInPeriod(s.date, s.endDate, monthStart, monthEnd), 0)
+          .reduce((sum: number, s: DayStatus) => sum + countDaysInPeriod(s.date, s.endDate, monthStart, monthEnd), 0)
         const sickDays = monthStatuses
           .filter(s => s.type === 'sick')
-          .reduce((sum, s) => sum + countDaysInPeriod(s.date, s.endDate, monthStart, monthEnd), 0)
+          .reduce((sum: number, s: DayStatus) => sum + countDaysInPeriod(s.date, s.endDate, monthStart, monthEnd), 0)
         const vacationDays = monthStatuses
           .filter(s => s.type === 'vacation')
-          .reduce((sum, s) => sum + countDaysInPeriod(s.date, s.endDate, monthStart, monthEnd), 0)
+          .reduce((sum: number, s: DayStatus) => sum + countDaysInPeriod(s.date, s.endDate, monthStart, monthEnd), 0)
         const absenceDays = monthStatuses
           .filter(s => s.type === 'absence')
-          .reduce((sum, s) => sum + countDaysInPeriod(s.date, s.endDate, monthStart, monthEnd), 0)
+          .reduce((sum: number, s: DayStatus) => sum + countDaysInPeriod(s.date, s.endDate, monthStart, monthEnd), 0)
         const truancyDays = monthStatuses
           .filter(s => s.type === 'truancy')
-          .reduce((sum, s) => sum + countDaysInPeriod(s.date, s.endDate, monthStart, monthEnd), 0)
+          .reduce((sum: number, s: DayStatus) => sum + countDaysInPeriod(s.date, s.endDate, monthStart, monthEnd), 0)
         const internshipDays = monthStatuses
           .filter(s => s.type === 'internship')
-          .reduce((sum, s) => sum + countDaysInPeriod(s.date, s.endDate, monthStart, monthEnd), 0)
+          .reduce((sum: number, s: DayStatus) => sum + countDaysInPeriod(s.date, s.endDate, monthStart, monthEnd), 0)
 
         // Недельные выходные и больничные
         const weekStatuses = statuses.filter(s => {
@@ -108,10 +108,10 @@ export const RatingPage = () => {
 
         const weeklyDaysOff = weekStatuses
           .filter(s => s.type === 'dayoff')
-          .reduce((sum, s) => sum + countDaysInPeriod(s.date, s.endDate, weekStart, weekEnd), 0)
+          .reduce((sum: number, s: DayStatus) => sum + countDaysInPeriod(s.date, s.endDate, weekStart, weekEnd), 0)
         const weeklySickDays = weekStatuses
           .filter(s => s.type === 'sick')
-          .reduce((sum, s) => sum + countDaysInPeriod(s.date, s.endDate, weekStart, weekEnd), 0)
+          .reduce((sum: number, s: DayStatus) => sum + countDaysInPeriod(s.date, s.endDate, weekStart, weekEnd), 0)
 
         // Отпуск за 90 дней
         const ninetyDayStatuses = statuses.filter(s => {
@@ -190,20 +190,10 @@ export const RatingPage = () => {
     }
   }
 
-  const teamKPD = ratings.reduce((sum, r) => sum + r.rating, 0) / (ratings.length || 1)
+  const teamKPD = ratings.reduce((sum: number, r: RatingWithBreakdown) => sum + r.rating, 0) / (ratings.length || 1)
   const headingColor = theme === 'dark' ? 'text-white' : 'text-gray-900'
 
-  const getRecommendations = (r: typeof sortedRatings[number]) => {
-    if (!r.breakdown) return ['Недостаточно данных — обновите статистику.']
-    const tips: string[] = []
-    if (r.breakdown.weeklyHoursPoints < 25) tips.push('Дотяни рабочие часы до 20+ в неделю (25%).')
-    if (r.breakdown.weeklyEarningsPoints < 30) tips.push('Увеличь недельный доход до 6000+ ₽ (30%).')
-    if (r.breakdown.referralsPoints < 30) tips.push('Добавь рефералов: до +30% (6 человек).')
-    if (r.breakdown.daysOffPoints <= 0) tips.push('Выходные: <2 дней в неделю для +5%.')
-    if (r.breakdown.sickDaysPoints <= 0) tips.push('Больничные: <3 дней в неделю И ≤9 дней в месяц для +5%.')
-    if (r.breakdown.vacationDaysPoints <= 0) tips.push('Отпуск: <12 дней в месяц И ≤30 дней за 90 дней для +10%.')
-    return tips.length ? tips : ['Отлично! Держи текущий темп.']
-  }
+
 
   const sortedRatings = useMemo<RatingWithBreakdown[]>(() => {
     return [...ratings].sort((a, b) => b.rating - a.rating)
@@ -404,63 +394,6 @@ export const RatingPage = () => {
               </div>
             </div>
           ))}
-        </div>
-      </div>
-
-      {/* Recommendations Section */}
-      <div className={`rounded-2xl p-6 border ${theme === 'dark' ? 'bg-[#0b1015] border-white/5' : 'bg-white border-gray-100'} shadow-xl`}>
-        <div className="flex items-center gap-3 mb-6">
-          <div className="p-2 bg-emerald-500/10 rounded-xl">
-            <Target className="w-5 h-5 text-emerald-400" />
-          </div>
-          <div>
-            <h3 className={`text-lg font-black tracking-tight ${headingColor}`}>Рекомендации по улучшению</h3>
-            <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Персональные советы для каждого участника</p>
-          </div>
-        </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-          {sortedRatings.map((r) => {
-            const recs = getRecommendations(r)
-            const userName = getMemberNameById(r.userId)
-            const bandClass =
-              r.rating >= 80
-                ? 'bg-emerald-500'
-                : r.rating >= 60
-                  ? 'bg-blue-500'
-                  : r.rating >= 40
-                    ? 'bg-amber-500'
-                    : 'bg-rose-500'
-            const bandText =
-              r.rating >= 80 ? 'Эталон' : r.rating >= 60 ? 'Уверенно' : r.rating >= 40 ? 'В пути' : 'Зона роста'
-
-            return (
-              <div key={r.userId} className={`rounded-xl border p-4 space-y-3 ${theme === 'dark' ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-200'}`}>
-                <div className="flex items-center justify-between gap-2">
-                  <div className="min-w-0">
-                    <p className={`text-xs uppercase tracking-wider font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{bandText}</p>
-                    <h4 className={`text-lg font-bold ${headingColor} truncate`}>{userName}</h4>
-                  </div>
-                  <div className="text-right">
-                    <div className={`text-2xl font-black ${headingColor}`}>{r.rating.toFixed(1)}%</div>
-                  </div>
-                </div>
-                <div className={`w-full rounded-full h-2 overflow-hidden ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-200'}`}>
-                  <div
-                    className={`h-full ${bandClass}`}
-                    style={{ width: `${Math.min(r.rating, 100)}%` }}
-                  />
-                </div>
-                <ul className={`space-y-1 text-sm ${theme === 'dark' ? 'text-white/80' : 'text-gray-600'}`}>
-                  {recs.map((tip, idx) => (
-                    <li key={idx} className="flex items-start gap-2">
-                      <span className="text-xs mt-0.5">•</span>
-                      <span>{tip}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )
-          })}
         </div>
       </div>
 
