@@ -115,16 +115,7 @@ export const About = () => {
               Здесь решения принимаются осознанно, а рост строится системно.
             </p>
 
-            <div className="flex flex-wrap gap-3 pt-2">
-              {['Командные сессии', 'Авторские стратегии', 'Smart Money'].map((tag) => (
-                <span key={tag} className={`px-4 py-2 rounded-xl text-sm font-bold border ${theme === 'dark' ? 'bg-white/5 border-white/10 text-gray-300' : 'bg-gray-100/50 border-gray-200 text-gray-700'}`}>
-                  {tag}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-
+  
         {/* Stats Column (Span 1) */}
         <div className="space-y-4">
           {/* Stat Card 1 */}
