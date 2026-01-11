@@ -58,7 +58,12 @@ export const Rating = () => {
       console.log('Rating.tsx - allMembers.length:', allMembers.length)
       console.log('Rating.tsx - usersLoading:', usersLoading)
 
-      for (const member of allMembers) {
+      // Filter out excluded user
+      const excludedUserIds = ['ydiEgmNj2sCBirUjWeiv']
+      const activeMembers = allMembers.filter(m => !excludedUserIds.includes(m.id))
+      console.log('Rating.tsx - activeMembers after filter:', activeMembers.length)
+
+      for (const member of activeMembers) {
         console.log('Rating.tsx - Processing member:', member.id, member.name)
         // Данные для рейтинга
         const weekEarnings = await getEarnings(member.id, weekStart, weekEnd)

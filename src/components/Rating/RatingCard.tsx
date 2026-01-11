@@ -44,14 +44,6 @@ export const RatingCard = ({ rating, place }: RatingCardProps) => {
         : rating.rating >= 40
           ? 'bg-amber-500'
           : 'bg-rose-500'
-  const ratingTextColor =
-    rating.rating >= 80
-      ? '#10b981'
-      : rating.rating >= 60
-        ? '#3b82f6'
-        : rating.rating >= 40
-          ? '#f59e0b'
-          : '#f43f5e'
 
   const accentPalette: Record<
     string,
@@ -273,68 +265,74 @@ export const RatingCard = ({ rating, place }: RatingCardProps) => {
   })()
 
   return (
-    <div className={`relative rounded-2xl p-6 ${cardBg} shadow-sm border ${borderColor} transition-colors`}>
+    <div className={`relative rounded-2xl p-6 ${cardBg} shadow-xl border ${borderColor} transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 overflow-hidden`}>
+      {/* Gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-blue-500/5 pointer-events-none" />
+
       {placeBadge}
+
       {/* Header with name and rating */}
-      <div className="mb-5 flex flex-col gap-3">
+      <div className="relative mb-6 flex flex-col gap-4">
         <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <p className={`text-[11px] uppercase tracking-[0.12em] ${mutedColor}`}>Участник</p>
+          <div className="min-w-0 flex-1">
+            <p className={`text-[10px] uppercase tracking-[0.15em] font-bold ${mutedColor} mb-2`}>Участник команды</p>
+            <h3 className={`text-3xl font-black ${headingColor} truncate mb-3 bg-gradient-to-r from-emerald-600 to-blue-600 bg-clip-text text-transparent dark:from-emerald-400 dark:to-blue-400`}>
+              <UserNickname userId={rating.userId} fallback="unknown" />
+            </h3>
             <div className="flex items-center gap-2 flex-wrap">
-              <h3 className={`text-2xl font-bold ${headingColor} truncate`}>
-                <UserNickname userId={rating.userId} fallback="unknown" />
-              </h3>
-            </div>
-            <div className="flex items-center gap-2 mt-1">
-              <span
-                className={`px-2.5 py-1 rounded-lg text-xs font-semibold border ${accent.border} ${accent.bg} ${accent.text} flex items-center gap-1`}
-              >
-                <span className={`text-lg leading-none ${accent.icon}`}>●</span>
-                <span>Ник</span>
+              <span className={`px-3 py-1.5 rounded-xl text-xs font-bold border-2 ${accent.border} ${accent.bg} ${accent.text} flex items-center gap-1.5 shadow-sm`}>
+                <span className={`text-base leading-none ${accent.icon}`}>●</span>
+                <span>ID: {rating.userId}</span>
               </span>
-              <div className="flex items-center gap-2">
-                <span className={`text-lg font-bold`} style={{ color: ratingTextColor }}>{rating.rating.toFixed(1)}%</span>
-              </div>
             </div>
+          </div>
+          <div className="flex flex-col items-end gap-1">
+            <span className={`text-4xl font-black bg-gradient-to-br from-emerald-600 to-blue-600 bg-clip-text text-transparent dark:from-emerald-400 dark:to-blue-400`}>
+              {rating.rating.toFixed(1)}%
+            </span>
+            <span className={`text-[10px] uppercase tracking-wider font-bold ${mutedColor}`}>Рейтинг</span>
           </div>
         </div>
 
         {/* Main rating progress bar */}
-        <div>
-          <div className="w-full bg-gray-200/70 dark:bg-gray-800 rounded-full h-6 overflow-hidden shadow-inner">
+        <div className="space-y-2">
+          <div className="relative w-full h-8 bg-gradient-to-r from-gray-200/50 to-gray-300/50 dark:from-gray-800/50 dark:to-gray-700/50 rounded-2xl overflow-hidden shadow-inner backdrop-blur-sm">
             <div
-              className={`h-full transition-all duration-500 flex items-center justify-center text-sm font-semibold text-white ${bandColor}`}
+              className={`h-full transition-all duration-700 ease-out flex items-center justify-end pr-3 ${bandColor} relative overflow-hidden`}
               style={{
                 width: barWidth,
-                minWidth: rating.rating <= 0 ? '40px' : undefined,
+                minWidth: rating.rating <= 0 ? '50px' : undefined,
               }}
             >
-              {rating.rating >= 8 && <span>{rating.rating.toFixed(0)}%</span>}
+              <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent" />
+              {rating.rating >= 5 && <span className="text-sm font-black text-white drop-shadow-lg relative z-10">{rating.rating.toFixed(1)}%</span>}
             </div>
           </div>
-          <div className="flex justify-between mt-1">
-            <span className={`text-xs ${mutedColor}`}>Общий рейтинг</span>
-            <span className={`text-xs font-semibold ${mutedColor}`}>{totalPoints}/100 баллов</span>
+          <div className="flex justify-between items-center">
+            <span className={`text-xs font-semibold ${mutedColor}`}>Общий прогресс</span>
+            <span className={`text-xs font-black ${headingColor} px-2 py-0.5 rounded-lg ${theme === 'dark' ? 'bg-white/10' : 'bg-gray-100'}`}>
+              {totalPoints}/100
+            </span>
           </div>
         </div>
 
         {/* Exclusion Status */}
-        <div className="mt-3">
+        <div className="mt-2">
           <div
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border text-sm font-medium"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border-2 text-sm font-bold shadow-lg backdrop-blur-sm"
             style={{
-              backgroundColor: `${exclusionStatus.color}15`,
-              borderColor: `${exclusionStatus.color}40`,
+              backgroundColor: `${exclusionStatus.color}20`,
+              borderColor: `${exclusionStatus.color}60`,
               color: exclusionStatus.color
             }}
           >
             <div
-              className="w-2 h-2 rounded-full animate-pulse"
-              style={{ backgroundColor: exclusionStatus.color }}
+              className="w-2.5 h-2.5 rounded-full animate-pulse shadow-lg"
+              style={{ backgroundColor: exclusionStatus.color, boxShadow: `0 0 10px ${exclusionStatus.color}` }}
             />
-            <span>{exclusionStatus.label}</span>
+            <span className="uppercase tracking-wide text-xs">{exclusionStatus.label}</span>
           </div>
-          <p className={`text-xs mt-1 ${mutedColor}`}>{exclusionStatus.description}</p>
+          <p className={`text-xs mt-2 ${mutedColor} font-medium`}>{exclusionStatus.description}</p>
         </div>
       </div>
 
