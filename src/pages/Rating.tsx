@@ -5,14 +5,15 @@ import { useAuthStore } from '@/store/authStore'
 import { useAdminStore } from '@/store/adminStore'
 import { RatingCard } from '@/components/Rating/RatingCard'
 import { ReferralForm } from '@/components/Rating/ReferralForm'
-import { getRatingData, getEarnings, getDayStatuses, getReferrals, getWorkSlots, deleteReferral, addApprovalRequest, getLatestUserActivities, getUserActivitiesLast24Hours } from '@/services/firestoreService'
+import { getRatingData, getEarnings, getDayStatuses, getReferrals, getWorkSlots, deleteReferral, addApprovalRequest } from '@/services/firestoreService'
 import { getLastNDaysRange, getWeekRange, formatDate, calculateHours, countDaysInPeriod } from '@/utils/dateUtils'
 import { calculateRating, getRatingBreakdown } from '@/utils/ratingUtils'
 import { getUserNicknameAsync, clearAllNicknameCache, getUserNicknameSync } from '@/utils/userUtils'
-import { RatingData, Referral, UserActivity } from '@/types'
+import { RatingData, Referral } from '@/types'
 import { useUsers } from '@/hooks/useUsers'
+import { TrendingUp, Users, Award, Target, Calendar, UserPlus, BarChart3 } from 'lucide-react'
 
-export const Rating = () => {
+export const RatingPage = () => {
   const { theme } = useThemeStore()
   const { user } = useAuthStore()
   const { isAdmin } = useAdminStore()
@@ -23,8 +24,7 @@ export const Rating = () => {
   const [referrals, setReferrals] = useState<Referral[]>([])
   const [showReferralForm, setShowReferralForm] = useState(false)
   const [activeReferral, setActiveReferral] = useState<Referral | null>(null)
-  const [userActivities, setUserActivities] = useState<UserActivity[]>([])
-  const [activities24h, setActivities24h] = useState<UserActivity[]>([])
+
 
   useEffect(() => {
     loadRatings()
@@ -182,13 +182,7 @@ export const Rating = () => {
       allRatings.sort((a, b) => b.rating - a.rating)
       setRatings(allRatings)
 
-      // Load user activities
-      const activities = await getLatestUserActivities()
-      setUserActivities(activities)
 
-      // Load activities for last 24 hours
-      const activitiesLast24h = await getUserActivitiesLast24Hours()
-      setActivities24h(activitiesLast24h)
     } catch (error) {
       console.error('Error loading ratings:', error)
     } finally {
@@ -197,20 +191,7 @@ export const Rating = () => {
   }
 
   const teamKPD = ratings.reduce((sum, r) => sum + r.rating, 0) / (ratings.length || 1)
-  const subTextColor = theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
   const headingColor = theme === 'dark' ? 'text-white' : 'text-gray-900'
-  const cardBg = 'bg-[#10141c]'
-  const calmBorder = 'border-[#48a35e]/60'
-  const cardShadow = 'shadow-[0_24px_80px_rgba(0,0,0,0.45)]'
-  const heroLabelColor = theme === 'dark' ? 'text-white/70' : 'text-slate-600'
-  const heroValueColor = theme === 'dark' ? 'text-white' : 'text-slate-900'
-
-  const ratingBands = [
-    { label: '80-100%', title: 'Эталон', desc: 'Стабильный вклад, примеры для команды', tone: 'text-emerald-700 dark:text-emerald-100', bg: 'bg-emerald-50 dark:bg-emerald-900/40 border-emerald-200/60 dark:border-emerald-700/60' },
-    { label: '60-79%', title: 'Уверенно', desc: 'Держат темп, есть потенциал роста', tone: 'text-blue-700 dark:text-blue-100', bg: 'bg-blue-50 dark:bg-blue-900/40 border-blue-200/60 dark:border-blue-700/60' },
-    { label: '40-59%', title: 'В пути', desc: 'Нужна точечная поддержка и фокус', tone: 'text-amber-700 dark:text-amber-100', bg: 'bg-amber-50 dark:bg-amber-900/40 border-amber-200/60 dark:border-amber-700/60' },
-    { label: '0-39%', title: 'Зона роста', desc: 'Запускаем план восстановления', tone: 'text-rose-700 dark:text-rose-100', bg: 'bg-rose-50 dark:bg-rose-900/40 border-rose-200/60 dark:border-rose-700/60' },
-  ]
 
   const getRecommendations = (r: typeof sortedRatings[number]) => {
     if (!r.breakdown) return ['Недостаточно данных — обновите статистику.']
@@ -242,55 +223,6 @@ export const Rating = () => {
   const topMember = sortedRatings[0]
   const topMemberName = topMember ? getUserNicknameSync(topMember.userId) : '—'
   const todayLabel = new Date().toLocaleDateString('ru-RU')
-
-  type HeroTone = 'emerald' | 'amber' | 'blue' | 'slate' | 'purple' | 'pink' | 'indigo'
-
-  const heroCards: { label: string; value: string; meta: string; tone: HeroTone }[] = [
-    { label: 'Средний рейтинг', value: `${teamKPD.toFixed(1)}%`, meta: 'по команде за неделю', tone: 'emerald' },
-    { label: 'Лидер недели', value: topMemberName, meta: topMember ? `${topMember.rating.toFixed(1)}%` : '—', tone: 'amber' },
-    { label: '80%+ участников', value: `${ratingOverview.high}`, meta: 'стабильно высоко', tone: 'blue' },
-    { label: 'Всего участников', value: `${ratings.length}`, meta: 'в рейтинге', tone: 'slate' },
-    { label: 'Медиана', value: `${ratingOverview.median.toFixed(1)}%`, meta: 'ровный темп', tone: 'purple' },
-    { label: 'Рефералы 30д', value: `${referrals.length}`, meta: 'активность команды', tone: 'pink' },
-    { label: 'Обновление', value: todayLabel, meta: 'автообновление данных', tone: 'indigo' },
-    { label: 'КПД недели', value: `${teamKPD.toFixed(1)}%`, meta: 'ключевой ориентир', tone: 'emerald' },
-  ]
-
-  const heroToneClass = (tone: HeroTone) => {
-    if (tone === 'emerald') {
-      return theme === 'dark'
-        ? 'bg-emerald-500/15 border-emerald-400/30 text-emerald-50'
-        : 'bg-emerald-50 border-emerald-200 text-emerald-900'
-    }
-    if (tone === 'amber') {
-      return theme === 'dark'
-        ? 'bg-amber-500/15 border-amber-400/30 text-amber-50'
-        : 'bg-amber-50 border-amber-200 text-amber-900'
-    }
-    if (tone === 'blue') {
-      return theme === 'dark'
-        ? 'bg-sky-500/15 border-sky-400/30 text-sky-50'
-        : 'bg-sky-50 border-sky-200 text-sky-900'
-    }
-    if (tone === 'purple') {
-      return theme === 'dark'
-        ? 'bg-indigo-500/15 border-indigo-400/30 text-indigo-50'
-        : 'bg-indigo-50 border-indigo-200 text-indigo-900'
-    }
-    if (tone === 'pink') {
-      return theme === 'dark'
-        ? 'bg-rose-500/15 border-rose-400/30 text-rose-50'
-        : 'bg-rose-50 border-rose-200 text-rose-900'
-    }
-    if (tone === 'indigo') {
-      return theme === 'dark'
-        ? 'bg-indigo-500/15 border-indigo-400/30 text-indigo-50'
-        : 'bg-indigo-50 border-indigo-200 text-indigo-900'
-    }
-    return theme === 'dark'
-      ? 'bg-white/5 border-white/15 text-white'
-      : 'bg-gray-50 border-gray-200 text-gray-900'
-  }
 
   const getMemberNameById = (id: string) => {
     // Use sync version for immediate display, will be updated when cache is populated
@@ -364,101 +296,129 @@ export const Rating = () => {
     await loadRatings()
   }
 
+  const statCards = [
+    {
+      label: 'Средний КПД команды',
+      value: `${teamKPD.toFixed(1)}%`,
+      note: 'за текущую неделю',
+      icon: <TrendingUp className="w-5 h-5 text-emerald-400" />,
+      bgClass: 'bg-emerald-500/5',
+      borderClass: 'border-emerald-500/20'
+    },
+    {
+      label: 'Лидер недели',
+      value: topMemberName,
+      note: topMember ? `${topMember.rating.toFixed(1)}%` : '—',
+      icon: <Award className="w-5 h-5 text-amber-400" />,
+      bgClass: 'bg-amber-500/5',
+      borderClass: 'border-amber-500/20'
+    },
+    {
+      label: 'Участников 80%+',
+      value: `${ratingOverview.high}`,
+      note: 'высокий уровень',
+      icon: <Target className="w-5 h-5 text-blue-400" />,
+      bgClass: 'bg-blue-500/5',
+      borderClass: 'border-blue-500/20'
+    },
+    {
+      label: 'Всего участников',
+      value: `${ratings.length}`,
+      note: 'в рейтинге',
+      icon: <Users className="w-5 h-5 text-purple-400" />,
+      bgClass: 'bg-purple-500/5',
+      borderClass: 'border-purple-500/20'
+    },
+    {
+      label: 'Медиана рейтинга',
+      value: `${ratingOverview.median.toFixed(1)}%`,
+      note: 'средний показатель',
+      icon: <BarChart3 className="w-5 h-5 text-indigo-400" />,
+      bgClass: 'bg-indigo-500/5',
+      borderClass: 'border-indigo-500/20'
+    },
+    {
+      label: 'Рефералы за 30 дней',
+      value: `${referrals.length}`,
+      note: 'новые участники',
+      icon: <UserPlus className="w-5 h-5 text-pink-400" />,
+      bgClass: 'bg-pink-500/5',
+      borderClass: 'border-pink-500/20'
+    },
+    {
+      label: 'Обновление данных',
+      value: todayLabel,
+      note: 'автообновление',
+      icon: <Calendar className="w-5 h-5 text-cyan-400" />,
+      bgClass: 'bg-cyan-500/5',
+      borderClass: 'border-cyan-500/20'
+    },
+
+  ]
+
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="relative overflow-hidden rounded-3xl border border-[#48a35e]/60 shadow-[0_24px_80px_rgba(0,0,0,0.45)] bg-[#10141c]">
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute -left-16 -bottom-10 w-80 h-80 bg-emerald-500/18 blur-3xl"></div>
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.08),transparent_45%)]"></div>
-        </div>
-
-        <div className="relative p-6 sm:p-8 space-y-6">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-            <div className="space-y-3 max-w-3xl">
-              <div className="flex items-start gap-3">
-                <div className="p-3 rounded-2xl bg-white/10 border border-white/20 text-white shadow-inner">
-                  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" className="text-emerald-300">
-                    <path d="M4 13.5V20h4v-6.5H4Z" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-                    <path d="M10 10v10h4V10h-4Z" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-                    <path d="M16 4v16h4V4h-4Z" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-                    <path d="M4 16.5 9.5 11l3 3 7-7" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </div>
-                <div className="space-y-2">
-                  <h1 className="text-3xl sm:text-4xl font-black text-white leading-tight">Рейтинг команды</h1>
-                  <p className="text-sm text-white/70">
-                    Данные за текущую неделю + последние 30 дней. В фокусе KPI команды, динамика и реферальная активность — как на дашборде задач.
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {['КПД недели', 'Рейтинг 30д', 'Рефералы', 'Сообщения'].map((chip, idx) => (
-                      <span
-                        key={chip}
-                        className={`px-4 py-1.5 rounded-full text-xs font-semibold border ${idx === 0
-                          ? 'bg-emerald-500 text-white border-emerald-300/60 shadow-md'
-                          : 'bg-white/10 text-white border-white/20'
-                          }`}
-                      >
-                        {chip}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
+      <div className="space-y-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-emerald-500/10 rounded-2xl border border-emerald-500/20">
+              <TrendingUp className="w-8 h-8 text-emerald-500" />
             </div>
-
-            <div className="flex flex-col items-start lg:items-end gap-2 text-white"></div>
+            <div>
+              <h1 className={`text-2xl md:text-3xl font-black tracking-tight ${headingColor}`}>
+                AVF Rating
+              </h1>
+              <p className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                Рейтинг эффективности команды ApeVault Frontier
+              </p>
+            </div>
           </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
-            {heroCards.map((card) => (
-              <div
-                key={card.label}
-                className={`relative overflow-hidden rounded-2xl border ${heroToneClass(card.tone)} p-4 backdrop-blur-sm`}
-              >
-                <div className="absolute right-3 top-3 text-xl opacity-20">•</div>
-                <div className={`text-xs uppercase tracking-[0.1em] font-semibold ${heroLabelColor}`}>{card.label}</div>
-                <div className={`mt-2 text-2xl font-bold ${heroValueColor}`}>{card.value}</div>
-                <div className={`text-sm ${heroLabelColor}`}>{card.meta}</div>
-              </div>
-            ))}
-          </div>
-
         </div>
-      </div>
 
-      {/* Как строим эффективность */}
-      <div className={`rounded-2xl p-6 sm:p-7 ${cardBg} ${cardShadow} border ${calmBorder}`}>
-        <div className="flex flex-col gap-2 mb-4">
-          <p className={`text-xs uppercase tracking-[0.12em] ${subTextColor}`}>Методика</p>
-          <h3 className={`text-2xl font-bold ${headingColor}`}>Как мы строим эффективность команды?</h3>
-          <p className={`text-sm ${subTextColor}`}>Четыре зоны, которые показывают, где сейчас участник и что делать дальше.</p>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
-          {ratingBands.map((band) => (
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {statCards.map((item, idx) => (
             <div
-              key={band.label}
-              className={`rounded-xl border ${band.bg} p-3 transition`}
+              key={idx}
+              className={`relative overflow-hidden rounded-2xl p-5 border transition-all duration-300 hover:shadow-lg group ${theme === 'dark'
+                ? `${item.bgClass} ${item.borderClass} hover:border-opacity-50`
+                : 'bg-white border-gray-100 hover:border-emerald-500/20'
+                }`}
             >
-              <div className="flex items-center justify-between">
-                <span className={`text-xs font-semibold ${subTextColor}`}>{band.label}</span>
-                <span className="text-lg">•</span>
+              <div className="flex justify-between items-start mb-4">
+                <span className={`text-[10px] font-bold uppercase tracking-wider ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                  {item.label}
+                </span>
+                <div className={`p-2 rounded-xl transition-colors ${theme === 'dark' ? 'bg-white/5 group-hover:bg-white/10' : 'bg-gray-100 group-hover:bg-gray-200'}`}>
+                  {item.icon}
+                </div>
               </div>
-              <p className={`text-base font-semibold ${band.tone}`}>{band.title}</p>
-              <p className={`text-sm ${subTextColor}`}>{band.desc}</p>
+              <div className="space-y-1">
+                <div className={`text-2xl font-black tracking-tight ${headingColor}`}>
+                  {item.value}
+                </div>
+                <div className={`text-[11px] font-medium ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>
+                  {item.note}
+                </div>
+              </div>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Рекомендации по участникам */}
-      <div className={`rounded-2xl p-6 sm:p-7 ${cardBg} ${cardShadow} border ${calmBorder}`}>
-        <div className="flex flex-col gap-2 mb-4">
-          <p className={`text-xs uppercase tracking-[0.12em] ${subTextColor}`}>Рекомендации</p>
-          <h3 className={`text-2xl font-bold ${headingColor}`}>Что улучшить каждому</h3>
-          <p className={`text-sm ${subTextColor}`}>Динамические подсказки на основе текущих метрик рейтинга.</p>
+      {/* Recommendations Section */}
+      <div className={`rounded-2xl p-6 border ${theme === 'dark' ? 'bg-[#0b1015] border-white/5' : 'bg-white border-gray-100'} shadow-xl`}>
+        <div className="flex items-center gap-3 mb-6">
+          <div className="p-2 bg-emerald-500/10 rounded-xl">
+            <Target className="w-5 h-5 text-emerald-400" />
+          </div>
+          <div>
+            <h3 className={`text-lg font-black tracking-tight ${headingColor}`}>Рекомендации по улучшению</h3>
+            <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Персональные советы для каждого участника</p>
+          </div>
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
           {sortedRatings.map((r) => {
             const recs = getRecommendations(r)
             const userName = getMemberNameById(r.userId)
@@ -474,23 +434,23 @@ export const Rating = () => {
               r.rating >= 80 ? 'Эталон' : r.rating >= 60 ? 'Уверенно' : r.rating >= 40 ? 'В пути' : 'Зона роста'
 
             return (
-              <div key={r.userId} className="rounded-xl border border-white/10 bg-white/5 p-4 space-y-3">
+              <div key={r.userId} className={`rounded-xl border p-4 space-y-3 ${theme === 'dark' ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-200'}`}>
                 <div className="flex items-center justify-between gap-2">
                   <div className="min-w-0">
-                    <p className={`text-xs uppercase tracking-[0.12em] ${subTextColor}`}>{bandText}</p>
+                    <p className={`text-xs uppercase tracking-wider font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{bandText}</p>
                     <h4 className={`text-lg font-bold ${headingColor} truncate`}>{userName}</h4>
                   </div>
                   <div className="text-right">
-                    <div className="text-2xl font-bold text-white">{r.rating.toFixed(1)}%</div>
+                    <div className={`text-2xl font-black ${headingColor}`}>{r.rating.toFixed(1)}%</div>
                   </div>
                 </div>
-                <div className="w-full bg-white/5 rounded-full h-3 overflow-hidden border border-white/10">
+                <div className={`w-full rounded-full h-2 overflow-hidden ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-200'}`}>
                   <div
                     className={`h-full ${bandClass}`}
                     style={{ width: `${Math.min(r.rating, 100)}%` }}
                   />
                 </div>
-                <ul className="space-y-1 text-sm text-white/80">
+                <ul className={`space-y-1 text-sm ${theme === 'dark' ? 'text-white/80' : 'text-gray-600'}`}>
                   {recs.map((tip, idx) => (
                     <li key={idx} className="flex items-start gap-2">
                       <span className="text-xs mt-0.5">•</span>
@@ -504,209 +464,33 @@ export const Rating = () => {
         </div>
       </div>
 
-      {/* Последняя активность на сайте */}
-      <div className={`rounded-2xl p-6 sm:p-7 ${cardBg} ${cardShadow} border ${calmBorder}`}>
-        <div className="flex flex-col gap-2 mb-4">
-          <p className={`text-xs uppercase tracking-[0.12em] ${subTextColor}`}>Активность</p>
-          <h3 className={`text-2xl font-bold ${headingColor}`}>Последняя активность на сайте</h3>
-          <p className={`text-sm ${subTextColor}`}>Информация о последнем посещении каждого участника.</p>
-        </div>
-        {userActivities.length > 0 ? (
-          <div className="overflow-auto rounded-xl border border-white/10 bg-white/5">
-            <table className="min-w-[800px] w-full text-sm text-white/90">
-              <thead className="bg-white/5 text-white/70 text-left">
-                <tr>
-                  <th className="py-3 px-4 font-semibold">Участник</th>
-                  <th className="py-3 px-4 font-semibold">Последний вход</th>
-                  <th className="py-3 px-4 font-semibold">Браузер</th>
-                  <th className="py-3 px-4 font-semibold">Время на сайте</th>
-                  <th className="py-3 px-4 font-semibold">Выход</th>
-                  <th className="py-3 px-4 font-semibold">Статус</th>
-                </tr>
-              </thead>
-              <tbody>
-                {allMembers.map((member) => {
-                  const activity = userActivities.find((a) => a.userId === member.id)
-                  const formatSessionDuration = (seconds?: number): string => {
-                    if (!seconds) return '—'
-                    const hours = Math.floor(seconds / 3600)
-                    const minutes = Math.floor((seconds % 3600) / 60)
-                    const secs = seconds % 60
-                    if (hours > 0) {
-                      return `${hours}ч ${minutes}м ${secs}с`
-                    } else if (minutes > 0) {
-                      return `${minutes}м ${secs}с`
-                    } else {
-                      return `${secs}с`
-                    }
-                  }
-                  const formatDateTime = (isoString: string): string => {
-                    try {
-                      const date = new Date(isoString)
-                      return formatDate(date, 'dd.MM.yyyy HH:mm')
-                    } catch {
-                      return isoString
-                    }
-                  }
 
-                  return (
-                    <tr
-                      key={member.id}
-                      className="border-t border-white/10 hover:bg-white/5 transition-colors"
-                    >
-                      <td className="py-3 px-4 font-semibold text-white whitespace-nowrap">{getUserNicknameSync(member.id)}</td>
-                      <td className="py-3 px-4 text-white/80 whitespace-nowrap">
-                        {activity ? formatDateTime(activity.loginAt) : '—'}
-                      </td>
-                      <td className="py-3 px-4 text-white/80 whitespace-nowrap">
-                        {activity?.browser || '—'}
-                      </td>
-                      <td className="py-3 px-4 text-white/80 whitespace-nowrap">
-                        {activity ? formatSessionDuration(activity.sessionDuration) : '—'}
-                      </td>
-                      <td className="py-3 px-4 text-white/80 whitespace-nowrap">
-                        {activity?.logoutAt ? formatDateTime(activity.logoutAt) : activity?.isActive ? 'Активен' : '—'}
-                      </td>
-                      <td className="py-3 px-4 whitespace-nowrap">
-                        {activity?.isActive ? (
-                          <span className="px-2 py-1 rounded-lg text-xs font-semibold bg-emerald-500/20 text-emerald-200 border border-emerald-400/30">
-                            Онлайн
-                          </span>
-                        ) : (
-                          <span className="px-2 py-1 rounded-lg text-xs font-semibold bg-gray-500/20 text-gray-300 border border-gray-400/30">
-                            Офлайн
-                          </span>
-                        )}
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <div className="rounded-xl border border-white/10 bg-white/5 p-4 text-white/70">
-            Данные об активности пока отсутствуют.
-          </div>
-        )}
 
-        {/* Статистика за последние 24 часа */}
-        <div className="mt-6">
-          <div className="flex flex-col gap-2 mb-4">
-            <p className={`text-xs uppercase tracking-[0.12em] ${subTextColor}`}>Статистика</p>
-            <h4 className={`text-xl font-bold ${headingColor}`}>Активность за последние 24 часа</h4>
-            <p className={`text-sm ${subTextColor}`}>Сводная информация о посещениях за сутки.</p>
-          </div>
-          {activities24h.length > 0 ? (
-            <div className="overflow-auto rounded-xl border border-white/10 bg-white/5">
-              <table className="min-w-[700px] w-full text-sm text-white/90">
-                <thead className="bg-white/5 text-white/70 text-left">
-                  <tr>
-                    <th className="py-3 px-4 font-semibold">Участник</th>
-                    <th className="py-3 px-4 font-semibold">Входов</th>
-                    <th className="py-3 px-4 font-semibold">Общее время</th>
-                    <th className="py-3 px-4 font-semibold">Среднее время сессии</th>
-                    <th className="py-3 px-4 font-semibold">Последний вход</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {allMembers.map((member) => {
-                    const memberActivities = activities24h.filter((a) => a.userId === member.id)
-
-                    const formatSessionDuration = (seconds?: number): string => {
-                      if (!seconds) return '—'
-                      const hours = Math.floor(seconds / 3600)
-                      const minutes = Math.floor((seconds % 3600) / 60)
-                      const secs = seconds % 60
-                      if (hours > 0) {
-                        return `${hours}ч ${minutes}м ${secs}с`
-                      } else if (minutes > 0) {
-                        return `${minutes}м ${secs}с`
-                      } else {
-                        return `${secs}с`
-                      }
-                    }
-
-                    const formatDateTime = (isoString: string): string => {
-                      try {
-                        const date = new Date(isoString)
-                        return formatDate(date, 'dd.MM.yyyy HH:mm')
-                      } catch {
-                        return isoString
-                      }
-                    }
-
-                    // Calculate statistics
-                    const totalSessions = memberActivities.length
-                    const totalDuration = memberActivities.reduce((sum, a) => {
-                      return sum + (a.sessionDuration || 0)
-                    }, 0)
-                    const avgDuration = totalSessions > 0 ? Math.floor(totalDuration / totalSessions) : 0
-
-                    // Get latest activity
-                    const latestActivity = memberActivities.length > 0
-                      ? memberActivities.reduce((latest, current) => {
-                        return new Date(current.loginAt) > new Date(latest.loginAt) ? current : latest
-                      })
-                      : null
-
-                    return (
-                      <tr
-                        key={member.id}
-                        className="border-t border-white/10 hover:bg-white/5 transition-colors"
-                      >
-                        <td className="py-3 px-4 font-semibold text-white whitespace-nowrap">{getUserNicknameSync(member.id)}</td>
-                        <td className="py-3 px-4 text-white/80 whitespace-nowrap text-center">
-                          {totalSessions > 0 ? totalSessions : '—'}
-                        </td>
-                        <td className="py-3 px-4 text-white/80 whitespace-nowrap">
-                          {totalDuration > 0 ? formatSessionDuration(totalDuration) : '—'}
-                        </td>
-                        <td className="py-3 px-4 text-white/80 whitespace-nowrap">
-                          {avgDuration > 0 ? formatSessionDuration(avgDuration) : '—'}
-                        </td>
-                        <td className="py-3 px-4 text-white/80 whitespace-nowrap">
-                          {latestActivity ? formatDateTime(latestActivity.loginAt) : '—'}
-                        </td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
+      {/* Referrals Section */}
+      <div className={`rounded-2xl p-6 border ${theme === 'dark' ? 'bg-[#0b1015] border-white/5' : 'bg-white border-gray-100'} shadow-xl`}>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-pink-500/10 rounded-xl">
+              <UserPlus className="w-5 h-5 text-pink-400" />
             </div>
-          ) : (
-            <div className="rounded-xl border border-white/10 bg-white/5 p-4 text-white/70">
-              За последние 24 часа активности не зафиксировано.
+            <div>
+              <h3 className={`text-lg font-black tracking-tight ${headingColor}`}>Рефералы</h3>
+              <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Всего: {referrals.length}</p>
             </div>
-          )}
-        </div>
-
-      </div>
-
-      {/* Referral stats */}
-      <div
-        id="rating-ref"
-        className={`rounded-2xl p-6 sm:p-7 ${cardBg} ${cardShadow} border ${calmBorder}`}
-      >
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
-          <div className="space-y-1">
-            <p className={`text-xs uppercase tracking-[0.12em] ${subTextColor}`}>Рефералы · 30 дней</p>
-            <h3 className={`text-2xl font-bold ${headingColor}`}>Привлеченные участники</h3>
-            <p className={`text-sm ${subTextColor}`}>Всего добавлено: <span className="font-semibold">{referrals.length}</span></p>
           </div>
           <button
             onClick={handleAddReferral}
-            className="px-4 py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 font-semibold shadow-md w-full sm:w-auto border border-indigo-200/70 bg-indigo-50 text-indigo-900 hover:bg-indigo-100 dark:bg-indigo-500/15 dark:border-indigo-400/30 dark:text-indigo-50"
+            className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm transition-all shadow-lg shadow-emerald-500/20 hover:scale-105 active:scale-95"
           >
-            <span className="text-xl">➕</span>
+            <UserPlus className="w-4 h-4" />
             <span>Добавить реферала</span>
           </button>
         </div>
 
         {referrals.length ? (
-          <div className="overflow-auto rounded-xl border border-white/10 bg-white/5">
-            <table className="min-w-[820px] w-full text-sm text-white/90">
-              <thead className="bg-white/5 text-white/70 text-left">
+          <div className={`overflow-auto rounded-xl border ${theme === 'dark' ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-200'}`}>
+            <table className={`min-w-[820px] w-full text-sm ${theme === 'dark' ? 'text-white/90' : 'text-gray-900'}`}>
+              <thead className={`text-left ${theme === 'dark' ? 'bg-white/5 text-white/70' : 'bg-gray-100 text-gray-600'}`}>
                 <tr>
                   <th className="py-3 px-4 font-semibold">Кто привел</th>
                   <th className="py-3 px-4 font-semibold">Код</th>
@@ -722,16 +506,21 @@ export const Rating = () => {
                   return (
                     <tr
                       key={referral.id}
-                      className="border-t border-white/10 hover:bg-white/5 transition-colors"
+                      className={`border-t transition-colors ${theme === 'dark' ? 'border-white/10 hover:bg-white/5' : 'border-gray-200 hover:bg-gray-100'}`}
                     >
-                      <td className="py-3 px-4 font-semibold text-white whitespace-nowrap">{ownerName}</td>
-                      <td className="py-3 px-4 text-white/80 whitespace-nowrap">{referral.referralId}</td>
-                      <td className="py-3 px-4 text-white/80">{referral.name}</td>
-                      <td className="py-3 px-4 text-white/70">{referral.comment || '—'}</td>
+                      <td className={`py-3 px-4 font-semibold whitespace-nowrap ${headingColor}`}>{ownerName}</td>
+                      <td className={`py-3 px-4 whitespace-nowrap ${theme === 'dark' ? 'text-white/80' : 'text-gray-600'}`}>{referral.referralId}</td>
+                      <td className={`py-3 px-4 ${theme === 'dark' ? 'text-white/80' : 'text-gray-600'}`}>{referral.name}</td>
+                      <td className={`py-3 px-4 ${theme === 'dark' ? 'text-white/70' : 'text-gray-500'}`}>{referral.comment || '—'}</td>
                       <td className="py-3 px-4 text-right whitespace-nowrap flex items-center justify-end gap-2">
                         <button
                           onClick={() => canManage && handleEditReferral(referral)}
-                          className={`px-3 py-1.5 rounded-lg text-xs font-semibold border border-white/20 bg-white/10 text-white transition ${!canManage ? 'opacity-40 cursor-not-allowed' : 'hover:bg-white/20'}`}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition ${!canManage
+                            ? 'opacity-40 cursor-not-allowed'
+                            : theme === 'dark'
+                              ? 'border-white/20 bg-white/10 text-white hover:bg-white/20'
+                              : 'border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100'
+                            }`}
                           disabled={!canManage}
                         >
                           Редактировать
@@ -751,35 +540,34 @@ export const Rating = () => {
             </table>
           </div>
         ) : (
-          <div className="rounded-xl border border-white/10 bg-white/5 p-4 text-white/70">
+          <div className={`rounded-xl border p-4 ${theme === 'dark' ? 'bg-white/5 border-white/10 text-white/70' : 'bg-gray-50 border-gray-200 text-gray-500'}`}>
             Пока нет рефералов.
           </div>
         )}
       </div>
 
-      {/* Rating cards section */}
-      <div
-        id="rating-method"
-        className={`rounded-2xl p-6 sm:p-7 ${cardBg} ${cardShadow} border ${calmBorder}`}
-      >
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
-          <div className="space-y-1">
-            <p className={`text-xs uppercase tracking-[0.12em] ${subTextColor}`}>Карточки участников</p>
-            <h3 className={`text-2xl font-bold ${headingColor}`}>Детальная статистика</h3>
-
+      {/* Rating Cards Section */}
+      <div className={`rounded-2xl p-6 border ${theme === 'dark' ? 'bg-[#0b1015] border-white/5' : 'bg-white border-gray-100'} shadow-xl`}>
+        <div className="flex items-center gap-3 mb-6">
+          <div className="p-2 bg-emerald-500/10 rounded-xl">
+            <BarChart3 className="w-5 h-5 text-emerald-400" />
           </div>
-
+          <div>
+            <h3 className={`text-lg font-black tracking-tight ${headingColor}`}>Детальная статистика</h3>
+            <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Карточки участников с полными данными</p>
+          </div>
         </div>
 
         {loading ? (
-          <div className={`rounded-xl p-12 text-center ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-50'} border ${calmBorder}`}>
-            <div className="animate-spin rounded-full h-12 w-12 border-4 border-emerald-500 border-t-transparent mx-auto mb-4"></div>
-            <p className={`text-lg font-semibold ${headingColor}`}>Загрузка рейтинга...</p>
-            <p className={`text-sm ${subTextColor} mt-2`}>Подождите, собираем статистику</p>
+          <div className={`rounded-xl p-12 text-center border border-dashed ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-gray-50'}`}>
+            <div className="flex flex-col items-center gap-4">
+              <div className="w-10 h-10 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin" />
+              <p className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Загрузка рейтинга...</p>
+            </div>
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
               {[
                 { label: 'Топ-1', value: sortedRatings[0]?.rating ? `${sortedRatings[0].rating.toFixed(1)}%` : '—' },
                 { label: 'Средний рейтинг', value: `${teamKPD.toFixed(1)}%` },
@@ -788,10 +576,10 @@ export const Rating = () => {
               ].map((item) => (
                 <div
                   key={item.label}
-                  className={`rounded-xl border ${calmBorder} ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-50'} px-4 py-3`}
+                  className={`rounded-xl border px-4 py-3 ${theme === 'dark' ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-200'}`}
                 >
-                  <p className={`text-[11px] uppercase tracking-wide ${subTextColor}`}>{item.label}</p>
-                  <p className={`text-2xl font-extrabold ${headingColor}`}>{item.value}</p>
+                  <p className={`text-[11px] uppercase tracking-wide font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{item.label}</p>
+                  <p className={`text-2xl font-black ${headingColor}`}>{item.value}</p>
                 </div>
               ))}
             </div>
@@ -799,9 +587,11 @@ export const Rating = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-2 gap-6">
               {sortedRatings.map((rating, index) => {
                 return (
-                  <div key={rating.userId}>
-                    <RatingCard rating={rating} place={{ rank: index + 1 }} />
-                  </div>
+                  <RatingCard
+                    key={rating.userId}
+                    rating={rating}
+                    place={{ rank: index + 1 }}
+                  />
                 )
               })}
             </div>
@@ -809,6 +599,7 @@ export const Rating = () => {
         )}
       </div>
 
+      {/* Form Overlay */}
       {showReferralForm && (
         <ReferralForm
           referral={activeReferral}
@@ -826,4 +617,3 @@ export const Rating = () => {
     </div>
   )
 }
-

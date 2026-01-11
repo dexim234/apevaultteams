@@ -8,7 +8,7 @@ import { Login } from './pages/Login'
 import { CallPage } from './pages/Call'
 import { Management } from './pages/Management'
 import { Earnings } from './pages/Earnings'
-import { Rating } from './pages/Rating'
+import { RatingPage } from './pages/Rating'
 import { Tasks } from './pages/Tasks'
 import { Admin } from './pages/Admin'
 import { Profile } from './pages/Profile'
@@ -84,7 +84,7 @@ function App() {
             path="/rating"
             element={
               <ProtectedRoute>
-                <Rating />
+                <RatingPage />
               </ProtectedRoute>
             }
           />
