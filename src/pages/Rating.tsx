@@ -180,7 +180,11 @@ export const Rating = () => {
 
       // Sort by rating
       allRatings.sort((a, b) => b.rating - a.rating)
+      console.log('Rating.tsx - allRatings after sort:', allRatings)
+      console.log('Rating.tsx - allRatings length:', allRatings.length)
+      console.log('Rating.tsx - first rating breakdown:', allRatings[0]?.breakdown)
       setRatings(allRatings)
+
 
 
     } catch (error) {
@@ -518,15 +522,20 @@ export const Rating = () => {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-2 gap-6">
-              {sortedRatings.map((rating, index) => {
-                return (
-                  <RatingCard
-                    key={rating.userId}
-                    rating={rating}
-                    place={{ rank: index + 1 }}
-                  />
-                )
-              })}
+              {(() => {
+                console.log('Rating.tsx - About to render cards. sortedRatings:', sortedRatings)
+                console.log('Rating.tsx - sortedRatings.length:', sortedRatings.length)
+                return sortedRatings.map((rating, index) => {
+                  console.log(`Rating.tsx - Rendering card ${index} for user:`, rating.userId)
+                  return (
+                    <RatingCard
+                      key={rating.userId}
+                      rating={rating}
+                      place={{ rank: index + 1 }}
+                    />
+                  )
+                })
+              })()}
             </div>
           </>
         )}

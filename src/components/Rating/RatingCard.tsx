@@ -25,6 +25,7 @@ interface MetricInfo {
 }
 
 export const RatingCard = ({ rating, place }: RatingCardProps) => {
+  console.log('RatingCard render - userId:', rating.userId, 'breakdown:', rating.breakdown)
   const { theme } = useThemeStore()
   const [expandedMetric, setExpandedMetric] = useState<number | null>(null)
   const member = TEAM_MEMBERS.find((m) => m.id === rating.userId)
