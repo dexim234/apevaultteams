@@ -18,6 +18,10 @@ export interface RatingBreakdown {
   weeklyEarningsPoints: number
   referrals: number
   referralsPoints: number
+  signals: number
+  initiatives: number
+  poolAmount: number
+  truancyDays: number
   totalRating: number
 }
 
@@ -200,6 +204,10 @@ export const getRatingBreakdown = (
     weeklyEarningsPoints,
     referrals: data.referrals,
     referralsPoints,
+    signals: data.signals,
+    initiatives: data.initiatives,
+    poolAmount: data.poolAmount,
+    truancyDays: data.truancyDays,
     totalRating,
   }
 }

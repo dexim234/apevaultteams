@@ -4,7 +4,7 @@ import { getRatingBreakdown, getExclusionStatus } from '@/utils/ratingUtils'
 import { RatingData, TEAM_MEMBERS } from '@/types'
 import { formatHours } from '@/utils/dateUtils'
 import { UserNickname } from '@/components/UserNickname'
-import { Calendar, Heart, Plane, Clock, DollarSign, Users, TrendingUp, Info, AlertTriangle } from 'lucide-react'
+import { Calendar, Heart, Plane, Clock, DollarSign, Users, TrendingUp, Info, AlertTriangle, Zap, Lightbulb } from 'lucide-react'
 import React, { useState } from 'react'
 
 interface RatingCardProps {
@@ -143,6 +143,39 @@ export const RatingCard = ({ rating, place }: RatingCardProps) => {
       color: 'bg-pink-200 text-pink-900'
     },
     {
+      icon: <Zap className="w-5 h-5" />,
+      label: 'Сигналы/Коллы',
+      value: `${rating.breakdown.signals}`,
+      points: 0,
+      maxPoints: 0,
+      what: `Дано ${rating.breakdown.signals} сигналов.`,
+      why: 'Активность в трейдинге и генерация идей.',
+      how: 'Продолжай искать и публиковать качественные сигналы.',
+      color: 'bg-yellow-200 text-yellow-900'
+    },
+    {
+      icon: <Lightbulb className="w-5 h-5" />,
+      label: 'Инициативы',
+      value: `${rating.breakdown.initiatives}`,
+      points: 0,
+      maxPoints: 0,
+      what: `Предложено ${rating.breakdown.initiatives} инициатив.`,
+      why: 'Проактивность помогает развивать проект.',
+      how: 'Предлагай идеи по улучшению процессов.',
+      color: 'bg-indigo-200 text-indigo-900'
+    },
+    {
+      icon: <DollarSign className="w-5 h-5" />,
+      label: 'Пул',
+      value: `${rating.breakdown.poolAmount.toFixed(2)} ₽`,
+      points: 0,
+      maxPoints: 0,
+      what: `Отправлено в пул: ${rating.breakdown.poolAmount.toFixed(2)} ₽.`,
+      why: 'Вклад в общий пул команды.',
+      how: 'Увеличивай отчисления с доходов.',
+      color: 'bg-green-200 text-green-900'
+    },
+    {
       icon: <Calendar className="w-5 h-5" />,
       label: 'Выходные',
       value: `${rating.breakdown.daysOff} дн.`,
@@ -183,16 +216,29 @@ export const RatingCard = ({ rating, place }: RatingCardProps) => {
     },
     {
       icon: <AlertTriangle className="w-5 h-5" />,
-      label: 'Прогулы',
+      label: 'Прогулы (Absence)',
       value: `${rating.breakdown.absenceDays} дн.`,
       points: rating.breakdown.absenceDaysPoints,
       maxPoints: 0,
-      what: `Зафиксировано ${rating.breakdown.absenceDays} прогулов.`,
-      why: 'Прогулы — это нарушение дисциплины, которое подводит команду.',
+      what: `Зафиксировано ${rating.breakdown.absenceDays} дней отсутствия (Absence).`,
+      why: 'Отсутствие без уважительной причины влияет на рейтинг.',
       how: rating.breakdown.absenceDays > 0
-        ? 'Исключи прогулы. Предупреждай о форс-мажорах заранее.'
-        : 'Дисциплина на высоте.',
-      color: 'bg-red-200 text-red-900'
+        ? 'Избегай отсутствия без предупреждения.'
+        : 'Дисциплина в норме.',
+      color: 'bg-red-100 text-red-800'
+    },
+    {
+      icon: <AlertTriangle className="w-5 h-5" />,
+      label: 'Прогулы (Truancy)',
+      value: `${rating.breakdown.truancyDays} дн.`,
+      points: 0,
+      maxPoints: 0,
+      what: `Зафиксировано ${rating.breakdown.truancyDays} прогулов (Truancy).`,
+      why: 'Грубое нарушение дисциплины.',
+      how: rating.breakdown.truancyDays > 0
+        ? 'Прогулы недопустимы.'
+        : 'Прогулов нет.',
+      color: 'bg-red-300 text-red-900'
     },
   ] : []
 
