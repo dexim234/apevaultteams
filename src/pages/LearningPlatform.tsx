@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { BookOpen, Clock, Users, Award, Play, ChevronRight, Search } from 'lucide-react'
+import { BookOpen, Clock, Users, Award, Play } from 'lucide-react'
 
 // Simple cn utility inline
 const cn = (...classes: (string | undefined | null | false)[]) => {
