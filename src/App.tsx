@@ -1,4 +1,3 @@
-// Main App component with routing
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useAuthStore } from './store/authStore'
 import { useAdminStore } from './store/adminStore'
@@ -15,10 +14,9 @@ import { Profile } from './pages/Profile'
 import { About } from './pages/About'
 import { Rules } from './pages/Rules'
 import { Approvals } from './pages/Approvals'
-import { MemeEvaluation } from './pages/MemeEvaluation'
+import { Strategies } from './pages/Strategies'
 import { AiAoAlerts } from './pages/AiAoAlerts'
-import { SignalsTriggerBot } from './pages/SignalsTriggerBot'
-import FasolSignalsStrategy from './pages/FasolSignalsStrategy'
+import { FasolSignalsStrategy } from './pages/FasolSignalsStrategy'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { AccessBlockScreen } from './components/AccessBlockScreen'
 import { cleanupOldData } from './services/firestoreService'
@@ -137,10 +135,10 @@ function App() {
             }
           />
           <Route
-            path="/meme-evaluation"
+            path="/strategies"
             element={
               <ProtectedRoute>
-                <MemeEvaluation />
+                <Strategies />
               </ProtectedRoute>
             }
           />
@@ -153,15 +151,7 @@ function App() {
             }
           />
           <Route
-            path="/signals-trigger-bot"
-            element={
-              <ProtectedRoute>
-                <SignalsTriggerBot />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/fasol-signals-strategy"
+            path="/our-deals-analysis"
             element={
               <ProtectedRoute>
                 <FasolSignalsStrategy />
@@ -177,6 +167,3 @@ function App() {
 }
 
 export default App
-
-
-

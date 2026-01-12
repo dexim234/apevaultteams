@@ -4,8 +4,7 @@ import { useAdminStore, ADMIN_PASSWORD } from '@/store/adminStore'
 import { useAuthStore } from '@/store/authStore'
 import { useViewedUserStore, getEffectiveUserId } from '@/store/viewedUserStore'
 import { useUserActivity } from '@/hooks/useUserActivity'
-import { checkUserAccess, getApprovalRequests, getTasks, getWorkSlots } from '@/services/firestoreService'
-import { formatDate } from '@/utils/dateUtils'
+import { checkUserAccess } from '@/services/firestoreService'
 import {
   Calendar,
   Settings,
@@ -17,7 +16,6 @@ import {
   Shield,
   DollarSign,
   AlertTriangle,
-  Table,
   ZapOff,
   Moon,
   Sun,
@@ -48,7 +46,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
     const saved = localStorage.getItem('sidebarCollapsed')
     return saved === 'true'
   })
-  const [notifications, setNotifications] = useState<{ id: string; text: string; time: string; status: string }[]>([])
+  const [notifications] = useState<{ id: string; text: string; time: string; status: string }[]>([])
   const [accessibleFeatures, setAccessibleFeatures] = useState<Set<string>>(new Set())
   const [isFeaturesLoading, setIsFeaturesLoading] = useState(true)
 
@@ -64,11 +62,11 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
       setIsFeaturesLoading(true)
       try {
         if (!user || isAdmin) {
-          setAccessibleFeatures(new Set(['slots', 'earnings', 'tasks', 'rating', 'profile', 'admin', 'tools', 'tools_meme_evaluation', 'tools_ai_ao_alerts', 'tools_signals_trigger_bot', 'tools_fasol_signals_strategy']))
+          setAccessibleFeatures(new Set(['slots', 'earnings', 'tasks', 'rating', 'profile', 'admin', 'tools', 'tools_strategies', 'tools_ai_ao_alerts', 'tools_our_deals_analysis']))
           return
         }
 
-        const features = ['slots', 'earnings', 'tasks', 'rating', 'profile', 'about', 'tools', 'tools_meme_evaluation', 'tools_ai_ao_alerts', 'tools_signals_trigger_bot', 'tools_fasol_signals_strategy', 'avf_hub']
+        const features = ['slots', 'earnings', 'tasks', 'rating', 'profile', 'about', 'tools', 'tools_strategies', 'tools_ai_ao_alerts', 'tools_our_deals_analysis', 'avf_hub']
         const accessible = new Set<string>()
 
         for (const feature of features) {
@@ -109,10 +107,9 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
   )
 
   const toolsSubItems: { path: string; label: string; icon: LucideIcon; feature: string }[] = [
-    { path: '/meme-evaluation', label: 'Оценка мема', icon: TrendingUp, feature: 'tools_meme_evaluation' },
+    { path: '/strategies', label: 'Стратегии', icon: TrendingUp, feature: 'tools_strategies' },
     { path: '/ai-ao-alerts', label: 'Al AO ALERTS', icon: AlertTriangle, feature: 'tools_ai_ao_alerts' },
-    { path: '/signals-trigger-bot', label: 'Al TB ALERTS', icon: Table, feature: 'tools_signals_trigger_bot' },
-    { path: '/fasol-signals-strategy', label: 'Al FL ALERTS', icon: Zap, feature: 'tools_fasol_signals_strategy' },
+    { path: '/our-deals-analysis', label: 'Анализ наших сделок', icon: Zap, feature: 'tools_our_deals_analysis' },
   ]
 
   // Filter tools that user has access to
@@ -121,173 +118,6 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
   )
 
   const isToolsActive = toolsSubItems.some(item => location.pathname === item.path)
-
-  useEffect(() => {
-    setShowToolsMenu(false)
-  }, [location.pathname])
-
-  useEffect(() => {
-    const loadNotifications = async () => {
-      // Only load notifications for admin, not when viewing other users
-      if (isAdmin || !user || viewedUserId) {
-        setNotifications([])
-        return
-      }
-
-      type NotificationItem = { id: string; text: string; time: string; status: string; timestamp: number }
-      const notificationsList: NotificationItem[] = []
-      const cutoff = Date.now() - 6 * 60 * 60 * 1000
-      const now = Date.now()
-      const oneHourMs = 60 * 60 * 1000
-
-      const viewedKey = `viewedNotifications_${user.id}`
-      const viewedIds = JSON.parse(localStorage.getItem(viewedKey) || '[]')
-
-      // Approvals
-      const approvals = await getApprovalRequests()
-      const approvalNotifications = approvals
-        .filter((a) => {
-          if (a.authorId !== user.id && a.targetUserId !== user.id) return false
-          const ts = Date.parse(a.updatedAt || a.createdAt)
-          if (Number.isNaN(ts) || ts < cutoff) return false
-          if (viewedIds.includes(`approval_${a.id}`)) return false
-          return true
-        })
-        .map((a) => {
-          const timestamp = Date.parse(a.updatedAt || a.createdAt || new Date().toISOString())
-          return {
-            id: `approval_${a.id}`,
-            status: a.status,
-            text: `${a.entity === 'slot' ? 'Слот' : a.entity === 'status' ? 'Статус' : a.entity === 'login' ? 'Ник' : a.entity === 'earning' ? 'Заработок' : a.entity === 'referral' ? 'Реферал' : 'Изменение'} • ${a.status === 'approved' ? 'Подтверждено' : a.status === 'rejected' ? 'Отклонено' : 'На согласовании'}${a.adminComment ? `: ${a.adminComment}` : ''}`,
-            time: formatDate(a.updatedAt || a.createdAt || new Date().toISOString(), 'dd.MM HH:mm'),
-            timestamp: Number.isNaN(timestamp) ? now : timestamp,
-          }
-        })
-      notificationsList.push(...approvalNotifications)
-
-      // Tasks
-      const tasks = await getTasks({ assignedTo: user.id })
-      const taskNotifications = tasks
-        .filter((task) => {
-          const createdAt = Date.parse(task.createdAt)
-          const isNew = !Number.isNaN(createdAt) && createdAt >= cutoff && !viewedIds.includes(`task_new_${task.id}`)
-
-          if (!task.dueDate || !task.dueTime) return isNew
-
-          const deadline = new Date(`${task.dueDate}T${task.dueTime}`)
-          const deadlineMs = deadline.getTime()
-          if (Number.isNaN(deadlineMs)) return isNew
-
-          const diffMs = deadlineMs - now
-          const isDueInHour = diffMs > 0 && diffMs <= oneHourMs && !viewedIds.includes(`task_due_${task.id}`)
-          const isOverdue = diffMs < 0 && diffMs >= -cutoff && !viewedIds.includes(`task_overdue_${task.id}`)
-
-          return isNew || isDueInHour || isOverdue
-        })
-        .map(task => {
-          const createdAt = Date.parse(task.createdAt)
-          const isNew = !Number.isNaN(createdAt) && createdAt >= cutoff && !viewedIds.includes(`task_new_${task.id}`)
-
-          if (isNew) {
-            const timestamp = Date.parse(task.createdAt)
-            return {
-              id: `task_new_${task.id}`,
-              status: 'new',
-              text: `Новая задача: ${task.title}`,
-              time: formatDate(task.createdAt, 'dd.MM HH:mm'),
-              timestamp: Number.isNaN(timestamp) ? now : timestamp,
-            }
-          }
-
-          if (!task.dueDate || !task.dueTime) return null
-
-          const deadline = new Date(`${task.dueDate}T${task.dueTime}`)
-          const deadlineMs = deadline.getTime()
-          if (Number.isNaN(deadlineMs)) return null
-
-          const diffMs = deadlineMs - now
-          if (diffMs > 0 && diffMs <= oneHourMs && !viewedIds.includes(`task_due_${task.id}`)) {
-            return {
-              id: `task_due_${task.id}`,
-              status: 'due',
-              text: `Дедлайн через час: ${task.title}`,
-              time: formatDate(deadline.toISOString(), 'dd.MM HH:mm'),
-              timestamp: deadlineMs,
-            }
-          }
-
-          if (diffMs < 0 && diffMs >= -cutoff && !viewedIds.includes(`task_overdue_${task.id}`)) {
-            return {
-              id: `task_overdue_${task.id}`,
-              status: 'overdue',
-              text: `Просрочен дедлайн: ${task.title}`,
-              time: formatDate(deadline.toISOString(), 'dd.MM HH:mm'),
-              timestamp: deadlineMs,
-            }
-          }
-
-          return null
-        })
-        .filter((n): n is { id: string; text: string; time: string; status: string; timestamp: number } => n !== null)
-      notificationsList.push(...taskNotifications)
-
-      // Slots
-      const slots = await getWorkSlots(user.id)
-      const slotNotifications = slots
-        .filter((slot) => {
-          if (viewedIds.includes(`slot_ended_${slot.id}`)) return false
-          if (!slot.slots || slot.slots.length === 0) return false
-
-          const lastSlot = slot.slots[slot.slots.length - 1]
-          if (!lastSlot) return false
-
-          let slotEnd: Date
-          if (lastSlot.endDate) {
-            slotEnd = new Date(lastSlot.endDate)
-            const [hours, minutes] = lastSlot.end.split(':').map(Number)
-            slotEnd.setHours(hours, minutes, 0, 0)
-          } else {
-            slotEnd = new Date(slot.date)
-            const [hours, minutes] = lastSlot.end.split(':').map(Number)
-            slotEnd.setHours(hours, minutes, 0, 0)
-          }
-
-          const slotEndMs = slotEnd.getTime()
-          if (Number.isNaN(slotEndMs)) return false
-
-          return slotEndMs < now && slotEndMs >= (now - cutoff)
-        })
-        .map((slot) => {
-          const lastSlot = slot.slots[slot.slots.length - 1]
-          let slotEnd: Date
-          if (lastSlot.endDate) {
-            slotEnd = new Date(lastSlot.endDate)
-            const [hours, minutes] = lastSlot.end.split(':').map(Number)
-            slotEnd.setHours(hours, minutes, 0, 0)
-          } else {
-            slotEnd = new Date(slot.date)
-            const [hours, minutes] = lastSlot.end.split(':').map(Number)
-            slotEnd.setHours(hours, minutes, 0, 0)
-          }
-
-          return {
-            id: `slot_ended_${slot.id}`,
-            status: 'ended',
-            text: `Слот завершился: ${formatDate(slot.date, 'dd.MM.yyyy')}`,
-            time: formatDate(slotEnd.toISOString(), 'dd.MM HH:mm'),
-            timestamp: slotEnd.getTime(),
-          }
-        })
-      notificationsList.push(...slotNotifications)
-
-      notificationsList.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))
-      setNotifications(notificationsList.map(({ timestamp, ...rest }) => rest))
-    }
-
-    loadNotifications()
-    const id = setInterval(loadNotifications, 2 * 60 * 1000)
-    return () => clearInterval(id)
-  }, [user, isAdmin, viewedUserId])
 
   const toggleCollapsed = () => {
     const newState = !isCollapsed
@@ -379,8 +209,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                 <div className="space-y-1 relative group/tools">
                   <button
                     onClick={() => !isCollapsed && setShowToolsMenu(!showToolsMenu)}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${isToolsActive ? 'bg-[#4E6E49]/15 text-[#4E6E49]' : 'text-gray-500 hover:bg-gray-100/50 dark:hover:bg-white/5'
-                      } ${isCollapsed ? 'justify-center px-0' : ''}`}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${isToolsActive ? 'bg-[#4E6E49]/15 text-[#4E6E49]' : 'text-gray-500 hover:bg-gray-100/50 dark:hover:bg-white/5'} ${isCollapsed ? 'justify-center px-0' : ''}`}
                   >
                     <Settings className={`w-4 h-4 transition-transform duration-500 ${isCollapsed ? 'group-hover/tools:rotate-90' : ''}`} />
                     {!isCollapsed && (
@@ -445,8 +274,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                   <Link
                     key={item.path}
                     to={item.path}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${location.pathname === item.path ? 'bg-[#4E6E49] text-white shadow-lg shadow-[#4E6E49]/30' : 'text-gray-500 hover:bg-gray-100/50 dark:hover:bg-white/5 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
-                      } ${isCollapsed ? 'justify-center px-0' : ''}`}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${location.pathname === item.path ? 'bg-[#4E6E49] text-white shadow-lg shadow-[#4E6E49]/30' : 'text-gray-500 hover:bg-gray-100/50 dark:hover:bg-white/5 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'} ${isCollapsed ? 'justify-center px-0' : ''}`}
                   >
                     <item.icon className="w-4 h-4" />
                     {!isCollapsed && <span className="font-bold text-sm tracking-tight">{item.label}</span>}
@@ -458,10 +286,9 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
           <div className={`relative z-10 m-4 space-y-2 transition-all duration-500 ${isCollapsed ? 'm-2 space-y-4' : ''}`}>
             <Link
               to="/profile"
-              className={`p-4 rounded-2xl flex items-center gap-3 transition-all group ${location.pathname === '/profile' ? 'bg-[#4E6E49]/10 border border-[#4E6E49]/30' : 'border border-gray-200/50 dark:border-white/5 hover:bg-gray-100/50 dark:hover:bg-white/5'
-                } ${isCollapsed ? 'p-0 h-12 w-12 items-center justify-center mx-auto border-0' : ''}`}
+              className={`p-4 rounded-2xl flex items-center gap-3 transition-all group ${location.pathname === '/profile' ? 'bg-[#4E6E49]/10 border border-[#4E6E49]/30' : 'border border-gray-200/50 dark:border-white/5 hover:bg-gray-100/50 dark:hover:bg-white/5'} ${isCollapsed ? 'p-0 h-12 w-12 items-center justify-center mx-auto border-0' : ''}`}
             >
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shadow-inner shrink-0 ${theme === 'dark' ? 'bg-emerald-500/20 text-[#4E6E49]' : 'bg-[#4E6E49]/10 text-[#4E6E49]'}`}>
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center text-[#4E6E49] font-bold shadow-inner shrink-0 ${theme === 'dark' ? 'bg-emerald-500/20 text-[#4E6E49]' : 'bg-[#4E6E49]/10 text-[#4E6E49]'}`}>
                 {user?.avatar ? <img src={user.avatar} className="w-full h-full rounded-full object-cover" /> : getInitials(user?.name || 'User')}
               </div>
               {!isCollapsed && (
@@ -569,7 +396,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
             <div className="flex-1 overflow-y-auto p-4 space-y-6">
               {/* Profile Section */}
               <div className={`flex items-center gap-3 p-4 rounded-2xl border ${theme === 'dark' ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-100'}`}>
-                <div className="w-10 h-10 rounded-full bg-[#4E6E49]/20 flex items-center justify-center text-[#4E6E49] font-bold">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-[#4E6E49] font-bold`}>
                   {user?.avatar ? <img src={user.avatar} className="w-full h-full rounded-full object-cover" /> : getInitials(user?.name || 'User')}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -590,10 +417,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                         key={item.path}
                         to={item.path}
                         onClick={() => setIsMobileMenuOpen(false)}
-                        className={`flex flex-col items-center justify-center gap-2 p-3 rounded-xl border transition-all ${location.pathname === item.path
-                          ? 'border-[#4E6E49]/50 bg-[#4E6E49]/10'
-                          : theme === 'dark' ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-gray-100 bg-gray-50 hover:bg-gray-100'
-                          }`}
+                        className={`flex flex-col items-center justify-center gap-2 p-3 rounded-xl border transition-all ${location.pathname === item.path ? 'border-[#4E6E49]/50 bg-[#4E6E49]/10' : theme === 'dark' ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-gray-100 bg-gray-50 hover:bg-gray-100'}`}
                       >
                         <item.icon className={`w-6 h-6 ${location.pathname === item.path ? 'text-[#4E6E49]' : 'text-gray-400'}`} />
                         <span className={`text-xs font-medium text-center ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>{item.label}</span>
@@ -612,10 +436,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                       key={item.path}
                       to={item.path}
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className={`flex items-center gap-3 p-3 rounded-xl transition-all ${location.pathname === item.path
-                        ? 'bg-[#4E6E49] text-white shadow-lg'
-                        : theme === 'dark' ? 'text-gray-400 hover:bg-white/5 hover:text-white' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900'
-                        }`}
+                      className={`flex items-center gap-3 p-3 rounded-xl transition-all ${location.pathname === item.path ? 'bg-[#4E6E49] text-white shadow-lg' : theme === 'dark' ? 'text-gray-400 hover:bg-white/5 hover:text-white' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900'}`}
                     >
                       <item.icon className="w-5 h-5" />
                       <span className="font-bold text-sm">{item.label}</span>
