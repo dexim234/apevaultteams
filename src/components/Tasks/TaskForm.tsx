@@ -236,7 +236,8 @@ export const TaskForm = ({ onClose, onSave, editingTask }: TaskFormProps) => {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-start sm:items-center justify-center z-[70] p-4 overflow-y-auto overscroll-contain modal-scroll touch-pan-y">
+    <>
+      <div className="fixed inset-0 bg-black/50 flex items-start sm:items-center justify-center z-[70] p-4 overflow-y-auto overscroll-contain modal-scroll touch-pan-y">
       <div
         className={`${cardBg} rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-2xl max-h-[calc(100vh-48px)] sm:max-h-[calc(100vh-64px)] overflow-y-auto border-2 touch-pan-y ${
           theme === 'dark'
@@ -511,9 +512,10 @@ export const TaskForm = ({ onClose, onSave, editingTask }: TaskFormProps) => {
           </div>
         </div>
       </div>
+      </div>
 
       {/* Индикатор прогресса сохранения */}
       <SaveProgressIndicator loading={loading} message="Сохранение задачи..." />
-    </div>
+    </>
   )
 }

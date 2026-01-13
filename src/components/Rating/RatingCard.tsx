@@ -277,6 +277,7 @@ export const RatingCard = ({ rating, place }: RatingCardProps) => {
               <UserNickname userId={rating.userId} fallback="unknown" />
             </h3>
             {placeBadge}
+          </div>
           <div className="flex flex-col items-end gap-1">
             <span className={`text-4xl font-black bg-gradient-to-br from-emerald-600 to-blue-600 bg-clip-text text-transparent dark:from-emerald-400 dark:to-blue-400`}>
               {rating.rating.toFixed(1)}%

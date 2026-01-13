@@ -775,7 +775,8 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory, cat
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
+    <>
+      <form onSubmit={handleSubmit} className="space-y-5">
       {error && (
         <div className={`p-4 rounded-xl ${theme === 'dark' ? 'bg-red-900/30 border border-red-700/50 text-red-300' : 'bg-red-50 border border-red-200 text-red-800'} flex items-center gap-3 animate-in shake`}>
           <AlertTriangle className="w-5 h-5 shrink-0" />
@@ -980,7 +981,8 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory, cat
               
               <div className="p-6 flex items-center justify-between sticky top-0 z-10 ${bgColor} border-b ${borderColor}">
                 <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${getCategoryGradient(category, theme)} flex items-center justify-center text-white shadow-lg bg                    <Eye className="w-5 h-5" />
+                  <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${getCategoryGradient(category, theme)} flex items-center justify-center text-white shadow-lg`}>
+                    <Eye className="w-5 h-5" />
                   </div>
                   <div>
                     <h2 className={`text-xl font-bold ${textColor}`}>Предпросмотр</h2>
@@ -1081,11 +1083,10 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory, cat
           </div>
         )
       })()}
-    </form>
 
-    {/* Индикатор прогресса сохранения */}
-    <SaveProgressIndicator loading={loading} message="Сохранение сигнала..." />
+      {/* Индикатор прогресса сохранения */}
+      <SaveProgressIndicator loading={loading} message="Сохранение сигнала..." />
+    </form>
+    </>
   )
 }
-
-// ... остальной код ...

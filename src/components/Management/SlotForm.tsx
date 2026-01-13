@@ -688,7 +688,8 @@ export const SlotForm = ({ slot, onClose, onSave }: SlotFormProps) => {
   const timeSummary = slots.map((s: any) => `${s.start}–${s.end}${s.endDate ? ' (+1)' : ''}`)
 
   return (
-    <div className="fixed inset-0 bg-slate-950/75 backdrop-blur-xl flex items-start sm:items-center justify-center z-[70] p-4 sm:p-6 touch-manipulation overflow-y-auto">
+    <>
+      <div className="fixed inset-0 bg-slate-950/75 backdrop-blur-xl flex items-start sm:items-center justify-center z-[70] p-4 sm:p-6 touch-manipulation overflow-y-auto">
       <div className={`w-full max-w-5xl rounded-3xl shadow-[0_24px_80px_rgba(0,0,0,0.45)] border ${theme === 'dark' ? 'bg-gradient-to-br from-[#0c1320] via-[#0b1220] to-[#08111b] border-white/10' : 'bg-gradient-to-br from-white via-slate-50 to-white border-slate-200'} max-h-[90vh] overflow-y-auto`}>
         <div className="p-4 sm:p-6 lg:p-7 flex flex-col h-full min-h-0 overflow-y-auto">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -1322,9 +1323,10 @@ export const SlotForm = ({ slot, onClose, onSave }: SlotFormProps) => {
           </div>
         </div>
       </div>
-    </div>
+      </div>
 
-    {/* Индикатор прогресса сохранения */}
-    <SaveProgressIndicator loading={loading} message="Сохранение слота..." />
+      {/* Индикатор прогресса сохранения */}
+      <SaveProgressIndicator loading={loading} message="Сохранение слота..." />
+    </>
   )
 }

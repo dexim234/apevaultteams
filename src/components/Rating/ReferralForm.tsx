@@ -151,7 +151,8 @@ export const ReferralForm = ({ referral, onClose, onSave }: ReferralFormProps) =
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start sm:items-center justify-center z-[70] p-4 sm:py-0 overflow-y-auto overflow-x-hidden overscroll-contain modal-scroll">
+    <>
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start sm:items-center justify-center z-[70] p-4 sm:py-0 overflow-y-auto overflow-x-hidden overscroll-contain modal-scroll">
       <div className={`w-full max-w-md rounded-lg shadow-xl ${theme === 'dark' ? 'bg-[#1a1a1a]' : 'bg-white'} max-h-[90vh] flex flex-col overflow-hidden`}>
         <div className="flex-shrink-0 p-6 pb-4">
           <div className="flex items-center justify-between">
@@ -269,9 +270,10 @@ export const ReferralForm = ({ referral, onClose, onSave }: ReferralFormProps) =
           </div>
         </div>
       </div>
-    </div>
+      </div>
 
-    {/* Индикатор прогресса сохранения */}
-    <SaveProgressIndicator loading={loading || deleteLoading} message="Сохранение реферела..." />
-  </div>
+      {/* Индикатор прогресса сохранения */}
+      <SaveProgressIndicator loading={loading || deleteLoading} message="Сохранение реферела..." />
+    </>
+  )
 }
