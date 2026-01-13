@@ -243,23 +243,22 @@ export const RatingCard = ({ rating, place }: RatingCardProps) => {
   const totalPoints = Math.max(0, Math.min(100, basePoints + absencePenalty))
   const exclusionStatus = getExclusionStatus(rating.rating)
 
+  // Place badge - показываем только место без медали
   const placeBadge = (() => {
     if (!place) return null
     const rank = place.rank
-    const palette =
-      rank === 1
-        ? { bg: 'from-amber-400 to-amber-600', ring: 'ring-amber-300/50', icon: '🥇' }
-        : rank === 2
-          ? { bg: 'from-slate-300 to-slate-500', ring: 'ring-slate-300/50', icon: '🥈' }
-          : rank === 3
-            ? { bg: 'from-amber-200 to-amber-500', ring: 'ring-amber-200/40', icon: '🥉' }
-            : { bg: 'from-gray-200 to-gray-400', ring: 'ring-gray-200/40', icon: rank.toString() }
 
     return (
-      <div className={`absolute top-3 right-3`}>
-        <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${palette.bg} ring-4 ${palette.ring} shadow-lg grid place-items-center text-lg font-semibold`}>
-          {palette.icon}
-        </div>
+      <div className={`inline-flex px-3 py-1.5 rounded-xl text-sm font-bold border-2 ${
+        rank === 1
+          ? 'bg-amber-500/10 border-amber-500/50 text-amber-600 dark:text-amber-400'
+          : rank === 2
+            ? 'bg-slate-500/10 border-slate-500/50 text-slate-500 dark:text-slate-400'
+            : rank === 3
+              ? 'bg-orange-500/10 border-orange-500/50 text-orange-500 dark:text-orange-400'
+              : 'bg-gray-500/10 border-gray-500/50 text-gray-500 dark:text-gray-400'
+      }`}>
+        {rank} {rank === 1 ? 'место' : 'место'}
       </div>
     )
   })()
@@ -269,23 +268,15 @@ export const RatingCard = ({ rating, place }: RatingCardProps) => {
       {/* Gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-blue-500/5 pointer-events-none" />
 
-      {placeBadge}
-
       {/* Header with name and rating */}
       <div className="relative mb-6 flex flex-col gap-4">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
             <p className={`text-[10px] uppercase tracking-[0.15em] font-bold ${mutedColor} mb-2`}>Участник команды</p>
-            <h3 className={`text-3xl font-black ${headingColor} truncate mb-3 bg-gradient-to-r from-emerald-600 to-blue-600 bg-clip-text text-transparent dark:from-emerald-400 dark:to-blue-400`}>
+            <h3 className={`text-3xl font-black ${headingColor} truncate mb-2 bg-gradient-to-r from-emerald-600 to-blue-600 bg-clip-text text-transparent dark:from-emerald-400 dark:to-blue-400`}>
               <UserNickname userId={rating.userId} fallback="unknown" />
             </h3>
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className={`px-3 py-1.5 rounded-xl text-xs font-bold border-2 ${accent.border} ${accent.bg} ${accent.text} flex items-center gap-1.5 shadow-sm`}>
-                <span className={`text-base leading-none ${accent.icon}`}>●</span>
-                <span>ID: {rating.userId}</span>
-              </span>
-            </div>
-          </div>
+            {placeBadge}
           <div className="flex flex-col items-end gap-1">
             <span className={`text-4xl font-black bg-gradient-to-br from-emerald-600 to-blue-600 bg-clip-text text-transparent dark:from-emerald-400 dark:to-blue-400`}>
               {rating.rating.toFixed(1)}%

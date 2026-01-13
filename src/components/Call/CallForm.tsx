@@ -12,6 +12,7 @@ import type {
 } from '@/types'
 import { TEAM_MEMBERS } from '@/types'
 import { Sparkles, Rocket, LineChart, Image, Coins, Shield, Target, Info, MapPin, TrendingUp, AlertTriangle, Settings, MessageSquare, Eye, X, Check, Globe2, Clock3, Link2, Activity, Gauge, Timer, ScrollText, Building2, CalendarClock, Percent, Octagon, Network as NetworkIcon, Copy } from 'lucide-react'
+import { SaveProgressIndicator } from '@/components/UI/SaveProgressIndicator'
 
 interface CallFormProps {
   onSuccess?: () => void
@@ -979,8 +980,7 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory, cat
               
               <div className="p-6 flex items-center justify-between sticky top-0 z-10 ${bgColor} border-b ${borderColor}">
                 <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${getCategoryGradient(category, theme)} flex items-center justify-center text-white shadow-lg`}>
-                    <Eye className="w-5 h-5" />
+                  <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${getCategoryGradient(category, theme)} flex items-center justify-center text-white shadow-lg bg                    <Eye className="w-5 h-5" />
                   </div>
                   <div>
                     <h2 className={`text-xl font-bold ${textColor}`}>Предпросмотр</h2>
@@ -1051,9 +1051,10 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory, cat
                   <button
                     type="button"
                     onClick={() => setShowPreview(false)}
-                    className={`flex-1 px-4 py-3.5 rounded-xl font-semibold border-2 transition-all duration-300 flex items-center justify-center gap-2 ${borderColor} ${theme === 'dark' 
-                      ? 'text-white hover:bg-gray-800' 
-                      : 'text-gray-700 hover:bg-gray-50'}`}
+                    className={`flex-1 px-4 py-3.5 rounded-xl font-semibold border-2 transition-all duration-300 flex items-center justify-center gap-2 shadow-lg ${loading
+                      ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                      : `bg-gradient-to-r ${getCategoryGradient(category, theme)} text-white hover:shadow-xl`
+                      }`}
                   >
                     <X className="w-4 h-4" />
                     Назад
@@ -1081,6 +1082,9 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory, cat
         )
       })()}
     </form>
+
+    {/* Индикатор прогресса сохранения */}
+    <SaveProgressIndicator loading={loading} message="Сохранение сигнала..." />
   )
 }
 

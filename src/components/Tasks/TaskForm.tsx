@@ -16,6 +16,7 @@ import { CATEGORY_ICONS } from './categoryIcons'
 import { formatDate } from '@/utils/dateUtils'
 import { getUserNicknameSync } from '@/utils/userUtils'
 import { useScrollLock } from '@/hooks/useScrollLock'
+import { SaveProgressIndicator } from '@/components/UI/SaveProgressIndicator'
 
 interface TaskFormProps {
   onClose: () => void
@@ -301,15 +302,7 @@ export const TaskForm = ({ onClose, onSave, editingTask }: TaskFormProps) => {
                         key={key}
                         type="button"
                         onClick={() => setCategory(key as TaskCategory)}
-                        className={`p-3 rounded-lg border-2 text-sm font-semibold transition-all text-center ${
-                          isActive
-                            ? theme === 'dark'
-                              ? 'border-[#4E6E49] bg-[#4E6E49]/15 text-[#4E6E49]'
-                              : 'border-[#4E6E49] bg-green-50 text-[#4E6E49]'
-                            : theme === 'dark'
-                              ? 'border-gray-800 bg-gray-900 text-gray-200 hover:border-[#4E6E49]/40'
-                              : 'border-gray-200 bg-white text-gray-800 hover:border-[#4E6E49]/40'
-                        } flex items-center justify-center gap-2`}
+                        className={`p-3 rounded-lg border-2 text-sm font-semibold transition-all text-center ${isActive ? theme === 'dark' ? 'border-[#4E6E49] bg-[#4E6E49]/15 text-[#4E6E49]' : 'border-[#4E6E49] bg-green-50 text-[#4E6E49]' : theme === 'dark' ? 'border-gray-800 bg-gray-900 text-gray-200 hover:border-[#4E6E49]/40' : 'border-gray-200 bg-white text-gray-800 hover:border-[#4E6E49]/40'} flex items-center justify-center gap-2`}
                       >
                         <Icon className="w-4 h-4" />
                         <span>{label}</span>
@@ -330,9 +323,7 @@ export const TaskForm = ({ onClose, onSave, editingTask }: TaskFormProps) => {
                       key={option.value}
                       type="button"
                       onClick={() => setPriority(option.value)}
-                      className={`p-3 rounded-lg border-2 text-left transition-all ${option.tone} ${
-                        priority === option.value ? 'ring-2 ring-offset-2 ring-[#4E6E49] dark:ring-offset-[#1a1a1a]' : ''
-                      }`}
+                      className={`p-3 rounded-lg border-2 text-left transition-all ${option.tone} ${priority === option.value ? 'ring-2 ring-offset-2 ring-[#4E6E49] dark:ring-offset-[#1a1a1a]' : ''}`}
                     >
                       <div className="flex items-center justify-between gap-2">
                         <span className="font-semibold text-sm">{option.label}</span>
@@ -399,13 +390,7 @@ export const TaskForm = ({ onClose, onSave, editingTask }: TaskFormProps) => {
                               key={member.id}
                               type="button"
                               onClick={() => handleStageAssigneeToggle(stage.id, member.id)}
-                              className={`p-2 rounded-lg border text-left text-sm transition-all ${
-                                isSelected
-                                  ? theme === 'dark'
-                                    ? 'border-[#4E6E49] bg-[#4E6E49]/20'
-                                    : 'border-[#4E6E49] bg-green-50'
-                                  : `${borderColor} ${inputBg}`
-                              }`}
+                              className={`p-2 rounded-lg border text-left text-sm transition-all ${isSelected ? theme === 'dark' ? 'border-[#4E6E49] bg-[#4E6E49]/20' : 'border-[#4E6E49] bg-green-50' : `${borderColor} ${inputBg}`}`}
                             >
                               <span className={isSelected ? 'text-[#4E6E49]' : headingColor}>{getUserNicknameSync(member.id)}</span>
                             </button>
@@ -466,7 +451,7 @@ export const TaskForm = ({ onClose, onSave, editingTask }: TaskFormProps) => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1">
-                <label className={`text-sm font-medium ${headingColor} flex items-center gap-2`}>
+                <label className={`block text-sm font-medium ${headingColor} flex items-center gap-2`}>
                   <Calendar className="w-4 h-4" />
                   Дата дедлайна *
                 </label>
@@ -479,7 +464,7 @@ export const TaskForm = ({ onClose, onSave, editingTask }: TaskFormProps) => {
                 />
               </div>
               <div className="space-y-1">
-                <label className={`text-sm font-medium ${headingColor} flex items-center gap-2`}>
+                <label className={`block text-sm font-medium ${headingColor} flex items-center gap-2`}>
                   <Clock className="w-4 h-4" />
                   Время дедлайна *
                 </label>
@@ -496,13 +481,23 @@ export const TaskForm = ({ onClose, onSave, editingTask }: TaskFormProps) => {
               <button
                 onClick={handleSave}
                 disabled={loading}
-                className={`flex-1 px-6 py-3 rounded-lg font-semibold transition-all ${
+                className={`flex-1 px-6 py-3 rounded-lg font-semibold transition-all relative overflow-hidden ${
                   loading
                     ? 'bg-gray-400 cursor-not-allowed'
-                    : 'bg-gradient-to-r from-[#4E6E49] to-emerald-700 hover:from-[#4E6E49] hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:scale-[1.02]'
+                    : 'bg-gradient-to-r from-[#4E6E49] to-emerald-700 hover:from-[#4E6E49] hover:to-emerald-700 text-white shadow-lg hover:shadow-xl'
                 }`}
               >
-                {loading ? 'Сохранение...' : isEditing ? 'Сохранить' : 'Создать задачу'}
+                <span className={`relative z-10 flex items-center justify-center gap-2 ${loading ? 'invisible' : ''}`}>
+                  {isEditing ? 'Сохранить' : 'Создать задачу'}
+                </span>
+                {loading && (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="flex items-center gap-2 text-white">
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <span>Сохранение...</span>
+                    </div>
+                  </div>
+                )}
               </button>
               <button
                 onClick={onClose}
@@ -516,6 +511,9 @@ export const TaskForm = ({ onClose, onSave, editingTask }: TaskFormProps) => {
           </div>
         </div>
       </div>
+
+      {/* Индикатор прогресса сохранения */}
+      <SaveProgressIndicator loading={loading} message="Сохранение задачи..." />
     </div>
   )
 }

@@ -5,6 +5,7 @@ import { useThemeStore } from '@/store/themeStore'
 import { addReferral, updateReferral, deleteReferral, addApprovalRequest } from '@/services/firestoreService'
 import { Referral } from '@/types'
 import { X, RefreshCcw, Trash2 } from 'lucide-react'
+import { SaveProgressIndicator } from '@/components/UI/SaveProgressIndicator'
 
 interface ReferralFormProps {
   referral?: Referral | null
@@ -247,9 +248,19 @@ export const ReferralForm = ({ referral, onClose, onSave }: ReferralFormProps) =
             <button
               onClick={handleSave}
               disabled={loading}
-              className="flex-1 px-4 py-2 bg-[#4E6E49] hover:bg-[#4E6E49] disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
+              className="flex-1 px-4 py-2 bg-[#4E6E49] hover:bg-[#4E6E49] disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg transition-colors relative overflow-hidden"
             >
-              {loading ? 'Сохранение...' : 'Сохранить'}
+              <span className={`relative z-10 flex items-center justify-center gap-2 ${loading ? 'invisible' : ''}`}>
+                {loading ? '' : 'Сохранить'}
+              </span>
+              {loading && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="flex items-center gap-2 text-white">
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <span>Сохранение...</span>
+                  </div>
+                </div>
+              )}
             </button>
             <button onClick={onClose} className={`px-4 py-2 rounded-lg transition-colors ${buttonColor}`}>
               Отмена
@@ -259,6 +270,8 @@ export const ReferralForm = ({ referral, onClose, onSave }: ReferralFormProps) =
         </div>
       </div>
     </div>
-  )
-}
 
+    {/* Индикатор прогресса сохранения */}
+    <SaveProgressIndicator loading={loading || deleteLoading} message="Сохранение реферела..." />
+  </div>
+}

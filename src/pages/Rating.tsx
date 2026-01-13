@@ -11,7 +11,7 @@ import { calculateRating, getRatingBreakdown } from '@/utils/ratingUtils'
 import { getUserNicknameAsync, clearAllNicknameCache, getUserNicknameSync } from '@/utils/userUtils'
 import { RatingData, Referral, Earnings, DayStatus } from '@/types'
 import { useUsers } from '@/hooks/useUsers'
-import { TrendingUp, Users, Award, Target, Calendar, UserPlus, BarChart3 } from 'lucide-react'
+import { TrendingUp, Award, Target, UserPlus } from 'lucide-react'
 
 export const Rating = () => {
   const { theme } = useThemeStore()
@@ -228,7 +228,6 @@ export const Rating = () => {
 
   const topMember = sortedRatings[0]
   const topMemberName = topMember ? getUserNicknameSync(topMember.userId) : '—'
-  const todayLabel = new Date().toLocaleDateString('ru-RU')
 
   const getMemberNameById = (id: string) => {
     // Use sync version for immediate display, will be updated when cache is populated
@@ -328,22 +327,6 @@ export const Rating = () => {
       borderClass: 'border-blue-500/20'
     },
     {
-      label: 'Всего участников',
-      value: `${ratings.length}`,
-      note: 'в рейтинге',
-      icon: <Users className="w-5 h-5 text-purple-400" />,
-      bgClass: 'bg-purple-500/5',
-      borderClass: 'border-purple-500/20'
-    },
-    {
-      label: 'Медиана рейтинга',
-      value: `${ratingOverview.median.toFixed(1)}%`,
-      note: 'средний показатель',
-      icon: <BarChart3 className="w-5 h-5 text-indigo-400" />,
-      bgClass: 'bg-indigo-500/5',
-      borderClass: 'border-indigo-500/20'
-    },
-    {
       label: 'Рефералы за 30 дней',
       value: `${referrals.length}`,
       note: 'новые участники',
@@ -351,15 +334,6 @@ export const Rating = () => {
       bgClass: 'bg-pink-500/5',
       borderClass: 'border-pink-500/20'
     },
-    {
-      label: 'Обновление данных',
-      value: todayLabel,
-      note: 'автообновление',
-      icon: <Calendar className="w-5 h-5 text-cyan-400" />,
-      bgClass: 'bg-cyan-500/5',
-      borderClass: 'border-cyan-500/20'
-    },
-
   ]
 
   return (

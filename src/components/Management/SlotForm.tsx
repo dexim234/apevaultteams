@@ -1,4 +1,3 @@
-// Form for adding/editing work slots
 import { useState, useEffect } from 'react'
 import { useAuthStore } from '@/store/authStore'
 import { useThemeStore } from '@/store/themeStore'
@@ -11,6 +10,7 @@ import { X, Plus, Trash2, Edit, CalendarDays, Calendar } from 'lucide-react'
 import { CategorySelector } from './CategorySelector'
 import { WorkSlot, TimeSlot, TEAM_MEMBERS, SLOT_CATEGORY_META, SlotCategory } from '@/types'
 import { useScrollLock } from '@/hooks/useScrollLock'
+import { SaveProgressIndicator } from '@/components/UI/SaveProgressIndicator'
 
 interface SlotFormProps {
   slot?: WorkSlot | null
@@ -746,7 +746,7 @@ export const SlotForm = ({ slot, onClose, onSave }: SlotFormProps) => {
                 ].map((step, index: number) => (
                   <div
                     key={step.label}
-                    className={`flex items-start gap-3 rounded-xl border px-3 py-3 ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-slate-200 bg-slate-50'}`}
+                    className={`flex items-start gap-3 rounded-xl border px-3 py-3 ${theme === 'dark' ? 'border-white/10 bg-white/5 text-gray-200 hover:border-white/30' : 'border-slate-200 bg-white text-gray-800 hover:border-slate-300'}`}
                   >
                     <span className={`mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${step.done ? 'bg-[#4E6E49] text-white' : (theme === 'dark' ? 'bg-slate-800 text-gray-300' : 'bg-slate-200 text-slate-700')}`}>
                       {index + 1}
@@ -940,7 +940,7 @@ export const SlotForm = ({ slot, onClose, onSave }: SlotFormProps) => {
                         value={currentStart}
                         onChange={(e) => setCurrentStart(e.target.value)}
                         className={`flex-1 px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base rounded-lg border touch-manipulation ${theme === 'dark'
-                          ? 'bg-gray-700 border-gray-800 text-white'
+                          ? 'bg-gray-700 border-gray-500 text-white'
                           : 'bg-white border-gray-300 text-gray-900'
                           } focus:outline-none focus:ring-2 focus:ring-[#4E6E49]`}
                         placeholder="Начало"
@@ -951,7 +951,7 @@ export const SlotForm = ({ slot, onClose, onSave }: SlotFormProps) => {
                         value={currentEnd}
                         onChange={(e) => setCurrentEnd(e.target.value)}
                         className={`flex-1 px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base rounded-lg border touch-manipulation ${theme === 'dark'
-                          ? 'bg-gray-700 border-gray-800 text-white'
+                          ? 'bg-gray-700 border-gray-500 text-white'
                           : 'bg-white border-gray-300 text-gray-900'
                           } focus:outline-none focus:ring-2 focus:ring-[#4E6E49]`}
                         placeholder="Окончание"
@@ -1296,9 +1296,19 @@ export const SlotForm = ({ slot, onClose, onSave }: SlotFormProps) => {
                     handleSave()
                   }}
                   disabled={loading || slots.length === 0 || (!slot && !category)}
-                  className="flex-1 px-4 py-2.5 sm:py-2 bg-[#4E6E49] hover:bg-[#4E6E49] disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg sm:rounded-xl transition-colors text-sm sm:text-base font-medium touch-manipulation active:scale-95 disabled:active:scale-100"
+                  className="flex-1 px-4 py-2.5 sm:py-2 bg-[#4E6E49] hover:bg-[#4E6E49] disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg sm:rounded-xl transition-colors text-sm sm:text-base font-medium touch-manipulation active:scale-95 disabled:active:scale-100 relative overflow-hidden"
                 >
-                  {loading ? 'Сохранение...' : slot ? 'Обновить слот' : 'Отправить на согласование'}
+                  <span className={`relative z-10 flex items-center justify-center gap-2 ${loading ? 'invisible' : ''}`}>
+                    {loading ? '' : slot ? 'Обновить слот' : 'Отправить на согласование'}
+                  </span>
+                  {loading && (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="flex items-center gap-2 text-white">
+                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        <span>Сохранение...</span>
+                      </div>
+                    </div>
+                  )}
                 </button>
                 <button
                   onClick={onClose}
@@ -1313,6 +1323,8 @@ export const SlotForm = ({ slot, onClose, onSave }: SlotFormProps) => {
         </div>
       </div>
     </div>
+
+    {/* Индикатор прогресса сохранения */}
+    <SaveProgressIndicator loading={loading} message="Сохранение слота..." />
   )
 }
-

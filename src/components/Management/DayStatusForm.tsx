@@ -1,4 +1,3 @@
-// Form for adding/editing day statuses (dayoff, sick, vacation)
 import { useState, useEffect } from 'react'
 import { useAuthStore } from '@/store/authStore'
 import { useThemeStore } from '@/store/themeStore'
@@ -9,6 +8,7 @@ import { getUserNicknameSync } from '@/utils/userUtils'
 import { X, Trash2 } from 'lucide-react'
 import { DayStatus, TEAM_MEMBERS } from '@/types'
 import { useScrollLock } from '@/hooks/useScrollLock'
+import { SaveProgressIndicator } from '@/components/UI/SaveProgressIndicator'
 
 interface DayStatusFormProps {
   type?: 'dayoff' | 'sick' | 'vacation' | 'absence' | 'truancy' | 'internship'
@@ -425,7 +425,6 @@ export const DayStatusForm = ({ type, status, onClose, onSave }: DayStatusFormPr
     internship: 'bg-green-500',
   }
 
-
   const previewDates =
     adminBulkMode && dateMode === 'range'
       ? [`${formatDate(rangeStart, 'dd.MM')}–${formatDate(rangeEnd, 'dd.MM')}`]
@@ -694,9 +693,9 @@ export const DayStatusForm = ({ type, status, onClose, onSave }: DayStatusFormPr
                           type="button"
                           onClick={() => setDateMode(option.value as typeof dateMode)}
                           className={`w-full text-left px-3 py-3 rounded-xl border transition flex flex-col gap-1 ${active
-                              ? 'border-[#4E6E49] bg-[#4E6E49]/10 text-[#4E6E49] shadow-sm'
+                              ? 'border-[#4E6E49] bg-[#4E6E49]/10 text-[#4E6E49]'
                               : theme === 'dark'
-                                ? 'border-white/10 bg-white/5 text-gray-200 hover:border-white/30'
+                                ? 'border-white/10 bg-white/5 text-gray-200'
                                 : 'border-slate-200 bg-white text-gray-800 hover:border-slate-300'
                             }`}
                         >
@@ -724,9 +723,9 @@ export const DayStatusForm = ({ type, status, onClose, onSave }: DayStatusFormPr
                           type="button"
                           onClick={() => setDateMode(option.value as typeof dateMode)}
                           className={`w-full text-left px-3 py-3 rounded-xl border transition flex flex-col gap-1 ${active
-                              ? 'border-[#4E6E49] bg-[#4E6E49]/10 text-[#4E6E49] shadow-sm'
+                              ? 'border-[#4E6E49] bg-[#4E6E49]/10 text-[#4E6E49]'
                               : theme === 'dark'
-                                ? 'border-white/10 bg-white/5 text-gray-200 hover:border-white/30'
+                                ? 'border-white/10 bg-white/5 text-gray-200'
                                 : 'border-slate-200 bg-white text-gray-800 hover:border-slate-300'
                             }`}
                         >
@@ -886,7 +885,7 @@ export const DayStatusForm = ({ type, status, onClose, onSave }: DayStatusFormPr
                         type="date"
                         value={multiDateInput}
                         onChange={(e) => setMultiDateInput(e.target.value)}
-                        className={`flex-1 px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base rounded-lg border touch-manipulation ${theme === 'dark'
+                        className={`flex-1 px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base rounded-lg touch-manipulation ${theme === 'dark'
                             ? 'bg-gray-700 border-gray-800 text-white'
                             : 'bg-white border-gray-300 text-gray-900'
                           } focus:outline-none focus:ring-2 focus:ring-[#4E6E49]`}
@@ -930,8 +929,8 @@ export const DayStatusForm = ({ type, status, onClose, onSave }: DayStatusFormPr
                   <div className="rounded-xl border border-gray-200 dark:border-gray-800 p-3 sm:p-4 space-y-3">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className={`text-sm sm:text-base font-semibold ${headingColor}`}>Повтор на неделю</p>
-                        <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Выберите дни текущей недели</p>
+                        <p className="text-sm sm:text-base font-semibold ${headingColor}`}>Повтор на неделю</p>
+                        <p className="text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Выберите дни текущей недели</p>
                       </div>
                       <label className="inline-flex items-center gap-2">
                         <input
@@ -957,9 +956,9 @@ export const DayStatusForm = ({ type, status, onClose, onSave }: DayStatusFormPr
                               className={`px-3 py-1 rounded-lg border text-sm ${active
                                   ? 'border-[#4E6E49] bg-[#4E6E49]/10 text-[#4E6E49]'
                                   : theme === 'dark'
-                                    ? 'border-white/10 bg-white/5 text-gray-200'
-                                    : 'border-gray-200 bg-white text-gray-800'
-                                }`}
+                                    ? 'bg-gray-800/60 border-gray-800 text-gray-200 hover:border-gray-600'
+                                    : 'bg-gray-100 border-gray-300 text-gray-700 hover:border-gray-400'
+                              }`}
                             >
                               {day}
                             </button>
@@ -972,8 +971,8 @@ export const DayStatusForm = ({ type, status, onClose, onSave }: DayStatusFormPr
                   <div className="rounded-xl border border-gray-200 dark:border-gray-800 p-3 sm:p-4 space-y-3">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className={`text-sm sm:text-base font-semibold ${headingColor}`}>Повтор по месяцу</p>
-                        <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>На тот же день недели до конца месяца</p>
+                        <p className="text-sm sm:text-base font-semibold ${headingColor}`}>Повтор по месяцу</p>
+                        <p className="text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>На тот же день недели до конца месяца</p>
                       </div>
                       <label className="inline-flex items-center gap-2">
                         <input
@@ -994,7 +993,7 @@ export const DayStatusForm = ({ type, status, onClose, onSave }: DayStatusFormPr
                                 ? 'border-[#4E6E49] bg-[#4E6E49]/10 text-[#4E6E49]'
                                 : theme === 'dark'
                                   ? 'border-white/10 bg-white/5 text-gray-200'
-                                  : 'border-gray-200 bg-white text-gray-800'
+                                  : 'border-slate-200 bg-white text-gray-800'
                               }`}
                           >
                             {day}
@@ -1076,9 +1075,19 @@ export const DayStatusForm = ({ type, status, onClose, onSave }: DayStatusFormPr
                 <button
                   onClick={handleSave}
                   disabled={loading || !selectedType}
-                  className={`flex-1 px-4 py-2.5 sm:py-2 ${selectedType ? typeColors[selectedType] : 'bg-gray-400'} hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg sm:rounded-xl transition-colors text-sm sm:text-base font-medium touch-manipulation active:scale-95 disabled:active:scale-100`}
+                  className={`flex-1 px-4 py-2.5 sm:py-2 ${selectedType ? typeColors[selectedType] : 'bg-gray-400'} hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg sm:rounded-xl transition-colors text-sm sm:text-base font-medium touch-manipulation active:scale-95 disabled:active:scale-100 relative overflow-hidden`}
                 >
-                  {loading ? 'Отправка...' : isAdmin ? 'Сохранить' : 'Отправить на согласование'}
+                  <span className={`relative z-10 flex items-center justify-center gap-2 ${loading ? 'invisible' : ''}`}>
+                    {loading ? '' : isAdmin ? 'Сохранить' : 'Отправить на согласование'}
+                  </span>
+                  {loading && (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="flex items-center gap-2 text-white">
+                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        <span>Сохранение...</span>
+                      </div>
+                    </div>
+                  )}
                 </button>
                 <button
                   onClick={onClose}
@@ -1093,6 +1102,8 @@ export const DayStatusForm = ({ type, status, onClose, onSave }: DayStatusFormPr
         </div>
       </div>
     </div>
+
+    {/* Индикатор прогресса сохранения */}
+    <SaveProgressIndicator loading={loading} message="Сохранение статуса..." />
   )
 }
-
