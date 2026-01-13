@@ -37,27 +37,76 @@ export const FasolSignalsStrategy = () => {
     screenshot: ''
   })
   
+  // Time input state
+  const [timeValue, setTimeValue] = useState('12:00')
+  
   // Delete confirmation modal state
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [copyFeedback, setCopyFeedback] = useState(false)
 
+  // Screenshot preview modal state
+  const [showScreenshotModal, setShowScreenshotModal] = useState(false)
+  const [currentScreenshot, setCurrentScreenshot] = useState<string | null>(null)
+  const [currentDealInfo, setCurrentDealInfo] = useState<{ date: string; time: string; contract: string } | null>(null)
+
   const resetForm = () => {
     setNewDeal({ contract: '', marketCap: '', drop07: '', profit: '', screenshot: '' })
+    setTimeValue(`${String(new Date().getHours()).padStart(2, '0')}:${String(new Date().getMinutes()).padStart(2, '0')}`)
     setEditingId(null)
   }
 
   const handleScreenshotUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setNewDeal({ ...newDeal, screenshot: reader.result as string })
-      }
-      reader.readAsDataURL(file)
+      processImageFile(file)
     }
   }
 
+  const processImageFile = (file: File) => {
+    if (!file.type.startsWith('image/')) return
+    const reader = new FileReader()
+    reader.onloadend = () => {
+      setNewDeal({ ...newDeal, screenshot: reader.result as string })
+    }
+    reader.readAsDataURL(file)
+  }
+
+  const handleScreenshotPaste = async (e: React.ClipboardEvent) => {
+    const items = e.clipboardData.items
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type.startsWith('image/')) {
+        const file = items[i].getAsFile()
+        if (file) {
+          processImageFile(file)
+          break
+        }
+      }
+    }
+  }
+
+  const handleScreenshotDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    const files = e.dataTransfer.files
+    if (files.length > 0 && files[0].type.startsWith('image/')) {
+      processImageFile(files[0])
+    }
+  }
+
+  const openScreenshotModal = (screenshot: string, deal: OurDealSignal) => {
+    const dateTime = deal.createdAt.includes('T') 
+      ? deal.createdAt.split('T') 
+      : [deal.createdAt, deal.createdAt.split(' ')[1] || '00:00']
+    setCurrentScreenshot(screenshot)
+    setCurrentDealInfo({
+      date: formatDate(dateTime[0]),
+      time: deal.createdAt.includes('T') ? deal.createdAt.split('T')[1].substring(0, 5) : deal.createdAt.split(' ')[1] || '',
+      contract: deal.contract
+    })
+    setShowScreenshotModal(true)
+  }
+
+  // Updated handleAddDeal with timestamp and username fallback
   const handleAddDeal = () => {
     if (!newDeal.contract || !newDeal.marketCap) return
 
@@ -68,8 +117,8 @@ export const FasolSignalsStrategy = () => {
       drop07: newDeal.drop07 || '-',
       profit: newDeal.profit || '-',
       screenshot: newDeal.screenshot || undefined,
-      createdAt: new Date().toISOString().split('T')[0],
-      createdBy: user?.id || 'admin'
+      createdAt: `${new Date().toISOString().split('T')[0]}T${timeValue}`,
+      createdBy: user?.name || user?.nickname || user?.id || 'admin'
     }
 
     setDeals([deal, ...deals])
@@ -88,7 +137,8 @@ export const FasolSignalsStrategy = () => {
             marketCap: newDeal.marketCap,
             drop07: newDeal.drop07 || '-',
             profit: newDeal.profit || '-',
-            screenshot: newDeal.screenshot || undefined
+            screenshot: newDeal.screenshot || undefined,
+            createdAt: `${deal.createdAt.split('T')[0]}T${timeValue}`
           }
         : deal
     ))
@@ -102,6 +152,7 @@ export const FasolSignalsStrategy = () => {
   }
 
   const openEditModal = (deal: OurDealSignal) => {
+    const timePart = deal.createdAt.includes('T') ? deal.createdAt.split('T')[1].substring(0, 5) : '12:00'
     setNewDeal({
       contract: deal.contract,
       marketCap: deal.marketCap,
@@ -109,6 +160,7 @@ export const FasolSignalsStrategy = () => {
       profit: deal.profit,
       screenshot: deal.screenshot || ''
     })
+    setTimeValue(timePart)
     setEditingId(deal.id)
     setShowModal(true)
   }
@@ -168,7 +220,7 @@ export const FasolSignalsStrategy = () => {
     }, 0)
     const avgDrop = deals.reduce((acc, d) => {
       const val = parseFloat(d.drop07.replace(/[^0-9.-]/g, '') || '0')
-      return acc + Math.abs(val)
+      return acc + val
     }, 0)
 
     return {
@@ -372,7 +424,7 @@ export const FasolSignalsStrategy = () => {
                         <td className={`p-4 text-center border-r ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'}`}>
                           {deal.screenshot ? (
                             <button
-                              onClick={() => window.open(deal.screenshot, '_blank')}
+                              onClick={() => deal.screenshot && openScreenshotModal(deal.screenshot, deal)}
                               className={`p-2 rounded-lg ${hoverBg} transition-colors`}
                               title="View screenshot"
                             >
@@ -433,6 +485,51 @@ export const FasolSignalsStrategy = () => {
           )}
         </div>
       </div>
+
+      {/* Screenshot Preview Modal */}
+      {showScreenshotModal && currentScreenshot && currentDealInfo && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+          onClick={() => setShowScreenshotModal(false)}
+        >
+          <div 
+            className={`relative max-w-4xl w-full rounded-3xl overflow-hidden ${cardBg} shadow-2xl`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className={`p-4 border-b ${theme === 'dark' ? 'border-white/10' : 'border-gray-100'} flex items-center justify-between`}>
+              <div className="flex items-center gap-4">
+                <span className={`font-mono text-sm ${mutedColor}`}>
+                  {currentDealInfo.date} at {currentDealInfo.time}
+                </span>
+                <a
+                  href={`https://gmgn.ai/sol/token/${currentDealInfo.contract}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`font-mono text-sm text-blue-400 hover:text-blue-300 underline`}
+                >
+                  {truncateAddress(currentDealInfo.contract)}
+                </a>
+              </div>
+              <button
+                onClick={() => setShowScreenshotModal(false)}
+                className={`p-2 rounded-lg hover:bg-white/10 ${mutedColor}`}
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            {/* Screenshot */}
+            <div className="p-4">
+              <img
+                src={currentScreenshot}
+                alt="Deal screenshot"
+                className="w-full h-auto rounded-xl"
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Add/Edit Modal */}
       {showModal && (
@@ -501,13 +598,39 @@ export const FasolSignalsStrategy = () => {
                 </div>
                 <div>
                   <label className={`block text-xs font-bold uppercase tracking-wider mb-2 ${mutedColor}`}>
-                    Профит
+                    Profit
                   </label>
                   <input
                     type="text"
                     placeholder="+25%"
                     value={newDeal.profit}
                     onChange={(e) => setNewDeal({ ...newDeal, profit: e.target.value })}
+                    className={`w-full px-4 py-3 rounded-xl border outline-none transition-all font-mono text-sm ${theme === 'dark' ? 'bg-white/5 border-white/10 text-white focus:border-emerald-500/50' : 'bg-gray-50 border-gray-200 text-gray-900 focus:border-emerald-500/30'}`}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className={`block text-xs font-bold uppercase tracking-wider mb-2 ${mutedColor}`}>
+                    Date
+                  </label>
+                  <input
+                    type="date"
+                    value={new Date().toISOString().split('T')[0]}
+                    onChange={() => {}}
+                    className={`w-full px-4 py-3 rounded-xl border outline-none transition-all font-mono text-sm ${theme === 'dark' ? 'bg-white/5 border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'}`}
+                    disabled
+                  />
+                </div>
+                <div>
+                  <label className={`block text-xs font-bold uppercase tracking-wider mb-2 ${mutedColor}`}>
+                    Time
+                  </label>
+                  <input
+                    type="time"
+                    value={timeValue}
+                    onChange={(e) => setTimeValue(e.target.value)}
                     className={`w-full px-4 py-3 rounded-xl border outline-none transition-all font-mono text-sm ${theme === 'dark' ? 'bg-white/5 border-white/10 text-white focus:border-emerald-500/50' : 'bg-gray-50 border-gray-200 text-gray-900 focus:border-emerald-500/30'}`}
                   />
                 </div>
@@ -535,19 +658,29 @@ export const FasolSignalsStrategy = () => {
                     </div>
                   )}
                   
-                  {/* File upload button */}
-                  <label className={`flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-dashed cursor-pointer transition-all ${theme === 'dark' ? 'border-white/20 hover:border-emerald-500/50 hover:bg-white/5' : 'border-gray-300 hover:border-emerald-500/50 hover:bg-gray-50'}`}>
-                    <ImageIcon className={`w-5 h-5 ${mutedColor}`} />
-                    <span className={`text-sm ${mutedColor}`}>
-                      {newDeal.screenshot ? 'Replace file' : 'Upload file'}
-                    </span>
+                  {/* File upload area */}
+                  <div 
+                    className={`relative flex items-center justify-center gap-2 px-4 py-4 rounded-xl border border-dashed cursor-pointer transition-all ${theme === 'dark' ? 'border-white/20 hover:border-emerald-500/50 hover:bg-white/5' : 'border-gray-300 hover:border-emerald-500/50 hover:bg-gray-50'}`}
+                    onPaste={handleScreenshotPaste}
+                    onDrop={handleScreenshotDrop}
+                    onDragOver={(e) => e.preventDefault()}
+                  >
                     <input
                       type="file"
                       accept="image/*"
                       onChange={handleScreenshotUpload}
-                      className="hidden"
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                     />
-                  </label>
+                    <ImageIcon className={`w-5 h-5 ${mutedColor}`} />
+                    <div className="text-center">
+                      <span className={`text-sm ${mutedColor}`}>
+                        {newDeal.screenshot ? 'Replace file' : 'Drop, paste or upload'}
+                      </span>
+                      <p className={`text-xs ${mutedColor} mt-1 opacity-60`}>
+                        Supports drag & drop, Ctrl+V, file upload
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -580,7 +713,7 @@ export const FasolSignalsStrategy = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <div className={`w-full max-w-sm rounded-3xl ${cardBg} ${cardBorder} border shadow-2xl overflow-hidden`}>
             <div className="p-6">
-              <div className={`w-12 h-12 rounded-full bg-rose-500/10 flex items-center justify-center mx-auto mb-4`}>
+              <div className="w-12 h-12 rounded-full bg-rose-500/10 flex items-center justify-center mx-auto mb-4">
                 <Trash2 className="w-6 h-6 text-rose-500" />
               </div>
               <h3 className={`text-lg font-bold text-center ${headingColor} mb-2`}>
