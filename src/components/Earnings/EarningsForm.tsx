@@ -8,7 +8,6 @@ import { getUserNicknameSync } from '@/utils/userUtils'
 import { EARNINGS_CATEGORY_META, Earnings, EarningsCategory, TEAM_MEMBERS } from '@/types'
 import { X, Rocket, LineChart, Image, Coins, BarChart3, ShieldCheck, Sparkles, Gift } from 'lucide-react'
 import { useScrollLock } from '@/hooks/useScrollLock'
-import { SaveProgressIndicator } from '@/components/UI/SaveProgressIndicator'
 
 interface EarningsFormProps {
   onClose: () => void
@@ -384,9 +383,6 @@ export const EarningsForm = ({ onClose, onSave, editingEarning }: EarningsFormPr
           </div>
         </div>
       </div>
-
-      {/* Индикатор прогресса сохранения */}
-      <SaveProgressIndicator loading={loading} message="Сохранение заработка..." />
     </div>
   )
 }

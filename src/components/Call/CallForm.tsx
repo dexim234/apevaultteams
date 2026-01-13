@@ -12,8 +12,6 @@ import type {
 } from '@/types'
 import { TEAM_MEMBERS } from '@/types'
 import { Sparkles, Rocket, LineChart, Image, Coins, Shield, Target, Info, MapPin, TrendingUp, AlertTriangle, Settings, MessageSquare, Eye, X, Check, Globe2, Clock3, Link2, Activity, Gauge, Timer, ScrollText, Building2, CalendarClock, Percent, Octagon, Network as NetworkIcon, Copy } from 'lucide-react'
-import { SaveProgressIndicator } from '@/components/UI/SaveProgressIndicator'
-
 interface CallFormProps {
   onSuccess?: () => void
   onCancel?: () => void
@@ -1083,9 +1081,6 @@ export const CallForm = ({ onSuccess, onCancel, callToEdit, initialCategory, cat
           </div>
         )
       })()}
-
-      {/* Индикатор прогресса сохранения */}
-      <SaveProgressIndicator loading={loading} message="Сохранение сигнала..." />
     </form>
     </>
   )

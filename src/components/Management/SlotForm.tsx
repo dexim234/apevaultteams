@@ -10,7 +10,6 @@ import { X, Plus, Trash2, Edit, CalendarDays, Calendar } from 'lucide-react'
 import { CategorySelector } from './CategorySelector'
 import { WorkSlot, TimeSlot, TEAM_MEMBERS, SLOT_CATEGORY_META, SlotCategory } from '@/types'
 import { useScrollLock } from '@/hooks/useScrollLock'
-import { SaveProgressIndicator } from '@/components/UI/SaveProgressIndicator'
 
 interface SlotFormProps {
   slot?: WorkSlot | null
@@ -1324,9 +1323,6 @@ export const SlotForm = ({ slot, onClose, onSave }: SlotFormProps) => {
         </div>
       </div>
       </div>
-
-      {/* Индикатор прогресса сохранения */}
-      <SaveProgressIndicator loading={loading} message="Сохранение слота..." />
     </>
   )
 }

@@ -7,7 +7,6 @@ import { formatDate } from '@/utils/dateUtils'
 import { DayStatus } from '@/types'
 import { X } from 'lucide-react'
 import { useScrollLock } from '@/hooks/useScrollLock'
-import { SaveProgressIndicator } from '@/components/UI/SaveProgressIndicator'
 
 interface DayStatusFormProps {
   onClose: () => void
@@ -214,9 +213,6 @@ export const DayStatusForm = ({ onClose, onSave, status: editingStatus, editingS
           </div>
         </div>
       </div>
-
-      {/* Индикатор прогресса сохранения */}
-      <SaveProgressIndicator loading={loading} message="Сохранение статуса..." />
     </>
   )
 }

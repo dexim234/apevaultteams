@@ -5,7 +5,6 @@ import { useThemeStore } from '@/store/themeStore'
 import { addReferral, updateReferral, deleteReferral, addApprovalRequest } from '@/services/firestoreService'
 import { Referral } from '@/types'
 import { X, RefreshCcw, Trash2 } from 'lucide-react'
-import { SaveProgressIndicator } from '@/components/UI/SaveProgressIndicator'
 
 interface ReferralFormProps {
   referral?: Referral | null
@@ -271,9 +270,6 @@ export const ReferralForm = ({ referral, onClose, onSave }: ReferralFormProps) =
         </div>
       </div>
       </div>
-
-      {/* Индикатор прогресса сохранения */}
-      <SaveProgressIndicator loading={loading || deleteLoading} message="Сохранение реферела..." />
     </>
   )
 }
