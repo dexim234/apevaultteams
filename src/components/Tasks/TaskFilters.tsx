@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { useThemeStore } from '@/store/themeStore'
 import { TaskCategory, TaskStatus, TASK_CATEGORIES } from '@/types'
 import { MemberSelector } from '@/components/Management/MemberSelector'
-import { Filter, ChevronDown, X, Plus } from 'lucide-react'
+import { Filter, ChevronDown, X, Plus, Tag } from 'lucide-react'
+import { CATEGORY_ICONS } from './categoryIcons'
 
 interface TaskFiltersProps {
   selectedCategory: TaskCategory | 'all'
@@ -51,11 +52,7 @@ export const TaskFilters = ({
     ? 'Все' 
     : TASK_CATEGORIES[selectedCategory]?.label || 'Категория'
 
-  // Get category icon
-  const getCategoryIcon = (key: TaskCategory | 'all') => {
-    if (key === 'all') return '🏷️'
-    return TASK_CATEGORIES[key]?.icon || '📁'
-  }
+  const SelectedCategoryIcon = selectedCategory === 'all' ? Tag : CATEGORY_ICONS[selectedCategory]
 
   return (
     <div className="space-y-3">
@@ -123,7 +120,7 @@ export const TaskFilters = ({
               className={`w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-sm font-medium border ${borderColor} ${inputBg} ${headingColor} cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-500/50`}
             >
               <span className="flex items-center gap-2">
-                <span>{getCategoryIcon(selectedCategory)}</span>
+                <SelectedCategoryIcon className="w-4 h-4 text-emerald-400" />
                 <span>{selectedCategoryLabel}</span>
               </span>
               <ChevronDown className={`w-4 h-4 ${mutedColor} transition-transform ${showCategoryDropdown ? 'rotate-180' : ''}`} />
@@ -144,22 +141,25 @@ export const TaskFilters = ({
                     }}
                     className={`w-full flex items-center gap-2 px-3 py-2 text-sm font-medium transition-colors ${hoverBg} ${selectedCategory === 'all' ? theme === 'dark' ? 'bg-white/10 text-white' : 'bg-gray-100 text-gray-900' : mutedColor}`}
                   >
-                    <span>🏷️</span>
+                    <Tag className="w-4 h-4" />
                     <span>Все категории</span>
                   </button>
-                  {categories.map(({ key, label }) => (
-                    <button
-                      key={key}
-                      onClick={() => {
-                        onCategoryChange(key)
-                        setShowCategoryDropdown(false)
-                      }}
-                      className={`w-full flex items-center gap-2 px-3 py-2 text-sm font-medium transition-colors ${hoverBg} ${selectedCategory === key ? theme === 'dark' ? 'bg-white/10 text-white' : 'bg-gray-100 text-gray-900' : mutedColor}`}
-                    >
-                      <span>{TASK_CATEGORIES[key]?.icon || '📁'}</span>
-                      <span>{label}</span>
-                    </button>
-                  ))}
+                  {categories.map(({ key, label }) => {
+                    const Icon = CATEGORY_ICONS[key]
+                    return (
+                      <button
+                        key={key}
+                        onClick={() => {
+                          onCategoryChange(key)
+                          setShowCategoryDropdown(false)
+                        }}
+                        className={`w-full flex items-center gap-2 px-3 py-2 text-sm font-medium transition-colors ${hoverBg} ${selectedCategory === key ? theme === 'dark' ? 'bg-white/10 text-white' : 'bg-gray-100 text-gray-900' : mutedColor}`}
+                      >
+                        <Icon className="w-4 h-4" />
+                        <span>{label}</span>
+                      </button>
+                    )
+                  })}
                 </div>
               </>
             )}
@@ -172,34 +172,6 @@ export const TaskFilters = ({
               onSelect={(userId) => onUsersChange(userId ? [userId] : [])}
             />
           </div>
-        </div>
-
-        {/* Categories scrollable chips (desktop only) */}
-        <div className="hidden lg:flex items-center gap-2 px-3 pb-3 overflow-x-auto scrollbar-hide">
-          <span className={`text-xs font-bold uppercase whitespace-nowrap ${mutedColor}`}>
-            Категории:
-          </span>
-          <button
-            onClick={() => onCategoryChange('all')}
-            className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors whitespace-nowrap ${selectedCategory === 'all'
-              ? theme === 'dark' ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' : 'bg-emerald-50 text-emerald-600 border-emerald-200'
-              : theme === 'dark' ? 'bg-white/5 text-gray-400 border-white/5 hover:bg-white/10' : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100'
-              }`}
-          >
-            Все
-          </button>
-          {categories.map(({ key, label }) => (
-            <button
-              key={key}
-              onClick={() => onCategoryChange(key)}
-              className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors whitespace-nowrap ${selectedCategory === key
-                ? theme === 'dark' ? 'bg-[#2A3441] text-white border-white/20' : 'bg-gray-800 text-white border-gray-800'
-                : theme === 'dark' ? 'bg-white/5 text-gray-400 border-white/5 hover:bg-white/10' : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100'
-                }`}
-            >
-              {label}
-            </button>
-          ))}
         </div>
       </div>
 
