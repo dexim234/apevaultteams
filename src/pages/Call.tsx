@@ -9,7 +9,6 @@ import {
   X,
   Edit,
   Trash2,
-  Check,
   Search,
   Sparkles,
   Copy,
@@ -20,7 +19,6 @@ import {
   Coins,
   AlertTriangle,
   Activity,
-  TrendingUp,
   Gauge,
   Plus,
   User,
@@ -457,56 +455,7 @@ export const CallPage = () => {
         </div>
       </div>
 
-      {/* Statistics Cards */}
-      <div className="px-4 sm:px-6 lg:px-8 mb-8">
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-          {/* Total Signals */}
-          <div className={`p-4 rounded-xl border ${borderColor} ${cardBg} shadow-xl`}>
-            <div className="flex items-center justify-between mb-2">
-              <span className={`text-xs uppercase tracking-wider ${subtleColor}`}>Всего сигналов</span>
-              <TrendingUp className="w-4 h-4 text-emerald-500" />
-            </div>
-            <p className={`text-3xl font-bold ${textColor}`}>{totals.total}</p>
-            <p className="text-xs text-emerald-500 mt-1 flex items-center gap-1">
-              <Rocket size={12} />
-              <span>Растем</span>
-            </p>
-          </div>
-
-          {/* Active */}
-          <div className={`p-4 rounded-xl border ${borderColor} ${cardBg} shadow-xl`}>
-            <div className="flex items-center justify-between mb-2">
-              <span className={`text-xs uppercase tracking-wider ${subtleColor}`}>Активные</span>
-              <Activity className="w-4 h-4 text-emerald-500" />
-            </div>
-            <p className={`text-3xl font-bold ${textColor}`}>{totals.active}</p>
-            <div className="w-full h-1 bg-gray-800 rounded-full mt-2 overflow-hidden">
-              <div
-                className="h-full bg-emerald-500 rounded-full transition-all duration-1000"
-                style={{ width: `${totals.total > 0 ? (totals.active / totals.total) * 100 : 0}%` }}
-              />
-            </div>
-          </div>
-
-          {/* Completed */}
-          <div className={`p-4 rounded-xl border ${borderColor} ${cardBg} shadow-xl`}>
-            <div className="flex items-center justify-between mb-2">
-              <span className={`text-xs uppercase tracking-wider ${subtleColor}`}>Завершенные</span>
-              <Check className="w-4 h-4 text-blue-500" />
-            </div>
-            <p className={`text-3xl font-bold ${textColor}`}>{totals.completed}</p>
-          </div>
-
-          {/* Cancelled */}
-          <div className={`p-4 rounded-xl border ${borderColor} ${cardBg} shadow-xl`}>
-            <div className="flex items-center justify-between mb-2">
-              <span className={`text-xs uppercase tracking-wider ${subtleColor}`}>Отмененные</span>
-              <X className="w-4 h-4 text-red-500" />
-            </div>
-            <p className={`text-3xl font-bold ${textColor}`}>{totals.cancelled}</p>
-          </div>
-        </div>
-      </div>
+      
 
       {/* Signals Feed Header */}
       <div className="px-4 sm:px-6 lg:px-8 mb-4">

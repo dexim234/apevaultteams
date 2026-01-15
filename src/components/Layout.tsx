@@ -28,7 +28,6 @@ import {
   PanelLeftOpen,
   Menu,
   X,
-  GraduationCap,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import logo from '@/assets/logo.png'
@@ -63,11 +62,11 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
       setIsFeaturesLoading(true)
       try {
         if (!user || isAdmin) {
-          setAccessibleFeatures(new Set(['slots', 'earnings', 'tasks', 'rating', 'profile', 'admin', 'tools', 'tools_strategies', 'tools_ai_ao_alerts', 'tools_our_deals_analysis', 'tools_learning_platform']))
+          setAccessibleFeatures(new Set(['slots', 'earnings', 'tasks', 'rating', 'profile', 'admin', 'tools', 'tools_strategies', 'tools_ai_ao_alerts', 'tools_our_deals_analysis']))
           return
         }
 
-        const features = ['slots', 'earnings', 'tasks', 'rating', 'profile', 'about', 'tools', 'tools_strategies', 'tools_ai_ao_alerts', 'tools_our_deals_analysis', 'tools_learning_platform', 'avf_hub']
+        const features = ['slots', 'earnings', 'tasks', 'rating', 'profile', 'about', 'tools', 'tools_strategies', 'tools_ai_ao_alerts', 'tools_our_deals_analysis', 'avf_hub']
         const accessible = new Set<string>()
 
         for (const feature of features) {
@@ -108,10 +107,9 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
   )
 
   const toolsSubItems: { path: string; label: string; icon: LucideIcon; feature: string }[] = [
-    { path: '/strategies', label: 'Стратегии', icon: TrendingUp, feature: 'tools_strategies' },
+    { path: '/strategies', label: 'AVF Контур', icon: TrendingUp, feature: 'tools_strategies' },
     { path: '/ai-ao-alerts', label: 'Al AO ALERTS', icon: AlertTriangle, feature: 'tools_ai_ao_alerts' },
     { path: '/our-deals-analysis', label: 'Анализ наших сделок', icon: Zap, feature: 'tools_our_deals_analysis' },
-    { path: '/learning-platform', label: 'Учебная платформа', icon: GraduationCap, feature: 'tools_learning_platform' },
   ]
 
   // Filter tools that user has access to

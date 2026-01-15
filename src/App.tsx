@@ -17,7 +17,7 @@ import { Approvals } from './pages/Approvals'
 import { Strategies } from './pages/Strategies'
 import { AiAoAlerts } from './pages/AiAoAlerts'
 import { FasolSignalsStrategy } from './pages/FasolSignalsStrategy'
-import { LearningPlatform } from './pages/LearningPlatform'
+
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { AccessBlockScreen } from './components/AccessBlockScreen'
 import { cleanupOldData } from './services/firestoreService'
@@ -159,14 +159,7 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route
-            path="/learning-platform"
-            element={
-              <ProtectedRoute>
-                <LearningPlatform />
-              </ProtectedRoute>
-            }
-          />
+          
         </Route>
 
         <Route path="/" element={<Navigate to={(isAuthenticated || isAdmin) ? "/management" : "/login"} replace />} />
