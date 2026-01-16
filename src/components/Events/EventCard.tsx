@@ -103,39 +103,39 @@ export const EventCard = memo(({ event, isAdmin, onEdit, onDelete }: EventCardPr
       {/* Background Gradient Glow */}
       <div className={`absolute -right-20 -top-20 w-64 h-64 bg-gradient-to-br ${meta.cardGradient} blur-3xl opacity-50 group-hover:opacity-100 transition-opacity duration-500`} />
 
-      <div className="relative flex flex-col md:flex-row gap-6">
+      <div className="relative flex flex-col lg:flex-row lg:items-start gap-6">
         {/* Left Section: Icon and Basics */}
         <div className="flex-1 min-w-0">
           <div className="flex items-start gap-4">
-            <div className={`p-3 rounded-2xl bg-gradient-to-br ${meta.gradient} shadow-lg shadow-emerald-500/10 text-white shrink-0`}>
-              <IconComponent className="w-6 h-6" />
+            <div className={`p-4 rounded-2xl bg-gradient-to-br ${meta.gradient} shadow-lg shadow-emerald-500/10 text-white shrink-0`}>
+              <IconComponent className="w-6 h-6 sm:w-7 sm:h-7" />
             </div>
 
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 flex-wrap mb-2">
-                <h3 className={`text-xl font-black ${textColor} tracking-tight`}>{event.title}</h3>
-                <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-gradient-to-r ${meta.gradient} text-white shadow-sm`}>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-3">
+                <h3 className={`text-xl sm:text-2xl font-black ${textColor} tracking-tight leading-tight`}>{event.title}</h3>
+                <span className={`w-fit px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-gradient-to-r ${meta.gradient} text-white shadow-sm ring-1 ring-white/20`}>
                   {meta.label}
                 </span>
               </div>
 
-              <div className="flex items-center gap-5 text-sm">
-                <div className="flex items-center gap-2">
-                  <div className={`p-1.5 rounded-lg ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-100'}`}>
-                    <Calendar size={14} className="text-emerald-500" />
+              <div className="flex flex-wrap items-center gap-5 text-sm sm:text-base">
+                <div className="flex items-center gap-2.5">
+                  <div className={`p-2 rounded-xl ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-100'}`}>
+                    <Calendar size={16} className="text-emerald-500" />
                   </div>
-                  <span className={`font-semibold ${subtleColor}`}>
+                  <span className={`font-bold ${subtleColor}`}>
                     {event.dates.length === 1
                       ? formatDate(event.dates[0])
-                      : `${formatDate(event.dates[0])} - ${formatDate(event.dates[event.dates.length - 1])}`
+                      : `${formatDate(event.dates[0])} — ${formatDate(event.dates[event.dates.length - 1])}`
                     }
                   </span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className={`p-1.5 rounded-lg ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-100'}`}>
-                    <Clock size={14} className="text-emerald-500" />
+                <div className="flex items-center gap-2.5">
+                  <div className={`p-2 rounded-xl ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-100'}`}>
+                    <Clock size={16} className="text-emerald-500" />
                   </div>
-                  <span className={`font-semibold ${subtleColor}`}>{event.time}</span>
+                  <span className={`font-bold ${subtleColor}`}>{event.time}</span>
                 </div>
               </div>
             </div>
@@ -180,38 +180,41 @@ export const EventCard = memo(({ event, isAdmin, onEdit, onDelete }: EventCardPr
         </div>
 
         {/* Right Section: Participants and Status */}
-        <div className="md:w-64 flex flex-col gap-4">
+        <div className="lg:w-72 flex flex-col gap-5">
           {/* Status highlight */}
-          <div className="flex flex-col gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2">
             {isActive && (
-              <div className="flex items-center justify-between p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 animate-pulse">
+              <div className="flex items-center justify-between p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 shadow-inner">
                 <span className="text-[10px] font-black uppercase text-emerald-500 tracking-wider">Идет сейчас</span>
-                <Timer size={14} className="text-emerald-500" />
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <Timer size={16} className="text-emerald-500" />
+                </div>
               </div>
             )}
             {timeUntil && !isActive && (
-              <div className="flex items-center justify-between p-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
+              <div className="flex items-center justify-between p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 shadow-inner">
                 <span className="text-[10px] font-black uppercase text-amber-500 tracking-wider">Начнется через</span>
-                <span className="text-xs font-bold text-amber-500">{timeUntil}</span>
+                <span className="text-sm font-black text-amber-500">{timeUntil}</span>
               </div>
             )}
             {isUserRequired && (
-              <div className="flex items-center justify-between p-3 rounded-xl bg-blue-500/10 border border-blue-500/20">
+              <div className="flex items-center justify-between p-4 rounded-2xl bg-blue-500/10 border border-blue-500/20 shadow-inner">
                 <span className="text-[10px] font-black uppercase text-blue-500 tracking-wider">Вы участвуете</span>
-                <Users size={14} className="text-blue-500" />
+                <Users size={16} className="text-blue-500" />
               </div>
             )}
           </div>
 
-          {/* Participants */}
+          {/* Participants - only scrollable container on mobile if many */}
           {participants.length > 0 && (
-            <div className={`p-4 rounded-xl ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-50'} border ${borderColor}`}>
-              <p className={`text-[10px] font-black uppercase tracking-widest ${subtleColor} mb-2.5`}>Участники</p>
-              <div className="flex flex-wrap gap-1.5">
+            <div className={`p-5 rounded-2xl ${theme === 'dark' ? 'bg-white/5 shadow-inner' : 'bg-gray-50'} border ${borderColor}`}>
+              <p className={`text-[10px] font-black uppercase tracking-widest ${subtleColor} mb-3.5`}>Участники</p>
+              <div className="flex flex-wrap gap-2">
                 {participants.map((name, idx) => (
                   <span
                     key={idx}
-                    className={`px-2 py-1 rounded-lg text-[11px] font-bold ${theme === 'dark' ? 'bg-white/10 text-gray-300' : 'bg-white text-gray-700 shadow-sm'}`}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold ${theme === 'dark' ? 'bg-white/10 text-gray-300' : 'bg-white text-gray-700 shadow-sm'}`}
                   >
                     {name}
                   </span>
@@ -222,19 +225,19 @@ export const EventCard = memo(({ event, isAdmin, onEdit, onDelete }: EventCardPr
 
           {/* Admin Actions */}
           {isAdmin && (
-            <div className="flex items-center gap-2 mt-auto pt-2">
+            <div className="flex items-center gap-3 mt-auto pt-4 border-t border-white/5 lg:border-none">
               <button
                 onClick={() => onEdit(event)}
-                className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all ${theme === 'dark' ? 'bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white' : 'bg-gray-50 hover:bg-gray-100 text-gray-500 hover:text-gray-900'}`}
+                className={`flex-1 flex items-center justify-center gap-2 px-5 py-3 rounded-2xl text-sm font-black transition-all ${theme === 'dark' ? 'bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white' : 'bg-gray-50 hover:bg-gray-100 text-gray-500 hover:text-gray-900'}`}
               >
-                <Edit size={14} />
+                <Edit size={16} />
                 Изменить
               </button>
               <button
                 onClick={() => onDelete(event.id)}
-                className={`p-2.5 rounded-xl transition-all ${theme === 'dark' ? 'bg-red-500/10 hover:bg-red-500/20 text-red-400' : 'bg-red-50 hover:bg-red-100 text-red-600'}`}
+                className={`p-3 rounded-2xl transition-all ${theme === 'dark' ? 'bg-red-500/10 hover:bg-red-500/20 text-red-400' : 'bg-red-50 hover:bg-red-100 text-red-600'}`}
               >
-                <Trash2 size={16} />
+                <Trash2 size={20} />
               </button>
             </div>
           )}

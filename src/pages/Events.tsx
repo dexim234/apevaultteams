@@ -145,9 +145,9 @@ export const EventsPage = () => {
     <div className={`min-h-screen ${bgColor} p-6`}>
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-8">
           <div className="flex items-center gap-4">
-            <div className={`p-3 rounded-xl bg-gradient-to-br from-emerald-400 to-cyan-500 text-white`}>
+            <div className={`p-3 rounded-xl bg-gradient-to-br from-emerald-400 to-cyan-500 text-white shadow-lg shadow-emerald-500/20`}>
               <Calendar size={24} />
             </div>
             <div>
@@ -156,11 +156,11 @@ export const EventsPage = () => {
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             {/* Filter toggle */}
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className={`p-3 rounded-xl border ${borderColor} transition-all ${theme === 'dark' ? 'hover:bg-white/5' : 'hover:bg-gray-100'}`}
+              className={`p-3 rounded-xl border ${borderColor} transition-all ${theme === 'dark' ? 'hover:bg-white/5' : 'hover:bg-gray-100'} ${showFilters ? 'bg-emerald-500/10 border-emerald-500/30' : ''}`}
             >
               <Filter size={20} className={showFilters ? 'text-emerald-500' : subtleColor} />
             </button>
@@ -169,27 +169,28 @@ export const EventsPage = () => {
             {isAdmin && (
               <button
                 onClick={() => setIsModalOpen(true)}
-                className="flex items-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-bold hover:shadow-lg hover:shadow-emerald-500/25 transition-all"
+                className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-bold hover:shadow-lg hover:shadow-emerald-500/25 transition-all"
               >
                 <Plus size={20} />
-                Создать
+                <span className="hidden sm:inline">Создать</span>
+                <span className="sm:hidden text-sm">Создать</span>
               </button>
             )}
           </div>
         </div>
 
         {/* Filters panel */}
-        <div className={`mb-6 p-4 rounded-xl border ${borderColor} ${cardBg} ${showFilters ? 'block' : 'hidden'}`}>
-          <div className="flex flex-wrap items-center gap-4">
+        <div className={`mb-6 p-5 rounded-2xl border ${borderColor} ${cardBg} shadow-sm transition-all duration-300 ${showFilters ? 'opacity-100 translate-y-0' : 'hidden opacity-0 -translate-y-4'}`}>
+          <div className="space-y-6">
             {/* Category filter */}
-            <div className="flex items-center gap-2">
-              <span className={`text-sm font-medium ${subtleColor}`}>Категория:</span>
+            <div className="space-y-3">
+              <span className={`text-xs font-black uppercase tracking-widest ${subtleColor}`}>По категории</span>
               <div className="flex flex-wrap gap-2">
                 <button
                   onClick={() => setCategoryFilter('all')}
-                  className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${categoryFilter === 'all'
-                    ? 'bg-emerald-500 text-white'
-                    : theme === 'dark' ? 'bg-white/10 text-gray-300 hover:bg-white/20' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${categoryFilter === 'all'
+                    ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20'
+                    : theme === 'dark' ? 'bg-white/5 text-gray-400 hover:bg-white/10' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                     }`}
                 >
                   Все
@@ -201,12 +202,12 @@ export const EventsPage = () => {
                     <button
                       key={cat}
                       onClick={() => setCategoryFilter(cat)}
-                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${categoryFilter === cat
-                        ? `bg-gradient-to-r ${meta.gradient} text-white`
-                        : theme === 'dark' ? 'bg-white/10 text-gray-300 hover:bg-white/20' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all ${categoryFilter === cat
+                        ? `bg-gradient-to-r ${meta.gradient} text-white shadow-lg shadow-emerald-500/20`
+                        : theme === 'dark' ? 'bg-white/5 text-gray-400 hover:bg-white/10' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                         }`}
                     >
-                      <IconComponent size={14} />
+                      <IconComponent size={16} />
                       {meta.label}
                     </button>
                   )
@@ -214,55 +215,59 @@ export const EventsPage = () => {
               </div>
             </div>
 
-            {/* Status filter */}
-            <div className="flex items-center gap-2">
-              <span className={`text-sm font-medium ${subtleColor}`}>Статус:</span>
-              <div className="flex flex-wrap gap-2">
-                {[
-                  { id: 'all', label: 'Все' },
-                  { id: 'upcoming', label: 'Предстоящие' },
-                  { id: 'ongoing', label: 'Идущие' },
-                  { id: 'past', label: 'Прошедшие' },
-                ].map((s) => (
-                  <button
-                    key={s.id}
-                    onClick={() => setStatusFilter(s.id as any)}
-                    className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${statusFilter === s.id
-                      ? 'bg-emerald-500 text-white'
-                      : theme === 'dark' ? 'bg-white/10 text-gray-300 hover:bg-white/20' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Status filter */}
+              <div className="space-y-3">
+                <span className={`text-xs font-black uppercase tracking-widest ${subtleColor}`}>По статусу</span>
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    { id: 'all', label: 'Все' },
+                    { id: 'upcoming', label: 'Предстоящие' },
+                    { id: 'ongoing', label: 'Идущие' },
+                    { id: 'past', label: 'Прошедшие' },
+                  ].map((s) => (
+                    <button
+                      key={s.id}
+                      onClick={() => setStatusFilter(s.id as any)}
+                      className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${statusFilter === s.id
+                        ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20'
+                        : theme === 'dark' ? 'bg-white/5 text-gray-400 hover:bg-white/10' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        }`}
+                    >
+                      {s.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Sort and My events */}
+              <div className="flex flex-col sm:flex-row items-start sm:items-end gap-6 sm:col-span-2">
+                <div className="space-y-3 flex-1 w-full">
+                  <span className={`text-xs font-black uppercase tracking-widest ${subtleColor}`}>Сортировать</span>
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value as 'date' | 'created')}
+                    className={`w-full min-w-[200px] px-4 py-2 rounded-xl text-sm font-bold border ${borderColor} focus:ring-2 focus:ring-emerald-500 outline-none transition-all ${theme === 'dark' ? 'bg-white/5 text-white' : 'bg-gray-50 text-gray-900'
                       }`}
                   >
-                    {s.label}
-                  </button>
-                ))}
+                    <option value="date">По ближайшей дате</option>
+                    <option value="created">По дате создания</option>
+                  </select>
+                </div>
+
+                <label className="flex items-center gap-3 p-2 rounded-xl cursor-pointer hover:bg-white/5 transition-all">
+                  <div className="relative">
+                    <input
+                      type="checkbox"
+                      checked={showMyOnly}
+                      onChange={(e) => setShowMyOnly(e.target.checked)}
+                      className="sr-only peer"
+                    />
+                    <div className="w-10 h-6 bg-gray-600 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                  </div>
+                  <span className={`text-sm font-bold ${textColor}`}>Только мои</span>
+                </label>
               </div>
-            </div>
-
-            {/* My events only */}
-            <div className="flex items-center gap-2 ml-auto">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={showMyOnly}
-                  onChange={(e) => setShowMyOnly(e.target.checked)}
-                  className="w-4 h-4 rounded border-gray-300 text-emerald-500 focus:ring-emerald-500"
-                />
-                <span className={`text-sm font-medium ${subtleColor}`}>Только мои события</span>
-              </label>
-            </div>
-
-            {/* Sort */}
-            <div className="flex items-center gap-2">
-              <span className={`text-sm font-medium ${subtleColor}`}>Сортировка:</span>
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as 'date' | 'created')}
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium border ${borderColor} ${theme === 'dark' ? 'bg-white/5 text-white' : 'bg-gray-50 text-gray-900'
-                  }`}
-              >
-                <option value="date">По дате</option>
-                <option value="created">По созданию</option>
-              </select>
             </div>
           </div>
         </div>

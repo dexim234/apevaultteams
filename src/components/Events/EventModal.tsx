@@ -308,19 +308,22 @@ export const EventModal = ({ event, onClose }: EventModalProps) => {
               </label>
               <div className="space-y-2">
                 <div className="flex gap-2">
-                  <input
-                    type="date"
-                    value={newDate}
-                    onChange={(e) => setNewDate(e.target.value)}
-                    className={`flex-1 px-4 py-2 rounded-lg border ${borderColor} ${inputBg} ${textColor} focus:outline-none focus:ring-2 focus:ring-emerald-500`}
-                  />
+                  <div className="relative flex-1">
+                    <Calendar size={18} className={`absolute left-4 top-1/2 -translate-y-1/2 ${subtleColor} sm:block hidden`} />
+                    <input
+                      type="date"
+                      value={newDate}
+                      onChange={(e) => setNewDate(e.target.value)}
+                      className={`w-full sm:pl-12 px-4 py-2.5 rounded-xl border ${borderColor} ${inputBg} ${textColor} focus:outline-none focus:ring-2 focus:ring-emerald-500`}
+                    />
+                  </div>
                   <button
                     type="button"
                     onClick={handleAddDate}
                     disabled={!newDate}
-                    className="px-4 py-2 rounded-lg bg-emerald-500 text-white font-medium hover:bg-emerald-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-2.5 rounded-xl bg-emerald-500 text-white font-bold hover:bg-emerald-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-emerald-500/20"
                   >
-                    <Plus size={18} />
+                    <Plus size={20} />
                   </button>
                 </div>
                 {dates.length > 0 && (
@@ -395,8 +398,8 @@ export const EventModal = ({ event, onClose }: EventModalProps) => {
             )}
 
             {/* Add link input */}
-            <div className="space-y-2">
-              <div className="flex gap-2">
+            <div className="space-y-3">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <div className="relative flex-[2]">
                   <LinkIcon size={18} className={`absolute left-4 top-1/2 -translate-y-1/2 ${subtleColor}`} />
                   <input
@@ -407,23 +410,25 @@ export const EventModal = ({ event, onClose }: EventModalProps) => {
                     className={`w-full pl-12 pr-4 py-3 rounded-xl border ${borderColor} ${inputBg} ${textColor} placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500`}
                   />
                 </div>
-                <div className="relative flex-1">
-                  <input
-                    type="text"
-                    value={newLinkName}
-                    onChange={(e) => setNewLinkName(e.target.value)}
-                    placeholder="Название"
-                    className={`w-full px-4 py-3 rounded-xl border ${borderColor} ${inputBg} ${textColor} placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500`}
-                  />
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <input
+                      type="text"
+                      value={newLinkName}
+                      onChange={(e) => setNewLinkName(e.target.value)}
+                      placeholder="Название"
+                      className={`w-full px-4 py-3 rounded-xl border ${borderColor} ${inputBg} ${textColor} placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500`}
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleAddLink}
+                    disabled={!newLinkUrl.trim()}
+                    className="px-5 py-3 rounded-xl bg-emerald-500 text-white font-bold hover:bg-emerald-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-emerald-500/20"
+                  >
+                    <Plus size={20} />
+                  </button>
                 </div>
-                <button
-                  type="button"
-                  onClick={handleAddLink}
-                  disabled={!newLinkUrl.trim()}
-                  className="px-4 py-3 rounded-xl bg-emerald-500 text-white font-medium hover:bg-emerald-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <Plus size={18} />
-                </button>
               </div>
             </div>
           </div>
@@ -523,11 +528,11 @@ export const EventModal = ({ event, onClose }: EventModalProps) => {
           </div>
 
           {/* Actions */}
-          <div className="flex items-center justify-end gap-3 pt-4 border-t ${borderColor}">
+          <div className="flex flex-col sm:flex-row items-center justify-end gap-3 pt-6 border-t ${borderColor}">
             <button
               type="button"
               onClick={onClose}
-              className={`px-6 py-3 rounded-xl font-medium transition-all ${theme === 'dark' ? 'hover:bg-white/10 text-gray-300' : 'hover:bg-gray-100 text-gray-700'
+              className={`w-full sm:w-auto px-8 py-3 rounded-xl font-bold transition-all ${theme === 'dark' ? 'hover:bg-white/10 text-gray-400' : 'hover:bg-gray-100 text-gray-600'
                 }`}
             >
               Отмена
@@ -535,12 +540,12 @@ export const EventModal = ({ event, onClose }: EventModalProps) => {
             <button
               type="submit"
               disabled={loading || uploading}
-              className="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-bold hover:shadow-lg hover:shadow-emerald-500/25 transition-all disabled:opacity-50"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 px-10 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-black shadow-lg shadow-emerald-500/25 transition-all hover:shadow-emerald-500/40 disabled:opacity-50"
             >
               {loading || uploading ? (
                 <>
                   <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Сохранение...
+                  <span>Сохранение...</span>
                 </>
               ) : (
                 <>Сохранить</>
