@@ -4,7 +4,7 @@ import { useAdminStore } from '@/store/adminStore'
 import { useThemeStore } from '@/store/themeStore'
 import { EventCard } from '@/components/Events/EventCard'
 import { EventModal } from '@/components/Events/EventModal'
-import { getEvents, deleteEvent } from '@/services/eventService'
+import { getEvents, deleteEvent, subscribeToEvents } from '@/services/eventService'
 import type { Event, EventCategory } from '@/types'
 import { EVENT_CATEGORY_META } from '@/types'
 import {
@@ -63,7 +63,12 @@ export const EventsPage = () => {
   }
 
   useEffect(() => {
-    fetchEvents()
+    const unsubscribe = subscribeToEvents((data) => {
+      setEvents(data)
+      setLoading(false)
+    })
+
+    return () => unsubscribe()
   }, [])
 
   const filteredEvents = useMemo(() => {

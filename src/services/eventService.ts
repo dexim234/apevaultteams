@@ -8,6 +8,7 @@ import {
   deleteDoc,
   query,
   orderBy,
+  onSnapshot,
 } from 'firebase/firestore'
 import { db } from '@/firebase/config'
 import { Event, EventCategory } from '@/types'
@@ -120,4 +121,32 @@ export const updateEvent = async (id: string, updates: Partial<Event>): Promise<
 export const deleteEvent = async (id: string): Promise<void> => {
   const eventRef = doc(db, 'events', id)
   await deleteDoc(eventRef)
+}
+
+export const subscribeToEvents = (callback: (events: Event[]) => void) => {
+  const eventsRef = collection(db, 'events')
+  const q = query(eventsRef, orderBy('createdAt', 'desc'))
+
+  return onSnapshot(q, (snapshot) => {
+    const results = snapshot.docs.map((doc: any) => {
+      const data = doc.data() as any
+      return {
+        id: doc.id,
+        title: data.title || '',
+        description: data.description || '',
+        category: data.category || 'memecoins',
+        dates: data.dates || [],
+        time: data.time || '',
+        links: data.links || [],
+        requiredParticipants: data.requiredParticipants || [],
+        going: data.going || [],
+        notGoing: data.notGoing || [],
+        files: data.files || [],
+        createdBy: data.createdBy || '',
+        createdAt: data.createdAt || new Date().toISOString(),
+        updatedAt: data.updatedAt || new Date().toISOString(),
+      } as Event
+    })
+    callback(results)
+  })
 }

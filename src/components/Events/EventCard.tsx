@@ -31,6 +31,7 @@ interface EventCardProps {
   isAdmin: boolean
   onEdit: (event: Event) => void
   onDelete: (eventId: string) => void
+  onRSVP?: () => void
 }
 
 const categoryIcons: Record<string, any> = {
@@ -105,28 +106,33 @@ export const EventCard = memo(({ event, isAdmin, onEdit, onDelete }: EventCardPr
     const currentGoing = [...event.going]
     const currentNotGoing = [...event.notGoing]
 
-    if (going) {
-      if (currentGoing.includes(user.id)) {
-        // Already going - remove
-        const updatedGoing = currentGoing.filter(id => id !== user.id)
-        await updateEvent(event.id, { going: updatedGoing })
+    try {
+      if (going) {
+        if (currentGoing.includes(user.id)) {
+          // Already going - remove
+          const updatedGoing = currentGoing.filter(id => id !== user.id)
+          await updateEvent(event.id, { going: updatedGoing })
+        } else {
+          // Not going yet - add to going, remove from notGoing
+          const updatedGoing = [...currentGoing, user.id]
+          const updatedNotGoing = currentNotGoing.filter(id => id !== user.id)
+          await updateEvent(event.id, { going: updatedGoing, notGoing: updatedNotGoing })
+        }
       } else {
-        // Not going yet - add to going, remove from notGoing
-        const updatedGoing = [...currentGoing, user.id]
-        const updatedNotGoing = currentNotGoing.filter(id => id !== user.id)
-        await updateEvent(event.id, { going: updatedGoing, notGoing: updatedNotGoing })
+        if (currentNotGoing.includes(user.id)) {
+          // Already not going - remove
+          const updatedNotGoing = currentNotGoing.filter(id => id !== user.id)
+          await updateEvent(event.id, { notGoing: updatedNotGoing })
+        } else {
+          // Add to notGoing, remove from going
+          const updatedNotGoing = [...currentNotGoing, user.id]
+          const updatedGoing = currentGoing.filter(id => id !== user.id)
+          await updateEvent(event.id, { going: updatedGoing, notGoing: updatedNotGoing })
+        }
       }
-    } else {
-      if (currentNotGoing.includes(user.id)) {
-        // Already not going - remove
-        const updatedNotGoing = currentNotGoing.filter(id => id !== user.id)
-        await updateEvent(event.id, { notGoing: updatedNotGoing })
-      } else {
-        // Add to notGoing, remove from going
-        const updatedNotGoing = [...currentNotGoing, user.id]
-        const updatedGoing = currentGoing.filter(id => id !== user.id)
-        await updateEvent(event.id, { going: updatedGoing, notGoing: updatedNotGoing })
-      }
+    } catch (error) {
+      console.error('Failed to RSVP:', error)
+      alert('Ошибка при сохранении ответа')
     }
   }
 
