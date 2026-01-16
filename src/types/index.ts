@@ -1,4 +1,3 @@
-// User types
 export interface User {
   id: string
   name: string
@@ -585,3 +584,80 @@ export interface Lesson {
   createdBy?: string // user ID who created the lesson
 }
 
+// Event types
+export type EventCategory = 'memecoins' | 'polymarket' | 'nft' | 'staking' | 'spot' | 'futures' | 'airdrop'
+
+export const EVENT_CATEGORY_META: Record<EventCategory, { label: string; gradient: string; gradientDark: string; icon: string; cardGradient: string }> = {
+  memecoins: {
+    label: 'Мемкоины',
+    gradient: 'from-emerald-400 via-teal-500 to-cyan-400',
+    gradientDark: 'from-emerald-500 via-teal-600 to-cyan-500',
+    icon: 'rocket',
+    cardGradient: 'from-emerald-500/20 via-teal-400/10 to-cyan-500/5'
+  },
+  polymarket: {
+    label: 'Polymarket',
+    gradient: 'from-rose-400 to-red-500',
+    gradientDark: 'from-rose-600 to-red-500',
+    icon: 'barchart',
+    cardGradient: 'from-rose-500/20 via-red-500/10 to-transparent'
+  },
+  nft: {
+    label: 'NFT',
+    gradient: 'from-purple-400 to-pink-500',
+    gradientDark: 'from-purple-600 to-pink-500',
+    icon: 'image',
+    cardGradient: 'from-purple-500/20 via-pink-500/10 to-transparent'
+  },
+  staking: {
+    label: 'Стейкинг',
+    gradient: 'from-emerald-400 to-green-500',
+    gradientDark: 'from-emerald-600 to-green-500',
+    icon: 'shield',
+    cardGradient: 'from-emerald-500/20 via-green-500/10 to-transparent'
+  },
+  spot: {
+    label: 'Спот',
+    gradient: 'from-amber-400 to-orange-500',
+    gradientDark: 'from-amber-600 to-orange-500',
+    icon: 'coins',
+    cardGradient: 'from-amber-500/20 via-orange-500/10 to-transparent'
+  },
+  futures: {
+    label: 'Фьючерсы',
+    gradient: 'from-blue-400 to-indigo-500',
+    gradientDark: 'from-blue-600 to-indigo-500',
+    icon: 'trending',
+    cardGradient: 'from-blue-500/20 via-indigo-500/10 to-transparent'
+  },
+  airdrop: {
+    label: 'Airdrop',
+    gradient: 'from-gray-300 to-gray-400',
+    gradientDark: 'from-gray-400 to-gray-300',
+    icon: 'gift',
+    cardGradient: 'from-gray-500/20 via-gray-400/10 to-transparent'
+  },
+}
+
+export interface EventFile {
+  id: string
+  name: string
+  url: string
+  type: string
+  size: number
+}
+
+export interface Event {
+  id: string
+  title: string
+  description: string
+  category: EventCategory
+  dates: string[] // Array of dates YYYY-MM-DD
+  time: string // HH:mm format
+  link?: string
+  requiredParticipants: string[] // User IDs
+  files: EventFile[]
+  createdBy: string
+  createdAt: string
+  updatedAt: string
+}

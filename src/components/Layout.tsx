@@ -28,6 +28,7 @@ import {
   PanelLeftOpen,
   Menu,
   X,
+  CalendarDays,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import logo from '@/assets/logo.png'
@@ -66,7 +67,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
           return
         }
 
-        const features = ['slots', 'earnings', 'tasks', 'rating', 'profile', 'about', 'tools', 'tools_strategies', 'tools_ai_ao_alerts', 'tools_our_deals_analysis', 'avf_hub']
+        const features = ['slots', 'earnings', 'tasks', 'rating', 'profile', 'about', 'tools', 'tools_strategies', 'tools_ai_ao_alerts', 'tools_our_deals_analysis', 'tools_events', 'avf_hub']
         const accessible = new Set<string>()
 
         for (const feature of features) {
@@ -110,6 +111,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
     { path: '/strategies', label: 'AVF Контур', icon: TrendingUp, feature: 'tools_strategies' },
     { path: '/ai-ao-alerts', label: 'Al AO ALERTS', icon: AlertTriangle, feature: 'tools_ai_ao_alerts' },
     { path: '/our-deals-analysis', label: 'Анализ наших сделок', icon: Zap, feature: 'tools_our_deals_analysis' },
+    { path: '/events', label: 'События', icon: CalendarDays, feature: 'tools_events' },
   ]
 
   // Filter tools that user has access to

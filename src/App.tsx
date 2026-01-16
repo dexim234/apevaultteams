@@ -17,6 +17,7 @@ import { Approvals } from './pages/Approvals'
 import { Strategies } from './pages/Strategies'
 import { AiAoAlerts } from './pages/AiAoAlerts'
 import { FasolSignalsStrategy } from './pages/FasolSignalsStrategy'
+import { EventsPage } from './pages/Events'
 
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { AccessBlockScreen } from './components/AccessBlockScreen'
@@ -156,6 +157,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <FasolSignalsStrategy />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/events"
+            element={
+              <ProtectedRoute>
+                <EventsPage />
               </ProtectedRoute>
             }
           />
