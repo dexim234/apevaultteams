@@ -4,8 +4,7 @@ import { useThemeStore } from '@/store/themeStore'
 import { useAuthStore } from '@/store/authStore'
 import { useAdminStore } from '@/store/adminStore'
 import { RatingCard } from '@/components/Rating/RatingCard'
-import { ReferralForm } from '@/components/Rating/ReferralForm'
-import { getRatingData, getEarnings, getDayStatuses, getReferrals, getWorkSlots, deleteReferral, addApprovalRequest } from '@/services/firestoreService'
+import { getRatingData, getEarnings, getDayStatuses, getReferrals, getWorkSlots } from '@/services/firestoreService'
 import { getLastNDaysRange, getWeekRange, formatDate, calculateHours, countDaysInPeriod } from '@/utils/dateUtils'
 import { calculateRating, getRatingBreakdown } from '@/utils/ratingUtils'
 import { getUserNicknameAsync, clearAllNicknameCache, getUserNicknameSync } from '@/utils/userUtils'
@@ -22,8 +21,6 @@ export const Rating = () => {
   const [ratings, setRatings] = useState<RatingWithBreakdown[]>([])
   const [loading, setLoading] = useState(true)
   const [referrals, setReferrals] = useState<Referral[]>([])
-  const [showReferralForm, setShowReferralForm] = useState(false)
-  const [activeReferral, setActiveReferral] = useState<Referral | null>(null)
 
 
   useEffect(() => {
@@ -229,11 +226,6 @@ export const Rating = () => {
   const topMember = sortedRatings[0]
   const topMemberName = topMember ? getUserNicknameSync(topMember.userId) : '—'
 
-  const getMemberNameById = (id: string) => {
-    // Use sync version for immediate display, will be updated when cache is populated
-    return getUserNicknameSync(id) || '—'
-  }
-
   // Load custom nicknames on mount
   useEffect(() => {
     const loadCustomNicknames = async () => {
@@ -272,34 +264,6 @@ export const Rating = () => {
       window.removeEventListener('nicknameUpdated', handleNicknameUpdate)
     }
   }, [allMembers])
-
-  const handleAddReferral = () => {
-    setActiveReferral(null)
-    setShowReferralForm(true)
-  }
-
-  const handleEditReferral = (referral: Referral) => {
-    setActiveReferral(referral)
-    setShowReferralForm(true)
-  }
-
-  const handleDeleteReferral = async (referral: Referral) => {
-    const canManage = isAdmin || referral.ownerId === user?.id
-    if (!canManage) return
-    if (isAdmin) {
-      await deleteReferral(referral.id)
-    } else {
-      await addApprovalRequest({
-        entity: 'referral',
-        action: 'delete',
-        authorId: user?.id || referral.ownerId,
-        targetUserId: referral.ownerId,
-        before: referral,
-        after: null,
-      })
-    }
-    await loadRatings()
-  }
 
   const statCards = [
     {
@@ -387,88 +351,6 @@ export const Rating = () => {
         </div>
       </div>
 
-
-
-      {/* Referrals Section */}
-      <div className={`rounded-2xl p-6 border ${theme === 'dark' ? 'bg-[#0b1015] border-white/5' : 'bg-white border-gray-100'} shadow-xl`}>
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-pink-500/10 rounded-xl">
-              <UserPlus className="w-5 h-5 text-pink-400" />
-            </div>
-            <div>
-              <h3 className={`text-lg font-black tracking-tight ${headingColor}`}>Рефералы</h3>
-              <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Всего: {referrals.length}</p>
-            </div>
-          </div>
-          <button
-            onClick={handleAddReferral}
-            className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm transition-all shadow-lg shadow-emerald-500/20 hover:scale-105 active:scale-95"
-          >
-            <UserPlus className="w-4 h-4" />
-            <span>Добавить реферала</span>
-          </button>
-        </div>
-
-        {referrals.length ? (
-          <div className={`overflow-auto rounded-xl border ${theme === 'dark' ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-200'}`}>
-            <table className={`min-w-[820px] w-full text-sm ${theme === 'dark' ? 'text-white/90' : 'text-gray-900'}`}>
-              <thead className={`text-left ${theme === 'dark' ? 'bg-white/5 text-white/70' : 'bg-gray-100 text-gray-600'}`}>
-                <tr>
-                  <th className="py-3 px-4 font-semibold">Кто привел</th>
-                  <th className="py-3 px-4 font-semibold">Код</th>
-                  <th className="py-3 px-4 font-semibold">Имя</th>
-                  <th className="py-3 px-4 font-semibold">Комментарий</th>
-                  <th className="py-3 px-4 font-semibold text-right">Действия</th>
-                </tr>
-              </thead>
-              <tbody>
-                {referrals.map((referral) => {
-                  const ownerName = getMemberNameById(referral.ownerId)
-                  const canManage = isAdmin || referral.ownerId === user?.id
-                  return (
-                    <tr
-                      key={referral.id}
-                      className={`border-t transition-colors ${theme === 'dark' ? 'border-white/10 hover:bg-white/5' : 'border-gray-200 hover:bg-gray-100'}`}
-                    >
-                      <td className={`py-3 px-4 font-semibold whitespace-nowrap ${headingColor}`}>{ownerName}</td>
-                      <td className={`py-3 px-4 whitespace-nowrap ${theme === 'dark' ? 'text-white/80' : 'text-gray-600'}`}>{referral.referralId}</td>
-                      <td className={`py-3 px-4 ${theme === 'dark' ? 'text-white/80' : 'text-gray-600'}`}>{referral.name}</td>
-                      <td className={`py-3 px-4 ${theme === 'dark' ? 'text-white/70' : 'text-gray-500'}`}>{referral.comment || '—'}</td>
-                      <td className="py-3 px-4 text-right whitespace-nowrap flex items-center justify-end gap-2">
-                        <button
-                          onClick={() => canManage && handleEditReferral(referral)}
-                          className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition ${!canManage
-                            ? 'opacity-40 cursor-not-allowed'
-                            : theme === 'dark'
-                              ? 'border-white/20 bg-white/10 text-white hover:bg-white/20'
-                              : 'border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100'
-                            }`}
-                          disabled={!canManage}
-                        >
-                          Редактировать
-                        </button>
-                        <button
-                          onClick={() => canManage && handleDeleteReferral(referral)}
-                          className={`px-3 py-1.5 rounded-lg text-xs font-semibold border border-rose-300/60 bg-rose-500/20 text-rose-50 transition ${!canManage ? 'opacity-40 cursor-not-allowed' : 'hover:bg-rose-500/30'}`}
-                          disabled={!canManage}
-                        >
-                          Удалить
-                        </button>
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <div className={`rounded-xl border p-4 ${theme === 'dark' ? 'bg-white/5 border-white/10 text-white/70' : 'bg-gray-50 border-gray-200 text-gray-500'}`}>
-            Пока нет рефералов.
-          </div>
-        )}
-      </div>
-
       {/* Rating Cards Section */}
       <div className={`rounded-2xl p-6 border ${theme === 'dark' ? 'bg-[#0b1015] border-white/5' : 'bg-white border-gray-100'} shadow-xl`}>
         <div className="flex items-center gap-3 mb-6">
@@ -508,40 +390,17 @@ export const Rating = () => {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-2 gap-6">
-              {(() => {
-                console.log('Rating.tsx - About to render cards. sortedRatings:', sortedRatings)
-                console.log('Rating.tsx - sortedRatings.length:', sortedRatings.length)
-                return sortedRatings.map((rating, index) => {
-                  console.log(`Rating.tsx - Rendering card ${index} for user:`, rating.userId)
-                  return (
-                    <RatingCard
-                      key={rating.userId}
-                      rating={rating}
-                      place={{ rank: index + 1 }}
-                    />
-                  )
-                })
-              })()}
+              {sortedRatings.map((rating, index) => (
+                <RatingCard
+                  key={rating.userId}
+                  rating={rating}
+                  place={{ rank: index + 1 }}
+                />
+              ))}
             </div>
           </>
         )}
       </div>
-
-      {/* Form Overlay */}
-      {showReferralForm && (
-        <ReferralForm
-          referral={activeReferral}
-          onClose={() => {
-            setShowReferralForm(false)
-            setActiveReferral(null)
-          }}
-          onSave={() => {
-            setShowReferralForm(false)
-            setActiveReferral(null)
-            loadRatings()
-          }}
-        />
-      )}
     </div>
   )
 }

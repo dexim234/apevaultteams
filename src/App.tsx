@@ -18,6 +18,7 @@ import { Strategies } from './pages/Strategies'
 import { AiAoAlerts } from './pages/AiAoAlerts'
 import { FasolSignalsStrategy } from './pages/FasolSignalsStrategy'
 import { EventsPage } from './pages/Events'
+import { Referrals } from './pages/Referrals'
 
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { AccessBlockScreen } from './components/AccessBlockScreen'
@@ -85,6 +86,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Rating />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/referrals"
+            element={
+              <ProtectedRoute>
+                <Referrals />
               </ProtectedRoute>
             }
           />
@@ -168,7 +177,7 @@ function App() {
               </ProtectedRoute>
             }
           />
-          
+
         </Route>
 
         <Route path="/" element={<Navigate to={(isAuthenticated || isAdmin) ? "/management" : "/login"} replace />} />

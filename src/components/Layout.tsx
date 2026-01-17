@@ -29,6 +29,7 @@ import {
   Menu,
   X,
   CalendarDays,
+  Users
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import logo from '@/assets/logo.png'
@@ -63,11 +64,11 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
       setIsFeaturesLoading(true)
       try {
         if (!user || isAdmin) {
-          setAccessibleFeatures(new Set(['slots', 'earnings', 'tasks', 'rating', 'profile', 'admin', 'tools', 'tools_strategies', 'tools_ai_ao_alerts', 'tools_our_deals_analysis']))
+          setAccessibleFeatures(new Set(['slots', 'earnings', 'tasks', 'rating', 'referrals', 'profile', 'admin', 'tools', 'tools_strategies', 'tools_ai_ao_alerts', 'tools_our_deals_analysis']))
           return
         }
 
-        const features = ['slots', 'earnings', 'tasks', 'rating', 'profile', 'about', 'tools', 'tools_strategies', 'tools_ai_ao_alerts', 'tools_our_deals_analysis', 'tools_events', 'avf_hub']
+        const features = ['slots', 'earnings', 'tasks', 'rating', 'referrals', 'profile', 'about', 'tools', 'tools_strategies', 'tools_ai_ao_alerts', 'tools_our_deals_analysis', 'tools_events', 'avf_hub']
         const accessible = new Set<string>()
 
         for (const feature of features) {
@@ -96,6 +97,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
     { path: '/tasks', label: 'AVF Tasks', icon: CheckSquare, feature: 'tasks' },
     { path: '/earnings', label: 'AVF Profit', icon: DollarSign, feature: 'earnings' },
     { path: '/rating', label: 'AVF Score', icon: TrendingUp, feature: 'rating' },
+    { path: '/referrals', label: 'AVF Referrals', icon: Users, feature: 'referrals' },
     { path: '/about', label: 'AVF INFO', icon: Info, feature: 'about' },
     ...(isAdmin ? [
       { path: '/approvals', label: 'AVF Check', icon: CheckCircle2, feature: 'admin' },

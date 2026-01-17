@@ -878,6 +878,10 @@ export const getReferrals = async (ownerId?: string, startDate?: string, endDate
       age: data.age,
       createdAt: data.createdAt,
       comment: data.comment,
+      phone: data.phone,
+      tgAccount: data.tgAccount,
+      source: data.source,
+      status: data.status || 'active',
     } as Referral
   })
 

@@ -162,6 +162,10 @@ export interface Referral {
   age: number
   createdAt: string
   comment?: string
+  phone?: string
+  tgAccount?: string
+  source?: string
+  status?: 'active' | 'inactive' | 'deleted'
 }
 
 // Call (Trading Signal) types
