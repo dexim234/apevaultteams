@@ -46,6 +46,8 @@ import {
   Zap,
   Wallet,
   PiggyBank,
+  Plus,
+  Lock,
 } from 'lucide-react'
 import { useNavigate, Link } from 'react-router-dom'
 import { TEAM_MEMBERS } from '@/types'
@@ -573,61 +575,61 @@ export const Profile = () => {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
           {[
             {
               label: 'Рейтинг (КПД)',
               value: rating ? `${rating.rating.toFixed(1)}%` : '—',
-              note: rating?.rating && rating.rating >= 70 ? 'Высокая эффективность' : 'Требуется рост',
-              icon: <Zap className="w-5 h-5 text-amber-400" />,
+              note: rating?.rating && rating.rating >= 70 ? 'High Perf' : 'Low Perf',
+              icon: <Zap className="w-4 h-4 md:w-5 md:h-5 text-amber-400" />,
               bgClass: 'bg-amber-500/5',
               borderClass: 'border-amber-500/10'
             },
             {
-              label: 'Задачи в работе',
+              label: 'Задачи',
               value: inProgressTasks,
-              note: `${tasks.length} всего задач`,
-              icon: <CheckSquare className="w-5 h-5 text-blue-400" />,
+              note: `${tasks.length} total`,
+              icon: <CheckSquare className="w-4 h-4 md:w-5 md:h-5 text-blue-400" />,
               bgClass: 'bg-blue-500/5',
               borderClass: 'border-blue-500/10'
             },
             {
-              label: 'Недельный доход',
+              label: 'Weekly',
               value: earningsSummary ? `${Math.round(earningsSummary.weekly.net).toLocaleString()} ₽` : '0 ₽',
-              note: earningsSummary?.weekly.net && earningsSummary.weekly.net >= 10000 ? 'Доступно к выводу' : 'Ниже порога',
-              icon: <Wallet className="w-5 h-5 text-emerald-400" />,
+              note: earningsSummary?.weekly.net && earningsSummary.weekly.net >= 10000 ? 'Ready' : 'Pending',
+              icon: <Wallet className="w-4 h-4 md:w-5 md:h-5 text-emerald-400" />,
               bgClass: 'bg-emerald-500/5',
               borderClass: 'border-emerald-500/10'
             },
             {
-              label: 'Статус аккаунта',
+              label: 'Статус',
               value: isAdmin ? 'Admin' : 'Member',
-              note: 'Постоянный доступ',
-              icon: <Shield className="w-5 h-5 text-purple-400" />,
+              note: 'Verified',
+              icon: <Shield className="w-4 h-4 md:w-5 md:h-5 text-purple-400" />,
               bgClass: 'bg-purple-500/5',
               borderClass: 'border-purple-500/10'
             }
           ].map((item, idx) => (
             <div
               key={idx}
-              className={`relative overflow-hidden rounded-2xl p-5 border transition-all duration-300 hover:shadow-xl group ${theme === 'dark'
-                ? `${item.bgClass} ${item.borderClass} hover:border-white/20`
+              className={`relative overflow-hidden rounded-2xl p-4 md:p-5 border transition-all duration-300 hover:shadow-2xl group ${theme === 'dark'
+                ? `backdrop-blur-xl ${item.bgClass} ${item.borderClass} hover:border-white/20`
                 : 'bg-white border-gray-100 hover:border-[#4E6E49]/20 shadow-sm'
                 }`}
             >
-              <div className="flex justify-between items-start mb-6">
-                <span className={`text-[10px] font-black uppercase tracking-widest ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>
+              <div className="flex justify-between items-start mb-4 md:mb-6">
+                <span className={`text-[8px] md:text-[10px] font-black uppercase tracking-widest ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>
                   {item.label}
                 </span>
-                <div className={`p-2 rounded-xl ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-50'}`}>
+                <div className={`p-1.5 md:p-2 rounded-xl ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-50'}`}>
                   {item.icon}
                 </div>
               </div>
-              <div className="space-y-1">
-                <div className={`text-2xl md:text-3xl font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+              <div className="space-y-0.5 md:space-y-1">
+                <div className={`text-xl md:text-3xl font-black tracking-tighter font-mono ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                   {item.value}
                 </div>
-                <div className={`text-[11px] font-bold ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>
+                <div className={`text-[9px] md:text-[11px] font-black uppercase tracking-tight ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>
                   {item.note}
                 </div>
               </div>
@@ -642,157 +644,134 @@ export const Profile = () => {
         <div className="space-y-5">
           <div className="grid grid-cols-1 lg:grid-cols-[1.05fr_0.95fr] gap-4 items-stretch">
             <div className="space-y-4 flex flex-col">
-              <div className={`rounded-2xl p-6 border ${theme === 'dark' ? 'border-white/5 bg-[#1a1a1a]' : 'border-gray-200 bg-white'} shadow flex-1`}>
-                <div className="flex items-center gap-3 mb-6">
-                  <div className={`p-2.5 rounded-xl ${theme === 'dark' ? 'bg-[#4E6E49]/10 text-[#4E6E49]' : 'bg-[#4E6E49]/5 text-[#4E6E49]'}`}>
-                    <User className="w-5 h-5" />
+              <div className={`rounded-3xl p-6 md:p-8 border transition-all duration-500 ${theme === 'dark' ? 'border-white/5 bg-[#1a1a1a]/60 backdrop-blur-2xl shadow-2xl' : 'border-gray-200 bg-white'} shadow flex-1 relative overflow-hidden group`}>
+                <div className="absolute top-0 right-0 w-32 h-32 bg-[#4E6E49]/5 blur-3xl rounded-full -mr-16 -mt-16 group-hover:bg-[#4E6E49]/10 transition-colors" />
+                <div className="flex items-center gap-4 mb-8">
+                  <div className={`p-3 rounded-2xl ${theme === 'dark' ? 'bg-[#4E6E49]/15 text-[#4E6E49] border border-[#4E6E49]/20' : 'bg-[#4E6E49]/5 text-[#4E6E49]'}`}>
+                    <User className="w-6 h-6" />
                   </div>
                   <div>
-                    <h2 className={`text-sm font-black uppercase tracking-widest ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Профиль</h2>
-                    <p className={`text-xs ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>Доступ и учетные данные</p>
+                    <h2 className={`text-xs font-black uppercase tracking-[0.2em] ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>Identity</h2>
+                    <p className={`text-lg font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>User Protocol</p>
                   </div>
                 </div>
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <div className={`p-4 rounded-xl border ${theme === 'dark' ? 'border-white/5 bg-black/20' : 'border-gray-100 bg-gray-50'} shadow-sm`}>
-                    <p className={`text-[10px] font-black uppercase tracking-widest ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>Имя</p>
-                    <p className={`mt-1 text-lg font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{userData.name}</p>
-                  </div>
-                  <div className={`p-4 rounded-xl border ${theme === 'dark' ? 'border-white/5 bg-black/20' : 'border-gray-100 bg-gray-50'} shadow-sm`}>
-                    <div className="flex items-center justify-between mb-1">
-                      <p className={`text-[10px] font-black uppercase tracking-widest ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>Ник</p>
-                      {!isEditingNickname && user && !isAdmin && (
-                        <button
-                          onClick={async () => {
-                            setIsEditingNickname(true)
-                            setNewNickname(nickname || '')
-                          }}
-                          className={`text-[10px] px-2 py-1 rounded-lg border transition-all font-black uppercase tracking-wider ${theme === 'dark' ? 'border-white/5 bg-white/5 hover:border-white/10 text-white' : 'border-gray-200 bg-white hover:border-gray-300 text-gray-700'}`}
-                        >
-                          <Edit3 className="w-3 h-3 inline mr-1" />
-                          Изменить
-                        </button>
-                      )}
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className={`p-4 rounded-2xl border transition-all ${theme === 'dark' ? 'border-white/5 bg-black/40 hover:border-white/10' : 'border-gray-100 bg-gray-50'}`}>
+                      <p className={`text-[9px] font-black uppercase tracking-[0.15em] ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>Legal Name</p>
+                      <p className={`mt-1 text-base font-black tracking-tight ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>{userData.name}</p>
                     </div>
-                    {isEditingNickname ? (
-                      <div className="space-y-2 mt-1">
-                        <input
-                          type="text"
-                          value={newNickname}
-                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewNickname(e.target.value)}
-                          placeholder="Введите новый ник"
-                          className={`w-full px-3 py-2 rounded-lg border ${theme === 'dark' ? 'border-white/10 bg-white/5 text-white' : 'border-gray-200 bg-white text-gray-900'} text-sm`}
-                          disabled={nicknameRequestPending}
-                        />
-                        <div className="flex gap-2">
+                    <div className={`p-4 rounded-2xl border transition-all ${theme === 'dark' ? 'border-white/5 bg-black/40 hover:border-white/10' : 'border-gray-100 bg-gray-50'}`}>
+                      <div className="flex items-center justify-between mb-1">
+                        <p className={`text-[9px] font-black uppercase tracking-[0.15em] ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>Alias</p>
+                        {!isEditingNickname && user && !isAdmin && (
                           <button
-                            onClick={handleRequestNicknameChange}
-                            disabled={nicknameRequestPending || !newNickname.trim()}
-                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${nicknameRequestPending || !newNickname.trim()
-                              ? 'opacity-50 cursor-not-allowed'
-                              : 'bg-[#4E6E49] text-white hover:bg-[#3d5639]'
-                              }`}
-                          >
-                            {nicknameRequestPending ? 'Отправка...' : 'Отправить на согласование'}
-                          </button>
-                          <button
-                            onClick={() => {
-                              setIsEditingNickname(false)
-                              setNewNickname('')
+                            onClick={async () => {
+                              setIsEditingNickname(true)
+                              setNewNickname(nickname || '')
                             }}
-                            disabled={nicknameRequestPending}
-                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition ${theme === 'dark' ? 'border-white/10 bg-white/5 hover:border-white/30 text-white' : 'border-gray-200 bg-white hover:border-gray-300 text-gray-700'
-                              }`}
+                            className={`text-[8px] px-2 py-0.5 rounded-md border transition-all font-black uppercase tracking-wider ${theme === 'dark' ? 'border-white/10 bg-white/5 hover:bg-white/10 text-white' : 'border-gray-200 bg-white hover:border-gray-300 text-gray-700'}`}
                           >
-                            Отмена
+                            Edit
                           </button>
-                        </div>
-                        <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                          Изменение ника требует согласования администратора
-                        </p>
+                        )}
                       </div>
-                    ) : (
-                      <div className="flex items-center gap-2 mt-1">
-                        <p className={`text-lg font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                      {isEditingNickname ? (
+                        <div className="space-y-2 mt-1">
+                          <input
+                            type="text"
+                            value={newNickname}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewNickname(e.target.value)}
+                            placeholder="New alias"
+                            className={`w-full px-3 py-1.5 rounded-xl border font-mono ${theme === 'dark' ? 'border-white/10 bg-black/40 text-white' : 'border-gray-200 bg-white text-gray-900'} text-xs`}
+                            disabled={nicknameRequestPending}
+                          />
+                          <div className="flex gap-2">
+                            <button
+                              onClick={handleRequestNicknameChange}
+                              disabled={nicknameRequestPending || !newNickname.trim()}
+                              className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${nicknameRequestPending || !newNickname.trim()
+                                ? 'opacity-50 cursor-not-allowed'
+                                : 'bg-[#4E6E49] text-white hover:bg-[#3d5639] shadow-lg shadow-[#4E6E49]/20'
+                                }`}
+                            >
+                              Sync
+                            </button>
+                            <button
+                              onClick={() => {
+                                setIsEditingNickname(false)
+                                setNewNickname('')
+                              }}
+                              className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all ${theme === 'dark' ? 'border-white/10 bg-white/5 hover:border-white/10 text-white' : 'border-gray-200 bg-white hover:border-gray-300 text-gray-700'}`}
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <p className={`mt-1 text-base font-black tracking-tight ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>
                           {user?.id ? <UserNickname userId={user.id} /> : '—'}
                         </p>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
-                  <div className={`p-4 rounded-xl border ${theme === 'dark' ? 'border-white/5 bg-black/20' : 'border-gray-100 bg-gray-50'} shadow-sm`}>
-                    <p className={`text-[10px] font-black uppercase tracking-widest ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>Логин</p>
-                    <div className="flex items-center gap-2 mt-1">
-                      <p className={`text-lg font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{userData.login}</p>
+                  <div className={`p-4 rounded-2xl border transition-all ${theme === 'dark' ? 'border-white/5 bg-black/40 hover:border-white/10' : 'border-gray-100 bg-gray-50'}`}>
+                    <p className={`text-[9px] font-black uppercase tracking-[0.15em] ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>Terminal Access (Login)</p>
+                    <div className="flex items-center gap-3 mt-1.5">
+                      <p className={`text-xl font-black font-mono tracking-tighter ${theme === 'dark' ? 'text-emerald-500' : 'text-emerald-600'}`}>{userData.login}</p>
                       <button
                         onClick={handleCopyLogin}
-                        className={`p-2 rounded-lg border transition-all ${loginCopied ? 'bg-[#4E6E49] text-white border-[#4E6E49]' : theme === 'dark' ? 'border-white/5 bg-white/5 hover:border-white/10' : 'border-gray-200 bg-white hover:border-gray-300'}`}
-                        title="Скопировать логин"
+                        className={`p-2 rounded-xl border transition-all ${loginCopied ? 'bg-[#4E6E49] text-white border-[#4E6E49]' : theme === 'dark' ? 'border-white/10 bg-white/5 hover:border-white/20' : 'border-gray-200 bg-white hover:border-gray-300'}`}
+                        title="Copy Login"
                       >
                         {loginCopied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                       </button>
                     </div>
                   </div>
-                </div>
-                <div className="mt-4 space-y-2">
-                  <label className={`text-[10px] font-black uppercase tracking-widest ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'} block`}>Пароль</label>
-                  <div className="flex items-center gap-2">
-                    <div className={`flex-1 px-4 py-3 rounded-xl border ${theme === 'dark' ? 'border-white/5 bg-black/20 text-white' : 'border-gray-200 bg-white text-gray-900'} font-mono text-sm`}>
-                      {showPassword ? userData.password : '•'.repeat(userData.password.length)}
-                    </div>
-                    <button
-                      onClick={() => setShowPassword(!showPassword)}
-                      className={`p-3 rounded-xl border ${theme === 'dark' ? 'border-white/5 bg-white/5 hover:border-white/10' : 'border-gray-200 bg-white hover:border-gray-300'} transition-all`}
-                      title={showPassword ? 'Скрыть пароль' : 'Показать пароль'}
-                    >
-                      {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                    </button>
-                    <button
-                      onClick={handleCopyPassword}
-                      className={`p-3 rounded-xl border transition-all ${passwordCopied ? 'bg-[#4E6E49] text-white border-[#4E6E49]' : theme === 'dark' ? 'border-white/5 bg-white/5 hover:border-white/10' : 'border-gray-200 bg-white hover:border-gray-300'}`}
-                      title="Скопировать пароль"
-                    >
-                      {passwordCopied ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
-                    </button>
-                  </div>
-                </div>
-                <div className="mt-4 grid gap-3 sm:grid-cols-1">
-                  <div className={`p-4 rounded-xl border ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-white'} shadow-sm`}>
-                    <p className={`text-xs font-semibold uppercase tracking-wide ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Учебная панель (преподаватель)</p>
-                    <div className="mt-2 space-y-2 text-sm">
-                      <div className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                        <span className="font-semibold">Имя: </span>
-                        <span className="font-medium">в разработке</span>
+                  <div className="space-y-2">
+                    <label className={`text-[9px] font-black uppercase tracking-[0.15em] ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'} block px-1`}>Secure Hash (Password)</label>
+                    <div className="flex items-center gap-2">
+                      <div className={`flex-1 px-4 py-3 rounded-2xl border font-mono text-sm tracking-widest ${theme === 'dark' ? 'border-white/5 bg-black/40 text-gray-400' : 'border-gray-200 bg-white text-gray-900'}`}>
+                        {showPassword ? userData.password : '••••••••'}
                       </div>
-                      <div className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                        <span className="font-semibold">Логин: </span>
-                        <span className="font-medium">в разработке</span>
-                      </div>
-                      <div className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                        <span className="font-semibold">Пароль: </span>
-                        <span className="font-medium">в разработке</span>
-                      </div>
+                      <button
+                        onClick={() => setShowPassword(!showPassword)}
+                        className={`p-3 rounded-2xl border ${theme === 'dark' ? 'border-white/10 bg-black/40 hover:border-white/20' : 'border-gray-200 bg-white hover:border-gray-300'} transition-all`}
+                        title={showPassword ? 'Hide' : 'Reveal'}
+                      >
+                        {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                      </button>
+                      <button
+                        onClick={handleCopyPassword}
+                        className={`p-3 rounded-2xl border transition-all ${passwordCopied ? 'bg-[#4E6E49] text-white border-[#4E6E49]' : theme === 'dark' ? 'border-white/10 bg-black/40 hover:border-white/20' : 'border-gray-200 bg-white hover:border-gray-300'}`}
+                        title="Copy Password"
+                      >
+                        {passwordCopied ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
+                      </button>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className={`rounded-2xl p-6 border ${theme === 'dark' ? 'border-white/5 bg-[#1a1a1a]' : 'border-gray-200 bg-white'} shadow flex-1`}>
-                <div className="flex items-center gap-3 mb-6">
-                  <div className={`p-2.5 rounded-xl ${theme === 'dark' ? 'bg-[#4E6E49]/10 text-[#4E6E49]' : 'bg-[#4E6E49]/5 text-[#4E6E49]'}`}>
-                    <CheckSquare className="w-5 h-5" />
+              <div className={`rounded-3xl p-6 md:p-8 border transition-all duration-500 ${theme === 'dark' ? 'border-white/5 bg-[#1a1a1a]/60 backdrop-blur-2xl shadow-2xl' : 'border-gray-200 bg-white'} shadow flex-1 relative overflow-hidden group`}>
+                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 blur-3xl rounded-full -mr-16 -mt-16 group-hover:bg-blue-500/10 transition-colors" />
+                <div className="flex items-center gap-4 mb-8">
+                  <div className={`p-3 rounded-2xl ${theme === 'dark' ? 'bg-blue-500/15 text-blue-400 border border-blue-500/20' : 'bg-blue-500/5 text-blue-600'}`}>
+                    <CheckSquare className="w-6 h-6" />
                   </div>
                   <div>
-                    <h2 className={`text-sm font-black uppercase tracking-widest ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Мои задачи</h2>
-                    <p className={`text-xs ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>Сводка по статусам</p>
+                    <h2 className={`text-xs font-black uppercase tracking-[0.2em] ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>Assignments</h2>
+                    <p className={`text-lg font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Task Matrix</p>
                   </div>
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-                  {[{ label: 'В работе', value: inProgressTasks, classes: theme === 'dark' ? 'bg-blue-500/5 border-blue-500/10 text-blue-400' : 'bg-blue-50 border-blue-100 text-blue-600' },
-                  { label: 'Выполнено', value: completedTasks, classes: theme === 'dark' ? 'bg-emerald-500/5 border-emerald-500/10 text-emerald-400' : 'bg-emerald-50 border-emerald-100 text-emerald-600' },
-                  { label: 'Закрыто', value: closedTasks, classes: theme === 'dark' ? 'bg-gray-500/5 border-gray-500/10 text-gray-400' : 'bg-gray-50 border-gray-100 text-gray-600' },
-                  { label: 'Всего', value: tasks.length, classes: theme === 'dark' ? 'bg-purple-500/5 border-purple-500/10 text-purple-400' : 'bg-purple-50 border-purple-100 text-purple-600' }].map(({ label, value, classes }) => (
-                    <div key={label} className={`p-4 rounded-xl border shadow-sm transition-all hover:translate-y-[-2px] ${classes}`}>
-                      <div className="text-[9px] font-black uppercase tracking-widest mb-2 opacity-70">{label}</div>
-                      <div className={`text-2xl font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{value}</div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+                  {[{ label: 'Active', value: inProgressTasks, color: 'text-blue-400' },
+                  { label: 'Done', value: completedTasks, color: 'text-emerald-400' },
+                  { label: 'Closed', value: closedTasks, color: 'text-gray-400' },
+                  { label: 'Total', value: tasks.length, color: 'text-purple-400' }].map(({ label, value, color }) => (
+                    <div key={label} className={`p-4 rounded-2xl border ${theme === 'dark' ? 'border-white/5 bg-black/40' : 'bg-gray-50 border-gray-100'} transition-all hover:scale-[1.05]`}>
+                      <div className="text-[8px] font-black uppercase tracking-widest mb-2 opacity-50">{label}</div>
+                      <div className={`text-xl font-black font-mono ${color}`}>{value}</div>
                     </div>
                   ))}
                 </div>
@@ -828,267 +807,227 @@ export const Profile = () => {
                     </div>
                   </div>
                 )}
-                <div className="mt-6 space-y-4">
-                  <div className="flex items-center gap-2">
-                    <StickyNote className="w-4 h-4 text-[#4E6E49]" />
-                    <p className={`text-[10px] font-black uppercase tracking-widest ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>Мои заметки</p>
-                  </div>
-                  <div className="grid gap-2 sm:grid-cols-2">
-                    <input
-                      type="text"
-                      value={noteDraft.title}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNoteDraft({ ...noteDraft, title: e.target.value })}
-                      placeholder="Заголовок"
-                      className={`px-3 py-2 rounded-lg border ${theme === 'dark' ? 'border-white/10 bg-white/5 text-white' : 'border-gray-200 bg-white text-gray-900'} text-sm`}
-                    />
-                    <div className="flex gap-2">
-                      {(['low', 'medium', 'high'] as const).map((p) => (
-                        <button
-                          key={p}
-                          onClick={() => setNoteDraft({ ...noteDraft, priority: p })}
-                          className={`px-3 py-2 rounded-lg border text-sm flex-1 ${noteDraft.priority === p
-                            ? 'border-[#4E6E49] bg-[#4E6E49]/10 text-[#4E6E49]'
-                            : theme === 'dark'
-                              ? 'border-white/10 bg-white/5 text-white'
-                              : 'border-gray-200 bg-white text-gray-800'
-                            }`}
-                        >
-                          {p === 'low' ? 'Низкий' : p === 'medium' ? 'Средний' : 'Высокий'}
-                        </button>
-                      ))}
+                <div className="mt-8 space-y-6">
+                  <div className="flex items-center gap-3">
+                    <div className={`p-2 rounded-xl ${theme === 'dark' ? 'bg-[#4E6E49]/10' : 'bg-[#4E6E49]/5'}`}>
+                      <StickyNote className="w-4 h-4 text-[#4E6E49]" />
                     </div>
+                    <p className={`text-[10px] font-black uppercase tracking-[0.2em] ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>Memo Buffer</p>
                   </div>
-                  <textarea
-                    value={noteDraft.text}
-                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setNoteDraft({ ...noteDraft, text: e.target.value })}
-                    rows={3}
-                    placeholder="Текст заметки"
-                    className={`w-full px-3 py-2 rounded-lg border ${theme === 'dark' ? 'border-white/10 bg-white/5 text-white' : 'border-gray-200 bg-white text-gray-900'} text-sm`}
-                  />
-                  <div className="flex gap-2">
-                    <button
-                      onClick={handleSaveNote}
-                      className={`px-4 py-2 rounded-lg font-semibold flex items-center gap-2 ${!user?.id
-                        ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
-                        : theme === 'dark'
-                          ? 'bg-[#4E6E49]/20 text-[#4E6E49] border border-[#4E6E49]/40'
-                          : 'bg-gradient-to-r from-[#4E6E49] to-emerald-500 text-white'
-                        }`}
-                      disabled={!user?.id}
-                    >
-                      <Edit3 className="w-4 h-4" />
-                      {noteDraft.id ? 'Сохранить' : 'Добавить'}
-                    </button>
-                    {noteDraft.id && (
-                      <button
-                        onClick={() =>
-                          setNoteDraft({
-                            id: '',
-                            userId: '',
-                            title: '',
-                            text: '',
-                            priority: 'medium',
-                            createdAt: '',
-                            updatedAt: '',
-                          })
-                        }
-                        className={`px-4 py-2 rounded-lg font-semibold border ${theme === 'dark' ? 'border-white/15 text-gray-200' : 'border-gray-200 text-gray-700'}`}
-                      >
-                        Отмена
-                      </button>
-                    )}
-                  </div>
-                  {notes.length > 0 && (
-                    <div className="space-y-2">
-                      {notes.map((n: Note) => (
-                        <div
-                          key={n.id}
-                          className={`p-3 rounded-lg border ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-gray-50'} flex flex-col gap-1`}
+                  <div className={`p-6 rounded-2xl border transition-all ${theme === 'dark' ? 'border-white/5 bg-black/40' : 'border-gray-100 bg-gray-50'}`}>
+                    <div className="grid gap-4 mb-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-3">
+                        <input
+                          type="text"
+                          value={noteDraft.title}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNoteDraft({ ...noteDraft, title: e.target.value })}
+                          placeholder="Note Header..."
+                          className={`px-4 py-2.5 rounded-xl border font-mono tracking-tight ${theme === 'dark' ? 'border-white/10 bg-black/60 text-white placeholder:text-gray-600' : 'border-gray-200 bg-white text-gray-900'} text-xs focus:border-[#4E6E49]/50 outline-none transition-all`}
+                        />
+                        <div className="flex gap-1.5 p-1 bg-black/20 rounded-xl border border-white/5">
+                          {(['low', 'medium', 'high'] as const).map((p) => (
+                            <button
+                              key={p}
+                              onClick={() => setNoteDraft({ ...noteDraft, priority: p })}
+                              className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${noteDraft.priority === p
+                                ? p === 'high' ? 'bg-red-500 text-white' : p === 'medium' ? 'bg-amber-500 text-white' : 'bg-emerald-500 text-white'
+                                : theme === 'dark' ? 'text-gray-500 hover:text-gray-300' : 'text-gray-400 hover:text-gray-600'
+                                }`}
+                            >
+                              {p}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="flex gap-3">
+                        <textarea
+                          value={noteDraft.text}
+                          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setNoteDraft({ ...noteDraft, text: e.target.value })}
+                          placeholder="Encrypt message content here..."
+                          className={`flex-1 px-4 py-3 rounded-xl border font-mono text-xs resize-none h-24 ${theme === 'dark' ? 'border-white/10 bg-black/60 text-white placeholder:text-gray-600' : 'border-gray-200 bg-white text-gray-900'} focus:border-[#4E6E49]/50 outline-none transition-all`}
+                        />
+                        <button
+                          onClick={handleSaveNote}
+                          className={`px-5 rounded-xl bg-[#4E6E49] text-white hover:bg-[#3d5639] transition-all flex items-center justify-center shadow-lg shadow-[#4E6E49]/20 active:scale-95`}
+                          title="Commit Note"
                         >
-                          <div className="flex items-start justify-between gap-2">
-                            <div className="min-w-0">
-                              <p className={`text-sm font-semibold ${headingColor} truncate`}>{n.title || 'Без названия'}</p>
-                              <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} whitespace-pre-line`}>{n.text}</p>
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <span
-                                className={`text-[11px] px-2 py-1 rounded-full border ${n.priority === 'high'
-                                  ? 'border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-500/40 dark:bg-rose-500/15 dark:text-rose-50'
-                                  : n.priority === 'medium'
-                                    ? 'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-500/40 dark:bg-amber-500/15 dark:text-amber-50'
-                                    : 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-500/40 dark:bg-emerald-500/15 dark:text-emerald-50'
-                                  }`}
-                              >
-                                {n.priority === 'high' ? 'Высокий' : n.priority === 'medium' ? 'Средний' : 'Низкий'}
-                              </span>
+                          <Plus className="w-6 h-6" />
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6">
+                      {notes.map((note: Note) => (
+                        <div
+                          key={note.id}
+                          className={`p-4 rounded-2xl border flex flex-col gap-2 relative group overflow-hidden transition-all hover:border-white/20 ${theme === 'dark' ? 'border-white/5 bg-black/40' : 'border-gray-200 bg-white shadow-sm'}`}
+                        >
+                          <div className={`absolute top-0 left-0 w-1.5 h-full ${note.priority === 'high' ? 'bg-red-500 shadow-[0_0_15px_rgba(239,68,68,0.4)]' : note.priority === 'medium' ? 'bg-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.4)]' : 'bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.4)]'}`} />
+                          <div className="flex items-start justify-between gap-4">
+                            <p className={`text-xs font-black uppercase tracking-wider truncate ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{note.title}</p>
+                            <div className="flex gap-1">
                               <button
-                                onClick={() => handleEditNote(n.id)}
-                                className={`p-1 rounded border ${theme === 'dark' ? 'border-white/10 text-gray-200' : 'border-gray-200 text-gray-700'}`}
-                                title="Редактировать"
+                                onClick={() => handleEditNote(note.id)}
+                                className="opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-lg hover:bg-[#4E6E49]/10 text-[#4E6E49]"
                               >
-                                <Edit3 className="w-4 h-4" />
+                                <Edit3 className="w-3.5 h-3.5" />
                               </button>
                               <button
-                                onClick={() => handleDeleteNote(n.id)}
-                                className={`p-1 rounded border ${theme === 'dark' ? 'border-white/10 text-red-200' : 'border-gray-200 text-red-600'}`}
-                                title="Удалить"
+                                onClick={() => handleDeleteNote(note.id)}
+                                className="opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-lg hover:bg-red-500/10 text-red-500"
                               >
-                                <Trash2 className="w-4 h-4" />
+                                <Trash2 className="w-3.5 h-3.5" />
                               </button>
                             </div>
+                          </div>
+                          <p className={`text-[11px] leading-relaxed font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} line-clamp-3`}>{note.text}</p>
+                          <div className="flex items-center justify-between mt-auto pt-2 opacity-30 group-hover:opacity-100 transition-opacity">
+                            <p className="text-[9px] font-black font-mono uppercase tracking-widest text-gray-500 italic">
+                              {formatDate(new Date(note.createdAt), 'dd.MM.yy HH:mm')}
+                            </p>
+                            <Lock className="w-3 h-3 text-gray-500" />
                           </div>
                         </div>
                       ))}
                     </div>
-                  )}
-                </div>
-                <div className="mt-4">
-                  <button
-                    onClick={() => navigate('/tasks')}
-                    className={`w-full px-4 py-3 rounded-lg font-semibold transition-all flex items-center justify-center gap-2 ${theme === 'dark' ? 'bg-gradient-to-r from-[#4E6E49]/20 to-emerald-700/20 text-[#4E6E49] border border-[#4E6E49]/40' : 'bg-gradient-to-r from-green-50 to-emerald-50 text-[#4E6E49] border border-green-200'}`}
-                  >
-                    <CheckSquare className="w-4 h-4" />
-                    Перейти к задачам
-                  </button>
+                  </div>
+                  <div className="mt-4">
+                    <button
+                      onClick={() => navigate('/tasks')}
+                      className={`w-full px-4 py-3 rounded-lg font-semibold transition-all flex items-center justify-center gap-2 ${theme === 'dark' ? 'bg-gradient-to-r from-[#4E6E49]/20 to-emerald-700/20 text-[#4E6E49] border border-[#4E6E49]/40' : 'bg-gradient-to-r from-green-50 to-emerald-50 text-[#4E6E49] border border-green-200'}`}
+                    >
+                      <CheckSquare className="w-4 h-4" />
+                      Перейти к задачам
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
 
             <div className="space-y-4 flex flex-col">
               {earningsSummary && (
-                <div className={`rounded-2xl p-6 border ${theme === 'dark' ? 'border-white/5 bg-[#1a1a1a]' : 'border-gray-200 bg-white'} shadow flex-1`}>
-                  <div className="flex items-center justify-between mb-6">
-                    <div className="flex items-center gap-3">
-                      <div className={`p-2.5 rounded-xl ${theme === 'dark' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-emerald-50 text-emerald-600'}`}>
-                        <DollarSign className="w-5 h-5" />
+                <div className={`rounded-3xl p-6 md:p-8 border transition-all duration-500 ${theme === 'dark' ? 'border-white/5 bg-[#1a1a1a]/60 backdrop-blur-2xl shadow-2xl' : 'border-gray-200 bg-white'} shadow flex-1 relative overflow-hidden group`}>
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 blur-3xl rounded-full -mr-16 -mt-16 group-hover:bg-emerald-500/10 transition-colors" />
+                  <div className="flex items-center justify-between mb-8">
+                    <div className="flex items-center gap-4">
+                      <div className={`p-3 rounded-2xl ${theme === 'dark' ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20' : 'bg-emerald-50 text-emerald-600'}`}>
+                        <DollarSign className="w-6 h-6" />
                       </div>
                       <div>
-                        <h2 className={`text-sm font-black uppercase tracking-widest ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Мой заработок</h2>
-                        <p className={`text-xs ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>Суммы с учётом долей</p>
+                        <h2 className={`text-xs font-black uppercase tracking-[0.2em] ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>Revenue</h2>
+                        <p className={`text-lg font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Node Profits</p>
                       </div>
                     </div>
-                    <div className={`px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border ${earningsSummary.weekly.net >= 10000 ? 'border-emerald-500/20 bg-emerald-500/5 text-emerald-500' : 'border-amber-500/20 bg-amber-500/5 text-amber-500'}`}>
-                      {earningsSummary.weekly.net >= 10000 ? 'Вывод доступен' : 'Ожидание порога'}
+                    <div className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all ${earningsSummary.weekly.net >= 10000 ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400 shadow-lg shadow-emerald-500/10' : 'border-amber-500/30 bg-amber-500/10 text-amber-500'}`}>
+                      {earningsSummary.weekly.net >= 10000 ? 'Claimable' : 'Accumulating'}
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
                     {[
-                      { label: 'Всего заработано', value: earningsSummary.total, icon: <TrendingUp className="w-3 h-3" /> },
-                      { label: 'Отправлено в пул', value: earningsSummary.pool, icon: <PiggyBank className="w-3 h-3" /> },
-                      { label: 'Чистыми', value: earningsSummary.net, icon: <Wallet className="w-3 h-3" /> },
+                      { label: 'Total Revenue', value: earningsSummary.total, icon: <TrendingUp className="w-4 h-4 text-emerald-400" /> },
+                      { label: 'Pool Shares', value: earningsSummary.pool, icon: <PiggyBank className="w-4 h-4 text-purple-400" /> },
+                      { label: 'Net Profit', value: earningsSummary.net, icon: <Wallet className="w-4 h-4 text-blue-400" /> },
                     ].map((item) => (
                       <div
                         key={item.label}
-                        className={`p-4 rounded-xl border shadow-sm ${theme === 'dark' ? 'border-white/5 bg-black/20' : 'border-gray-100 bg-gray-50'}`}
+                        className={`p-5 rounded-2xl border transition-all ${theme === 'dark' ? 'border-white/5 bg-black/40 hover:border-white/10' : 'border-gray-100 bg-gray-50'}`}
                       >
-                        <div className="flex items-center gap-2 mb-2 opacity-70">
+                        <div className="flex items-center gap-2 mb-3 opacity-50">
                           {item.icon}
                           <p className="text-[9px] font-black uppercase tracking-widest">{item.label}</p>
                         </div>
-                        <p className={`text-xl font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{Math.round(item.value).toLocaleString('ru-RU')} ₽</p>
+                        <p className={`text-xl font-black font-mono tracking-tighter ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{Math.round(item.value).toLocaleString('ru-RU')} <span className="text-xs opacity-50">₽</span></p>
                       </div>
                     ))}
                   </div>
 
-                  <div className={`p-5 rounded-xl border ${theme === 'dark' ? 'border-white/5 bg-emerald-500/5' : 'border-emerald-100 bg-emerald-50/50'} flex flex-col gap-4`}>
-                    <div className="flex items-center justify-between gap-2 flex-wrap">
+                  <div className={`p-6 rounded-2xl border transition-all ${theme === 'dark' ? 'border-emerald-500/10 bg-emerald-500/5 hover:bg-emerald-500/10' : 'border-emerald-100 bg-emerald-50/50'} flex flex-col gap-5`}>
+                    <div className="flex items-center justify-between gap-4 flex-wrap">
                       <div>
-                        <p className={`text-xs font-black uppercase tracking-wider ${theme === 'dark' ? 'text-emerald-500/80' : 'text-emerald-700'}`}>Активная неделя</p>
-                        <p className={`text-[10px] ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Пн, Ср, Пт, Сб — дни вывода</p>
+                        <p className={`text-[10px] font-black uppercase tracking-[0.2em] ${theme === 'dark' ? 'text-emerald-500/80' : 'text-emerald-700'}`}>Active Epoch</p>
+                        <p className={`text-[11px] font-medium ${theme === 'dark' ? 'text-gray-500' : 'text-gray-600'}`}>Sync Schedule: Mon, Wed, Fri, Sat</p>
                       </div>
-                      <span className={`text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full border ${earningsSummary.weekly.net >= 10000 ? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-500' : 'border-amber-500/20 bg-amber-500/10 text-amber-500'}`}>
-                        {earningsSummary.weekly.net >= 10000 ? 'Доступно к выводу' : 'Перенос суммы'}
+                      <span className={`text-[9px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full border shadow-sm ${earningsSummary.weekly.net >= 10000 ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400' : 'border-amber-500/30 bg-amber-500/10 text-amber-500'}`}>
+                        {earningsSummary.weekly.net >= 10000 ? 'Ready to bridge' : 'Threshold pending'}
                       </span>
                     </div>
+
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                       {[
-                        { label: 'Заработано', value: earningsSummary.weekly.gross },
-                        { label: 'В пул', value: earningsSummary.weekly.pool },
-                        { label: 'Чистыми', value: earningsSummary.weekly.net },
+                        { label: 'Epoch Gross', value: earningsSummary.weekly.gross },
+                        { label: 'Epoch Pool', value: earningsSummary.weekly.pool },
+                        { label: 'Epoch Net', value: earningsSummary.weekly.net },
                       ].map((item) => (
                         <div
                           key={item.label}
-                          className={`p-3 rounded-lg border ${theme === 'dark' ? 'border-white/5 bg-white/5' : 'border-white/80 bg-white/80'} shadow-sm`}
+                          className={`p-4 rounded-xl border transition-all ${theme === 'dark' ? 'border-white/5 bg-black/20 hover:border-white/10' : 'border-white/80 bg-white/80'}`}
                         >
-                          <p className="text-[9px] font-black uppercase tracking-widest opacity-70">{item.label}</p>
-                          <p className={`text-base font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{Math.round(item.value).toLocaleString('ru-RU')} ₽</p>
+                          <p className="text-[8px] font-black uppercase tracking-widest opacity-40 mb-1">{item.label}</p>
+                          <p className={`text-base font-black font-mono tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{Math.round(item.value).toLocaleString('ru-RU')} ₽</p>
                         </div>
                       ))}
                     </div>
-                    {earningsSummary.weekly.net < 10000 && (
-                      <p className={`text-[10px] font-medium ${theme === 'dark' ? 'text-amber-500/80' : 'text-amber-700'}`}>
-                        Менее 10 000 ₽ чистыми — вывод недоступен, сумма переносится.
-                      </p>
-                    )}
                   </div>
                 </div>
               )}
 
               {rating && ratingBreakdown && (
-                <div className={`rounded-2xl p-6 border ${theme === 'dark' ? 'border-white/5 bg-[#1a1a1a]' : 'border-gray-200 bg-white'} shadow flex-1`}>
-                  <div className="flex items-center justify-between mb-6">
-                    <div className="flex items-center gap-3">
-                      <div className={`p-2.5 rounded-xl ${theme === 'dark' ? 'bg-purple-500/10 text-purple-400' : 'bg-purple-50 text-purple-600'}`}>
-                        <TrendingUp className="w-5 h-5" />
+                <div className={`rounded-3xl p-6 md:p-8 border transition-all duration-500 ${theme === 'dark' ? 'border-white/5 bg-[#1a1a1a]/60 backdrop-blur-2xl shadow-2xl' : 'border-gray-200 bg-white'} shadow flex-1 relative overflow-hidden group`}>
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 blur-3xl rounded-full -mr-16 -mt-16 group-hover:bg-purple-500/10 transition-colors" />
+                  <div className="flex items-center justify-between mb-8">
+                    <div className="flex items-center gap-4">
+                      <div className={`p-3 rounded-2xl ${theme === 'dark' ? 'bg-purple-500/15 text-purple-400 border border-purple-500/20' : 'bg-purple-50 text-purple-600'}`}>
+                        <TrendingUp className="w-6 h-6" />
                       </div>
                       <div>
-                        <h2 className={`text-sm font-black uppercase tracking-widest ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Рейтинг</h2>
-                        <p className={`text-xs ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>Еженедельная оценка</p>
+                        <h2 className={`text-xs font-black uppercase tracking-[0.2em] ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>Performance</h2>
+                        <p className={`text-lg font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Network Rating</p>
                       </div>
                     </div>
-                    <div className={`px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border border-purple-500/20 bg-purple-500/5 text-purple-500`}>
+                    <div className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border border-purple-500/30 bg-purple-500/10 text-purple-400 shadow-lg shadow-purple-500/10`}>
                       {rating.rating.toFixed(1)}%
                     </div>
                   </div>
 
-                  <div className={`p-5 rounded-xl border ${theme === 'dark' ? 'border-white/5 bg-black/20' : 'border-gray-100 bg-gray-50'} mb-6`}>
-                    <div className={`text-4xl font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{rating.rating.toFixed(1)}%</div>
-                    <p className={`text-xs mt-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} font-medium`}>
-                      {rating.rating >= 70 ? 'Отличный результат' : rating.rating >= 50 ? 'Хороший темп' : 'Требуется усиление показателей'}
+                  <div className={`p-6 rounded-2xl border transition-all ${theme === 'dark' ? 'border-white/5 bg-black/40 hover:border-white/10' : 'border-gray-100 bg-gray-50'} mb-8 relative overflow-hidden`}>
+                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-purple-500/20 to-transparent" />
+                    <div className={`text-5xl font-black font-mono tracking-tighter ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{rating.rating.toFixed(1)}<span className="text-xl opacity-30">%</span></div>
+                    <p className={`text-xs mt-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} font-black uppercase tracking-widest`}>
+                      {rating.rating >= 70 ? 'Optimal Performance' : rating.rating >= 50 ? 'Stable Operation' : 'Critical Warning'}
                     </p>
                   </div>
 
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    {[{ label: 'Выходные', value: `${ratingBreakdown.daysOff} дн`, pts: ratingBreakdown.daysOffPoints, classes: theme === 'dark' ? 'bg-slate-500/5 border-slate-500/10 text-slate-400' : 'bg-slate-50 border-slate-100 text-slate-600' },
-                    { label: 'Больничные', value: `${rating.sickDays} дн`, pts: ratingBreakdown.sickDaysPoints, classes: theme === 'dark' ? 'bg-amber-500/5 border-amber-500/10 text-amber-500' : 'bg-amber-50 border-amber-100 text-amber-600' },
-                    { label: 'Отпуск', value: `${rating.vacationDays} дн`, pts: ratingBreakdown.vacationDaysPoints, classes: theme === 'dark' ? 'bg-orange-500/5 border-orange-500/10 text-orange-500' : 'bg-orange-50 border-orange-100 text-orange-600' },
-                    { label: 'Часы', value: `${ratingBreakdown.weeklyHours.toFixed(1)} ч`, pts: ratingBreakdown.weeklyHoursPoints, classes: theme === 'dark' ? 'bg-blue-500/5 border-blue-500/10 text-blue-400' : 'bg-blue-50 border-blue-100 text-blue-600' },
-                    { label: 'Заработок', value: `${(ratingBreakdown.weeklyEarnings / 1000).toFixed(1)}k ₽`, pts: ratingBreakdown.weeklyEarningsPoints, classes: theme === 'dark' ? 'bg-emerald-500/5 border-emerald-500/10 text-emerald-400' : 'bg-emerald-50 border-emerald-100 text-emerald-600' },
-                    { label: 'Рефералы', value: `${rating.referrals}`, pts: ratingBreakdown.referralsPoints, classes: theme === 'dark' ? 'bg-purple-500/5 border-purple-500/10 text-purple-400' : 'bg-purple-50 border-purple-100 text-purple-600' }].map(item => (
-                      <div key={item.label} className={`p-3 rounded-xl border shadow-sm transition-all hover:scale-[1.02] ${item.classes}`}>
-                        <div className="text-[8px] font-black uppercase tracking-widest opacity-80 mb-1">{item.label}</div>
-                        <div className={`text-sm font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{item.value}</div>
-                        <div className={`text-[10px] font-black mt-1`}>{item.pts.toFixed(1)}%</div>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                    {[{ label: 'Days Off', value: `${ratingBreakdown.daysOff} D`, pts: ratingBreakdown.daysOffPoints, color: 'text-slate-400', bg: 'bg-slate-500/10' },
+                    { label: 'Sick Lvl', value: `${rating.sickDays} D`, pts: ratingBreakdown.sickDaysPoints, color: 'text-amber-500', bg: 'bg-amber-500/10' },
+                    { label: 'Vacation', value: `${rating.vacationDays} D`, pts: ratingBreakdown.vacationDaysPoints, color: 'text-orange-500', bg: 'bg-orange-500/10' },
+                    { label: 'Uptime', value: `${ratingBreakdown.weeklyHours.toFixed(1)} H`, pts: ratingBreakdown.weeklyHoursPoints, color: 'text-blue-400', bg: 'bg-blue-500/10' },
+                    { label: 'Yield', value: `${(ratingBreakdown.weeklyEarnings / 1000).toFixed(1)}K`, pts: ratingBreakdown.weeklyEarningsPoints, color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
+                    { label: 'Referrals', value: `${rating.referrals}`, pts: ratingBreakdown.referralsPoints, color: 'text-purple-400', bg: 'bg-purple-500/10' }].map(item => (
+                      <div key={item.label} className={`p-4 rounded-2xl border transition-all hover:scale-[1.05] ${theme === 'dark' ? 'border-white/5 bg-black/40 hover:border-white/10' : 'bg-white border-gray-100'}`}>
+                        <div className="text-[8px] font-black uppercase tracking-[0.2em] opacity-40 mb-2">{item.label}</div>
+                        <div className={`text-sm font-black font-mono ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{item.value}</div>
+                        <div className={`text-[10px] font-black mt-2 ${item.color} flex items-center gap-1`}>
+                          <div className={`w-1 h-3 rounded-full ${item.bg.replace('/10', '/30')}`} />
+                          {item.pts.toFixed(1)}%
+                        </div>
                       </div>
                     ))}
                   </div>
 
-                  <div className={`mt-4 p-4 rounded-xl border ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-100 bg-gray-50'}`}>
-                    <h3 className={`text-sm font-bold ${headingColor} mb-2 flex items-center gap-2`}>
+                  <div className={`mt-8 p-6 rounded-2xl border transition-all ${theme === 'dark' ? 'border-white/5 bg-black/40 hover:border-white/10' : 'border-gray-100 bg-gray-50/50'}`}>
+                    <h3 className={`text-[10px] font-black uppercase tracking-[0.2em] ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'} mb-3 flex items-center gap-2`}>
                       <Info className="w-4 h-4" />
-                      Как считается рейтинг
+                      Rating Algorithm
                     </h3>
-                    <p className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                      7 параметров: выходные, больничные, отпуск (месяц), часы, доход, рефералы, сообщения (неделя). Максимум 100%.
+                    <p className={`text-[11px] leading-relaxed font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                      Calculation based on 7 node parameters: attendance, illness protocols, vacation logs, operational hours, yield metrics, referral network, and communications. Maximum efficiency: 100%.
                     </p>
                   </div>
                 </div>
               )}
             </div>
-          </div>
-
-          <div className={`rounded-2xl p-6 border ${theme === 'dark' ? 'border-white/5 bg-[#1a1a1a]' : 'border-gray-200 bg-white'} shadow`}>
-            <button
-              onClick={handleLogout}
-              className={`w-full px-6 py-4 rounded-xl font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${theme === 'dark'
-                ? 'bg-rose-500/5 text-rose-500 border border-rose-500/20 hover:bg-rose-500 hover:text-white'
-                : 'bg-rose-50 text-rose-600 border border-rose-100 hover:bg-rose-600 hover:text-white'
-                }`}
-            >
-              <LogOut className="w-5 h-5" />
-              <span>Выйти из аккаунта</span>
-            </button>
           </div>
         </div>
       )}
