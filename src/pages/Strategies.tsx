@@ -3,7 +3,6 @@ import { useThemeStore } from '@/store/themeStore'
 import {
     TrendingUp,
     Rocket,
-    Shield,
     LineChart,
     BarChart3,
     Image as ImageIcon,
@@ -14,7 +13,7 @@ import {
 } from 'lucide-react'
 import { MemecoinStrategies } from '@/components/Strategies/MemecoinStrategies'
 
-type TabType = 'memecoins' | 'polymarket' | 'nft' | 'staking' | 'spot' | 'futures' | 'airdrop' | 'other';
+type TabType = 'memecoins' | 'polymarket' | 'nft' | 'staking' | 'spot' | 'futures' | 'airdrop';
 
 export const Strategies = () => {
     const { theme } = useThemeStore()
@@ -30,7 +29,6 @@ export const Strategies = () => {
         { id: 'spot', label: 'Спот', icon: <Wallet2 className="w-4 h-4" /> },
         { id: 'futures', label: 'Фьючерсы', icon: <Zap className="w-4 h-4" /> },
         { id: 'airdrop', label: 'AirDrop', icon: <Gift className="w-4 h-4" /> },
-        { id: 'other', label: 'Скоро...', icon: <Shield className="w-4 h-4" />, disabled: true },
     ]
 
     return (
@@ -64,13 +62,10 @@ export const Strategies = () => {
                     {tabs.map((tab) => (
                         <button
                             key={tab.id}
-                            disabled={tab.disabled}
-                            onClick={() => !tab.disabled && setActiveTab(tab.id as TabType)}
+                            onClick={() => setActiveTab(tab.id as TabType)}
                             className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${activeTab === tab.id
-                                    ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/25'
-                                    : tab.disabled
-                                        ? 'opacity-30 cursor-not-allowed text-gray-500'
-                                        : 'text-gray-400 hover:bg-white/5 hover:text-white'
+                                ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/25'
+                                : 'text-gray-400 hover:bg-white/5 hover:text-white'
                                 }`}
                         >
                             {tab.icon}
