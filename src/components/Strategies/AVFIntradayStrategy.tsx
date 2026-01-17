@@ -50,7 +50,7 @@ const StrategyStep: React.FC<StrategyStepProps> = ({ number, title, children, ic
                         {number}
                     </div>
                     <div className="flex items-center gap-3">
-                        <div className={theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}>
+                        <div className={theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}>
                             {icon}
                         </div>
                         <h3 className={`text-lg font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
@@ -100,7 +100,7 @@ export const AVFIntradayStrategy: React.FC = () => {
                         <p className={`text-lg leading-relaxed ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
                             AVF Intraday — это системная стратегия внутридневной торговли в Solana-сегменте, ориентированная на поиск и отработку свежих токенов с горизонтом удержания позиции от 1 часа до 1 торгового дня.
                         </p>
-                        <p className={`text-sm opacity-80 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                        <p className={`text-sm opacity-80 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
                             Это не скальпинг и не погоня за хаями. Ключ — быстрое, но взвешенное принятие решений на основе чётких метрик и алгоритма.
                         </p>
                         <div className={`flex flex-wrap gap-4 pt-2`}>
@@ -147,7 +147,7 @@ export const AVFIntradayStrategy: React.FC = () => {
                     <HelpCircle className="w-8 h-8 text-orange-500 shrink-0" />
                     <div className="space-y-2">
                         <h4 className={`text-lg font-black ${headingColor}`}>Суть стратегии</h4>
-                        <p className={`text-xs leading-relaxed ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                        <p className={`text-xs leading-relaxed ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
                             Это не про угадывание, это рабочая рутина. Результат достигается анализом, а не спешкой. Один пропущенный красный флаг перечеркивает серию прибыльных сделок. Если токен требует оправданий — он не торгуется.
                         </p>
                     </div>
@@ -158,7 +158,7 @@ export const AVFIntradayStrategy: React.FC = () => {
                     <ShieldAlert className="w-8 h-8 text-blue-500 shrink-0" />
                     <div className="space-y-2">
                         <h4 className={`text-lg font-black ${headingColor}`}>Кому подходит?</h4>
-                        <p className={`text-xs leading-relaxed ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                        <p className={`text-xs leading-relaxed ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
                             Трейдерам, ценящим структуру и понятные правила. Новичкам с небольшим депо и опытным филлерам, желающим диверсифицировать стиль через 15–60 минут после старта токена.
                         </p>
                     </div>

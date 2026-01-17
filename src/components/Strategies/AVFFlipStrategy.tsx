@@ -49,7 +49,7 @@ const StrategyStep: React.FC<StrategyStepProps> = ({ number, title, children, ic
                         {number}
                     </div>
                     <div className="flex items-center gap-3">
-                        <div className={theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}>
+                        <div className={theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}>
                             {icon}
                         </div>
                         <h3 className={`text-lg font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
@@ -102,7 +102,7 @@ export const AVFFlipStrategy: React.FC = () => {
                         <p className={`text-lg leading-relaxed ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
                             Flip на секундном таймфрейме — это сверхбыстрая стратегия скальпинга, заточенная под мгновенный откуп резких просадок на графике.
                         </p>
-                        <p className={`text-sm opacity-80 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                        <p className={`text-sm opacity-80 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
                             Цель — не угадать рост токена, а активно отработать момент сильного падения, которое с высокой вероятностью откупается. Сделки длятся <strong>от 1 до 5 секунд</strong>.
                         </p>
                     </div>
@@ -116,8 +116,8 @@ export const AVFFlipStrategy: React.FC = () => {
                     <Activity className="w-8 h-8 text-emerald-500 shrink-0" />
                     <div className="space-y-2">
                         <h4 className={`text-lg font-black ${headingColor}`}>Почему это работает?</h4>
-                        <p className={`text-xs leading-relaxed ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                            Большинство трейдеров используют медленные источники (DexScreener/DexTool), которые отстают на 5-7 секунд. Резкие сливы (10-20% эмиссии) создают глубокие просадки, видимые только в быстрых терминалах (GMGN, Alpha One).
+                        <p className={`text-xs leading-relaxed ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+                            Большинство трейдеров используют медленные источники (DexScreener/DexTool), которые отстают на 5-7 секунд. Резкие сливы (10-20% эмиссии) создают глубокие просадки, видимые только в быстрых терминалах (GMGN, Alpha One, Fasol).
                         </p>
                     </div>
                 </div>
@@ -127,7 +127,7 @@ export const AVFFlipStrategy: React.FC = () => {
                     <MousePointer2 className="w-8 h-8 text-blue-500 shrink-0" />
                     <div className="space-y-2">
                         <h4 className={`text-lg font-black ${headingColor}`}>Кому подходит?</h4>
-                        <p className={`text-xs leading-relaxed ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                        <p className={`text-xs leading-relaxed ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
                             Любому трейдеру, готовому тренировать внимание и дисциплину. Работает на любом депозите, но идеальный старт — <strong>от 50 долларов</strong>. Важен только импульс и откуп в моменте.
                         </p>
                     </div>
@@ -349,7 +349,7 @@ export const AVFFlipStrategy: React.FC = () => {
                     <HelpCircle className="w-8 h-8 text-emerald-500 shrink-0" />
                     <div className="space-y-2">
                         <h4 className={`text-lg font-black ${headingColor}`}>Финальное напутствие</h4>
-                        <p className={`text-sm leading-relaxed ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                        <p className={`text-sm leading-relaxed ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
                             FLIP-1S требует максимального спокойствия. Это механический процесс откупа неэффективности рынка. Если вы успеваете реагировать быстрее, чем DexScreener отображает свечу — вы уже в прибыли. Не торопите прогресс, результат придет через сотни микро-сделок.
                         </p>
                     </div>
