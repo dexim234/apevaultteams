@@ -91,19 +91,27 @@ export const EventsPage = () => {
 
     if (statusFilter !== 'all') {
       result = result.filter(e => {
-        const isOngoing = e.dates.includes(currentDate) && e.time <= currentTime
-
-        // Refined past logic: if all dates are in the past, OR it's today but the time has passed and it's not "ongoing"
+        // Helper to check if event is "active" right now
+        // Active = Today AND (Time >= StartTime) AND (Time < EndTime if exists)
         const allDatesPast = e.dates.every(d => d < currentDate)
         const isToday = e.dates.includes(currentDate)
-        const isPastToday = isToday && e.time < currentTime
-
         const upcomingDates = e.dates.filter(d => d > currentDate)
+
+        const isStartedToday = isToday && e.time <= currentTime
+        const isEndedToday = isToday && e.endTime ? e.endTime <= currentTime : false
+
+        const isOngoing = isStartedToday && !isEndedToday
+
+        // Upcoming = Future Date OR (Today AND Not Started Yet)
         const isUpcoming = upcomingDates.length > 0 || (isToday && e.time > currentTime)
 
+        // Past = All dates in past OR (Today AND Ended)
+        const isPast = allDatesPast || (isToday && isEndedToday)
+
         if (statusFilter === 'ongoing') return isOngoing
-        if (statusFilter === 'past') return allDatesPast || (isPastToday && !isOngoing)
+        if (statusFilter === 'past') return isPast
         if (statusFilter === 'upcoming') return isUpcoming
+
         return true
       })
     }

@@ -71,7 +71,9 @@ export const EventCard = memo(({ event, isAdmin, onEdit, onDelete }: EventCardPr
   const currentDateStr = currentTime.toISOString().split('T')[0]
   const currentTimeStr = currentTime.toTimeString().slice(0, 5)
 
-  const isActive = event.dates.includes(currentDateStr) && event.time <= currentTimeStr
+  const isActive = event.dates.includes(currentDateStr) &&
+    event.time <= currentTimeStr &&
+    (event.endTime ? event.endTime > currentTimeStr : true)
 
   // Get next occurrence date
   const upcomingDates = event.dates.filter(date => date >= currentDateStr).sort()
