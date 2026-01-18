@@ -11,7 +11,19 @@ import {
     BarChart,
     MessageSquare,
     Search,
-    Timer
+    Timer,
+    Terminal,
+    Monitor,
+    Bot,
+    Bell,
+    Database,
+    Share2,
+    ShieldAlert,
+    Users,
+    ShieldCheck,
+    Activity,
+    TrendingUp,
+    ExternalLink
 } from 'lucide-react'
 import { AVFLateVolumeStrategy } from './AVFLateVolumeStrategy'
 import { AVFIntradayStrategy } from './AVFIntradayStrategy'
@@ -138,11 +150,52 @@ export const MemecoinStrategies: React.FC = () => {
                     </div>
                 </div>
 
-                <div className={`rounded-2xl p-12 border border-dashed text-center ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-gray-50'
-                    }`}>
-                    <p className={`text-lg font-bold ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>
-                        Инструменты находятся в стадии разработки и появятся позже
-                    </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    {[
+                        { name: 'Sniper', url: 'https://www.sniper.xyz', desc: 'Терминал с демо-торговлей для отработки навыков', icon: <Terminal className="w-5 h-5 text-green-400" /> },
+                        { name: 'Axiom', url: 'https://axiom.trade', desc: 'Профессиональный терминал для анализа и выбора монет', icon: <BarChart className="w-5 h-5 text-blue-400" /> },
+                        { name: 'GMGN', url: 'https://gmgn.ai', desc: 'Снайпер-бот и аналитическая платформа', icon: <Zap className="w-5 h-5 text-yellow-400" /> },
+                        { name: 'DexScreener', url: 'https://dexscreener.com', desc: 'Мониторинг графиков и поиск новых пар', icon: <Monitor className="w-5 h-5 text-slate-400" /> },
+                        { name: 'Alpha One', url: 'https://t.me/alpha_web3_bot', desc: 'ТГ-терминал с сигналами и AI-агентом', icon: <Bot className="w-5 h-5 text-purple-400" /> },
+                        { name: 'Fasol', url: 'https://t.me/Fasol_robot', desc: 'Торговый бот с гибкими алертами', icon: <Bell className="w-5 h-5 text-red-400" /> },
+                        { name: 'Solscan', url: 'https://solscan.io', desc: 'Эксплорер блокчейна Solana', icon: <Search className="w-5 h-5 text-teal-400" /> },
+                        { name: 'Etherscan', url: 'https://etherscan.io', desc: 'Эксплорер блокчейна Ethereum', icon: <Database className="w-5 h-5 text-indigo-400" /> },
+                        { name: 'BscScan', url: 'https://bscscan.com', desc: 'Эксплорер блокчейна BSC', icon: <Database className="w-5 h-5 text-yellow-500" /> },
+                        { name: 'Bubblemaps', url: 'https://bubblemaps.io', desc: 'Визуализация связей кошельков', icon: <Share2 className="w-5 h-5 text-pink-400" /> },
+                        { name: 'Frontrun', url: 'https://chromewebstore.google.com/detail/frontrun/kifcalgkjaphbpbcgokommchjiimejah', desc: 'Анализ кошельков и защита от фронтрана', icon: <ShieldAlert className="w-5 h-5 text-orange-400" /> },
+                        { name: 'Nansen', url: 'https://www.nansen.ai', desc: 'Smart Money и глубокая аналитика', icon: <Brain className="w-5 h-5 text-cyan-400" /> },
+                        { name: 'HolderScan', url: 'https://holderscan.com', desc: 'Анализ холдеров и кластеров', icon: <Users className="w-5 h-5 text-emerald-400" /> },
+                        { name: 'RugCheck', url: 'https://rugcheck.xyz', desc: 'Проверка токенов на безопасность', icon: <ShieldCheck className="w-5 h-5 text-red-500" /> },
+                        { name: 'SolSniffer', url: 'https://www.solsniffer.com', desc: 'Сниффер новых токенов Solana', icon: <Activity className="w-5 h-5 text-violet-400" /> },
+                        { name: 'KolScan', url: 'https://kolscan.io', desc: 'Трекинг KOL-ов и инфлюенсеров', icon: <TrendingUp className="w-5 h-5 text-fuchsia-400" /> },
+                    ].map((tool, idx) => (
+                        <a
+                            key={idx}
+                            href={tool.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={`group relative p-5 rounded-2xl border transition-all duration-300 hover:shadow-lg ${theme === 'dark'
+                                    ? 'bg-[#151a21]/50 border-white/5 hover:border-blue-500/30'
+                                    : 'bg-white border-gray-100 hover:border-blue-500/20'
+                                }`}
+                        >
+                            <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <ExternalLink className={`w-4 h-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`} />
+                            </div>
+
+                            <div className={`p-2.5 rounded-xl w-fit mb-4 ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-50'
+                                } group-hover:scale-110 transition-transform`}>
+                                {tool.icon}
+                            </div>
+
+                            <h4 className={`font-bold mb-1 ${headingColor} flex items-center gap-2`}>
+                                {tool.name}
+                            </h4>
+                            <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed">
+                                {tool.desc}
+                            </p>
+                        </a>
+                    ))}
                 </div>
             </section>
         </div>
