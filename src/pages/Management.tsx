@@ -232,26 +232,59 @@ export const Management = () => {
       const recommendedWeek = Math.max(0, 15 - weekSlots.length)
       const recommendedDay = Math.max(0, 3 - todaySlots.length)
 
-      const memberCounts: Record<string, number> = {}
+      const memberMinutes: Record<string, number> = {}
       TEAM_MEMBERS.forEach((m) => {
-        memberCounts[m.id] = 0
+        memberMinutes[m.id] = 0
       })
+
       weekSlots.forEach((s) => {
         const involved = new Set([s.userId, ...(s.participants || [])])
+
+        // Calculate total duration of all slots for this record
+        let totalDuration = 0
+        s.slots.forEach((slot: any) => {
+          const start = new Date(`2000-01-01T${slot.start}`)
+          let end = new Date(`2000-01-01T${slot.end}`)
+
+          if (slot.endDate) {
+            // If cross-midnight/multi-day, we can't just use 2000-01-01.
+            // We need to calculate difference properly. 
+            // But simpler: just parsing hours/minutes if no date involved.
+            // If endDate is present, it means it ends on a specific date. 
+            // However, `s.slots` usually stores time segments. 
+
+            // Let's stick to the logic used in intervals calculation or simply:
+            // If end < start, add 24 hours (cross midnight)
+            if (end < start) {
+              end.setDate(end.getDate() + 1)
+            }
+          } else {
+            if (end < start) {
+              end.setDate(end.getDate() + 1)
+            }
+          }
+          totalDuration += (end.getTime() - start.getTime()) / (1000 * 60)
+        })
+
         involved.forEach((id) => {
-          if (memberCounts[id] !== undefined) {
-            memberCounts[id] = (memberCounts[id] || 0) + 1
+          if (memberMinutes[id] !== undefined) {
+            memberMinutes[id] = (memberMinutes[id] || 0) + totalDuration
           }
         })
       })
 
-      const sortedMembers = Object.entries(memberCounts).sort((a, b) => b[1] - a[1])
-      const mostActive = sortedMembers[0]?.[1] ? getMemberName(sortedMembers[0][0]) : 'Нет данных'
-      const minCount = Math.min(...Object.values(memberCounts))
-      const leastActive = Object.entries(memberCounts)
-        .filter(([, count]) => count === minCount)
-        .map(([id]) => getMemberName(id))
+      const sortedMembers = Object.entries(memberMinutes).sort((a, b) => b[1] - a[1])
+      const mostActive = sortedMembers[0]?.[1] > 0 ? getMemberName(sortedMembers[0][0]) : 'Нет данных'
+
+      // Calculate active members (those who have > 0 minutes)
+      // const activeMembersIds = Object.entries(memberMinutes).filter(([_, mins]) => mins > 0).map(([id]) => id)
+
+      // Least active: 3 members with lowest > 0 minutes
+      const leastActive = Object.entries(memberMinutes)
+        .filter(([_, mins]) => mins > 0)
+        .sort((a, b) => a[1] - b[1])
         .slice(0, 3)
+        .map(([id]) => getMemberName(id))
 
       const intervals = allSlots.flatMap((slot) => {
         const slotDate = slot.date
