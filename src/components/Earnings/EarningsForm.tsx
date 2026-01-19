@@ -3,7 +3,7 @@ import { useAuthStore } from '@/store/authStore'
 import { useAdminStore } from '@/store/adminStore'
 import { useThemeStore } from '@/store/themeStore'
 import { addEarnings, updateEarnings } from '@/services/firestoreService'
-import { canAddEarnings, formatDate } from '@/utils/dateUtils'
+import { formatDate } from '@/utils/dateUtils'
 import { getUserNicknameSync } from '@/utils/userUtils'
 import { EARNINGS_CATEGORY_META, Earnings, EarningsCategory, TEAM_MEMBERS } from '@/types'
 import { X, Rocket, LineChart, Image, Coins, BarChart3, ShieldCheck, Sparkles, Gift, Wallet, Users } from 'lucide-react'
@@ -27,7 +27,7 @@ export const EarningsForm = ({ onClose, onSave, editingEarning }: EarningsFormPr
   const [amount, setAmount] = useState(editingEarning?.amount.toString() || '')
 
   // New State
-  const [walletType, setWalletType] = useState<'general' | 'personal'>(editingEarning?.walletType || 'general')
+  const [walletType, setWalletType] = useState<'general' | 'personal' | 'pool'>(editingEarning?.walletType || 'general')
   const [isDeving, setIsDeving] = useState(editingEarning?.isDeving || false)
   const [extraWalletsCount, setExtraWalletsCount] = useState(editingEarning?.extraWalletsCount?.toString() || '')
   const [extraWalletsAmount, setExtraWalletsAmount] = useState(editingEarning?.extraWalletsAmount?.toString() || '')
@@ -84,10 +84,9 @@ export const EarningsForm = ({ onClose, onSave, editingEarning }: EarningsFormPr
   const handleSave = async () => {
     const participants = resolveParticipants()
 
-    if (!canAddEarnings(date)) {
-      setError('Нельзя добавлять заработок за прошедшие дни')
-      return
-    }
+
+
+    // Date validation removed as per request
 
     if (!amount || participants.length === 0) {
       setError('Пожалуйста, заполните все обязательные поля')
@@ -226,7 +225,7 @@ export const EarningsForm = ({ onClose, onSave, editingEarning }: EarningsFormPr
 
           <div className="space-y-3">
             <label className={`block text-sm font-medium ${headingColor}`}>Тип кошелька</label>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-3 gap-2">
               <button
                 onClick={() => setWalletType('general')}
                 disabled={!canEdit}
@@ -249,12 +248,23 @@ export const EarningsForm = ({ onClose, onSave, editingEarning }: EarningsFormPr
                 <Wallet className="w-5 h-5" />
                 <span className="font-medium text-sm">Личный</span>
               </button>
+              <button
+                onClick={() => setWalletType('pool')}
+                disabled={!canEdit}
+                className={`flex items-center justify-center gap-2 p-3 rounded-xl border transition-all ${walletType === 'pool'
+                  ? 'border-emerald-500 bg-emerald-500/10 text-emerald-500'
+                  : `border-transparent ${theme === 'dark' ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-700'}`
+                  }`}
+              >
+                <Coins className="w-5 h-5" />
+                <span className="font-medium text-sm">Пул</span>
+              </button>
             </div>
           </div>
 
           <div className="space-y-3">
             <label className={`block text-sm font-medium ${headingColor}`}>
-              {walletType === 'general' ? 'Прибыль с основного кошелька (₽)' : 'Ваш заработок (₽)'}
+              {walletType === 'general' ? 'Прибыль с основного кошелька (₽)' : walletType === 'pool' ? 'Сумма в пул (₽)' : 'Ваш заработок (₽)'}
             </label>
             <input
               type="number"
@@ -281,7 +291,7 @@ export const EarningsForm = ({ onClose, onSave, editingEarning }: EarningsFormPr
                   />
                 </div>
               </>
-            ) : (
+            ) : walletType === 'personal' ? (
               <div className="space-y-3 col-span-2">
                 <label className={`block text-sm font-medium ${headingColor}`}>Заработок с доп. кошельков (₽)</label>
                 <input
@@ -293,7 +303,7 @@ export const EarningsForm = ({ onClose, onSave, editingEarning }: EarningsFormPr
                   className={`w-full px-3 py-2.5 rounded-xl border ${inputBgPlaceholder} disabled:opacity-50 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all`}
                 />
               </div>
-            )}
+            ) : null}
           </div>
 
           <div className={`p-4 rounded-xl space-y-2 ${theme === 'dark' ? 'bg-gray-700/50' : 'bg-gray-100'}`}>

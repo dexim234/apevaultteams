@@ -1,7 +1,7 @@
 
 import { EarningsCategory } from '@/types'
 
-type WalletType = 'general' | 'personal'
+type WalletType = 'general' | 'personal' | 'pool'
 
 interface RateConfig {
     max: number // Upper bound of the range (exclusive, or effectively inclusive depending on logic). Using strictly less logic usually.
@@ -166,6 +166,10 @@ export const calculatePoolShare = (
 ): { poolShare: number; percent: number } => {
     if (amount <= 0) return { poolShare: 0, percent: 0 }
 
+    if (walletType === 'pool') {
+        return { poolShare: amount, percent: 1 }
+    }
+
     const rates = walletType === 'general' ? GENERAL_RATES : PERSONAL_RATES
     const key = getRateKey(category, isDeving)
     const tiers = rates[key] || rates['other']
@@ -194,6 +198,8 @@ export const calculateTotalEarnings = (
 ): number => {
     if (walletType === 'general') {
         return mainAmount + (copyWalletsCount * mainAmount)
+    } else if (walletType === 'pool') {
+        return mainAmount
     } else {
         return mainAmount + extraWalletsAmount
     }
