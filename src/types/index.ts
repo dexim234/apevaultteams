@@ -683,18 +683,3 @@ export interface Event {
   createdAt: string
   updatedAt: string
 }
-
-// Token Analysis Signal types
-export interface TokenSignal {
-  id: string
-  tokenMint: string
-  signalTime: number // Unix timestamp
-  entryPrice: number
-  currentPrice: number
-  currentPnLPct: number
-  maxProfitPct: number
-  maxDrawdownPct: number
-  currentMarketCap: number
-  createdAt: number
-  updatedAt: number
-}

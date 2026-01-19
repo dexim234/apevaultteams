@@ -55,92 +55,90 @@ export const EarningsTable = ({ earnings }: EarningsTableProps) => {
 
   return (
     <div className={`overflow-hidden rounded-3xl border shadow-2xl ${theme === 'dark' ? 'bg-[#0b1015] border-white/5' : 'bg-white border-gray-100'}`}>
-      <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className={theme === 'dark' ? 'bg-white/5' : 'bg-gray-50'}>
-              <th className="px-6 py-5 text-[10px] font-black uppercase tracking-widest text-gray-500">Ранг</th>
-              <th className="px-6 py-5 text-[10px] font-black uppercase tracking-widest text-gray-500">Участник</th>
-              <th className="px-6 py-5 text-[10px] font-black uppercase tracking-widest text-gray-500">Сферы</th>
-              <th className="px-6 py-5 text-[10px] font-black uppercase tracking-widest text-gray-500 text-right">Сумма пула</th>
-              <th className="px-6 py-5 text-[10px] font-black uppercase tracking-widest text-gray-500 text-right">Чистые средства</th>
-              <th className="px-6 py-5 text-[10px] font-black uppercase tracking-widest text-gray-500 text-right">KPI</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-white/5">
-            {sortedMembers.map((member, index) => {
-              const kpi = (member.weeklyNet / KPI_TARGET) * 100
-              const rankColor = index === 0 ? 'text-amber-500' : index === 1 ? 'text-gray-400' : index === 2 ? 'text-orange-500' : 'text-gray-600'
-              const avatar = member.avatar
+      <table className="w-full text-left border-collapse">
+        <thead>
+          <tr className={theme === 'dark' ? 'bg-white/5' : 'bg-gray-50'}>
+            <th className="px-6 py-5 text-[10px] font-black uppercase tracking-widest text-gray-500">Ранг</th>
+            <th className="px-6 py-5 text-[10px] font-black uppercase tracking-widest text-gray-500">Участник</th>
+            <th className="px-6 py-5 text-[10px] font-black uppercase tracking-widest text-gray-500">Сферы</th>
+            <th className="px-6 py-5 text-[10px] font-black uppercase tracking-widest text-gray-500 text-right">Сумма пула</th>
+            <th className="px-6 py-5 text-[10px] font-black uppercase tracking-widest text-gray-500 text-right">Чистые средства</th>
+            <th className="px-6 py-5 text-[10px] font-black uppercase tracking-widest text-gray-500 text-right">KPI</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-white/5">
+          {sortedMembers.map((member, index) => {
+            const kpi = (member.weeklyNet / KPI_TARGET) * 100
+            const rankColor = index === 0 ? 'text-amber-500' : index === 1 ? 'text-gray-400' : index === 2 ? 'text-orange-500' : 'text-gray-600'
+            const avatar = member.avatar
 
-              return (
-                <tr
-                  key={member.id}
-                  className={`group transition-all duration-300 ${theme === 'dark' ? 'hover:bg-white/[0.02]' : 'hover:bg-gray-50'}`}
-                >
-                  <td className="px-6 py-5">
-                    <span className={`text-sm font-black ${rankColor}`}>
-                      #{index + 1}
-                    </span>
-                  </td>
-                  <td className="px-6 py-5">
-                    <div className="flex items-center gap-3">
-                      <div className="relative">
-                        {avatar ? (
-                          <img src={avatar} alt="" className="w-9 h-9 rounded-full object-cover ring-2 ring-white/5" />
-                        ) : (
-                          <div className="w-9 h-9 rounded-full bg-emerald-500/20 flex items-center justify-center text-sm font-black text-emerald-500">
-                            {member.name[0]}
-                          </div>
-                        )}
-                      </div>
-                      <div>
-                        <p className={`text-sm font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{getUserNicknameSync(member.id)}</p>
-                        <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Frontier Team</p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-5">
-                    <div className="flex flex-wrap gap-1.5">
-                      {member.categories.length > 0 ? (
-                        member.categories.map(cat => (
-                          <span key={cat} className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-tight border ${theme === 'dark' ? 'bg-white/5 border-white/10 text-gray-400' : 'bg-gray-100 border-gray-200 text-gray-600'
-                            }`}>
-                            {EARNINGS_CATEGORY_META[cat as EarningsCategory]?.label || cat}
-                          </span>
-                        ))
+            return (
+              <tr
+                key={member.id}
+                className={`group transition-all duration-300 ${theme === 'dark' ? 'hover:bg-white/[0.02]' : 'hover:bg-gray-50'}`}
+              >
+                <td className="px-6 py-5">
+                  <span className={`text-sm font-black ${rankColor}`}>
+                    #{index + 1}
+                  </span>
+                </td>
+                <td className="px-6 py-5">
+                  <div className="flex items-center gap-3">
+                    <div className="relative">
+                      {avatar ? (
+                        <img src={avatar} alt="" className="w-9 h-9 rounded-full object-cover ring-2 ring-white/5" />
                       ) : (
-                        <span className="text-[10px] text-gray-500 font-bold uppercase">—</span>
+                        <div className="w-9 h-9 rounded-full bg-emerald-500/20 flex items-center justify-center text-sm font-black text-emerald-500">
+                          {member.name[0]}
+                        </div>
                       )}
                     </div>
-                  </td>
-                  <td className="px-6 py-5 text-right">
-                    <span className={`text-sm font-black ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                      {member.totalPool.toLocaleString()} ₽
-                    </span>
-                  </td>
-                  <td className="px-6 py-5 text-right">
-                    <span className="text-sm font-black text-emerald-500">
-                      {member.totalEarnings.toLocaleString()} ₽
-                    </span>
-                  </td>
-                  <td className="px-6 py-5 text-right w-48">
-                    <div className="flex items-center justify-end gap-3">
-                      <div className={`w-24 h-1.5 rounded-full overflow-hidden ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-100'}`}>
-                        <div
-                          className={`h-full rounded-full transition-all duration-1000 ${theme === 'dark' ? 'bg-white' : 'bg-black'}`}
-                          style={{ width: `${Math.min(kpi, 100)}%` }}
-                        />
-                      </div>
-                      <span className="text-[10px] font-black text-gray-500">{kpi.toFixed(0)}%</span>
+                    <div>
+                      <p className={`text-sm font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{getUserNicknameSync(member.id)}</p>
+                      <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Frontier Team</p>
                     </div>
-                  </td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
-      </div>
+                  </div>
+                </td>
+                <td className="px-6 py-5">
+                  <div className="flex flex-wrap gap-1.5">
+                    {member.categories.length > 0 ? (
+                      member.categories.map(cat => (
+                        <span key={cat} className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-tight border ${theme === 'dark' ? 'bg-white/5 border-white/10 text-gray-400' : 'bg-gray-100 border-gray-200 text-gray-600'
+                          }`}>
+                          {EARNINGS_CATEGORY_META[cat as EarningsCategory]?.label || cat}
+                        </span>
+                      ))
+                    ) : (
+                      <span className="text-[10px] text-gray-500 font-bold uppercase">—</span>
+                    )}
+                  </div>
+                </td>
+                <td className="px-6 py-5 text-right">
+                  <span className={`text-sm font-black ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                    {member.totalPool.toLocaleString()} ₽
+                  </span>
+                </td>
+                <td className="px-6 py-5 text-right">
+                  <span className="text-sm font-black text-emerald-500">
+                    {member.totalEarnings.toLocaleString()} ₽
+                  </span>
+                </td>
+                <td className="px-6 py-5 text-right w-48">
+                  <div className="flex items-center justify-end gap-3">
+                    <div className={`w-24 h-1.5 rounded-full overflow-hidden ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-100'}`}>
+                      <div
+                        className={`h-full rounded-full transition-all duration-1000 ${theme === 'dark' ? 'bg-white' : 'bg-black'}`}
+                        style={{ width: `${Math.min(kpi, 100)}%` }}
+                      />
+                    </div>
+                    <span className="text-[10px] font-black text-gray-500">{kpi.toFixed(0)}%</span>
+                  </div>
+                </td>
+              </tr>
+            )
+          })}
+        </tbody>
+      </table>
     </div>
   )
 }
