@@ -17,6 +17,7 @@ import { Approvals } from './pages/Approvals'
 import { Strategies } from './pages/Strategies'
 import { EventsPage } from './pages/Events'
 import { Referrals } from './pages/Referrals'
+import { TokenAnalysis } from './pages/TokenAnalysis'
 
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { AccessBlockScreen } from './components/AccessBlockScreen'
@@ -156,6 +157,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <EventsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/token-analysis"
+            element={
+              <ProtectedRoute>
+                <TokenAnalysis />
               </ProtectedRoute>
             }
           />

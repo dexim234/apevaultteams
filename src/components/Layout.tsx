@@ -27,8 +27,17 @@ import {
   Menu,
   X,
   CalendarDays,
-  Users
+  Users,
+  LineChart
 } from 'lucide-react'
+
+// ... (skipping to toolsSubItems)
+
+const toolsSubItems: { path: string; label: string; icon: LucideIcon; feature: string }[] = [
+  { path: '/strategies', label: 'AVF Контур', icon: TrendingUp, feature: 'tools_strategies' },
+  { path: '/token-analysis', label: 'Анализ токенов', icon: LineChart, feature: 'tools_strategies' },
+  { path: '/events', label: 'События', icon: CalendarDays, feature: 'tools_events' },
+]
 import type { LucideIcon } from 'lucide-react'
 import logo from '@/assets/logo.png'
 import { useState, useEffect } from 'react'
@@ -109,6 +118,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
 
   const toolsSubItems: { path: string; label: string; icon: LucideIcon; feature: string }[] = [
     { path: '/strategies', label: 'AVF Контур', icon: TrendingUp, feature: 'tools_strategies' },
+    { path: '/token-analysis', label: 'Анализ токенов', icon: LineChart, feature: 'tools_strategies' },
     { path: '/events', label: 'События', icon: CalendarDays, feature: 'tools_events' },
   ]
 
