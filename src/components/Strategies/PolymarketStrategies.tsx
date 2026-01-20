@@ -11,8 +11,6 @@ import {
     Wallet,
     ExternalLink,
     Zap,
-    BarChart2,
-    Users,
     Activity
 } from 'lucide-react'
 import { AVFValueBettingStrategy } from './AVFValueBettingStrategy'
