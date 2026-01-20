@@ -3,7 +3,13 @@ import { useThemeStore } from '@/store/themeStore'
 import {
     Lightbulb,
     Target,
-    Calculator
+    Calculator,
+    Wrench,
+    BarChart3,
+    Brain,
+    TrendingUp,
+    Wallet,
+    ExternalLink
 } from 'lucide-react'
 import { AVFValueBettingStrategy } from './AVFValueBettingStrategy'
 import { AVFArbitrageStrategy } from './AVFArbitrageStrategy'
@@ -66,6 +72,89 @@ export const PolymarketStrategies: React.FC = () => {
                             <AVFArbitrageStrategy />
                         )}
                     </div>
+                </div>
+            </section>
+
+            {/* Tools Block */}
+            <section className="space-y-6">
+                <div className="flex items-center gap-3">
+                    <div className="p-2 bg-amber-500/10 rounded-xl border border-amber-500/20">
+                        <Wrench className="w-6 h-6 text-amber-500" />
+                    </div>
+                    <div>
+                        <h3 className={`text-xl font-black ${headingColor}`}>Инструменты</h3>
+                        <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                            Аналитические платформы и сервисы для Polymarket
+                        </p>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    {[
+                        {
+                            name: 'Polymarket',
+                            url: 'https://polymarket.com/',
+                            desc: 'Децентрализованная платформа на блокчейне Polygon для торговли вероятностями событий. Покупайте токены результата YES или NO, где цена токена отражает рыночную вероятность события. Торговля через смарт-контракты без посредников.',
+                            icon: <Target className="w-5 h-5 text-rose-400" />
+                        },
+                        {
+                            name: 'HashDive',
+                            url: 'https://hashdive.com',
+                            desc: 'Аналитическая платформа с уникальной системой Smart Scores (–100 до +100) на основе перфоманса трейдеров. Отслеживайте активность китов, крупные сделки, рыночные тренды, ликвидность и волатильность. Портфельный анализ по адресам.',
+                            icon: <BarChart3 className="w-5 h-5 text-blue-400" />
+                        },
+                        {
+                            name: 'Polysights',
+                            url: 'https://app.polysights.xyz',
+                            desc: 'Платформа аналитики с ML/AI: AI-driven insights и рыночные сводки, поиск арбитражных возможностей, продвинутые торговые метрики. Smart фильтры по категориям, трендам и ликвидности. Telegram-бот и live feed событий.',
+                            icon: <Brain className="w-5 h-5 text-purple-400" />
+                        },
+                        {
+                            name: 'Munar AI',
+                            url: 'https://app.munar.ai',
+                            desc: 'AI-криптопомощник (crypto copilot) для трейдеров. Помогает анализировать рынки, отвечает на вопросы о событиях и стратегиях, генерирует аналитические отчёты и торговые рекомендации.',
+                            icon: <Brain className="w-5 h-5 text-cyan-400" />
+                        },
+                        {
+                            name: 'Polymarket Analytics',
+                            url: 'https://polymarketanalytics.com',
+                            desc: 'Глобальная платформа данных: live-цены всех активных маркетов (обновление каждые 5 минут), Top Traders с фильтрацией по категориям (Politics, Crypto, Sports), Unified Search для Polymarket и Kalshi, Real-time Activity и Portfolio Builder.',
+                            icon: <TrendingUp className="w-5 h-5 text-emerald-400" />
+                        },
+                        {
+                            name: 'PredictFolio',
+                            url: 'https://predictfolio.com',
+                            desc: 'Портфолио и трейдер-аналитика: Portfolio Tracker для отслеживания позиций и PnL в реальном времени, Trader Analytics для анализа стратегий, Benchmarking для сравнения с топ-трейдерами, Follow Winners для копирования сделок.',
+                            icon: <Wallet className="w-5 h-5 text-indigo-400" />
+                        },
+                    ].map((tool, idx) => (
+                        <a
+                            key={idx}
+                            href={tool.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={`group relative p-5 rounded-2xl border transition-all duration-300 hover:shadow-lg ${theme === 'dark'
+                                ? 'bg-[#151a21]/50 border-white/5 hover:border-rose-500/30'
+                                : 'bg-white border-gray-100 hover:border-rose-500/20'
+                                }`}
+                        >
+                            <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <ExternalLink className={`w-4 h-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`} />
+                            </div>
+
+                            <div className={`p-2.5 rounded-xl w-fit mb-4 ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-50'
+                                } group-hover:scale-110 transition-transform`}>
+                                {tool.icon}
+                            </div>
+
+                            <h4 className={`font-bold mb-1 ${headingColor} flex items-center gap-2`}>
+                                {tool.name}
+                            </h4>
+                            <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed">
+                                {tool.desc}
+                            </p>
+                        </a>
+                    ))}
                 </div>
             </section>
         </div>
