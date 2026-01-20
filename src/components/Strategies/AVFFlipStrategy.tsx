@@ -273,70 +273,70 @@ export const AVFFlipStrategy: React.FC = () => {
                         </div>
                     </StrategyStep>
                 </div>
-            </div>
 
-            {/* 5. Sidebar: Checkups & Errors */}
-            <div className="space-y-6">
-                {/* Express Check */}
-                <div className={`rounded-2xl p-6 border ${theme === 'dark' ? 'bg-[#151a21]/80 border-white/5' : 'bg-white border-gray-100'
-                        } shadow-lg space-y-4`}>
-                    <div className="flex items-center gap-3">
-                        <Info className={`w-6 h-6 text-blue-500`} />
-                        <h3 className={`text-lg font-black ${headingColor}`}>Экспресс-чек</h3>
+                {/* Sidebar: Checkups & Errors */}
+                <div className="space-y-6">
+                    {/* Express Check */}
+                    <div className={`rounded-2xl p-6 border ${theme === 'dark' ? 'bg-[#151a21]/80 border-white/5' : 'bg-white border-gray-100'
+                            } shadow-lg space-y-4`}>
+                        <div className="flex items-center gap-3">
+                            <Info className={`w-6 h-6 text-blue-500`} />
+                            <h3 className={`text-lg font-black ${headingColor}`}>Экспресс-чек</h3>
+                        </div>
+                        <div className="space-y-3">
+                            <div className="space-y-1 pb-2 border-b border-white/5">
+                                <p className="text-[9px] font-black text-blue-500 uppercase tracking-widest">Объёмы</p>
+                                <p className="text-xs text-gray-500">За 5 мин — $50,000+. Серия зелёных свечей вверх.</p>
+                            </div>
+                            <div className="space-y-1 pb-2 border-b border-white/5">
+                                <p className="text-[9px] font-black text-blue-500 uppercase tracking-widest">Метрики</p>
+                                <p className="text-xs text-gray-500">DEV {'<'} 2%. Топ-10 холдеров {'<'} 50%. Ликвидность {'>'} $20k.</p>
+                            </div>
+                            <div className="space-y-1 pb-2 border-b border-white/5">
+                                <p className="text-[9px] font-black text-blue-500 uppercase tracking-widest">Позиция</p>
+                                <p className="text-xs text-gray-500">Вход {'<'} 1% от ликвидности. Макс 30% депозита.</p>
+                            </div>
+                        </div>
                     </div>
-                    <div className="space-y-3">
-                        <div className="space-y-1 pb-2 border-b border-white/5">
-                            <p className="text-[9px] font-black text-blue-500 uppercase tracking-widest">Объёмы</p>
-                            <p className="text-xs text-gray-500">За 5 мин — $50,000+. Серия зелёных свечей вверх.</p>
-                        </div>
-                        <div className="space-y-1 pb-2 border-b border-white/5">
-                            <p className="text-[9px] font-black text-blue-500 uppercase tracking-widest">Метрики</p>
-                            <p className="text-xs text-gray-500">DEV {'<'} 2%. Топ-10 холдеров {'<'} 50%. Ликвидность {'>'} $20k.</p>
-                        </div>
-                        <div className="space-y-1 pb-2 border-b border-white/5">
-                            <p className="text-[9px] font-black text-blue-500 uppercase tracking-widest">Позиция</p>
-                            <p className="text-xs text-gray-500">Вход {'<'} 1% от ликвидности. Макс 30% депозита.</p>
-                        </div>
-                    </div>
-                </div>
 
-                {/* Typical Errors */}
-                <div className={`rounded-2xl p-6 border ${theme === 'dark' ? 'bg-rose-500/5 border-rose-500/20' : 'bg-rose-50 border-rose-500/20'
-                        } shadow-lg space-y-4`}>
-                    <div className="flex items-center gap-3">
-                        <XCircle className="w-6 h-6 text-rose-500" />
-                        <h3 className={`text-lg font-black ${headingColor}`}>Типовые ошибки</h3>
+                    {/* Typical Errors */}
+                    <div className={`rounded-2xl p-6 border ${theme === 'dark' ? 'bg-rose-500/5 border-rose-500/20' : 'bg-rose-50 border-rose-500/20'
+                            } shadow-lg space-y-4`}>
+                        <div className="flex items-center gap-3">
+                            <XCircle className="w-6 h-6 text-rose-500" />
+                            <h3 className={`text-lg font-black ${headingColor}`}>Типовые ошибки</h3>
+                        </div>
+                        <div className="space-y-4 text-xs text-gray-500">
+                            <div>
+                                <p className="font-bold text-rose-500">Вход после откупа</p>
+                                <p className="leading-relaxed">Заход на росте приводит к потере на следующем сливе. Жди только дна.</p>
+                            </div>
+                            <div>
+                                <p className="font-bold text-rose-500">Засаживание (Hope)</p>
+                                <p className="leading-relaxed">Надежда на отскок более 2-3 секунд. Не откупилось — выходи сразу.</p>
+                            </div>
+                            <div>
+                                <p className="font-bold text-rose-500">Тильт-усреднение</p>
+                                <p className="leading-relaxed">Попытка отбиться после минуса через увеличение позы. Стоп после -30%.</p>
+                            </div>
+                        </div>
                     </div>
-                    <div className="space-y-4 text-xs text-gray-500">
-                        <div>
-                            <p className="font-bold text-rose-500">Вход после откупа</p>
-                            <p className="leading-relaxed">Заход на росте приводит к потере на следующем сливе. Жди только дна.</p>
-                        </div>
-                        <div>
-                            <p className="font-bold text-rose-500">Засаживание (Hope)</p>
-                            <p className="leading-relaxed">Надежда на отскок более 2-3 секунд. Не откупилось — выходи сразу.</p>
-                        </div>
-                        <div>
-                            <p className="font-bold text-rose-500">Тильт-усреднение</p>
-                            <p className="leading-relaxed">Попытка отбиться после минуса через увеличение позы. Стоп после -30%.</p>
-                        </div>
-                    </div>
-                </div>
 
-                {/* Risk Management */}
-                <div className={`p-6 rounded-2xl border-2 border-dashed ${theme === 'dark' ? 'border-blue-500/30' : 'border-blue-500/20'} space-y-4`}>
-                    <div className="flex items-center gap-3">
-                        <ShieldAlert className="w-5 h-5 text-blue-500" />
-                        <h4 className="font-bold text-sm">Дисциплина рисков</h4>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-1">
-                            <p className="text-[10px] text-gray-500 font-bold">СТОП СЕССИИ</p>
-                            <p className="text-xs font-black text-rose-500">-30% (Пауза 2ч)</p>
+                    {/* Risk Management */}
+                    <div className={`p-6 rounded-2xl border-2 border-dashed ${theme === 'dark' ? 'border-blue-500/30' : 'border-blue-500/20'} space-y-4`}>
+                        <div className="flex items-center gap-3">
+                            <ShieldAlert className="w-5 h-5 text-blue-500" />
+                            <h4 className="font-bold text-sm">Дисциплина рисков</h4>
                         </div>
-                        <div className="space-y-1">
-                            <p className="text-[10px] text-gray-500 font-bold">СТОП ДНЯ</p>
-                            <p className="text-xs font-black text-rose-500">-50% (Отдых)</p>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-1">
+                                <p className="text-[10px] text-gray-500 font-bold">СТОП СЕССИИ</p>
+                                <p className="text-xs font-black text-rose-500">-30% (Пауза 2ч)</p>
+                            </div>
+                            <div className="space-y-1">
+                                <p className="text-[10px] text-gray-500 font-bold">СТОП ДНЯ</p>
+                                <p className="text-xs font-black text-rose-500">-50% (Отдых)</p>
+                            </div>
                         </div>
                     </div>
                 </div>

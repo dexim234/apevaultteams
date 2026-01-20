@@ -21,7 +21,6 @@ type StrategyId = 'value-betting' | 'arbitrage';
 interface Tool {
     name: string
     url: string
-    shortDesc: string
     fullDesc: string
     icon: React.ReactNode
     color: string
@@ -48,7 +47,6 @@ export const PolymarketStrategies: React.FC = () => {
         {
             name: 'Polymarket',
             url: 'https://polymarket.com/',
-            shortDesc: 'Децентрализованная платформа на блокчейне Polygon',
             fullDesc: 'Децентрализованная платформа на блокчейне Polygon, на которой можно торговать вероятностями событий, покупая токены результата — YES или NO. Цена токена отражает рыночную вероятность события.',
             icon: <Target className="w-5 h-5" />,
             color: 'text-rose-400',
@@ -58,7 +56,6 @@ export const PolymarketStrategies: React.FC = () => {
         {
             name: 'HashDive',
             url: 'https://hashdive.com',
-            shortDesc: 'Аналитика Polymarket и Kalshi с Smart Scores',
             fullDesc: 'Аналитическая платформа для Polymarket и Kalshi. Отслеживайте Smart Scores трейдеров (–100 до +100) на основе их перфоманса. Мониторинг активности китов, крупных сделок, рыночных трендов, ликвидности и волатильности. Анализ позиций и PnL по кошелькам.',
             icon: <BarChart3 className="w-5 h-5" />,
             color: 'text-blue-400',
@@ -68,7 +65,6 @@ export const PolymarketStrategies: React.FC = () => {
         {
             name: 'Polysights',
             url: 'https://app.polysights.xyz',
-            shortDesc: 'AI/ML аналитика и арбитражные возможности',
             fullDesc: 'Платформа аналитики для Polymarket с ML и AI. AI-driven insights и рыночные сводки. Поиск арбитражных возможностей и продвинутые торговые метрики. Анализ цен, объёмов и трендов. Smart фильтры по категориям, трендам и ликвидности. Telegram-бот и live feed событий. Leaderboard и performance metrics.',
             icon: <Brain className="w-5 h-5" />,
             color: 'text-purple-400',
@@ -78,7 +74,6 @@ export const PolymarketStrategies: React.FC = () => {
         {
             name: 'Munar AI',
             url: 'https://app.munar.ai',
-            shortDesc: 'AI-криптопомощник для трейдеров',
             fullDesc: 'AI крипто-помощник (crypto copilot) для трейдеров. Помогает анализировать рынки, отвечает на вопросы о событиях и стратегиях, генерирует аналитические отчёты и торговые рекомендации.',
             icon: <Zap className="w-5 h-5" />,
             color: 'text-cyan-400',
@@ -88,7 +83,6 @@ export const PolymarketStrategies: React.FC = () => {
         {
             name: 'Polymarket Analytics',
             url: 'https://polymarketanalytics.com',
-            shortDesc: 'Глобальная платформа данных и аналитики',
             fullDesc: 'Глобальная платформа данных и аналитики для Polymarket. Live цены всех активных маркетов с обновлением каждые 5 минут. Top Traders с фильтрацией по категориям (Politics, Crypto, Sports). Unified Search — поиск маркетов на Polymarket и Kalshi в одном месте. Real-time Activity для отслеживания позиций топ-трейдеров. Portfolio Builder для управления несколькими кошельками и сводной PnL.',
             icon: <TrendingUp className="w-5 h-5" />,
             color: 'text-emerald-400',
@@ -98,7 +92,6 @@ export const PolymarketStrategies: React.FC = () => {
         {
             name: 'PredictFolio',
             url: 'https://predictfolio.com',
-            shortDesc: 'Портфолио и трейдер-аналитика',
             fullDesc: 'Портфолио и трейдер-аналитика для Polymarket. Portfolio Tracker для отслеживания позиций, PnL и odds в реальном времени. Trader Analytics для анализа стратегий других трейдеров. Benchmarking для сравнения win rate, volume и PnL с топ-кошельками. Follow Winners для копирования лучших сделок. Advanced Search по хендлу, маркету или метрикам.',
             icon: <Wallet className="w-5 h-5" />,
             color: 'text-indigo-400',
@@ -193,12 +186,9 @@ export const PolymarketStrategies: React.FC = () => {
                                     </div>
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                    <h4 className={`font-bold ${headingColor} text-lg mb-1`}>
+                                    <h4 className={`font-bold ${headingColor} text-lg`}>
                                         {tool.name}
                                     </h4>
-                                    <p className={`text-xs font-medium ${tool.color} truncate`}>
-                                        {tool.shortDesc}
-                                    </p>
                                 </div>
                             </div>
 
