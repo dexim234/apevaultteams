@@ -59,7 +59,16 @@ const StrategyStep: React.FC<StrategyStepProps> = ({ number, title, children, ic
                 </div>
                 {isOpen ? <ChevronUp className="w-5 h-5 text-gray-500" /> : <ChevronDown className="w-5 h-5 text-gray-500" />}
             </button>
-</div>
+
+            {isOpen && (
+                <div className={`p-6 pt-0 border-t ${theme === 'dark' ? 'border-white/5' : 'border-gray-50'}`}>
+                    <div className={`mt-4 space-y-4 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+                        {children}
+                    </div>
+                </div>
+            )}
+        </div>
+    )
 }
 
 export const AVFFlipStrategy: React.FC = () => {
