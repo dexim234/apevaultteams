@@ -73,15 +73,20 @@ const COLUMNS: ColumnConfig[] = [
 
 // Получение текущего времени в Москве (UTC+3)
 const getMoscowDateTime = (): { date: string; time: string } => {
-  // Берём UTC время системы и добавляем 3 часа для Москвы
+  // Создаём дату в часовом поясе UTC, затем добавляем 3 часа для Москвы
   const now = new Date()
-  const moscowTime = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), now.getUTCHours() + 3, now.getUTCMinutes(), now.getUTCSeconds())
+  const moscowTime = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), now.getUTCHours() + 3, now.getUTCMinutes(), now.getUTCSeconds()))
 
   // Форматируем вручную, чтобы избежать проблем с часовыми поясами
   const dateStr = `${moscowTime.getFullYear()}-${String(moscowTime.getMonth() + 1).padStart(2, '0')}-${String(moscowTime.getDate()).padStart(2, '0')}`
   const timeStr = `${String(moscowTime.getHours()).padStart(2, '0')}:${String(moscowTime.getMinutes()).padStart(2, '0')}`
 
   return { date: dateStr, time: timeStr }
+}
+
+// Получение текущего времени в миллисекундах по Москве (UTC+3)
+const getNowMskMs = (): number => {
+  return Date.now() + 3 * 60 * 60 * 1000
 }
 
 export const EventsPage = () => {
@@ -122,10 +127,7 @@ export const EventsPage = () => {
   // Разделение событий по колонкам
   const eventsByColumns = useMemo(() => {
     const { date: currentDate } = getMoscowDateTime()
-
-    // Текущее время в МСК в миллисекундах
-    const nowUtc = new Date()
-    const nowMskMs = nowUtc.getTime() + 3 * 60 * 60 * 1000
+    const nowMskMs = getNowMskMs()
 
     const columns: Record<EventColumn, Event[]> = {
       upcoming: [],
@@ -137,11 +139,20 @@ export const EventsPage = () => {
     const activeThresholdMs = 30 * 60 * 1000
 
     events.forEach((event) => {
-      // Получаем все даты события, которые ещё не прошли полностью
+      // Функция для получения времени окончания события на конкретную дату
+      const getEventEndMs = (date: string) => {
+        const startMs = new Date(`${date}T${event.time}`).getTime()
+        if (event.endTime) {
+          return new Date(`${date}T${event.endTime}`).getTime()
+        }
+        return startMs + 2 * 60 * 60 * 1000 // По умолчанию 2 часа
+      }
+
+      // Получаем все даты события, которые ещё не закончились
       const upcomingDates = event.dates
         .filter((date) => {
-          const eventDateTime = new Date(`${date}T${event.time}`)
-          return eventDateTime.getTime() > nowMskMs
+          const eventEndMs = getEventEndMs(date)
+          return eventEndMs > nowMskMs
         })
         .sort()
 
@@ -153,13 +164,16 @@ export const EventsPage = () => {
         return
       }
 
-      // Проверяем, активно ли событие сейчас
-      const isToday = event.dates.includes(currentDate)
-      const eventStartMs = new Date(`${nextDate}T${event.time}`).getTime()
-      const eventEndMs = event.endTime
-        ? new Date(`${nextDate}T${event.endTime}`).getTime()
-        : eventStartMs + 2 * 60 * 60 * 1000 // По умолчанию 2 часа
+      // Определяем правильную дату для проверки статуса
+      // Если сегодня в upcomingDates, используем сегодня (событие идёт сейчас или было сегодня)
+      const isTodayInUpcoming = upcomingDates.includes(currentDate)
+      const checkDate = isTodayInUpcoming ? currentDate : nextDate
 
+      // Проверяем, активно ли событие сейчас
+      const eventStartMs = new Date(`${checkDate}T${event.time}`).getTime()
+      const eventEndMs = getEventEndMs(checkDate)
+
+      const isToday = event.dates.includes(currentDate)
       const isActive = isToday && eventStartMs <= nowMskMs && eventEndMs > nowMskMs
       const timeToStart = eventStartMs - nowMskMs
 
