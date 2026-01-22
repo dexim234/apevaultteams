@@ -18,8 +18,6 @@ import {
   Coins,
   Rocket,
   BarChart3,
-  Archive,
-  Star,
 } from 'lucide-react'
 
 import { LucideIcon } from 'lucide-react'
