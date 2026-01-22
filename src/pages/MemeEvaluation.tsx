@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { useThemeStore } from '@/store/themeStore'
-import { TrendingUp, Target, ShieldCheck, AlertTriangle, Rocket, DollarSign, Home, Clock, CheckCircle, Search } from 'lucide-react'
+import { TrendingUp, Target, ShieldCheck, AlertTriangle, Rocket, DollarSign, Home, Clock, CheckCircle, Search, Lock } from 'lucide-react'
+import { useAccessControl } from '@/hooks/useAccessControl'
 
 export const MemeEvaluation = () => {
   const { theme } = useThemeStore()
@@ -168,6 +169,26 @@ export const MemeEvaluation = () => {
 
     loadChecklist()
   }, [])
+
+  const { hasAccess, loading: accessLoading, reason } = useAccessControl('tools_meme_evaluation')
+
+  if (accessLoading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="animate-spin rounded-full h-8 w-8 border-4 border-emerald-500 border-t-transparent"></div>
+      </div>
+    )
+  }
+
+  if (!hasAccess) {
+    return (
+      <div className="py-20 text-center space-y-4">
+        <Lock className="w-16 h-16 text-gray-700 mx-auto opacity-20" />
+        <h3 className={`text-xl font-black ${headingColor}`}>Доступ ограничен</h3>
+        <p className="text-gray-500 max-w-md mx-auto">{reason || 'У вас нет доступа к инструменту оценки мемкоинов.'}</p>
+      </div>
+    )
+  }
 
   return (
     <>

@@ -7,6 +7,8 @@ import { AiAlert, AiAoStrategy, AiAoProfit } from '@/types'
 import { Plus, Edit, Trash2, Save, X, Copy, Check, Filter, ArrowUp, ArrowDown, RotateCcw, Calendar as CalendarIcon, Hash, Coins, TrendingDown, TrendingUp, Activity, Clock, FileText, AlertTriangle, ChevronDown, Upload, TrendingUp as TrendingUpIcon, TrendingDown as TrendingDownIcon } from 'lucide-react'
 import { MultiStrategySelector } from '@/components/Management/MultiStrategySelector'
 import { UserNickname } from '@/components/UserNickname'
+import { useAccessControl } from '@/hooks/useAccessControl'
+import { Lock } from 'lucide-react'
 
 type SortField = 'date' | 'drop' | 'profit'
 type SortOrder = 'asc' | 'desc'
@@ -21,6 +23,8 @@ export const AiAoAlerts = () => {
     const cardBg = theme === 'dark' ? 'bg-[#151a21]/80 backdrop-blur-xl' : 'bg-white/80 backdrop-blur-xl'
     const cardBorder = theme === 'dark' ? 'border-blue-500/30' : 'border-blue-500/20'
     const cardShadow = theme === 'dark' ? 'shadow-[0_8px_32px_rgba(0,0,0,0.4)]' : 'shadow-[0_8px_32px_rgba(0,0,0,0.08)]'
+
+    const pageAccess = useAccessControl('tools_ai_ao_alerts')
 
     const [alerts, setAlerts] = useState<AiAlert[]>([])
     const [loading, setLoading] = useState(true)
@@ -402,6 +406,24 @@ export const AiAoAlerts = () => {
         if (parts.length !== 3) return dateStr
         const year = parts[0].slice(-2)
         return `${parts[2]}.${parts[1]}.${year}`
+    }
+
+    if (pageAccess.loading) {
+        return (
+            <div className="flex items-center justify-center py-20">
+                <div className="animate-spin rounded-full h-8 w-8 border-4 border-emerald-500 border-t-transparent"></div>
+            </div>
+        )
+    }
+
+    if (!pageAccess.hasAccess) {
+        return (
+            <div className="py-20 text-center space-y-4">
+                <Lock className="w-16 h-16 text-gray-700 mx-auto opacity-20" />
+                <h3 className={`text-xl font-black ${headingColor}`}>Доступ ограничен</h3>
+                <p className="text-gray-500 max-w-md mx-auto">{pageAccess.reason || 'У вас нет доступа к инструменту AI AO Alerts.'}</p>
+            </div>
+        )
     }
 
     return (

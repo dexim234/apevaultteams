@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useThemeStore } from '@/store/themeStore'
-import { useAuthStore } from '@/store/authStore'
-import { useAdminStore } from '@/store/adminStore'
-import { checkUserAccess } from '@/services/firestoreService'
+import { useAccessControl } from '@/hooks/useAccessControl'
 import {
     TrendingUp,
     Rocket,
@@ -22,55 +20,39 @@ type TabType = 'memecoins' | 'polymarket' | 'nft' | 'staking' | 'spot' | 'future
 
 export const Strategies = () => {
     const { theme } = useThemeStore()
-    const { user } = useAuthStore()
-    const { isAdmin } = useAdminStore()
     const [activeTab, setActiveTab] = useState<TabType>('memecoins')
-    const [accessibleTabs, setAccessibleTabs] = useState<Set<TabType>>(new Set(['memecoins']))
-    const [loading, setLoading] = useState(true)
 
     const headingColor = theme === 'dark' ? 'text-white' : 'text-gray-900'
 
-    const tabs: { id: TabType; label: string; icon: any; feature: string }[] = [
-        { id: 'memecoins', label: 'Мемкоины', icon: <Rocket className="w-4 h-4" />, feature: 'tools_kontur_memecoins' },
-        { id: 'polymarket', label: 'Polymarket', icon: <BarChart3 className="w-4 h-4" />, feature: 'tools_kontur_polymarket' },
-        { id: 'nft', label: 'NFT', icon: <ImageIcon className="w-4 h-4" />, feature: 'tools_kontur_nft' },
-        { id: 'staking', label: 'Стейкинг', icon: <Database className="w-4 h-4" />, feature: 'tools_kontur_staking' },
-        { id: 'spot', label: 'Спот', icon: <Wallet2 className="w-4 h-4" />, feature: 'tools_kontur_spot' },
-        { id: 'futures', label: 'Фьючерсы', icon: <Zap className="w-4 h-4" />, feature: 'tools_kontur_futures' },
-        { id: 'airdrop', label: 'AirDrop', icon: <Gift className="w-4 h-4" />, feature: 'tools_kontur_airdrop' },
+    const pageAccess = useAccessControl('tools_strategies_view')
+    const memecoinsAccess = useAccessControl('tools_kontur_memecoins')
+    const polymarketAccess = useAccessControl('tools_kontur_polymarket')
+    const nftAccess = useAccessControl('tools_kontur_nft')
+    const stakingAccess = useAccessControl('tools_kontur_staking')
+    const spotAccess = useAccessControl('tools_kontur_spot')
+    const futuresAccess = useAccessControl('tools_kontur_futures')
+    const airdropAccess = useAccessControl('tools_kontur_airdrop')
+
+    const tabs: { id: TabType; label: string; icon: any; access: { hasAccess: boolean; loading: boolean } }[] = [
+        { id: 'memecoins', label: 'Мемкоины', icon: <Rocket className="w-4 h-4" />, access: memecoinsAccess },
+        { id: 'polymarket', label: 'Polymarket', icon: <BarChart3 className="w-4 h-4" />, access: polymarketAccess },
+        { id: 'nft', label: 'NFT', icon: <ImageIcon className="w-4 h-4" />, access: nftAccess },
+        { id: 'staking', label: 'Стейкинг', icon: <Database className="w-4 h-4" />, access: stakingAccess },
+        { id: 'spot', label: 'Спот', icon: <Wallet2 className="w-4 h-4" />, access: spotAccess },
+        { id: 'futures', label: 'Фьючерсы', icon: <Zap className="w-4 h-4" />, access: futuresAccess },
+        { id: 'airdrop', label: 'AirDrop', icon: <Gift className="w-4 h-4" />, access: airdropAccess },
     ]
 
+    const visibleTabs = tabs.filter(t => t.access.hasAccess)
+    const anyLoading = tabs.some(t => t.access.loading) || pageAccess.loading
+
     useEffect(() => {
-        const checkAccess = async () => {
-            if (!user || isAdmin) {
-                setAccessibleTabs(new Set(tabs.map(t => t.id)))
-                setLoading(false)
-                return
-            }
-
-            const accessible = new Set<TabType>()
-            for (const tab of tabs) {
-                const result = await checkUserAccess(user.id, tab.feature)
-                if (result.hasAccess) {
-                    accessible.add(tab.id)
-                }
-            }
-
-            setAccessibleTabs(accessible)
-
-            // Set first accessible tab as active if current is not accessible
-            if (!accessible.has(activeTab) && accessible.size > 0) {
-                setActiveTab(Array.from(accessible)[0])
-            }
-            setLoading(false)
+        if (!anyLoading && visibleTabs.length > 0 && !visibleTabs.find(t => t.id === activeTab)) {
+            setActiveTab(visibleTabs[0].id)
         }
+    }, [anyLoading, visibleTabs, activeTab])
 
-        checkAccess()
-    }, [user, isAdmin])
-
-    const visibleTabs = tabs.filter(t => accessibleTabs.has(t.id))
-
-    if (loading) {
+    if (anyLoading) {
         return (
             <div className="flex items-center justify-center py-20">
                 <div className="animate-spin rounded-full h-8 w-8 border-4 border-blue-500 border-t-transparent"></div>
@@ -78,12 +60,14 @@ export const Strategies = () => {
         )
     }
 
-    if (visibleTabs.length === 0 && !loading) {
+    if (!pageAccess.hasAccess || visibleTabs.length === 0) {
         return (
             <div className="py-20 text-center space-y-4">
                 <TrendingUp className="w-16 h-16 text-gray-700 mx-auto opacity-20" />
                 <h3 className={`text-xl font-black ${headingColor}`}>Доступ ограничен</h3>
-                <p className="text-gray-500 max-w-md mx-auto">У вас нет доступа к разделам AVF Контур. Свяжитесь с администрацией.</p>
+                <p className="text-gray-500 max-w-md mx-auto">
+                    {pageAccess.reason || 'У вас нет доступа к разделам AVF Контур. Свяжитесь с администрацией.'}
+                </p>
             </div>
         )
     }

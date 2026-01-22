@@ -8,6 +8,8 @@ import { getTasks, deleteTask } from '@/services/firestoreService'
 import { Task, TaskCategory, TaskStatus } from '@/types'
 import { CheckSquare, LayoutGrid, Calendar, Zap, Layers, CheckCircle2, Archive, Timer } from 'lucide-react'
 import { formatDate } from '@/utils/dateUtils'
+import { useAccessControl } from '@/hooks/useAccessControl'
+import { Lock } from 'lucide-react'
 
 export const Tasks = () => {
   const { theme } = useThemeStore()
@@ -20,6 +22,9 @@ export const Tasks = () => {
   const [selectedCategory, setSelectedCategory] = useState<TaskCategory | 'all'>('all')
   const [selectedStatus, setSelectedStatus] = useState<TaskStatus | 'all'>('all')
   const [selectedUsers, setSelectedUsers] = useState<string[]>([])
+
+  const pageAccess = useAccessControl('avf_tasks')
+  const addTaskAccess = useAccessControl('tasks_add')
 
   const headingColor = theme === 'dark' ? 'text-white' : 'text-gray-900'
 
@@ -108,7 +113,23 @@ export const Tasks = () => {
     .filter(t => t.status !== 'completed' && t.status !== 'closed' && t.dueDate)
     .sort((a, b) => new Date(`${a.dueDate}T${a.dueTime}`).getTime() - new Date(`${b.dueDate}T${b.dueTime}`).getTime())[0]
 
+  if (pageAccess.loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="animate-spin rounded-full h-8 w-8 border-4 border-emerald-500 border-t-transparent"></div>
+      </div>
+    )
+  }
 
+  if (!pageAccess.hasAccess) {
+    return (
+      <div className="py-20 text-center space-y-4">
+        <Lock className="w-16 h-16 text-gray-700 mx-auto opacity-20" />
+        <h3 className={`text-xl font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Доступ к Tasks ограничен</h3>
+        <p className="text-gray-500 max-w-md mx-auto">{pageAccess.reason || 'У вас нет доступа к управлению задачами.'}</p>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-8 animate-fade-in pb-12 font-sans">
@@ -136,11 +157,10 @@ export const Tasks = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Row 1 */}
         <div
-          className={`relative overflow-hidden rounded-2xl p-5 border transition-all duration-300 hover:shadow-lg group ${
-            theme === 'dark'
-              ? 'bg-emerald-500/5 border-emerald-500/20 hover:border-emerald-500/50'
-              : 'bg-white border-gray-100 hover:border-emerald-500/20'
-          }`}
+          className={`relative overflow-hidden rounded-2xl p-5 border transition-all duration-300 hover:shadow-lg group ${theme === 'dark'
+            ? 'bg-emerald-500/5 border-emerald-500/20 hover:border-emerald-500/50'
+            : 'bg-white border-gray-100 hover:border-emerald-500/20'
+            }`}
         >
           <div className="flex justify-between items-start mb-4">
             <span className={`text-[10px] font-bold uppercase tracking-wider ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
@@ -159,11 +179,10 @@ export const Tasks = () => {
         </div>
 
         <div
-          className={`relative overflow-hidden rounded-2xl p-5 border transition-all duration-300 hover:shadow-lg group ${
-            theme === 'dark'
-              ? 'bg-blue-500/5 border-blue-500/20 hover:border-blue-500/50'
-              : 'bg-white border-gray-100 hover:border-blue-500/20'
-          }`}
+          className={`relative overflow-hidden rounded-2xl p-5 border transition-all duration-300 hover:shadow-lg group ${theme === 'dark'
+            ? 'bg-blue-500/5 border-blue-500/20 hover:border-blue-500/50'
+            : 'bg-white border-gray-100 hover:border-blue-500/20'
+            }`}
         >
           <div className="flex justify-between items-start mb-4">
             <span className={`text-[10px] font-bold uppercase tracking-wider ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
@@ -182,11 +201,10 @@ export const Tasks = () => {
         </div>
 
         <div
-          className={`relative overflow-hidden rounded-2xl p-5 border transition-all duration-300 hover:shadow-lg group ${
-            theme === 'dark'
-              ? 'bg-indigo-500/5 border-indigo-500/20 hover:border-indigo-500/50'
-              : 'bg-white border-gray-100 hover:border-indigo-500/20'
-          }`}
+          className={`relative overflow-hidden rounded-2xl p-5 border transition-all duration-300 hover:shadow-lg group ${theme === 'dark'
+            ? 'bg-indigo-500/5 border-indigo-500/20 hover:border-indigo-500/50'
+            : 'bg-white border-gray-100 hover:border-indigo-500/20'
+            }`}
         >
           <div className="flex justify-between items-start mb-4">
             <span className={`text-[10px] font-bold uppercase tracking-wider ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
@@ -205,11 +223,10 @@ export const Tasks = () => {
         </div>
 
         <div
-          className={`relative overflow-hidden rounded-2xl p-5 border transition-all duration-300 hover:shadow-lg group ${
-            theme === 'dark'
-              ? 'bg-amber-500/5 border-amber-500/20 hover:border-amber-500/50'
-              : 'bg-white border-gray-100 hover:border-amber-500/20'
-          }`}
+          className={`relative overflow-hidden rounded-2xl p-5 border transition-all duration-300 hover:shadow-lg group ${theme === 'dark'
+            ? 'bg-amber-500/5 border-amber-500/20 hover:border-amber-500/50'
+            : 'bg-white border-gray-100 hover:border-amber-500/20'
+            }`}
         >
           <div className="flex justify-between items-start mb-4">
             <span className={`text-[10px] font-bold uppercase tracking-wider ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
@@ -229,11 +246,10 @@ export const Tasks = () => {
 
         {/* Row 2 */}
         <div
-          className={`relative overflow-hidden rounded-2xl p-5 border transition-all duration-300 hover:shadow-lg group ${
-            theme === 'dark'
-              ? 'bg-teal-500/5 border-teal-500/20 hover:border-teal-500/50'
-              : 'bg-white border-gray-100 hover:border-teal-500/20'
-          }`}
+          className={`relative overflow-hidden rounded-2xl p-5 border transition-all duration-300 hover:shadow-lg group ${theme === 'dark'
+            ? 'bg-teal-500/5 border-teal-500/20 hover:border-teal-500/50'
+            : 'bg-white border-gray-100 hover:border-teal-500/20'
+            }`}
         >
           <div className="flex justify-between items-start mb-4">
             <span className={`text-[10px] font-bold uppercase tracking-wider ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
@@ -249,11 +265,10 @@ export const Tasks = () => {
         </div>
 
         <div
-          className={`relative overflow-hidden rounded-2xl p-5 border transition-all duration-300 hover:shadow-lg group ${
-            theme === 'dark'
-              ? 'bg-cyan-500/5 border-cyan-500/20 hover:border-cyan-500/50'
-              : 'bg-white border-gray-100 hover:border-cyan-500/20'
-          }`}
+          className={`relative overflow-hidden rounded-2xl p-5 border transition-all duration-300 hover:shadow-lg group ${theme === 'dark'
+            ? 'bg-cyan-500/5 border-cyan-500/20 hover:border-cyan-500/50'
+            : 'bg-white border-gray-100 hover:border-cyan-500/20'
+            }`}
         >
           <div className="flex justify-between items-start mb-4">
             <span className={`text-[10px] font-bold uppercase tracking-wider ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
@@ -269,11 +284,10 @@ export const Tasks = () => {
         </div>
 
         <div
-          className={`relative overflow-hidden rounded-2xl p-5 border transition-all duration-300 hover:shadow-lg group ${
-            theme === 'dark'
-              ? 'bg-sky-500/5 border-sky-500/20 hover:border-sky-500/50'
-              : 'bg-white border-gray-100 hover:border-sky-500/20'
-          }`}
+          className={`relative overflow-hidden rounded-2xl p-5 border transition-all duration-300 hover:shadow-lg group ${theme === 'dark'
+            ? 'bg-sky-500/5 border-sky-500/20 hover:border-sky-500/50'
+            : 'bg-white border-gray-100 hover:border-sky-500/20'
+            }`}
         >
           <div className="flex justify-between items-start mb-4">
             <span className={`text-[10px] font-bold uppercase tracking-wider ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
@@ -289,11 +303,10 @@ export const Tasks = () => {
         </div>
 
         <div
-          className={`relative overflow-hidden rounded-2xl p-5 border transition-all duration-300 hover:shadow-lg group ${
-            theme === 'dark'
-              ? 'bg-rose-500/5 border-rose-500/20 hover:border-rose-500/50'
-              : 'bg-white border-gray-100 hover:border-rose-500/20'
-          }`}
+          className={`relative overflow-hidden rounded-2xl p-5 border transition-all duration-300 hover:shadow-lg group ${theme === 'dark'
+            ? 'bg-rose-500/5 border-rose-500/20 hover:border-rose-500/50'
+            : 'bg-white border-gray-100 hover:border-rose-500/20'
+            }`}
         >
           <div className="flex justify-between items-start mb-4">
             <span className={`text-[10px] font-bold uppercase tracking-wider ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
@@ -336,7 +349,7 @@ export const Tasks = () => {
               onCategoryChange={setSelectedCategory}
               onStatusChange={setSelectedStatus}
               onUsersChange={setSelectedUsers}
-              onAddTask={() => setShowForm(true)}
+              onAddTask={addTaskAccess.hasAccess ? () => setShowForm(true) : undefined}
             />
           </div>
 

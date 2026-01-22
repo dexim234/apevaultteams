@@ -32,6 +32,8 @@ import { UserConflictsForm } from '@/components/Management/UserConflictsForm'
 import { AccessBlocksForm } from '@/components/Management/AccessBlocksForm'
 import { getWorkSlots, getDayStatuses } from '@/services/firestoreService'
 import { getWeekDays, formatDate, getMoscowTime } from '@/utils/dateUtils'
+import { useAccessControl } from '@/hooks/useAccessControl'
+import { Lock } from 'lucide-react'
 
 type ViewMode = 'table' | 'week'
 export type SlotFilter = 'all' | 'upcoming' | 'completed'
@@ -66,6 +68,13 @@ export const Management = () => {
     remainingSlots: 0,
     todaySlots: 0,
   })
+
+  // Access Control Hooks
+  const pageAccess = useAccessControl('avf_schedule')
+  const statsAccess = useAccessControl('schedule_stats_view')
+  const addSlotAccess = useAccessControl('schedule_add_slot')
+  const statusEditAccess = useAccessControl('schedule_status_edit')
+  const slotDeleteAccess = useAccessControl('schedule_slot_delete')
 
   const [timeAnchors, setTimeAnchors] = useState<{ nextStart: Date | null; activeEnd: Date | null }>({
     nextStart: null,
@@ -471,6 +480,23 @@ export const Management = () => {
     },
   ]
 
+  if (pageAccess.loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="animate-spin rounded-full h-8 w-8 border-4 border-emerald-500 border-t-transparent"></div>
+      </div>
+    )
+  }
+
+  if (!pageAccess.hasAccess) {
+    return (
+      <div className="py-20 text-center space-y-4">
+        <Lock className="w-16 h-16 text-gray-700 mx-auto opacity-20" />
+        <h3 className={`text-xl font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Доступ к Schedule ограничен</h3>
+        <p className="text-gray-500 max-w-md mx-auto">{pageAccess.reason || 'У вас нет доступа к управлению расписанием.'}</p>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6 relative">
@@ -493,37 +519,39 @@ export const Management = () => {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {statCards.map((item, idx) => {
-            return (
-              <div
-                key={idx}
-                className={`relative overflow-hidden rounded-2xl p-5 border transition-all duration-300 hover:shadow-lg group ${theme === 'dark'
-                  // @ts-ignore
-                  ? `${item.bgClass} ${item.borderClass} hover:border-opacity-50`
-                  : 'bg-white border-gray-100 hover:border-emerald-500/20'
-                  }`}
-              >
-                <div className="flex justify-between items-start mb-4">
-                  <span className={`text-[10px] font-bold uppercase tracking-wider ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                    {item.label}
-                  </span>
-                  <div className={`p-2 rounded-xl transition-colors ${theme === 'dark' ? 'bg-white/5 group-hover:bg-white/10' : 'bg-gray-100 group-hover:bg-gray-200'}`}>
-                    {item.icon}
+        {statsAccess.hasAccess && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {statCards.map((item, idx) => {
+              return (
+                <div
+                  key={idx}
+                  className={`relative overflow-hidden rounded-2xl p-5 border transition-all duration-300 hover:shadow-lg group ${theme === 'dark'
+                    // @ts-ignore
+                    ? `${item.bgClass} ${item.borderClass} hover:border-opacity-50`
+                    : 'bg-white border-gray-100 hover:border-emerald-500/20'
+                    }`}
+                >
+                  <div className="flex justify-between items-start mb-4">
+                    <span className={`text-[10px] font-bold uppercase tracking-wider ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                      {item.label}
+                    </span>
+                    <div className={`p-2 rounded-xl transition-colors ${theme === 'dark' ? 'bg-white/5 group-hover:bg-white/10' : 'bg-gray-100 group-hover:bg-gray-200'}`}>
+                      {item.icon}
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <div className={`text-2xl font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                      {item.value}
+                    </div>
+                    <div className={`text-[11px] font-medium ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>
+                      {item.note}
+                    </div>
                   </div>
                 </div>
-                <div className="space-y-1">
-                  <div className={`text-2xl font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    {item.value}
-                  </div>
-                  <div className={`text-[11px] font-medium ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>
-                    {item.note}
-                  </div>
-                </div>
-              </div>
-            )
-          })}
-        </div>
+              )
+            })}
+          </div>
+        )}
       </div>
 
       {/* Controls Toolbar - No sticky */}
@@ -560,30 +588,36 @@ export const Management = () => {
 
             {/* Center: Actions */}
             <div className="flex items-center gap-2">
-              <button
-                onClick={handleAddSlot}
-                className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm transition-all shadow-lg shadow-emerald-500/20 hover:scale-105 active:scale-95"
-              >
-                <PlusCircle className="w-4 h-4" />
-                <span>Добавить слот</span>
-              </button>
-              <button
-                onClick={handleAddAbsence}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border font-bold text-sm transition-all hover:scale-105 active:scale-95 ${theme === 'dark'
-                  ? 'border-white/10 bg-white/5 text-gray-300 hover:bg-white/10 hover:text-white'
-                  : 'border-gray-200 bg-gray-50 text-gray-600 hover:bg-gray-100'
-                  }`}
-              >
-                <UserX className="w-4 h-4" />
-                <span className="hidden sm:inline">Отсутствие</span>
-              </button>
-              <button
-                onClick={handleDeleteSlots}
-                className="p-2.5 rounded-xl border border-rose-500/20 bg-rose-500/10 text-rose-500 hover:bg-rose-500/20 transition-all"
-                title="Очистить"
-              >
-                <Trash2 className="w-5 h-5" />
-              </button>
+              {addSlotAccess.hasAccess && (
+                <button
+                  onClick={handleAddSlot}
+                  className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm transition-all shadow-lg shadow-emerald-500/20 hover:scale-105 active:scale-95"
+                >
+                  <PlusCircle className="w-4 h-4" />
+                  <span>Добавить слот</span>
+                </button>
+              )}
+              {statusEditAccess.hasAccess && (
+                <button
+                  onClick={handleAddAbsence}
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border font-bold text-sm transition-all hover:scale-105 active:scale-95 ${theme === 'dark'
+                    ? 'border-white/10 bg-white/5 text-gray-300 hover:bg-white/10 hover:text-white'
+                    : 'border-gray-200 bg-gray-50 text-gray-600 hover:bg-gray-100'
+                    }`}
+                >
+                  <UserX className="w-4 h-4" />
+                  <span className="hidden sm:inline">Отсутствие</span>
+                </button>
+              )}
+              {slotDeleteAccess.hasAccess && (
+                <button
+                  onClick={handleDeleteSlots}
+                  className="p-2.5 rounded-xl border border-rose-500/20 bg-rose-500/10 text-rose-500 hover:bg-rose-500/20 transition-all"
+                  title="Очистить"
+                >
+                  <Trash2 className="w-5 h-5" />
+                </button>
+              )}
             </div>
 
             <div className="flex items-center gap-2 w-full lg:w-72">

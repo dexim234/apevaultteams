@@ -10,6 +10,8 @@ import { Plus, DollarSign, TrendingUp, Sparkles, Wallet, PiggyBank, PieChart, Co
 import { getWeekRange, formatDate } from '@/utils/dateUtils'
 import { getUserNicknameAsync } from '@/utils/userUtils'
 import { useUsers } from '@/hooks/useUsers'
+import { useAccessControl } from '@/hooks/useAccessControl'
+import { Lock } from 'lucide-react'
 
 export const Earnings = () => {
   const { theme } = useThemeStore()
@@ -25,6 +27,36 @@ export const Earnings = () => {
     monthPool: 0,
     monthNet: 0
   })
+
+  // Access Control Hooks
+  const pageAccess = useAccessControl('avf_profit')
+  const statsAccess = useAccessControl('profit_stats_view')
+  const addAccess = useAccessControl('profit_add')
+  const insightsAccess = useAccessControl('profit_insights_view')
+  const leadersAccess = useAccessControl('profit_leaders_view')
+  const historyAccess = useAccessControl('profit_history_view')
+
+  // Category Access
+  const memecoinsAccess = useAccessControl('profit_cat_memecoins')
+  const polymarketAccess = useAccessControl('profit_cat_polymarket')
+  const nftAccess = useAccessControl('profit_cat_nft')
+  const spotAccess = useAccessControl('profit_cat_spot')
+  const futuresAccess = useAccessControl('profit_cat_futures')
+  const stakingAccess = useAccessControl('profit_cat_staking')
+  const airdropAccess = useAccessControl('profit_cat_airdrop')
+  const otherAccess = useAccessControl('profit_cat_other')
+
+  const categoryAccess: Record<EarningsCategory, boolean> = {
+    memecoins: memecoinsAccess.hasAccess,
+    polymarket: polymarketAccess.hasAccess,
+    nft: nftAccess.hasAccess,
+    spot: spotAccess.hasAccess,
+    futures: futuresAccess.hasAccess,
+    staking: stakingAccess.hasAccess,
+    airdrop: airdropAccess.hasAccess,
+    other: otherAccess.hasAccess
+  }
+
   const POOL_RATE = 0.45
   const categoryKeys = Object.keys(EARNINGS_CATEGORY_META) as EarningsCategory[]
 
@@ -174,6 +206,24 @@ export const Earnings = () => {
   const topCategory = [...categoryBreakdown].sort((a, b) => b.net - a.net)[0]
   const topContributor = contributorRanking[0]
 
+  if (pageAccess.loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="animate-spin rounded-full h-8 w-8 border-4 border-emerald-500 border-t-transparent"></div>
+      </div>
+    )
+  }
+
+  if (!pageAccess.hasAccess) {
+    return (
+      <div className="py-20 text-center space-y-4">
+        <Lock className="w-16 h-16 text-gray-700 mx-auto opacity-20" />
+        <h3 className={`text-xl font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Доступ к AVF Profit ограничен</h3>
+        <p className="text-gray-500 max-w-md mx-auto">{pageAccess.reason || 'У вас нет доступа к мониторингу доходов.'}</p>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
       {/* Header & Stats */}
@@ -192,86 +242,90 @@ export const Earnings = () => {
               </p>
             </div>
           </div>
-          <button
-            onClick={() => setShowForm(true)}
-            className="flex items-center gap-2 px-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm transition-all shadow-lg shadow-emerald-500/20 hover:scale-105 active:scale-95"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Добавить заработок</span>
-          </button>
+          {addAccess.hasAccess && (
+            <button
+              onClick={() => setShowForm(true)}
+              className="flex items-center gap-2 px-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm transition-all shadow-lg shadow-emerald-500/20 hover:scale-105 active:scale-95"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Добавить заработок</span>
+            </button>
+          )}
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[
-            {
-              label: 'НЕДЕЛЯ (ЧИСТЫМИ)',
-              value: `${stats.weekNet.toLocaleString()} ₽`,
-              badgeIcon: <Zap className="w-4 h-4 text-emerald-500" />,
-              changeType: 'positive',
-              icon: <TrendingUp className="w-5 h-5 text-emerald-400" />,
-              bgClass: 'bg-emerald-500/5',
-              borderClass: 'border-emerald-500/10'
-            },
-            {
-              label: 'НЕДЕЛЯ (ПУЛ)',
-              value: `${stats.weekPool.toLocaleString()} ₽`,
-              badgeIcon: <ShieldCheck className="w-4 h-4 text-blue-400" />,
-              icon: <PiggyBank className="w-5 h-5 text-blue-400" />,
-              bgClass: 'bg-blue-500/5',
-              borderClass: 'border-blue-500/10'
-            },
-            {
-              label: 'МЕСЯЦ (ЧИСТЫМИ)',
-              value: `${stats.monthNet.toLocaleString()} ₽`,
-              isTrend: true,
-              icon: <Wallet className="w-5 h-5 text-purple-400" />,
-              bgClass: 'bg-purple-500/5',
-              borderClass: 'border-purple-500/10'
-            },
-            {
-              label: 'МЕСЯЦ (ПУЛ)',
-              value: `${stats.monthPool.toLocaleString()} ₽`,
-              isCoins: true,
-              icon: <Coins className="w-5 h-5 text-orange-400" />,
-              bgClass: 'bg-orange-500/5',
-              borderClass: 'border-orange-500/10',
-              change: undefined,
-              badgeIcon: undefined
-            }
-          ].map((item, idx) => (
-            <div
-              key={idx}
-              className={`relative overflow-hidden rounded-2xl p-5 border transition-all duration-300 hover:shadow-xl group ${theme === 'dark'
-                ? `${item.bgClass} ${item.borderClass} hover:border-white/20`
-                : 'bg-white border-gray-100 hover:border-emerald-500/20 shadow-sm'
-                }`}
-            >
-              <div className="flex justify-between items-start mb-6">
-                <span className={`text-[10px] font-black uppercase tracking-widest ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>
-                  {item.label}
-                </span>
-                {item.change && (
-                  <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 text-[10px] font-black">
-                    {item.change}
+        {statsAccess.hasAccess && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[
+              {
+                label: 'НЕДЕЛЯ (ЧИСТЫМИ)',
+                value: `${stats.weekNet.toLocaleString()} ₽`,
+                badgeIcon: <Zap className="w-4 h-4 text-emerald-500" />,
+                changeType: 'positive',
+                icon: <TrendingUp className="w-5 h-5 text-emerald-400" />,
+                bgClass: 'bg-emerald-500/5',
+                borderClass: 'border-emerald-500/10'
+              },
+              {
+                label: 'НЕДЕЛЯ (ПУЛ)',
+                value: `${stats.weekPool.toLocaleString()} ₽`,
+                badgeIcon: <ShieldCheck className="w-4 h-4 text-blue-400" />,
+                icon: <PiggyBank className="w-5 h-5 text-blue-400" />,
+                bgClass: 'bg-blue-500/5',
+                borderClass: 'border-blue-500/10'
+              },
+              {
+                label: 'МЕСЯЦ (ЧИСТЫМИ)',
+                value: `${stats.monthNet.toLocaleString()} ₽`,
+                isTrend: true,
+                icon: <Wallet className="w-5 h-5 text-purple-400" />,
+                bgClass: 'bg-purple-500/5',
+                borderClass: 'border-purple-500/10'
+              },
+              {
+                label: 'МЕСЯЦ (ПУЛ)',
+                value: `${stats.monthPool.toLocaleString()} ₽`,
+                isCoins: true,
+                icon: <Coins className="w-5 h-5 text-orange-400" />,
+                bgClass: 'bg-orange-500/5',
+                borderClass: 'border-orange-500/10',
+                change: undefined,
+                badgeIcon: undefined
+              }
+            ].map((item, idx) => (
+              <div
+                key={idx}
+                className={`relative overflow-hidden rounded-2xl p-5 border transition-all duration-300 hover:shadow-xl group ${theme === 'dark'
+                  ? `${item.bgClass} ${item.borderClass} hover:border-white/20`
+                  : 'bg-white border-gray-100 hover:border-emerald-500/20 shadow-sm'
+                  }`}
+              >
+                <div className="flex justify-between items-start mb-6">
+                  <span className={`text-[10px] font-black uppercase tracking-widest ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>
+                    {item.label}
                   </span>
-                )}
-                {'badgeIcon' in item && item.badgeIcon && (
-                  <div className="p-1 bg-emerald-500/10 rounded-lg">
-                    {item.badgeIcon as React.ReactNode}
+                  {item.change && (
+                    <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 text-[10px] font-black">
+                      {item.change}
+                    </span>
+                  )}
+                  {'badgeIcon' in item && item.badgeIcon && (
+                    <div className="p-1 bg-emerald-500/10 rounded-lg">
+                      {item.badgeIcon as React.ReactNode}
+                    </div>
+                  )}
+                  {item.isTrend && <TrendingUp className="w-4 h-4 text-purple-500/40" />}
+                  {item.isCoins && <PiggyBank className="w-4 h-4 text-orange-500/40" />}
+                </div>
+                <div className="flex items-end justify-between">
+                  <div className={`text-2xl md:text-3xl font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    {item.value}
                   </div>
-                )}
-                {item.isTrend && <TrendingUp className="w-4 h-4 text-purple-500/40" />}
-                {item.isCoins && <PiggyBank className="w-4 h-4 text-orange-500/40" />}
-              </div>
-              <div className="flex items-end justify-between">
-                <div className={`text-2xl md:text-3xl font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  {item.value}
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Split layout: Shares vs Details */}
@@ -286,7 +340,7 @@ export const Earnings = () => {
           </div>
 
           <div className="space-y-6">
-            {categoryWithShares.map((cat) => {
+            {categoryWithShares.filter(cat => categoryAccess[cat.key]).map((cat) => {
               const meta = EARNINGS_CATEGORY_META[cat.key]
               return (
                 <div key={cat.key} className="space-y-2">
@@ -335,7 +389,7 @@ export const Earnings = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {categoryWithShares.map((cat) => {
+            {categoryWithShares.filter(cat => categoryAccess[cat.key]).map((cat) => {
               const meta = EARNINGS_CATEGORY_META[cat.key]
               return (
                 <div key={cat.key} className={`p-4 rounded-xl border ${theme === 'dark' ? 'bg-black/20 border-white/5 hover:border-white/10' : 'bg-gray-50 border-gray-200'} transition-all group`}>
@@ -382,7 +436,15 @@ export const Earnings = () => {
         </div>
       </div>
 
-      <div id="earn-insights" className={`relative overflow-hidden rounded-3xl p-8 ${theme === 'dark' ? 'bg-[#0b1015] border-white/5' : 'bg-white border-gray-100'} border shadow-2xl`}>
+      <div id="earn-insights" className={`relative overflow-hidden rounded-3xl p-8 ${theme === 'dark' ? 'bg-[#0b1015] border-white/5' : 'bg-white border-gray-100'} border shadow-2xl ${!insightsAccess.hasAccess ? 'opacity-50 grayscale pointer-events-none' : ''}`}>
+        {!insightsAccess.hasAccess && (
+          <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/40 backdrop-blur-[2px] rounded-3xl">
+            <div className="flex flex-col items-center gap-2">
+              <Lock className="w-8 h-8 text-white/50" />
+              <p className="text-white/70 font-bold text-sm">Инсайты ограничены</p>
+            </div>
+          </div>
+        )}
         <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 blur-3xl rounded-full -mr-32 -mt-32" />
         <div className="relative z-10 space-y-8">
           <div>
@@ -435,10 +497,8 @@ export const Earnings = () => {
       </div>
 
       <div className="pt-8 border-t border-white/5">
-
         {loading ? (
-          <div className={`rounded-2xl p-12 text-center border border-dashed ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-gray-50'
-            }`}>
+          <div className={`rounded-2xl p-12 text-center border border-dashed ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-gray-50'}`}>
             <div className="flex flex-col items-center gap-4">
               <div className="w-10 h-10 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin" />
               <p className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Загрузка данных...</p>
@@ -446,91 +506,91 @@ export const Earnings = () => {
           </div>
         ) : (
           <div className="space-y-12">
-            {/* Table Part */}
-            <div id="earn-history" className="space-y-8">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-emerald-500/10 rounded-xl">
-                    <TrendingUp className="w-5 h-5 text-emerald-500" />
-                  </div>
-                  <h3 className={`text-lg font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Лидеры по доходу</h3>
-                </div>
-              </div>
-
-              <EarningsTable earnings={earnings} />
-
-              {/* Personal Cumulative Stats Block */}
-              <div className="space-y-6">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-purple-500/10 rounded-xl">
-                    <PiggyBank className="w-5 h-5 text-purple-400" />
-                  </div>
-                  <h3 className={`text-lg font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Личные Накопления</h3>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-                  {contributorRanking.map((member) => (
-                    <div
-                      key={member.id}
-                      className={`relative overflow-hidden rounded-2xl p-5 border shadow-xl ${theme === 'dark' ? 'bg-white/5 border-white/5' : 'bg-white border-gray-100'
-                        }`}
-                    >
-                      <div className="flex items-center gap-3 mb-4">
-                        <div className="relative">
-                          {member.avatar ? (
-                            <img src={member.avatar} alt="" className="w-8 h-8 rounded-full object-cover ring-2 ring-white/10" />
-                          ) : (
-                            <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center text-xs font-black text-emerald-500">
-                              {member.name[0]}
-                            </div>
-                          )}
-                        </div>
-                        <div>
-                          <p className={`text-sm font-black truncate max-w-[100px] ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{member.name}</p>
-                          <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">{member.login}</p>
-                        </div>
-                      </div>
-
-                      <div className="space-y-4">
-                        <div className="space-y-1">
-                          <p className="text-[9px] font-black text-gray-500 uppercase tracking-widest">Всего заработано</p>
-                          <p className="text-base font-black text-emerald-500">{member.grossContribution.toLocaleString()} ₽</p>
-                        </div>
-                        <div className="grid grid-cols-2 gap-2">
-                          <div className="space-y-1">
-                            <p className="text-[8px] font-black text-gray-500 uppercase tracking-widest">В ПУЛ</p>
-                            <p className={`text-[11px] font-black ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>{member.poolShare.toLocaleString()} ₽</p>
-                          </div>
-                          <div className="space-y-1 text-right">
-                            <p className="text-[8px] font-black text-gray-500 uppercase tracking-widest">ПОЛУЧЕНО</p>
-                            <p className={`text-[11px] font-black ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>{member.net.toLocaleString()} ₽</p>
-                          </div>
-                        </div>
-                        <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-emerald-500 rounded-full"
-                            style={{ width: `${Math.min((member.net / member.grossContribution) * 100, 100)}%` }}
-                          />
-                        </div>
-                      </div>
+            {leadersAccess.hasAccess && (
+              <div id="earn-history" className="space-y-8">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-emerald-500/10 rounded-xl">
+                      <TrendingUp className="w-5 h-5 text-emerald-500" />
                     </div>
-                  ))}
+                    <h3 className={`text-lg font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Лидеры по доходу</h3>
+                  </div>
+                </div>
+
+                <EarningsTable earnings={earnings.filter(e => categoryAccess[e.category])} />
+
+                <div className="space-y-6">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-purple-500/10 rounded-xl">
+                      <PiggyBank className="w-5 h-5 text-purple-400" />
+                    </div>
+                    <h3 className={`text-lg font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Личные Накопления</h3>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+                    {contributorRanking.map((member) => (
+                      <div
+                        key={member.id}
+                        className={`relative overflow-hidden rounded-2xl p-5 border shadow-xl ${theme === 'dark' ? 'bg-white/5 border-white/5' : 'bg-white border-gray-100'}`}
+                      >
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className="relative">
+                            {member.avatar ? (
+                              <img src={member.avatar} alt="" className="w-8 h-8 rounded-full object-cover ring-2 ring-white/10" />
+                            ) : (
+                              <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center text-xs font-black text-emerald-500">
+                                {member.name[0]}
+                              </div>
+                            )}
+                          </div>
+                          <div>
+                            <p className={`text-sm font-black truncate max-w-[100px] ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{member.name}</p>
+                            <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">{member.login}</p>
+                          </div>
+                        </div>
+
+                        <div className="space-y-4">
+                          <div className="space-y-1">
+                            <p className="text-[9px] font-black text-gray-500 uppercase tracking-widest">Всего заработано</p>
+                            <p className="text-base font-black text-emerald-500">{member.grossContribution.toLocaleString()} ₽</p>
+                          </div>
+                          <div className="grid grid-cols-2 gap-2">
+                            <div className="space-y-1">
+                              <p className="text-[8px] font-black text-gray-500 uppercase tracking-widest">В ПУЛ</p>
+                              <p className={`text-[11px] font-black ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>{member.poolShare.toLocaleString()} ₽</p>
+                            </div>
+                            <div className="space-y-1 text-right">
+                              <p className="text-[8px] font-black text-gray-500 uppercase tracking-widest">ПОЛУЧЕНО</p>
+                              <p className={`text-[11px] font-black ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>{member.net.toLocaleString()} ₽</p>
+                            </div>
+                          </div>
+                          <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-emerald-500 rounded-full"
+                              style={{ width: `${Math.min((member.net / member.grossContribution) * 100, 100)}%` }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
+            )}
 
+            {historyAccess.hasAccess && (
               <div className="pt-8 border-t border-white/5">
                 <EarningsList
-                  earnings={earnings}
+                  earnings={earnings.filter(e => categoryAccess[e.category])}
                   onEdit={handleEdit}
                   onDelete={loadEarnings}
                 />
               </div>
-            </div>
+            )}
           </div>
         )}
       </div>
 
-      {/* Form Overlay */}
       {showForm && (
         <EarningsForm
           onClose={handleCloseForm}

@@ -54,6 +54,10 @@ const FEATURE_GROUPS: FeatureGroup[] = [
       { value: 'hub_signals_cat_memecoins', label: 'Сигналы: Мемкоины', description: 'Запретить работу с мемкоинами в HUB' },
       { value: 'hub_signals_cat_polymarket', label: 'Сигналы: Polymarket', description: 'Запретить работу с Polymarket в HUB' },
       { value: 'hub_signals_cat_nft', label: 'Сигналы: NFT', description: 'Запретить работу с NFT в HUB' },
+      { value: 'hub_signals_cat_spot', label: 'Сигналы: Спот', description: 'Запретить работу со Спотом в HUB' },
+      { value: 'hub_signals_cat_futures', label: 'Сигналы: Фьючерсы', description: 'Запретить работу с Фьючерсами в HUB' },
+      { value: 'hub_signals_cat_staking', label: 'Сигналы: Стейкинг', description: 'Запретить работу со Стейкингом в HUB' },
+      { value: 'hub_signals_cat_airdrop', label: 'Сигналы: AirDrop', description: 'Запретить работу с AirDrop в HUB' },
     ]
   },
   {
@@ -87,10 +91,17 @@ const FEATURE_GROUPS: FeatureGroup[] = [
       { value: 'profit_insights_view', label: 'Инсайты эффективности', description: 'Скрыть аналитику эффективности' },
       { value: 'profit_leaders_view', label: 'Лидеры по доходу', description: 'Скрыть топ участников' },
       { value: 'profit_history_view', label: 'История выплат', description: 'Скрыть историю накоплений и выплат' },
-      { value: 'profit_cat_memecoins', label: 'Категория: Мемкоины', description: 'Запретить доход по мсмкоинам' },
+      { value: 'profit_cat_memecoins', label: 'Категория: Мемкоины', description: 'Запретить доход по мемкоинам' },
       { value: 'profit_cat_polymarket', label: 'Категория: Polymarket', description: 'Запретить доход по Polymarket' },
+      { value: 'profit_cat_nft', label: 'Категория: NFT', description: 'Запретить доход по NFT' },
+      { value: 'profit_cat_spot', label: 'Категория: Спот', description: 'Запретить доход по Споту' },
+      { value: 'profit_cat_futures', label: 'Категория: Фьючерсы', description: 'Запретить доход по Фьючерсам' },
+      { value: 'profit_cat_staking', label: 'Категория: Стейкинг', description: 'Запретить доход по Стейкингу' },
+      { value: 'profit_cat_airdrop', label: 'Категория: AirDrop', description: 'Запретить доход по AirDrop' },
+      { value: 'profit_cat_other', label: 'Категория: Прочее', description: 'Запретить доход по прочим категориям' },
       { value: 'profit_wallet_general', label: 'Кошелек: Общий', description: 'Запретить выбор типа General' },
       { value: 'profit_wallet_personal', label: 'Кошелек: Личный', description: 'Запретить выбор типа Personal' },
+      { value: 'profit_wallet_pool', label: 'Кошелек: Пул', description: 'Запретить выбор типа Пул' },
     ]
   },
   {

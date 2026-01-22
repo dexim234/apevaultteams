@@ -8,15 +8,23 @@ import { calculateRating, getRatingBreakdown } from '@/utils/ratingUtils'
 import { getUserNicknameAsync, clearAllNicknameCache, getUserNicknameSync } from '@/utils/userUtils'
 import { RatingData, Referral, Earnings, DayStatus } from '@/types'
 import { useUsers } from '@/hooks/useUsers'
-import { TrendingUp, Award, Target, UserPlus, BarChart3 } from 'lucide-react'
+import { TrendingUp, Award, Target, UserPlus, BarChart3, Lock } from 'lucide-react'
+import { useAuthStore } from '@/store/authStore'
+import { useAccessControl } from '@/hooks/useAccessControl'
 
 export const Rating = () => {
+  const { user } = useAuthStore()
   const { theme } = useThemeStore()
   const { users: allMembers, loading: usersLoading } = useUsers()
   type RatingWithBreakdown = RatingData & { breakdown?: ReturnType<typeof getRatingBreakdown> }
   const [ratings, setRatings] = useState<RatingWithBreakdown[]>([])
   const [loading, setLoading] = useState(true)
   const [referrals, setReferrals] = useState<Referral[]>([])
+
+  // Access Control
+  const pageAccess = useAccessControl('avf_rating')
+  const othersAccess = useAccessControl('rating_others_view')
+  const selfAccess = useAccessControl('rating_self_view')
 
 
   useEffect(() => {
@@ -199,25 +207,49 @@ export const Rating = () => {
     }
   }
 
+  const filteredRatings = useMemo(() => {
+    if (!user) return []
+    return ratings.filter(r => {
+      const isSelf = r.userId === user.id
+      if (isSelf) return selfAccess.hasAccess
+      return othersAccess.hasAccess
+    })
+  }, [ratings, user, selfAccess.hasAccess, othersAccess.hasAccess])
+
+  if (pageAccess.loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="animate-spin rounded-full h-8 w-8 border-4 border-emerald-500 border-t-transparent"></div>
+      </div>
+    )
+  }
+
+  if (!pageAccess.hasAccess) {
+    return (
+      <div className="py-20 text-center space-y-4">
+        <Lock className="w-16 h-16 text-gray-700 mx-auto opacity-20" />
+        <h3 className={`text-xl font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Доступ к AVF Score ограничен</h3>
+        <p className="text-gray-500 max-w-md mx-auto">{othersAccess.reason || 'У вас нет доступа к просмотру рейтинга.'}</p>
+      </div>
+    )
+  }
+
   const teamKPD = ratings.reduce((sum: number, r: RatingWithBreakdown) => sum + r.rating, 0) / (ratings.length || 1)
   const headingColor = theme === 'dark' ? 'text-white' : 'text-gray-900'
 
-
-
   const sortedRatings = useMemo<RatingWithBreakdown[]>(() => {
-    return [...ratings].sort((a, b) => b.rating - a.rating)
-  }, [ratings])
+    return [...filteredRatings].sort((a, b) => b.rating - a.rating)
+  }, [filteredRatings])
 
   const ratingOverview = useMemo(() => {
-    if (!ratings.length) {
+    if (!sortedRatings.length) {
       return { top: 0, median: 0, count: 0, high: 0 }
     }
-    const sorted = [...ratings].sort((a, b) => b.rating - a.rating)
-    const top = sorted[0]?.rating || 0
-    const median = sorted[Math.floor((sorted.length - 1) / 2)]?.rating || top
-    const high = sorted.filter((r) => r.rating >= 80).length
-    return { top, median, count: sorted.length, high }
-  }, [ratings])
+    const top = sortedRatings[0]?.rating || 0
+    const median = sortedRatings[Math.floor((sortedRatings.length - 1) / 2)]?.rating || top
+    const high = sortedRatings.filter((r) => r.rating >= 80).length
+    return { top, median, count: sortedRatings.length, high }
+  }, [sortedRatings])
 
   const topMember = sortedRatings[0]
   const topMemberName = topMember ? getUserNicknameSync(topMember.userId) : '—'

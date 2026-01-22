@@ -30,6 +30,8 @@ import {
 } from 'lucide-react'
 import { useAuthStore } from '@/store/authStore'
 import { useScrollLock } from '@/hooks/useScrollLock'
+import { useAccessControl } from '@/hooks/useAccessControl'
+import { Lock } from 'lucide-react'
 
 type StatusFilter = 'all' | 'active' | 'completed' | 'cancelled' | 'reviewed'
 type RiskFilter = 'all' | CallRiskLevel
@@ -38,59 +40,59 @@ const CATEGORY_ORDER: CallCategory[] = ['memecoins', 'polymarket', 'nft', 'staki
 
 // Updated CATEGORY_META with cardGradient
 const CATEGORY_META: Record<CallCategory, { label: string; gradient: string; gradientDark: string; chip: string; icon: JSX.Element; cardGradient: string }> = {
-  memecoins: { 
-    label: 'Мемкоины', 
+  memecoins: {
+    label: 'Мемкоины',
     gradient: 'from-emerald-400 via-teal-500 to-cyan-400',
     gradientDark: 'from-emerald-500 via-teal-600 to-cyan-500',
     chip: 'bg-emerald-500/10 text-emerald-400',
     icon: <Rocket className="w-5 h-5 text-white" />,
     cardGradient: 'from-emerald-500/20 via-teal-400/10 to-cyan-500/5'
   },
-  futures: { 
-    label: 'Фьючерсы', 
-    gradient: 'from-blue-400 to-indigo-500', 
+  futures: {
+    label: 'Фьючерсы',
+    gradient: 'from-blue-400 to-indigo-500',
     gradientDark: 'from-blue-600 to-indigo-500',
-    chip: 'bg-blue-500/10 text-blue-600', 
+    chip: 'bg-blue-500/10 text-blue-600',
     icon: <LineChart className="w-5 h-5 text-white" />,
     cardGradient: 'from-blue-500/20 via-indigo-500/10 to-transparent'
   },
-  nft: { 
-    label: 'NFT', 
-    gradient: 'from-purple-400 to-pink-500', 
+  nft: {
+    label: 'NFT',
+    gradient: 'from-purple-400 to-pink-500',
     gradientDark: 'from-purple-600 to-pink-500',
-    chip: 'bg-purple-500/10 text-purple-600', 
+    chip: 'bg-purple-500/10 text-purple-600',
     icon: <Image className="w-5 h-5 text-white" />,
     cardGradient: 'from-purple-500/20 via-pink-500/10 to-transparent'
   },
-  spot: { 
-    label: 'Спот', 
-    gradient: 'from-amber-400 to-orange-500', 
+  spot: {
+    label: 'Спот',
+    gradient: 'from-amber-400 to-orange-500',
     gradientDark: 'from-amber-600 to-orange-500',
-    chip: 'bg-amber-500/10 text-amber-600', 
+    chip: 'bg-amber-500/10 text-amber-600',
     icon: <Coins className="w-5 h-5 text-white" />,
     cardGradient: 'from-amber-500/20 via-orange-500/10 to-transparent'
   },
-  airdrop: { 
-    label: 'AirDrop', 
-    gradient: 'from-gray-300 to-gray-400', 
+  airdrop: {
+    label: 'AirDrop',
+    gradient: 'from-gray-300 to-gray-400',
     gradientDark: 'from-gray-400 to-gray-300',
-    chip: 'bg-gray-500/10 text-gray-600', 
+    chip: 'bg-gray-500/10 text-gray-600',
     icon: <Sparkles className="w-5 h-5 text-white" />,
     cardGradient: 'from-gray-500/20 via-gray-400/10 to-transparent'
   },
-  polymarket: { 
-    label: 'Polymarket', 
-    gradient: 'from-rose-400 to-red-500', 
+  polymarket: {
+    label: 'Polymarket',
+    gradient: 'from-rose-400 to-red-500',
     gradientDark: 'from-rose-600 to-red-500',
-    chip: 'bg-rose-500/10 text-rose-600', 
+    chip: 'bg-rose-500/10 text-rose-600',
     icon: <Gauge className="w-5 h-5 text-white" />,
     cardGradient: 'from-rose-500/20 via-red-500/10 to-transparent'
   },
-  staking: { 
-    label: 'Стейкинг', 
-    gradient: 'from-emerald-400 to-green-500', 
+  staking: {
+    label: 'Стейкинг',
+    gradient: 'from-emerald-400 to-green-500',
     gradientDark: 'from-emerald-600 to-green-500',
-    chip: 'bg-emerald-500/10 text-emerald-600', 
+    chip: 'bg-emerald-500/10 text-emerald-600',
     icon: <Shield className="w-5 h-5 text-white" />,
     cardGradient: 'from-emerald-500/20 via-green-500/10 to-transparent'
   },
@@ -128,6 +130,29 @@ export const CallPage = () => {
   const [categoryFilter, setCategoryFilter] = useState<'all' | CallCategory>('all')
   const [riskFilter, setRiskFilter] = useState<RiskFilter>('all')
   const [traderFilter, setTraderFilter] = useState<'all' | string>('all')
+
+  // Access Control Hooks
+  const pageAccess = useAccessControl('avf_hub')
+  const addSignalAccess = useAccessControl('hub_signals_add')
+
+  // Category-specific access
+  const memecoinsAccess = useAccessControl('hub_signals_cat_memecoins')
+  const polymarketAccess = useAccessControl('hub_signals_cat_polymarket')
+  const nftAccess = useAccessControl('hub_signals_cat_nft')
+  const spotAccess = useAccessControl('hub_signals_cat_spot')
+  const futuresAccess = useAccessControl('hub_signals_cat_futures')
+  const stakingAccess = useAccessControl('hub_signals_cat_staking')
+  const airdropAccess = useAccessControl('hub_signals_cat_airdrop')
+
+  const categoryAccess: Record<CallCategory, boolean> = {
+    memecoins: memecoinsAccess.hasAccess,
+    polymarket: polymarketAccess.hasAccess,
+    nft: nftAccess.hasAccess,
+    spot: spotAccess.hasAccess,
+    futures: futuresAccess.hasAccess,
+    staking: stakingAccess.hasAccess,
+    airdrop: airdropAccess.hasAccess
+  }
 
   useScrollLock(showForm || showDeleteModal || !!cancelCallId)
 
@@ -262,6 +287,7 @@ export const CallPage = () => {
     if (categoryFilter !== 'all' && call.category !== categoryFilter) return false
     if (riskFilter !== 'all' && getRiskLevel(call) !== riskFilter) return false
     if (traderFilter !== 'all' && call.userId !== traderFilter) return false
+    if (!categoryAccess[call.category]) return false
     if (searchQuery.trim()) {
       return composeSearchString(call).includes(searchQuery.toLowerCase())
     }
@@ -296,7 +322,7 @@ export const CallPage = () => {
 
   // Get all users for trader options
   const { users: allMembers } = useUsers()
-  
+
   const traderOptions = [
     { value: 'all', label: 'Все трейдеры', icon: <User size={16} /> },
     ...allMembers.map(t => ({
@@ -307,6 +333,24 @@ export const CallPage = () => {
     }))
   ]
 
+  if (pageAccess.loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="animate-spin rounded-full h-8 w-8 border-4 border-emerald-500 border-t-transparent"></div>
+      </div>
+    )
+  }
+
+  if (!pageAccess.hasAccess) {
+    return (
+      <div className="py-20 text-center space-y-4">
+        <Lock className="w-16 h-16 text-gray-700 mx-auto opacity-20" />
+        <h3 className={`text-xl font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Доступ к AVF HUB ограничен</h3>
+        <p className="text-gray-500 max-w-md mx-auto">{pageAccess.reason || 'У вас нет доступа к сигналам.'}</p>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6 pb-20">
       {/* Mobile Header */}
@@ -316,18 +360,20 @@ export const CallPage = () => {
             <Activity className="w-7 h-7 text-emerald-500" />
             <h1 className={`text-xl font-bold ${textColor}`}>AVF HUB</h1>
           </div>
-          <button
-            onClick={() => {
-              setEditingCall(null)
-              setFormCategory('memecoins')
-              setShowCategorySelector(true)
-              setShowForm(true)
-            }}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-lg font-bold text-white shadow-lg transition-all hover:scale-105 active:scale-95 bg-emerald-500 hover:bg-emerald-600"
-          >
-            <Plus size={16} />
-            <span>Call</span>
-          </button>
+          {addSignalAccess.hasAccess && (
+            <button
+              onClick={() => {
+                setEditingCall(null)
+                setFormCategory('memecoins')
+                setShowCategorySelector(true)
+                setShowForm(true)
+              }}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-lg font-bold text-white shadow-lg transition-all hover:scale-105 active:scale-95 bg-emerald-500 hover:bg-emerald-600"
+            >
+              <Plus size={16} />
+              <span>Call</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -339,18 +385,20 @@ export const CallPage = () => {
             <h1 className={`text-3xl font-bold ${textColor}`}>AVF HUB</h1>
           </div>
 
-          <button
-            onClick={() => {
-              setEditingCall(null)
-              setFormCategory('memecoins')
-              setShowCategorySelector(true)
-              setShowForm(true)
-            }}
-            className="flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-white shadow-lg transition-all hover:scale-105 active:scale-95 bg-emerald-500 hover:bg-emerald-600"
-          >
-            <Plus size={18} />
-            <span>Call</span>
-          </button>
+          {addSignalAccess.hasAccess && (
+            <button
+              onClick={() => {
+                setEditingCall(null)
+                setFormCategory('memecoins')
+                setShowCategorySelector(true)
+                setShowForm(true)
+              }}
+              className="flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-white shadow-lg transition-all hover:scale-105 active:scale-95 bg-emerald-500 hover:bg-emerald-600"
+            >
+              <Plus size={18} />
+              <span>Call</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -360,7 +408,7 @@ export const CallPage = () => {
           <h3 className={`text-sm font-semibold ${subtleColor}`}>Создать сигнал</h3>
         </div>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
-          {CATEGORY_ORDER.map((cat) => {
+          {CATEGORY_ORDER.filter(cat => categoryAccess[cat]).map((cat) => {
             const meta = CATEGORY_META[cat]
             const catGradient = theme === 'dark' ? meta.gradientDark : meta.gradient
             const borderColorCat: Record<CallCategory, string> = {
@@ -455,7 +503,7 @@ export const CallPage = () => {
         </div>
       </div>
 
-      
+
 
       {/* Signals Feed Header */}
       <div className="px-4 sm:px-6 lg:px-8 mb-4">
@@ -648,33 +696,31 @@ export const CallPage = () => {
             <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl animate-pulse" />
             <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-teal-500/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '0.5s' }} />
           </div>
-          
+
           <div className={`relative ${bgColor} rounded-3xl shadow-2xl shadow-black/50 border ${borderColor} max-w-4xl w-full max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-300`}>
             {/* Header gradient accent - dynamic based on category */}
-            <div className={`h-1.5 transition-all duration-300 ${
-              formCategory === 'memecoins' ? 'bg-gradient-to-r from-teal-400 via-cyan-500 to-emerald-400' :
-              formCategory === 'polymarket' ? 'bg-gradient-to-r from-rose-500 via-red-500 to-orange-500' :
-              formCategory === 'nft' ? 'bg-gradient-to-r from-purple-500 via-pink-500 to-rose-500' :
-              formCategory === 'futures' ? 'bg-gradient-to-r from-blue-500 via-indigo-500 to-cyan-500' :
-              formCategory === 'spot' ? 'bg-gradient-to-r from-amber-500 via-orange-500 to-yellow-500' :
-              formCategory === 'staking' ? 'bg-gradient-to-r from-emerald-500 via-green-500 to-emerald-400' :
-              formCategory === 'airdrop' ? 'bg-gradient-to-r from-gray-400 via-gray-300 to-gray-200' :
-              'bg-gradient-to-r from-gray-400 via-gray-300 to-gray-200'
-            }`} />
+            <div className={`h-1.5 transition-all duration-300 ${formCategory === 'memecoins' ? 'bg-gradient-to-r from-teal-400 via-cyan-500 to-emerald-400' :
+                formCategory === 'polymarket' ? 'bg-gradient-to-r from-rose-500 via-red-500 to-orange-500' :
+                  formCategory === 'nft' ? 'bg-gradient-to-r from-purple-500 via-pink-500 to-rose-500' :
+                    formCategory === 'futures' ? 'bg-gradient-to-r from-blue-500 via-indigo-500 to-cyan-500' :
+                      formCategory === 'spot' ? 'bg-gradient-to-r from-amber-500 via-orange-500 to-yellow-500' :
+                        formCategory === 'staking' ? 'bg-gradient-to-r from-emerald-500 via-green-500 to-emerald-400' :
+                          formCategory === 'airdrop' ? 'bg-gradient-to-r from-gray-400 via-gray-300 to-gray-200' :
+                            'bg-gradient-to-r from-gray-400 via-gray-300 to-gray-200'
+              }`} />
 
             <div className="flex flex-col h-full">
               <div className={`p-5 flex items-center justify-between sticky top-0 z-20 ${bgColor} border-b ${borderColor}`}>
                 <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-lg transition-all duration-300 ${
-                    formCategory === 'memecoins' ? 'bg-gradient-to-br from-teal-400 to-emerald-500 shadow-teal-400/30' :
-                    formCategory === 'polymarket' ? 'bg-gradient-to-br from-rose-500 to-red-600 shadow-rose-500/30' :
-                    formCategory === 'nft' ? 'bg-gradient-to-br from-purple-500 to-pink-600 shadow-purple-500/30' :
-                    formCategory === 'futures' ? 'bg-gradient-to-br from-blue-500 to-indigo-600 shadow-blue-500/30' :
-                    formCategory === 'spot' ? 'bg-gradient-to-br from-amber-500 to-orange-600 shadow-amber-500/30' :
-                    formCategory === 'staking' ? 'bg-gradient-to-br from-emerald-500 to-green-600 shadow-emerald-500/30' :
-                    formCategory === 'airdrop' ? 'bg-gradient-to-br from-gray-400 to-gray-300 shadow-gray-400/30' :
-                    'bg-gradient-to-br from-gray-400 to-gray-300 shadow-gray-400/30'
-                  }`}>
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-lg transition-all duration-300 ${formCategory === 'memecoins' ? 'bg-gradient-to-br from-teal-400 to-emerald-500 shadow-teal-400/30' :
+                      formCategory === 'polymarket' ? 'bg-gradient-to-br from-rose-500 to-red-600 shadow-rose-500/30' :
+                        formCategory === 'nft' ? 'bg-gradient-to-br from-purple-500 to-pink-600 shadow-purple-500/30' :
+                          formCategory === 'futures' ? 'bg-gradient-to-br from-blue-500 to-indigo-600 shadow-blue-500/30' :
+                            formCategory === 'spot' ? 'bg-gradient-to-br from-amber-500 to-orange-600 shadow-amber-500/30' :
+                              formCategory === 'staking' ? 'bg-gradient-to-br from-emerald-500 to-green-600 shadow-emerald-500/30' :
+                                formCategory === 'airdrop' ? 'bg-gradient-to-br from-gray-400 to-gray-300 shadow-gray-400/30' :
+                                  'bg-gradient-to-br from-gray-400 to-gray-300 shadow-gray-400/30'
+                    }`}>
                     {CATEGORY_META[formCategory].icon}
                   </div>
                   <div>
