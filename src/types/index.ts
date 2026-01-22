@@ -451,7 +451,9 @@ export interface UserConflict {
 // Access block types
 export interface AccessBlock {
   id: string
-  userId?: string // specific user ID, if null - blocks all users
+  userId?: string // specific user ID
+  userIds?: string[] // array of user IDs
+  targetType: 'all' | 'single' | 'subset'
   reason: string
   createdBy: string
   createdAt: string
@@ -462,17 +464,77 @@ export interface AccessBlock {
 
 export type AccessFeature =
   | 'all' // block entire site
-  | 'tools' // block access to Tools section (hide from menu)
-  | 'tools_meme_evaluation' // block Meme Evaluation in Tools
-  | 'tools_ai_ao_alerts' // block AI-AO Alerts in Tools
-  | 'tools_signals_trigger_bot' // block Signals Trigger Bot in Tools
+  // Sections
+  | 'tools' // block access to Tools section
   | 'avf_hub' // block AVF HUB section
-  | 'about' // block About section (AVF INFO)
-  | 'slots' // block slot management
-  | 'earnings' // block earnings
-  | 'tasks' // block tasks
+  | 'avf_schedule' // block AVF Schedule (former slots)
+  | 'avf_tasks' // block AVF Tasks (former tasks)
+  | 'avf_profit' // block AVF Profit (former earnings)
+  | 'avf_rating' // block AVF Score (former rating)
+  | 'avf_referrals' // block AVF Referrals
+  | 'avf_info' // block AVF INFO (former about)
+  // Tools Sub-features
+  | 'tools_events' // block Events section in Tools
+  | 'tools_kontur' // block AVF Kontur in Tools
+  | 'tools_kontur_memecoins'
+  | 'tools_kontur_polymarket'
+  | 'tools_kontur_nft'
+  | 'tools_kontur_staking'
+  | 'tools_kontur_spot'
+  | 'tools_kontur_futures'
+  | 'tools_kontur_airdrop'
+  | 'tools_strategies_view' // block viewing strategies
+  | 'tools_items_view' // block viewing tool items
+  // HUB Sub-features
+  | 'hub_signals_add'
+  | 'hub_signals_view'
+  | 'hub_signals_cat_memecoins'
+  | 'hub_signals_cat_polymarket'
+  | 'hub_signals_cat_nft'
+  | 'hub_signals_cat_spot'
+  | 'hub_signals_cat_futures'
+  | 'hub_signals_cat_staking'
+  | 'hub_signals_cat_airdrop'
+  // Schedule Sub-features
+  | 'schedule_stats_view'
+  | 'schedule_view'
+  | 'schedule_add_slot'
+  | 'schedule_status_edit'
+  | 'schedule_slot_delete'
+  // Tasks Sub-features
+  | 'tasks_add'
+  | 'tasks_view'
+  // Profit Sub-features
+  | 'profit_add'
+  | 'profit_stats_view'
+  | 'profit_leaders_view'
+  | 'profit_history_view'
+  | 'profit_insights_view'
+  | 'profit_cat_memecoins'
+  | 'profit_cat_futures'
+  | 'profit_cat_nft'
+  | 'profit_cat_spot'
+  | 'profit_cat_airdrop'
+  | 'profit_cat_polymarket'
+  | 'profit_cat_staking'
+  | 'profit_cat_other'
+  | 'profit_wallet_general'
+  | 'profit_wallet_personal'
+  | 'profit_wallet_pool'
+  // Rating Sub-features
+  | 'rating_others_view'
+  | 'rating_self_view'
+  | 'rating_specific_view'
   | 'profile' // block profile access
-  | 'rating' // block rating
+  // Legacy aliases
+  | 'slots'
+  | 'earnings'
+  | 'tasks'
+  | 'rating'
+  | 'about'
+  | 'tools_meme_evaluation'
+  | 'tools_ai_ao_alerts'
+  | 'tools_signals_trigger_bot'
 
 // AI - AO Alerts types
 export interface AiAlert {

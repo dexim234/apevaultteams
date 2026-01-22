@@ -1,5 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useThemeStore } from '@/store/themeStore'
+import { useAuthStore } from '@/store/authStore'
+import { useAdminStore } from '@/store/adminStore'
+import { checkUserAccess } from '@/services/firestoreService'
 import {
     TrendingUp,
     Rocket,
@@ -19,19 +22,71 @@ type TabType = 'memecoins' | 'polymarket' | 'nft' | 'staking' | 'spot' | 'future
 
 export const Strategies = () => {
     const { theme } = useThemeStore()
+    const { user } = useAuthStore()
+    const { isAdmin } = useAdminStore()
     const [activeTab, setActiveTab] = useState<TabType>('memecoins')
+    const [accessibleTabs, setAccessibleTabs] = useState<Set<TabType>>(new Set(['memecoins']))
+    const [loading, setLoading] = useState(true)
 
     const headingColor = theme === 'dark' ? 'text-white' : 'text-gray-900'
 
-    const tabs = [
-        { id: 'memecoins', label: 'Мемкоины', icon: <Rocket className="w-4 h-4" /> },
-        { id: 'polymarket', label: 'Polymarket', icon: <BarChart3 className="w-4 h-4" /> },
-        { id: 'nft', label: 'NFT', icon: <ImageIcon className="w-4 h-4" /> },
-        { id: 'staking', label: 'Стейкинг', icon: <Database className="w-4 h-4" /> },
-        { id: 'spot', label: 'Спот', icon: <Wallet2 className="w-4 h-4" /> },
-        { id: 'futures', label: 'Фьючерсы', icon: <Zap className="w-4 h-4" /> },
-        { id: 'airdrop', label: 'AirDrop', icon: <Gift className="w-4 h-4" /> },
+    const tabs: { id: TabType; label: string; icon: any; feature: string }[] = [
+        { id: 'memecoins', label: 'Мемкоины', icon: <Rocket className="w-4 h-4" />, feature: 'tools_kontur_memecoins' },
+        { id: 'polymarket', label: 'Polymarket', icon: <BarChart3 className="w-4 h-4" />, feature: 'tools_kontur_polymarket' },
+        { id: 'nft', label: 'NFT', icon: <ImageIcon className="w-4 h-4" />, feature: 'tools_kontur_nft' },
+        { id: 'staking', label: 'Стейкинг', icon: <Database className="w-4 h-4" />, feature: 'tools_kontur_staking' },
+        { id: 'spot', label: 'Спот', icon: <Wallet2 className="w-4 h-4" />, feature: 'tools_kontur_spot' },
+        { id: 'futures', label: 'Фьючерсы', icon: <Zap className="w-4 h-4" />, feature: 'tools_kontur_futures' },
+        { id: 'airdrop', label: 'AirDrop', icon: <Gift className="w-4 h-4" />, feature: 'tools_kontur_airdrop' },
     ]
+
+    useEffect(() => {
+        const checkAccess = async () => {
+            if (!user || isAdmin) {
+                setAccessibleTabs(new Set(tabs.map(t => t.id)))
+                setLoading(false)
+                return
+            }
+
+            const accessible = new Set<TabType>()
+            for (const tab of tabs) {
+                const result = await checkUserAccess(user.id, tab.feature)
+                if (result.hasAccess) {
+                    accessible.add(tab.id)
+                }
+            }
+
+            setAccessibleTabs(accessible)
+
+            // Set first accessible tab as active if current is not accessible
+            if (!accessible.has(activeTab) && accessible.size > 0) {
+                setActiveTab(Array.from(accessible)[0])
+            }
+            setLoading(false)
+        }
+
+        checkAccess()
+    }, [user, isAdmin])
+
+    const visibleTabs = tabs.filter(t => accessibleTabs.has(t.id))
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center py-20">
+                <div className="animate-spin rounded-full h-8 w-8 border-4 border-blue-500 border-t-transparent"></div>
+            </div>
+        )
+    }
+
+    if (visibleTabs.length === 0 && !loading) {
+        return (
+            <div className="py-20 text-center space-y-4">
+                <TrendingUp className="w-16 h-16 text-gray-700 mx-auto opacity-20" />
+                <h3 className={`text-xl font-black ${headingColor}`}>Доступ ограничен</h3>
+                <p className="text-gray-500 max-w-md mx-auto">У вас нет доступа к разделам AVF Контур. Свяжитесь с администрацией.</p>
+            </div>
+        )
+    }
 
     return (
         <div className="space-y-8 pb-12">
@@ -61,7 +116,7 @@ export const Strategies = () => {
             {/* Tabs Navigation - Scrollable on small screens */}
             <div className="overflow-x-auto pb-2 scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
                 <div className="flex items-center gap-2 p-1.5 rounded-2xl bg-white/5 border border-white/5 w-fit backdrop-blur-sm min-w-max">
-                    {tabs.map((tab) => (
+                    {visibleTabs.map((tab) => (
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id as TabType)}

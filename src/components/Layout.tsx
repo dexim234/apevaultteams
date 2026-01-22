@@ -32,6 +32,7 @@ import {
 import type { LucideIcon } from 'lucide-react'
 import logo from '@/assets/logo.png'
 import { useState, useEffect } from 'react'
+import { AccessBlockScreen } from '@/components/AccessBlockScreen'
 
 export const Layout = ({ children }: { children: React.ReactNode }) => {
   const { theme, toggleTheme } = useThemeStore()
@@ -62,11 +63,15 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
       setIsFeaturesLoading(true)
       try {
         if (!user || isAdmin) {
-          setAccessibleFeatures(new Set(['slots', 'earnings', 'tasks', 'rating', 'referrals', 'profile', 'admin', 'tools', 'tools_strategies', 'tools_ai_ao_alerts', 'tools_our_deals_analysis']))
+          setAccessibleFeatures(new Set(['avf_schedule', 'avf_profit', 'avf_tasks', 'avf_rating', 'avf_referrals', 'profile', 'admin', 'tools', 'tools_strategies', 'tools_events', 'avf_hub', 'avf_info']))
           return
         }
 
-        const features = ['slots', 'earnings', 'tasks', 'rating', 'referrals', 'profile', 'about', 'tools', 'tools_strategies', 'tools_events', 'avf_hub']
+        const features = [
+          'avf_schedule', 'avf_profit', 'avf_tasks', 'avf_rating', 'avf_referrals',
+          'profile', 'avf_info', 'tools', 'tools_strategies', 'tools_events',
+          'avf_hub', 'slots', 'earnings', 'tasks', 'rating', 'about' // Keep legacy for compatibility
+        ]
         const accessible = new Set<string>()
 
         for (const feature of features) {
@@ -91,12 +96,12 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
 
   const funcsSubItems: { path: string; label: string; icon: LucideIcon; feature?: string }[] = [
     { path: '/call', label: 'AVF HUB', icon: Radio, feature: 'avf_hub' },
-    { path: '/management', label: 'AVF Schedule', icon: Calendar, feature: 'slots' },
-    { path: '/tasks', label: 'AVF Tasks', icon: CheckSquare, feature: 'tasks' },
-    { path: '/earnings', label: 'AVF Profit', icon: DollarSign, feature: 'earnings' },
-    { path: '/rating', label: 'AVF Score', icon: TrendingUp, feature: 'rating' },
-    { path: '/referrals', label: 'AVF Referrals', icon: Users, feature: 'referrals' },
-    { path: '/about', label: 'AVF INFO', icon: Info, feature: 'about' },
+    { path: '/management', label: 'AVF Schedule', icon: Calendar, feature: 'avf_schedule' },
+    { path: '/tasks', label: 'AVF Tasks', icon: CheckSquare, feature: 'avf_tasks' },
+    { path: '/earnings', label: 'AVF Profit', icon: DollarSign, feature: 'avf_profit' },
+    { path: '/rating', label: 'AVF Score', icon: TrendingUp, feature: 'avf_rating' },
+    { path: '/referrals', label: 'AVF Referrals', icon: Users, feature: 'avf_referrals' },
+    { path: '/about', label: 'AVF INFO', icon: Info, feature: 'avf_info' },
     ...(isAdmin ? [
       { path: '/approvals', label: 'AVF Check', icon: CheckCircle2, feature: 'admin' },
       { path: '/admin', label: 'AVF Admin', icon: Shield, feature: 'admin' },
@@ -131,6 +136,9 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <div className={`min-h-screen ${theme === 'dark' ? 'dark bg-[#0b0f17]' : 'bg-[#f8fafc]'}`}>
+      {/* Site-wide Access Block Screen */}
+      <AccessBlockScreen />
+
       <div className="absolute inset-0 pointer-events-none -z-10 overflow-hidden">
         <div className="absolute -top-24 -left-12 w-80 h-80 bg-gradient-to-br from-[#4E6E49]/25 via-transparent to-transparent blur-3xl" />
         <div className="absolute top-8 right-0 w-[520px] h-[520px] bg-gradient-to-bl from-blue-500/12 via-purple-500/10 to-transparent blur-3xl" />

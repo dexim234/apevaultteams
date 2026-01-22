@@ -1530,7 +1530,9 @@ export const getAccessBlocks = async (userId?: string, isActive?: boolean): Prom
     return {
       id: doc.id,
       userId: data?.userId,
-      reason: data?.reason || '',
+      userIds: data?.userIds || [],
+      targetType: data?.targetType || (data?.userId ? 'single' : 'all'),
+      reason: data?.reason || 'Администратор не указал причину',
       createdBy: data?.createdBy || '',
       createdAt: data?.createdAt || '',
       expiresAt: data?.expiresAt,
@@ -1540,14 +1542,16 @@ export const getAccessBlocks = async (userId?: string, isActive?: boolean): Prom
   })
 
   // Filter in memory based on userId
-  // Handle both null/undefined and empty string as "no user" (general block)
-  // Also handle old records where userId field doesn't exist at all
-  if (userId !== undefined && userId !== null) {
-    // Return only blocks for this specific user
-    results = results.filter((block: AccessBlock) => block.userId === userId)
+  if (userId) {
+    // Return blocks targeting this specific user OR subsets they are in OR general blocks
+    results = results.filter((block: AccessBlock) =>
+      block.targetType === 'all' ||
+      (block.targetType === 'single' && block.userId === userId) ||
+      (block.targetType === 'subset' && block.userIds?.includes(userId))
+    )
   } else {
-    // Return only general blocks (no userId, null, undefined, or empty string)
-    results = results.filter((block: AccessBlock) => !block.userId)
+    // Return only general blocks (targetType 'all')
+    results = results.filter((block: AccessBlock) => block.targetType === 'all')
   }
 
   return results
@@ -1570,7 +1574,9 @@ export const getAllAccessBlocks = async (isActive?: boolean): Promise<AccessBloc
     return {
       id: doc.id,
       userId: data?.userId,
-      reason: data?.reason || '',
+      userIds: data?.userIds || [],
+      targetType: data?.targetType || (data?.userId ? 'single' : 'all'),
+      reason: data?.reason || 'Администратор не указал причину',
       createdBy: data?.createdBy || '',
       createdAt: data?.createdAt || '',
       expiresAt: data?.expiresAt,
@@ -1599,104 +1605,62 @@ export const deleteAccessBlock = async (id: string) => {
 // Check if user has access to a specific feature
 export const checkUserAccess = async (userId: string, feature: string): Promise<{ hasAccess: boolean; reason?: string; expiresAt?: string }> => {
   try {
-    // Check for general blocks (userId is null)
-    const generalBlocks = await getAccessBlocks(undefined, true)
-    for (const block of generalBlocks) {
+    // Unified check for any applicable active blocks
+    const allBlocks = await getAllAccessBlocks(true)
+
+    // Sort blocks: site-wide 'all' first, then section blocks
+    const sortedBlocks = allBlocks.filter(b => b.isActive).sort((a, b) => {
+      if (a.blockFeatures.includes('all')) return -1
+      if (b.blockFeatures.includes('all')) return 1
+      return 0
+    })
+
+    for (const block of sortedBlocks) {
+      // Check if block applies to this user
+      const isTargeted =
+        block.targetType === 'all' ||
+        (block.targetType === 'single' && block.userId === userId) ||
+        (block.targetType === 'subset' && block.userIds?.includes(userId))
+
+      if (!isTargeted) continue
+
       // Check if block is expired
       if (block.expiresAt && new Date(block.expiresAt) < new Date()) {
-        // Block is expired, mark as inactive
         await updateAccessBlock(block.id, { isActive: false })
         continue
       }
 
-      // Check for 'all' feature - blocks entire site
-      if (block.blockFeatures.includes('all' as any)) {
+      // 1. Site-wide block
+      if (block.blockFeatures.includes('all')) {
         return { hasAccess: false, reason: block.reason, expiresAt: block.expiresAt }
       }
 
-      // Check for specific feature
+      // 2. Specific feature block
       if (block.blockFeatures.includes(feature as any)) {
         return { hasAccess: false, reason: block.reason, expiresAt: block.expiresAt }
       }
 
-      // Check for 'tools' - blocks entire Tools section (should hide from menu)
-      if (feature === 'tools' && block.blockFeatures.includes('tools' as any)) {
-        return { hasAccess: false, reason: block.reason, expiresAt: block.expiresAt }
+      // 3. Section-level blocks (parent blocks)
+      const parents: Record<string, string[]> = {
+        'tools': ['tools_events', 'tools_kontur', 'tools_strategies_view', 'tools_items_view'],
+        'tools_kontur': ['tools_kontur_memecoins', 'tools_kontur_polymarket', 'tools_kontur_nft', 'tools_kontur_staking', 'tools_kontur_spot', 'tools_kontur_futures', 'tools_kontur_airdrop'],
+        'avf_hub': ['hub_signals_add', 'hub_signals_view', 'hub_signals_cat_memecoins', 'hub_signals_cat_polymarket', 'hub_signals_cat_nft', 'hub_signals_cat_spot', 'hub_signals_cat_futures', 'hub_signals_cat_staking', 'hub_signals_cat_airdrop'],
+        'avf_schedule': ['schedule_stats_view', 'schedule_view', 'schedule_add_slot', 'schedule_status_edit', 'schedule_slot_delete'],
+        'avf_tasks': ['tasks_add', 'tasks_view'],
+        'avf_profit': ['profit_add', 'profit_stats_view', 'profit_leaders_view', 'profit_history_view', 'profit_insights_view', 'profit_cat_memecoins', 'profit_cat_futures', 'profit_cat_nft', 'profit_cat_spot', 'profit_cat_airdrop', 'profit_cat_polymarket', 'profit_cat_staking', 'profit_cat_other', 'profit_wallet_general', 'profit_wallet_personal', 'profit_wallet_pool'],
+        'avf_rating': ['rating_others_view', 'rating_self_view', 'rating_specific_view'],
+        // Legacy parents
+        'slots': ['schedule_stats_view', 'schedule_view', 'schedule_add_slot', 'schedule_status_edit', 'schedule_slot_delete'],
+        'earnings': ['profit_add', 'profit_stats_view', 'profit_leaders_view', 'profit_history_view', 'profit_insights_view'],
+        'tasks': ['tasks_add', 'tasks_view'],
+        'rating': ['rating_others_view', 'rating_self_view', 'rating_specific_view'],
+        'about': ['avf_info']
       }
 
-      // Check for 'call' feature
-      if (feature === 'call' && block.blockFeatures.includes('call' as any)) {
-        return { hasAccess: false, reason: block.reason, expiresAt: block.expiresAt }
-      }
-
-      // Check for 'avf_hub' feature
-      if (feature === 'avf_hub' && block.blockFeatures.includes('avf_hub' as any)) {
-        return { hasAccess: false, reason: block.reason, expiresAt: block.expiresAt }
-      }
-
-      // Check for 'about' feature
-      if (feature === 'about' && block.blockFeatures.includes('about' as any)) {
-        return { hasAccess: false, reason: block.reason, expiresAt: block.expiresAt }
-      }
-
-      // Check for tool sub-features
-      const toolSubFeatures = ['tools_meme_evaluation', 'tools_ai_ao_alerts', 'tools_signals_trigger_bot']
-      if (toolSubFeatures.includes(feature) && block.blockFeatures.includes('tools' as any)) {
-        // If tools section is blocked, all sub-features are blocked too
-        return { hasAccess: false, reason: block.reason, expiresAt: block.expiresAt }
-      }
-      if (toolSubFeatures.includes(feature) && block.blockFeatures.includes(feature as any)) {
-        return { hasAccess: false, reason: block.reason, expiresAt: block.expiresAt }
-      }
-    }
-
-    // Check for user-specific blocks
-    const userBlocks = await getAccessBlocks(userId, true)
-    for (const block of userBlocks) {
-      // Check if block is expired
-      if (block.expiresAt && new Date(block.expiresAt) < new Date()) {
-        // Block is expired, mark as inactive
-        await updateAccessBlock(block.id, { isActive: false })
-        continue
-      }
-
-      // Check for 'all' feature - blocks entire site
-      if (block.blockFeatures.includes('all' as any)) {
-        return { hasAccess: false, reason: block.reason, expiresAt: block.expiresAt }
-      }
-
-      // Check for specific feature
-      if (block.blockFeatures.includes(feature as any)) {
-        return { hasAccess: false, reason: block.reason, expiresAt: block.expiresAt }
-      }
-
-      // Check for 'tools' - blocks entire Tools section
-      if (feature === 'tools' && block.blockFeatures.includes('tools' as any)) {
-        return { hasAccess: false, reason: block.reason, expiresAt: block.expiresAt }
-      }
-
-      // Check for 'call' feature
-      if (feature === 'call' && block.blockFeatures.includes('call' as any)) {
-        return { hasAccess: false, reason: block.reason, expiresAt: block.expiresAt }
-      }
-
-      // Check for 'avf_hub' feature
-      if (feature === 'avf_hub' && block.blockFeatures.includes('avf_hub' as any)) {
-        return { hasAccess: false, reason: block.reason, expiresAt: block.expiresAt }
-      }
-
-      // Check for 'about' feature
-      if (feature === 'about' && block.blockFeatures.includes('about' as any)) {
-        return { hasAccess: false, reason: block.reason, expiresAt: block.expiresAt }
-      }
-
-      // Check for tool sub-features
-      const toolSubFeatures = ['tools_meme_evaluation', 'tools_ai_ao_alerts', 'tools_signals_trigger_bot']
-      if (toolSubFeatures.includes(feature) && block.blockFeatures.includes('tools' as any)) {
-        return { hasAccess: false, reason: block.reason, expiresAt: block.expiresAt }
-      }
-      if (toolSubFeatures.includes(feature) && block.blockFeatures.includes(feature as any)) {
-        return { hasAccess: false, reason: block.reason, expiresAt: block.expiresAt }
+      for (const [parent, children] of Object.entries(parents)) {
+        if (block.blockFeatures.includes(parent as any) && children.includes(feature)) {
+          return { hasAccess: false, reason: block.reason, expiresAt: block.expiresAt }
+        }
       }
     }
 
