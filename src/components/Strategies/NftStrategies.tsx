@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useThemeStore } from '@/store/themeStore'
 import {
     ShoppingBag,
@@ -20,6 +20,7 @@ import {
 export const NftStrategies: React.FC = () => {
     const { theme } = useThemeStore()
     const headingColor = theme === 'dark' ? 'text-white' : 'text-gray-900'
+    const [activeCategory, setActiveCategory] = useState<number | null>(null)
 
     const categories = [
         {
@@ -89,52 +90,87 @@ export const NftStrategies: React.FC = () => {
                 </div>
 
                 <div className="space-y-12">
-                    {categories.map((category, catIdx) => (
-                        <section key={catIdx} className="space-y-6">
-                            <div className="flex items-center gap-3">
-                                <div className={`p-2 ${category.bgColor} rounded-xl border ${category.borderColor}`}>
-                                    {category.icon}
-                                </div>
-                                <div>
-                                    <h3 className={`text-xl font-black ${headingColor}`}>{category.title}</h3>
-                                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                    {activeCategory === null ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                            {categories.map((category, idx) => (
+                                <button
+                                    key={idx}
+                                    onClick={() => setActiveCategory(idx)}
+                                    className={`group p-6 rounded-3xl border text-left transition-all duration-500 hover:-translate-y-2 ${theme === 'dark'
+                                            ? 'bg-[#151a21]/50 border-white/5 hover:border-blue-500/30 hover:bg-blue-500/5'
+                                            : 'bg-white border-gray-100 hover:border-blue-500/20 hover:shadow-xl'
+                                        }`}
+                                >
+                                    <div className={`p-4 rounded-2xl w-fit mb-4 transition-transform duration-500 group-hover:scale-110 ${category.bgColor} ${category.borderColor} border`}>
+                                        {React.cloneElement(category.icon as React.ReactElement, { className: 'w-8 h-8' })}
+                                    </div>
+                                    <h4 className={`text-lg font-black mb-2 ${headingColor}`}>{category.title}</h4>
+                                    <p className={`text-xs leading-relaxed ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                                         {category.description}
                                     </p>
-                                </div>
+                                    <div className="mt-4 flex items-center gap-2 text-blue-500 font-bold text-[10px] uppercase tracking-wider">
+                                        Смотреть инструменты <ExternalLink className="w-3 h-3" />
+                                    </div>
+                                </button>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="space-y-8 animate-scale-up">
+                            <div className="flex items-center justify-between">
+                                <button
+                                    onClick={() => setActiveCategory(null)}
+                                    className="text-xs font-bold text-gray-500 hover:text-blue-500 transition-colors flex items-center gap-1"
+                                >
+                                    ← Все категории
+                                </button>
                             </div>
 
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                                {category.tools.map((tool, idx) => (
-                                    <a
-                                        key={idx}
-                                        href={tool.url}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className={`group relative p-5 rounded-2xl border transition-all duration-300 hover:shadow-lg ${theme === 'dark'
-                                            ? 'bg-[#151a21]/50 border-white/5 hover:border-blue-500/30'
-                                            : 'bg-white border-gray-100 hover:border-blue-500/20'
-                                            }`}
-                                    >
-                                        <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <ExternalLink className={`w-4 h-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`} />
-                                        </div>
-
-                                        <div className={`p-2.5 rounded-xl w-fit mb-4 ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-50'
-                                            } group-hover:scale-110 transition-transform`}>
-                                            {tool.icon}
-                                        </div>
-
-                                        <h4 className={`font-bold mb-1 ${headingColor} flex items-center gap-2`}>
-                                            {tool.name}
-                                        </h4>
-                                        <p className="text-xs text-gray-500 line-clamp-3 leading-relaxed">
-                                            {tool.desc}
+                            <section className="space-y-6">
+                                <div className="flex items-center gap-3">
+                                    <div className={`p-3 ${categories[activeCategory].bgColor} rounded-2xl border ${categories[activeCategory].borderColor}`}>
+                                        {React.cloneElement(categories[activeCategory].icon as React.ReactElement, { className: 'w-8 h-8' })}
+                                    </div>
+                                    <div>
+                                        <h3 className={`text-2xl font-black ${headingColor}`}>{categories[activeCategory].title}</h3>
+                                        <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                                            {categories[activeCategory].description}
                                         </p>
-                                    </a>
-                                ))}
-                            </div>
-                        </section>
-                    ))}
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                                    {categories[activeCategory].tools.map((tool, idx) => (
+                                        <a
+                                            key={idx}
+                                            href={tool.url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className={`group relative p-5 rounded-2xl border transition-all duration-300 hover:shadow-lg ${theme === 'dark'
+                                                ? 'bg-[#151a21]/50 border-white/5 hover:border-blue-500/30'
+                                                : 'bg-white border-gray-100 hover:border-blue-500/20'
+                                                }`}
+                                        >
+                                            <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <ExternalLink className={`w-4 h-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`} />
+                                            </div>
+
+                                            <div className={`p-2.5 rounded-xl w-fit mb-4 ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-50'
+                                                } group-hover:scale-110 transition-transform`}>
+                                                {tool.icon}
+                                            </div>
+
+                                            <h4 className={`font-bold mb-1 ${headingColor} flex items-center gap-2`}>
+                                                {tool.name}
+                                            </h4>
+                                            <p className="text-xs text-gray-500 line-clamp-3 leading-relaxed">
+                                                {tool.desc}
+                                            </p>
+                                        </a>
+                                    ))}
+                                </div>
+                            </section>
+                        </div>
+                    )}
                 </div>
             </section>
         </div>

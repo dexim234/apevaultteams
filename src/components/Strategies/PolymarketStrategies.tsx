@@ -16,7 +16,7 @@ import {
 import { AVFValueBettingStrategy } from './AVFValueBettingStrategy'
 import { AVFArbitrageStrategy } from './AVFArbitrageStrategy'
 
-type StrategyId = 'value-betting' | 'arbitrage';
+type StrategyId = 'value-betting' | 'arbitrage' | null;
 
 interface Tool {
     name: string
@@ -30,7 +30,7 @@ interface Tool {
 
 export const PolymarketStrategies: React.FC = () => {
     const { theme } = useThemeStore()
-    const [activeStrategy, setActiveStrategy] = useState<StrategyId>('value-betting')
+    const [activeStrategy, setActiveStrategy] = useState<StrategyId>(null)
 
     const headingColor = theme === 'dark' ? 'text-white' : 'text-gray-900'
     const cardBg = theme === 'dark' ? 'bg-[#151a21]/50' : 'bg-white'
@@ -117,34 +117,75 @@ export const PolymarketStrategies: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Strategy Selector */}
-                    <div className={`flex p-1 rounded-xl w-fit ${theme === 'dark' ? 'bg-white/5 border border-white/5' : 'bg-gray-100'}`}>
-                        {strategies.map(s => (
+                    {/* Strategy Selector - Visible when strategy is already selected */}
+                    {activeStrategy && (
+                        <div className={`flex p-1 rounded-xl w-fit ${theme === 'dark' ? 'bg-white/5 border border-white/5' : 'bg-gray-100'}`}>
+                            {strategies.map(s => (
+                                <button
+                                    key={s.id}
+                                    onClick={() => setActiveStrategy(s.id as StrategyId)}
+                                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all duration-300 ${activeStrategy === s.id
+                                        ? 'bg-rose-500 text-white shadow-md'
+                                        : 'text-gray-500 hover:text-gray-400'
+                                        }`}
+                                >
+                                    {s.icon}
+                                    {s.name}
+                                </button>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                {!activeStrategy ? (
+                    /* Selection Grid */
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        {strategies.map((s) => (
                             <button
                                 key={s.id}
                                 onClick={() => setActiveStrategy(s.id as StrategyId)}
-                                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all duration-300 ${activeStrategy === s.id
-                                    ? 'bg-rose-500 text-white shadow-md'
-                                    : 'text-gray-500 hover:text-gray-400'
+                                className={`group p-8 rounded-[2.5rem] border text-left transition-all duration-500 hover:-translate-y-2 ${theme === 'dark'
+                                        ? 'bg-white/5 border-white/5 hover:border-rose-500/30 hover:bg-rose-500/5'
+                                        : 'bg-white border-gray-100 hover:border-rose-500/20 hover:shadow-2xl hover:shadow-rose-500/10'
                                     }`}
                             >
-                                {s.icon}
-                                {s.name}
+                                <div className={`p-4 rounded-2xl w-fit mb-6 transition-transform duration-500 group-hover:scale-110 ${theme === 'dark' ? 'bg-rose-500/20 text-rose-400' : 'bg-rose-50 text-rose-500'
+                                    }`}>
+                                    {React.cloneElement(s.icon as React.ReactElement, { className: 'w-8 h-8' })}
+                                </div>
+                                <h4 className={`text-xl font-black mb-2 ${headingColor}`}>{s.name}</h4>
+                                <p className={`text-sm leading-relaxed ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                                    {s.id === 'value-betting'
+                                        ? 'Поиск математического ожидания и недооцененных исходов на рынках предсказаний.'
+                                        : 'Заработок на разнице цен между Polymarket и другими платформами или реальностью.'}
+                                </p>
+                                <div className="mt-6 flex items-center gap-2 text-rose-500 font-bold text-xs uppercase tracking-wider">
+                                    Подробнее <ExternalLink className="w-3 h-3" />
+                                </div>
                             </button>
                         ))}
                     </div>
-                </div>
-
-                <div className={`rounded-3xl border p-1 sm:p-2 ${theme === 'dark' ? 'bg-[#0b1015]/50 border-white/5' : 'bg-white border-gray-100'
-                    } shadow-xl`}>
-                    <div className={`p-6 sm:p-8 rounded-[2.5rem] ${innerBg}`}>
-                        {activeStrategy === 'value-betting' ? (
-                            <AVFValueBettingStrategy />
-                        ) : (
-                            <AVFArbitrageStrategy />
-                        )}
+                ) : (
+                    /* Active Strategy View */
+                    <div className={`rounded-3xl border p-1 sm:p-2 ${theme === 'dark' ? 'bg-[#0b1015]/50 border-white/5' : 'bg-white border-gray-100'
+                        } shadow-xl animate-scale-up`}>
+                        <div className={`p-6 sm:p-8 rounded-[2.5rem] ${innerBg}`}>
+                            <div className="mb-6 flex items-center justify-between">
+                                <button
+                                    onClick={() => setActiveStrategy(null)}
+                                    className="text-xs font-bold text-gray-500 hover:text-rose-500 transition-colors flex items-center gap-1"
+                                >
+                                    ← К списку стратегий
+                                </button>
+                            </div>
+                            {activeStrategy === 'value-betting' ? (
+                                <AVFValueBettingStrategy />
+                            ) : (
+                                <AVFArbitrageStrategy />
+                            )}
+                        </div>
                     </div>
-                </div>
+                )}
             </section>
 
             {/* Tools Block */}

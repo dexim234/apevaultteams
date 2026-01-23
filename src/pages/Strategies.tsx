@@ -10,7 +10,8 @@ import {
     Database,
     Wallet2,
     Zap,
-    Gift
+    Gift,
+    ChevronDown
 } from 'lucide-react'
 import { MemecoinStrategies } from '@/components/Strategies/MemecoinStrategies'
 import { PolymarketStrategies } from '@/components/Strategies/PolymarketStrategies'
@@ -97,24 +98,54 @@ export const Strategies = () => {
                 </div>
             </div>
 
-            {/* Tabs Navigation - Scrollable on small screens */}
-            <div className="overflow-x-auto pb-2 scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
-                <div className="flex items-center gap-2 p-1.5 rounded-2xl bg-white/5 border border-white/5 w-fit backdrop-blur-sm min-w-max">
-                    {visibleTabs.map((tab) => (
-                        <button
-                            key={tab.id}
-                            onClick={() => setActiveTab(tab.id as TabType)}
-                            className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 relative ${activeTab === tab.id
-                                ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/25'
-                                : 'text-gray-400 hover:bg-white/5 hover:text-white'
-                                }`}
-                        >
-                            <div className="flex items-center gap-2">
-                                {tab.icon}
-                                {tab.label}
+            {/* Tabs Navigation - Centered on PC, Selector on Mobile */}
+            <div className="relative">
+                {/* Mobile Selector */}
+                <div className="sm:hidden relative z-10 px-4">
+                    <div className={`p-4 rounded-2xl border ${theme === 'dark' ? 'bg-[#151a21]/90 border-white/10' : 'bg-white border-gray-200'} backdrop-blur-xl shadow-lg`}>
+                        <div className="relative group">
+                            <select
+                                value={activeTab}
+                                onChange={(e) => setActiveTab(e.target.value as TabType)}
+                                className={`w-full appearance-none px-4 py-3 rounded-xl font-bold transition-all outline-none border ${theme === 'dark'
+                                        ? 'bg-white/5 border-white/10 text-white focus:border-blue-500/50'
+                                        : 'bg-gray-50 border-gray-200 text-gray-900 focus:border-blue-500/30'
+                                    }`}
+                            >
+                                {visibleTabs.map((tab) => (
+                                    <option key={tab.id} value={tab.id} className={theme === 'dark' ? 'bg-[#151a21] text-white' : 'bg-white text-gray-900'}>
+                                        {tab.label}
+                                    </option>
+                                ))}
+                            </select>
+                            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-blue-500">
+                                <ChevronDown className="w-5 h-5" />
                             </div>
-                        </button>
-                    ))}
+                        </div>
+                    </div>
+                </div>
+
+                {/* PC Centered Tabs */}
+                <div className="hidden sm:flex justify-center w-full">
+                    <div className="overflow-x-auto pb-2 scrollbar-hide">
+                        <div className={`flex items-center gap-2 p-2 rounded-2xl ${theme === 'dark' ? 'bg-white/5 border-white/10' : 'bg-gray-100/50 border-gray-200'} border backdrop-blur-sm w-fit`}>
+                            {visibleTabs.map((tab) => (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setActiveTab(tab.id as TabType)}
+                                    className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 relative ${activeTab === tab.id
+                                        ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/25'
+                                        : 'text-gray-400 hover:bg-white/5 hover:text-white'
+                                        }`}
+                                >
+                                    <div className="flex items-center gap-2">
+                                        {tab.icon}
+                                        {tab.label}
+                                    </div>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
                 </div>
             </div>
 
