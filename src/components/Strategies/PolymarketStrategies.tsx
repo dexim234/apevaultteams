@@ -12,8 +12,6 @@ import {
     ExternalLink,
     Zap,
     Activity,
-    Search,
-    Calendar,
     ArrowLeft
 } from 'lucide-react'
 import { AVFValueBettingStrategy } from './AVFValueBettingStrategy'
