@@ -11,7 +11,6 @@ import {
     Wallet,
     ExternalLink,
     Zap,
-    Activity,
     ArrowLeft
 } from 'lucide-react'
 import { AVFValueBettingStrategy } from './AVFValueBettingStrategy'
@@ -49,8 +48,8 @@ export const PolymarketStrategies: React.FC = () => {
             url: 'https://polymarket.com/',
             fullDesc: 'Децентрализованная платформа на блокчейне Polygon, на которой можно торговать вероятностями событий, покупая токены результата — YES или NO. Цена токена отражает рыночную вероятность события.',
             icon: <Target className="w-5 h-5" />,
-            color: 'text-rose-400',
-            bgColor: 'bg-rose-500/10 border-rose-500/20',
+            color: 'text-blue-400',
+            bgColor: 'bg-blue-500/10 border-blue-500/20',
             tags: ['Core', 'Trading']
         },
         {
@@ -106,8 +105,8 @@ export const PolymarketStrategies: React.FC = () => {
             <section className="space-y-6">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div className="flex items-center gap-3">
-                        <div className="p-2 bg-rose-500/10 rounded-xl border border-rose-500/20">
-                            <Lightbulb className="w-6 h-6 text-rose-500" />
+                        <div className="p-2 bg-blue-500/10 rounded-xl border border-blue-500/20">
+                            <Lightbulb className="w-6 h-6 text-blue-500" />
                         </div>
                         <div>
                             <h3 className={`text-xl font-black ${headingColor}`}>Стратегии</h3>
@@ -125,7 +124,7 @@ export const PolymarketStrategies: React.FC = () => {
                                     key={s.id}
                                     onClick={() => setActiveStrategy(s.id as StrategyId)}
                                     className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all duration-300 ${activeStrategy === s.id
-                                        ? 'bg-rose-500 text-white shadow-md'
+                                        ? 'bg-blue-500 text-white shadow-md'
                                         : 'text-gray-500 hover:text-gray-400'
                                         }`}
                                 >
@@ -145,11 +144,11 @@ export const PolymarketStrategies: React.FC = () => {
                                 key={s.id}
                                 onClick={() => setActiveStrategy(s.id as StrategyId)}
                                 className={`group p-8 rounded-[2.5rem] border text-left transition-all duration-500 hover:-translate-y-2 ${theme === 'dark'
-                                    ? 'bg-white/5 border-white/5 hover:border-rose-500/30 hover:bg-rose-500/5'
-                                    : 'bg-white border-gray-100 hover:border-rose-500/20 hover:shadow-2xl hover:shadow-rose-500/10'
+                                    ? 'bg-white/5 border-white/5 hover:border-blue-500/30 hover:bg-blue-500/5'
+                                    : 'bg-white border-gray-100 hover:border-blue-500/20 hover:shadow-2xl hover:shadow-blue-500/10'
                                     }`}
                             >
-                                <div className={`p-4 rounded-2xl w-fit mb-6 transition-transform duration-500 group-hover:scale-110 ${theme === 'dark' ? 'bg-rose-500/20 text-rose-400' : 'bg-rose-50 text-rose-500'
+                                <div className={`p-4 rounded-2xl w-fit mb-6 transition-transform duration-500 group-hover:scale-110 ${theme === 'dark' ? 'bg-blue-500/20 text-blue-400' : 'bg-blue-50 text-blue-500'
                                     }`}>
                                     {React.cloneElement(s.icon as React.ReactElement, { className: 'w-8 h-8' })}
                                 </div>
@@ -159,7 +158,7 @@ export const PolymarketStrategies: React.FC = () => {
                                         ? 'Поиск математического ожидания и недооцененных исходов на рынках предсказаний.'
                                         : 'Заработок на разнице цен между Polymarket и другими платформами или реальностью.'}
                                 </p>
-                                <div className="mt-6 flex items-center gap-2 text-rose-500 font-bold text-xs uppercase tracking-wider">
+                                <div className="mt-6 flex items-center gap-2 text-blue-500 font-bold text-xs uppercase tracking-wider">
                                     Подробнее <ExternalLink className="w-3 h-3" />
                                 </div>
                             </button>
@@ -173,7 +172,7 @@ export const PolymarketStrategies: React.FC = () => {
                             <div className="mb-6 flex items-center justify-between">
                                 <button
                                     onClick={() => setActiveStrategy(null)}
-                                    className="text-xs font-bold text-gray-500 hover:text-rose-500 transition-colors flex items-center gap-1"
+                                    className="text-xs font-bold text-gray-500 hover:text-blue-500 transition-colors flex items-center gap-1"
                                 >
                                     ← К списку стратегий
                                 </button>
@@ -191,8 +190,8 @@ export const PolymarketStrategies: React.FC = () => {
             {/* Tools Block */}
             <section className="space-y-8">
                 <div className="flex items-center gap-3">
-                    <div className="p-2 bg-amber-500/10 rounded-xl border border-amber-500/20">
-                        <Wrench className="w-6 h-6 text-amber-500" />
+                    <div className="p-2 bg-blue-500/10 rounded-xl border border-blue-500/20">
+                        <Wrench className="w-6 h-6 text-blue-500" />
                     </div>
                     <div>
                         <h3 className={`text-xl font-black ${headingColor}`}>Инструменты</h3>
@@ -243,7 +242,7 @@ export const PolymarketStrategies: React.FC = () => {
                                     <p className={`text-xs leading-relaxed ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                                         {cat.description}
                                     </p>
-                                    <div className="mt-4 flex items-center gap-2 text-rose-500 font-bold text-[10px] uppercase tracking-wider">
+                                    <div className="mt-4 flex items-center gap-2 text-blue-500 font-bold text-[10px] uppercase tracking-wider">
                                         Смотреть инструменты <ExternalLink className="w-3 h-3" />
                                     </div>
                                 </button>
@@ -254,7 +253,7 @@ export const PolymarketStrategies: React.FC = () => {
                             <div className="flex items-center justify-between">
                                 <button
                                     onClick={() => setActiveToolCategory(null)}
-                                    className="text-xs font-bold text-gray-500 hover:text-rose-500 transition-colors flex items-center gap-2"
+                                    className="text-xs font-bold text-gray-500 hover:text-blue-500 transition-colors flex items-center gap-2"
                                 >
                                     <ArrowLeft className="w-4 h-4" /> К категориям
                                 </button>
@@ -277,7 +276,7 @@ export const PolymarketStrategies: React.FC = () => {
                                 <div key={catIdx} className="space-y-6">
                                     <div className="flex items-center gap-3">
                                         <div className={`p-3 rounded-2xl ${theme === 'dark' ? 'bg-white/5 border border-white/10' : 'bg-gray-100 border border-gray-200'}`}>
-                                            <Wrench className="w-6 h-6 text-rose-500" />
+                                            <Wrench className="w-6 h-6 text-blue-500" />
                                         </div>
                                         <h4 className={`text-xl font-bold ${headingColor}`}>{category.title}</h4>
                                     </div>
@@ -289,8 +288,8 @@ export const PolymarketStrategies: React.FC = () => {
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 className={`group relative p-5 rounded-2xl border transition-all duration-300 hover:shadow-lg ${theme === 'dark'
-                                                    ? 'bg-[#151a21]/50 border-white/5 hover:border-rose-500/30'
-                                                    : 'bg-white border-gray-100 hover:border-rose-500/20'
+                                                    ? 'bg-[#151a21]/50 border-white/5 hover:border-blue-500/30'
+                                                    : 'bg-white border-gray-100 hover:border-blue-500/20'
                                                     }`}
                                             >
                                                 <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -319,32 +318,6 @@ export const PolymarketStrategies: React.FC = () => {
                 </div>
             </section>
 
-            {/* Quick Stats */}
-            <section className={`p-6 rounded-2xl border ${theme === 'dark' ? 'bg-gradient-to-br from-rose-500/5 to-amber-500/5 border-white/5' : 'bg-gradient-to-br from-rose-50 to-amber-50 border-gray-100'
-                }`}>
-                <div className="flex flex-wrap items-center justify-between gap-6">
-                    <div className="flex items-center gap-4">
-                        <div className="p-3 rounded-xl bg-rose-500/10">
-                            <Activity className="w-6 h-6 text-rose-500" />
-                        </div>
-                        <div>
-                            <p className={`text-sm ${mutedText}`}>Всего инструментов</p>
-                            <p className={`text-2xl font-black ${headingColor}`}>{tools.length}</p>
-                        </div>
-                    </div>
-                    <div className="flex flex-wrap gap-3">
-                        {['Analytics', 'AI/ML', 'Portfolio', 'Live Data', 'Whales'].map((category, idx) => (
-                            <span
-                                key={idx}
-                                className={`px-3 py-1.5 text-xs font-medium rounded-lg ${theme === 'dark' ? 'bg-white/5 text-gray-300' : 'bg-white text-gray-600 border border-gray-200'
-                                    }`}
-                            >
-                                {category}
-                            </span>
-                        ))}
-                    </div>
-                </div>
-            </section>
         </div>
     )
 }

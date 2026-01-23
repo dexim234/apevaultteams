@@ -24,7 +24,6 @@ import {
     TrendingUp,
     ExternalLink,
     Lock,
-    MessageSquare,
     Calendar,
     ArrowLeft
 } from 'lucide-react'
@@ -202,14 +201,14 @@ export const MemecoinStrategies: React.FC = () => {
                                         borderColor: 'border-green-500/20'
                                     },
                                     {
-                                        title: 'Ончейн-аналитика',
+                                        title: 'Ончейн-аналитика и блокчейны',
                                         description: 'Блокчейн-эксплореры и данные о транзакциях',
                                         icon: <Database className="w-8 h-8 text-blue-500" />,
                                         bgColor: 'bg-blue-500/10',
                                         borderColor: 'border-blue-500/20'
                                     },
                                     {
-                                        title: 'Безопасность и Рисерч',
+                                        title: 'Безопасность и Речерч',
                                         description: 'Проверка токенов и анализ связей кошельков',
                                         icon: <ShieldCheck className="w-8 h-8 text-rose-500" />,
                                         bgColor: 'bg-rose-500/10',
@@ -221,14 +220,21 @@ export const MemecoinStrategies: React.FC = () => {
                                         icon: <Brain className="w-8 h-8 text-purple-500" />,
                                         bgColor: 'bg-purple-500/10',
                                         borderColor: 'border-purple-500/20'
+                                    },
+                                    {
+                                        title: 'Нарративы',
+                                        description: 'Социальная аналитика и мониторинг внимания',
+                                        icon: <Share2 className="w-8 h-8 text-indigo-500" />,
+                                        bgColor: 'bg-indigo-500/10',
+                                        borderColor: 'border-indigo-500/20'
                                     }
                                 ].map((cat, idx) => (
                                     <button
                                         key={idx}
                                         onClick={() => setActiveToolCategory(idx)}
                                         className={`group p-6 rounded-3xl border text-left transition-all duration-500 hover:-translate-y-2 ${theme === 'dark'
-                                                ? 'bg-[#151a21]/50 border-white/5 hover:border-blue-500/30 hover:bg-blue-500/5'
-                                                : 'bg-white border-gray-100 hover:border-blue-500/20 hover:shadow-xl'
+                                            ? 'bg-[#151a21]/50 border-white/5 hover:border-blue-500/30 hover:bg-blue-500/5'
+                                            : 'bg-white border-gray-100 hover:border-blue-500/20 hover:shadow-xl'
                                             }`}
                                     >
                                         <div className={`p-4 rounded-2xl w-fit mb-4 transition-transform duration-500 group-hover:scale-110 ${cat.bgColor} ${cat.borderColor} border`}>
@@ -270,7 +276,7 @@ export const MemecoinStrategies: React.FC = () => {
                                         ]
                                     },
                                     {
-                                        title: 'Ончейн-аналитика',
+                                        title: 'Ончейн-аналитика и блокчейны',
                                         description: 'Блокчейн-эксплореры и данные о транзакциях',
                                         icon: <Database className="w-6 h-6 text-blue-500" />,
                                         items: [
@@ -280,7 +286,7 @@ export const MemecoinStrategies: React.FC = () => {
                                         ]
                                     },
                                     {
-                                        title: 'Безопасность и Рисерч',
+                                        title: 'Безопасность и Речерч',
                                         description: 'Проверка токенов и анализ связей кошельков',
                                         icon: <ShieldCheck className="w-6 h-6 text-rose-500" />,
                                         items: [
@@ -299,50 +305,62 @@ export const MemecoinStrategies: React.FC = () => {
                                             { name: 'HolderScan', url: 'https://holderscan.com', desc: 'Анализ холдеров и кластеров', icon: <Users className="w-5 h-5 text-emerald-400" /> },
                                             { name: 'KolScan', url: 'https://kolscan.io', desc: 'Трекинг KOL-ов и инфлюенсеров', icon: <TrendingUp className="w-5 h-5 text-fuchsia-400" /> },
                                         ]
+                                    },
+                                    {
+                                        title: 'Нарративы',
+                                        description: 'Социальная аналитика и мониторинг внимания',
+                                        icon: <Share2 className="w-6 h-6 text-indigo-500" />,
+                                        items: [
+                                            { name: 'LunarCrush', url: 'https://lunarcrush.com/home?category=cryptocurrencies', desc: 'Социальная и тренд-аналитика: метрики популярности, настроения и роста обсуждений.', icon: <Activity className="w-5 h-5 text-orange-400" /> },
+                                            { name: 'Santiment', url: 'https://app.santiment.net', desc: 'Социальные и он-чейн метрики: упоминания, активность сообщества и поведение держателей.', icon: <BarChart className="w-5 h-5 text-blue-400" /> },
+                                            { name: 'Sharpe AI', url: 'https://sharpe.ai/home/ru', desc: 'Крипто mindshare и тренды: отслеживание доли обсуждений и внимания в реальном времени.', icon: <Brain className="w-5 h-5 text-purple-400" /> },
+                                            { name: 'Coindar', url: 'https://coindar.org', desc: 'Календарь событий: листинги, аирдропы и мероприятия как триггеры нарративов.', icon: <Calendar className="w-5 h-5 text-green-400" /> },
+                                        ]
                                     }
-                                ].filter((_c, i) => i === activeToolCategory).map((category, catIdx) => (
-                                    <div key={catIdx} className="space-y-6">
-                                        <div className="flex items-center gap-3">
-                                            <div className={`p-3 rounded-2xl transition-colors ${theme === 'dark' ? 'bg-white/5 border border-white/10' : 'bg-gray-100 border border-gray-200'}`}>
-                                                {category.icon}
+                                ]
+                                    .filter((_c, i) => i === activeToolCategory).map((category, catIdx) => (
+                                        <div key={catIdx} className="space-y-6">
+                                            <div className="flex items-center gap-3">
+                                                <div className={`p-3 rounded-2xl transition-colors ${theme === 'dark' ? 'bg-white/5 border border-white/10' : 'bg-gray-100 border border-gray-200'}`}>
+                                                    {category.icon}
+                                                </div>
+                                                <div>
+                                                    <h4 className={`text-xl font-bold ${headingColor}`}>{category.title}</h4>
+                                                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{category.description}</p>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <h4 className={`text-xl font-bold ${headingColor}`}>{category.title}</h4>
-                                                <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{category.description}</p>
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                                                {category.items.map((tool, idx) => (
+                                                    <a
+                                                        key={idx}
+                                                        href={tool.url}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className={`group relative p-5 rounded-2xl border transition-all duration-300 hover:shadow-lg ${theme === 'dark'
+                                                            ? 'bg-[#151a21]/50 border-white/5 hover:border-blue-500/30'
+                                                            : 'bg-white border-gray-100 hover:border-blue-500/20'
+                                                            }`}
+                                                    >
+                                                        <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                            <ExternalLink className={`w-4 h-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`} />
+                                                        </div>
+
+                                                        <div className={`p-2.5 rounded-xl w-fit mb-4 ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-50'
+                                                            } group-hover:scale-110 transition-transform`}>
+                                                            {tool.icon}
+                                                        </div>
+
+                                                        <h4 className={`font-bold mb-1 ${headingColor} flex items-center gap-2`}>
+                                                            {tool.name}
+                                                        </h4>
+                                                        <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed">
+                                                            {tool.desc}
+                                                        </p>
+                                                    </a>
+                                                ))}
                                             </div>
                                         </div>
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                                            {category.items.map((tool, idx) => (
-                                                <a
-                                                    key={idx}
-                                                    href={tool.url}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className={`group relative p-5 rounded-2xl border transition-all duration-300 hover:shadow-lg ${theme === 'dark'
-                                                        ? 'bg-[#151a21]/50 border-white/5 hover:border-blue-500/30'
-                                                        : 'bg-white border-gray-100 hover:border-blue-500/20'
-                                                        }`}
-                                                >
-                                                    <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                        <ExternalLink className={`w-4 h-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`} />
-                                                    </div>
-
-                                                    <div className={`p-2.5 rounded-xl w-fit mb-4 ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-50'
-                                                        } group-hover:scale-110 transition-transform`}>
-                                                        {tool.icon}
-                                                    </div>
-
-                                                    <h4 className={`font-bold mb-1 ${headingColor} flex items-center gap-2`}>
-                                                        {tool.name}
-                                                    </h4>
-                                                    <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed">
-                                                        {tool.desc}
-                                                    </p>
-                                                </a>
-                                            ))}
-                                        </div>
-                                    </div>
-                                ))}
+                                    ))}
                             </div>
                         )}
                     </div>
@@ -355,80 +373,6 @@ export const MemecoinStrategies: React.FC = () => {
                 </section>
             )}
 
-            {/* 4. Narrative Tools Block */}
-            {hasToolsAccess ? (
-                <section className="space-y-8">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2 bg-indigo-500/10 rounded-xl border border-indigo-500/20">
-                            <MessageSquare className="w-6 h-6 text-indigo-500" />
-                        </div>
-                        <div>
-                            <h3 className={`text-xl font-black ${headingColor}`}>Инструменты по нарративам</h3>
-                            <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                                Социальная аналитика, тренд-трекинг и мониторинг внимания
-                            </p>
-                        </div>
-                    </div>
-
-                    {!activeToolCategory ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                            {[
-                                {
-                                    name: 'LunarCrush',
-                                    url: 'https://lunarcrush.com/home?category=cryptocurrencies',
-                                    desc: 'Социальная и тренд-аналитика: метрики популярности, настроения и роста обсуждений.',
-                                    icon: <Activity className="w-5 h-5 text-orange-400" />
-                                },
-                                {
-                                    name: 'Santiment',
-                                    url: 'https://app.santiment.net',
-                                    desc: 'Социальные и он-чейн метрики: упоминания, активность сообщества и поведение держателей.',
-                                    icon: <BarChart className="w-5 h-5 text-blue-400" />
-                                },
-                                {
-                                    name: 'Sharpe AI',
-                                    url: 'https://sharpe.ai/home/ru',
-                                    desc: 'Крипто mindshare и тренды: отслеживание доли обсуждений и внимания в реальном времени.',
-                                    icon: <Brain className="w-5 h-5 text-purple-400" />
-                                },
-                                {
-                                    name: 'Coindar',
-                                    url: 'https://coindar.org',
-                                    desc: 'Календарь событий: листинги, аирдропы и мероприятия как триггеры нарративов.',
-                                    icon: <Calendar className="w-5 h-5 text-green-400" />
-                                },
-                            ].map((tool, idx) => (
-                                <a
-                                    key={idx}
-                                    href={tool.url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className={`group relative p-5 rounded-2xl border transition-all duration-300 hover:shadow-lg ${theme === 'dark'
-                                        ? 'bg-[#151a21]/50 border-white/5 hover:border-blue-500/30'
-                                        : 'bg-white border-gray-100 hover:border-blue-500/20'
-                                        }`}
-                                >
-                                    <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <ExternalLink className={`w-4 h-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`} />
-                                    </div>
-
-                                    <div className={`p-2.5 rounded-xl w-fit mb-4 ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-50'
-                                        } group-hover:scale-110 transition-transform`}>
-                                        {tool.icon}
-                                    </div>
-
-                                    <h4 className={`font-bold mb-1 ${headingColor} flex items-center gap-2`}>
-                                        {tool.name}
-                                    </h4>
-                                    <p className="text-xs text-gray-500 line-clamp-3 leading-relaxed">
-                                        {tool.desc}
-                                    </p>
-                                </a>
-                            ))}
-                        </div>
-                    ) : null}
-                </section>
-            ) : null}
         </div>
     )
 }
