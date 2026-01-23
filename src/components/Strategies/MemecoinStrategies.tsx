@@ -25,13 +25,16 @@ import {
     ExternalLink,
     Lock,
     Calendar,
-    ArrowLeft
+    ArrowLeft,
+    Layers
 } from 'lucide-react'
 import { AVFLateVolumeStrategy } from './AVFLateVolumeStrategy'
 import { AVFIntradayStrategy } from './AVFIntradayStrategy'
 import { AVFFlipStrategy } from './AVFFlipStrategy'
+import { AVFFlipFibaStrategy } from './AVFFlipFibaStrategy'
+import { AVFFibaModeStrategy } from './AVFFibaModeStrategy'
 
-type StrategyId = 'late-volume' | 'intraday' | 'flip' | null;
+type StrategyId = 'late-volume' | 'intraday' | 'flip' | 'flip-fiba' | 'fiba-mode' | null;
 
 export const MemecoinStrategies: React.FC = () => {
     const { theme } = useThemeStore()
@@ -69,6 +72,8 @@ export const MemecoinStrategies: React.FC = () => {
         { id: 'late-volume', name: 'AVF Late Volume', icon: <BarChart className="w-4 h-4" /> },
         { id: 'intraday', name: 'AVF Intraday', icon: <Zap className="w-4 h-4" /> },
         { id: 'flip', name: 'AVF FLIP-1S', icon: <Timer className="w-4 h-4" /> },
+        { id: 'flip-fiba', name: 'AVF FLIP + FIBA', icon: <Zap className="w-4 h-4" /> },
+        { id: 'fiba-mode', name: 'AVF - FIBA MODE', icon: <Layers className="w-4 h-4" /> },
     ]
 
     if (loading) {
@@ -133,7 +138,8 @@ export const MemecoinStrategies: React.FC = () => {
                                     <p className={`text-sm leading-relaxed ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                                         {s.id === 'late-volume' ? 'Работа с аномальными объемами на поздних стадиях.' :
                                             s.id === 'intraday' ? 'Внутридневная торговля на основе технического анализа.' :
-                                                'Скоростная торговля на изменениях цены в 1 секунду.'}
+                                                s.id === 'flip' ? 'Скоростная торговля на изменениях цены в 1 секунду.' :
+                                                    'Интрадей-флип токенов Solana pre-migration.'}
                                     </p>
                                     <div className="mt-6 flex items-center gap-2 text-blue-500 font-bold text-xs uppercase tracking-wider">
                                         Подробнее <ExternalLink className="w-3 h-3" />
@@ -159,8 +165,12 @@ export const MemecoinStrategies: React.FC = () => {
                                     <AVFLateVolumeStrategy />
                                 ) : activeStrategy === 'intraday' ? (
                                     <AVFIntradayStrategy />
-                                ) : (
+                                ) : activeStrategy === 'flip' ? (
                                     <AVFFlipStrategy />
+                                ) : activeStrategy === 'flip-fiba' ? (
+                                    <AVFFlipFibaStrategy />
+                                ) : (
+                                    <AVFFibaModeStrategy />
                                 )}
                             </div>
                         </div>
