@@ -19,12 +19,15 @@ import {
     ArrowLeft,
     Twitter,
     Target,
-    Flame
+    Flame,
+    MessageSquare
 } from 'lucide-react'
 import { AftNftSnipingStrategy } from './AftNftSnipingStrategy'
 import { AvfMintFlipStrategy } from './AvfMintFlipStrategy'
+import { AvfNftNarrativeStrategy } from './AvfNftNarrativeStrategy'
+import { TwitterSmartAccountChecklist } from './TwitterSmartAccountChecklist'
 
-type StrategyId = 'nft-sniping' | 'nft-mint-flip' | null;
+type StrategyId = 'nft-sniping' | 'nft-mint-flip' | 'nft-narrative' | 'twitter-checklist' | null;
 
 export const NftStrategies: React.FC = () => {
     const { theme } = useThemeStore()
@@ -35,6 +38,8 @@ export const NftStrategies: React.FC = () => {
     const strategies = [
         { id: 'nft-sniping' as StrategyId, name: 'AVF снайпинг NFT', icon: <Target className="w-4 h-4" />, desc: 'Покупка NFT ниже текущей рыночной цены (флора) с целью быстрой перепродажи.' },
         { id: 'nft-mint-flip' as StrategyId, name: 'AVF Mint → Flip', icon: <Flame className="w-4 h-4" />, desc: 'Покупка на первичном рынке (минт) и перепродажа на хайпе запуска.' },
+        { id: 'nft-narrative' as StrategyId, name: 'AVF торговля NFT на нарративах', icon: <MessageSquare className="w-4 h-4" />, desc: 'Работа с темами, в которые рынок начинает верить. Покупка раньше, продажа на массовом внимании.' },
+        { id: 'twitter-checklist' as StrategyId, name: 'Чек-лист: Smart Twitter', icon: <Twitter className="w-4 h-4" />, desc: 'Как отличить «умный» аккаунт в Twitter (X) от маркетингового шума. 5–6 совпадений — аккаунт стоит внимания.' },
     ]
 
     const categories = [
@@ -166,6 +171,8 @@ export const NftStrategies: React.FC = () => {
                             </div>
                             {activeStrategy === 'nft-sniping' && <AftNftSnipingStrategy />}
                             {activeStrategy === 'nft-mint-flip' && <AvfMintFlipStrategy />}
+                            {activeStrategy === 'nft-narrative' && <AvfNftNarrativeStrategy />}
+                            {activeStrategy === 'twitter-checklist' && <TwitterSmartAccountChecklist />}
                         </div>
                     </div>
                 )}
