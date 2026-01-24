@@ -17,6 +17,7 @@ import {
 import { MemecoinStrategies } from '@/components/Strategies/MemecoinStrategies'
 import { PolymarketStrategies } from '@/components/Strategies/PolymarketStrategies'
 import { NftStrategies } from '@/components/Strategies/NftStrategies'
+import { FuturesStrategies } from '@/components/Strategies/FuturesStrategies'
 
 type TabType = 'memecoins' | 'polymarket' | 'nft' | 'staking' | 'spot' | 'futures' | 'airdrop';
 
@@ -208,6 +209,8 @@ export const Strategies = () => {
                     <PolymarketStrategies />
                 ) : activeTab === 'nft' ? (
                     <NftStrategies />
+                ) : activeTab === 'futures' ? (
+                    <FuturesStrategies />
                 ) : (
                     <div className="py-20 text-center space-y-4">
                         <div className="flex justify-center">

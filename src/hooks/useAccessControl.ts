@@ -20,13 +20,13 @@ export const useAccessControl = (feature: string): AccessResult => {
 
     useEffect(() => {
         const check = async () => {
-            if (!user) {
-                setAccess({ hasAccess: false, loading: false, reason: 'Необходима авторизация' })
+            if (isAdmin) {
+                setAccess({ hasAccess: true, loading: false })
                 return
             }
 
-            if (isAdmin) {
-                setAccess({ hasAccess: true, loading: false })
+            if (!user) {
+                setAccess({ hasAccess: false, loading: false, reason: 'Необходима авторизация' })
                 return
             }
 

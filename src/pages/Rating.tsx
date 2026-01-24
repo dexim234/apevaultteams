@@ -16,7 +16,7 @@ export const Rating = () => {
   const { user } = useAuthStore()
   const { theme } = useThemeStore()
   const { users: allMembers, loading: usersLoading } = useUsers()
-  type RatingWithBreakdown = RatingData & { breakdown?: ReturnType<typeof getRatingBreakdown> }
+  type RatingWithBreakdown = RatingData & { breakdown: ReturnType<typeof getRatingBreakdown> }
   const [ratings, setRatings] = useState<RatingWithBreakdown[]>([])
   const [loading, setLoading] = useState(true)
   const [referrals, setReferrals] = useState<Referral[]>([])
@@ -51,155 +51,166 @@ export const Rating = () => {
       const ninetyDayStart = formatDate(ninetyDayRange.start, 'yyyy-MM-dd')
       const ninetyDayEnd = formatDate(ninetyDayRange.end, 'yyyy-MM-dd')
 
-      const currentReferrals = await getReferrals(undefined, monthIsoStart, monthIsoEnd)
-      setReferrals(currentReferrals)
-      const allRatings: (RatingData & { breakdown?: ReturnType<typeof getRatingBreakdown> })[] = []
+      // 1. Bulk Fetch Data
+      const [
+        currentReferrals,
+        weekEarningsAll,
+        monthEarningsAll,
+        allExistingRatings
+      ] = await Promise.all([
+        getReferrals(undefined, monthIsoStart, monthIsoEnd),
+        getEarnings(undefined, weekStart, weekEnd),
+        getEarnings(undefined, monthStart, monthEnd),
+        getRatingData() // Fetch all ratings at once
+      ])
 
-      console.log('Rating.tsx - allMembers:', allMembers)
-      console.log('Rating.tsx - allMembers.length:', allMembers.length)
-      console.log('Rating.tsx - usersLoading:', usersLoading)
+      setReferrals(currentReferrals)
 
       // Filter out excluded user
       const excludedUserIds = ['ydiEgmNj2sCBirUjWeiv']
       const activeMembers = allMembers.filter(m => !excludedUserIds.includes(m.id))
-      console.log('Rating.tsx - activeMembers after filter:', activeMembers.length)
 
-      for (const member of activeMembers) {
-        console.log('Rating.tsx - Processing member:', member.id, member.name)
-        // Данные для рейтинга
-        const weekEarnings = await getEarnings(member.id, weekStart, weekEnd)
-        // Если у записи несколько участников, сумма делится поровну между ними
-        const weeklyEarnings = weekEarnings.reduce((sum: number, e: Earnings) => {
-          const participantCount = e.participants && e.participants.length > 0 ? e.participants.length : 1
-          return sum + (e.amount / participantCount)
-        }, 0)
+      // 2. Process members in parallel
+      const ratingPromises = activeMembers.map(async (member) => {
+        try {
+          // Earnings filtering (in memory from bulk data)
+          const weekEarnings = weekEarningsAll.filter(e => {
+            const participants = e.participants && e.participants.length > 0 ? [...e.participants, e.userId] : [e.userId]
+            return participants.includes(member.id)
+          })
 
-        const monthEarnings = await getEarnings(member.id, monthStart, monthEnd)
-        // Если у записи несколько участников, сумма делится поровну между ними
-        const totalEarnings = monthEarnings.reduce((sum: number, e: Earnings) => {
-          const participantCount = e.participants && e.participants.length > 0 ? e.participants.length : 1
-          return sum + (e.amount / participantCount)
-        }, 0)
-        const poolAmount = monthEarnings.reduce((sum: number, e: Earnings) => {
-          const participantCount = e.participants && e.participants.length > 0 ? e.participants.length : 1
-          return sum + (e.poolAmount / participantCount)
-        }, 0)
+          const weeklyEarnings = weekEarnings.reduce((sum: number, e: Earnings) => {
+            const participantCount = e.participants && e.participants.length > 0 ? e.participants.length : 1
+            return sum + (e.amount / participantCount)
+          }, 0)
 
-        const statuses = await getDayStatuses(member.id)
-        // Filter statuses that overlap with the month period
-        const monthStatuses = statuses.filter(s => {
-          const statusStart = s.date
-          const statusEnd = s.endDate || s.date
-          return statusStart <= monthEnd && statusEnd >= monthStart
-        })
-        // Count days, not just status count (for multi-day statuses)
-        const daysOff = monthStatuses
-          .filter(s => s.type === 'dayoff')
-          .reduce((sum: number, s: DayStatus) => sum + countDaysInPeriod(s.date, s.endDate, monthStart, monthEnd), 0)
-        const sickDays = monthStatuses
-          .filter(s => s.type === 'sick')
-          .reduce((sum: number, s: DayStatus) => sum + countDaysInPeriod(s.date, s.endDate, monthStart, monthEnd), 0)
-        const vacationDays = monthStatuses
-          .filter(s => s.type === 'vacation')
-          .reduce((sum: number, s: DayStatus) => sum + countDaysInPeriod(s.date, s.endDate, monthStart, monthEnd), 0)
-        const absenceDays = monthStatuses
-          .filter(s => s.type === 'absence')
-          .reduce((sum: number, s: DayStatus) => sum + countDaysInPeriod(s.date, s.endDate, monthStart, monthEnd), 0)
-        const truancyDays = monthStatuses
-          .filter(s => s.type === 'truancy')
-          .reduce((sum: number, s: DayStatus) => sum + countDaysInPeriod(s.date, s.endDate, monthStart, monthEnd), 0)
-        const internshipDays = monthStatuses
-          .filter(s => s.type === 'internship')
-          .reduce((sum: number, s: DayStatus) => sum + countDaysInPeriod(s.date, s.endDate, monthStart, monthEnd), 0)
+          const monthEarnings = monthEarningsAll.filter(e => {
+            const participants = e.participants && e.participants.length > 0 ? [...e.participants, e.userId] : [e.userId]
+            return participants.includes(member.id)
+          })
 
-        // Недельные выходные и больничные
-        const weekStatuses = statuses.filter(s => {
-          const statusStart = s.date
-          const statusEnd = s.endDate || s.date
-          return statusStart <= weekEnd && statusEnd >= weekStart
-        })
+          const totalEarnings = monthEarnings.reduce((sum: number, e: Earnings) => {
+            const participantCount = e.participants && e.participants.length > 0 ? e.participants.length : 1
+            return sum + (e.amount / participantCount)
+          }, 0)
 
-        const weeklyDaysOff = weekStatuses
-          .filter(s => s.type === 'dayoff')
-          .reduce((sum: number, s: DayStatus) => sum + countDaysInPeriod(s.date, s.endDate, weekStart, weekEnd), 0)
-        const weeklySickDays = weekStatuses
-          .filter(s => s.type === 'sick')
-          .reduce((sum: number, s: DayStatus) => sum + countDaysInPeriod(s.date, s.endDate, weekStart, weekEnd), 0)
+          const poolAmount = monthEarnings.reduce((sum: number, e: Earnings) => {
+            const participantCount = e.participants && e.participants.length > 0 ? e.participants.length : 1
+            return sum + (e.poolAmount / participantCount)
+          }, 0)
 
-        // Отпуск за 90 дней
-        const ninetyDayStatuses = statuses.filter(s => {
-          const statusStart = s.date
-          const statusEnd = s.endDate || s.date
-          return statusStart <= ninetyDayEnd && statusEnd >= ninetyDayStart
-        })
+          // Individual fetches (still necessary, but parallelized)
+          const [statuses, slots] = await Promise.all([
+            getDayStatuses(member.id),
+            getWorkSlots(member.id)
+          ])
 
-        const ninetyDayVacationDays = ninetyDayStatuses
-          .filter(s => s.type === 'vacation')
-          .reduce((sum, s) => sum + countDaysInPeriod(s.date, s.endDate, ninetyDayStart, ninetyDayEnd), 0)
+          // Filter statuses that overlap with the month period
+          const monthStatuses = statuses.filter(s => {
+            const statusStart = s.date
+            const statusEnd = s.endDate || s.date
+            return statusStart <= monthEnd && statusEnd >= monthStart
+          })
 
-        const slots = await getWorkSlots(member.id)
-        const weekSlots = slots.filter(s => s.date >= weekStart && s.date <= weekEnd)
-        const weeklyHours = weekSlots.reduce((sum, slot) => sum + calculateHours(slot.slots), 0)
+          const countStatusDays = (type: string) => monthStatuses
+            .filter(s => s.type === type)
+            .reduce((sum: number, s: DayStatus) => sum + countDaysInPeriod(s.date, s.endDate, monthStart, monthEnd), 0)
 
-        // Для статистики используем общее количество из ratings
-        const existingRatings = await getRatingData(member.id)
-        const ratingData = existingRatings[0] || {
-          userId: member.id,
-          earnings: 0,
-          messages: 0,
-          initiatives: 0,
-          signals: 0,
-          profitableSignals: 0,
-          referrals: 0,
-          daysOff: 0,
-          sickDays: 0,
-          vacationDays: 0,
-          absenceDays: 0,
-          internshipDays: 0,
-          poolAmount: 0,
-          rating: 0,
-          lastUpdated: new Date().toISOString(),
+          const daysOff = countStatusDays('dayoff')
+          const sickDays = countStatusDays('sick')
+          const vacationDays = countStatusDays('vacation')
+          const absenceDays = countStatusDays('absence')
+          const truancyDays = countStatusDays('truancy')
+          const internshipDays = countStatusDays('internship')
+
+          // Недельные выходные и больничные
+          const weekStatuses = statuses.filter(s => {
+            const statusStart = s.date
+            const statusEnd = s.endDate || s.date
+            return statusStart <= weekEnd && statusEnd >= weekStart
+          })
+
+          const weeklyDaysOff = weekStatuses
+            .filter(s => s.type === 'dayoff')
+            .reduce((sum: number, s: DayStatus) => sum + countDaysInPeriod(s.date, s.endDate, weekStart, weekEnd), 0)
+          const weeklySickDays = weekStatuses
+            .filter(s => s.type === 'sick')
+            .reduce((sum: number, s: DayStatus) => sum + countDaysInPeriod(s.date, s.endDate, weekStart, weekEnd), 0)
+
+          // Отпуск за 90 дней
+          const ninetyDayStatuses = statuses.filter(s => {
+            const statusStart = s.date
+            const statusEnd = s.endDate || s.date
+            return statusStart <= ninetyDayEnd && statusEnd >= ninetyDayStart
+          })
+
+          const ninetyDayVacationDays = ninetyDayStatuses
+            .filter(s => s.type === 'vacation')
+            .reduce((sum, s) => sum + countDaysInPeriod(s.date, s.endDate, ninetyDayStart, ninetyDayEnd), 0)
+
+          const weekSlots = slots.filter(s => s.date >= weekStart && s.date <= weekEnd)
+          const weeklyHours = weekSlots.reduce((sum, slot) => sum + calculateHours(slot.slots), 0)
+
+          // Find existing rating data
+          const existingRatingData = allExistingRatings.find(r => r.userId === member.id)
+          const ratingData = existingRatingData || {
+            userId: member.id,
+            earnings: 0,
+            messages: 0,
+            initiatives: 0,
+            signals: 0,
+            profitableSignals: 0,
+            referrals: 0,
+            daysOff: 0,
+            sickDays: 0,
+            vacationDays: 0,
+            absenceDays: 0,
+            internshipDays: 0,
+            poolAmount: 0,
+            rating: 0,
+            lastUpdated: new Date().toISOString(),
+          }
+
+          const userReferrals = currentReferrals.filter((referral) => referral.ownerId === member.id).length
+
+          const updatedData: Omit<RatingData, 'rating'> = {
+            userId: member.id,
+            earnings: totalEarnings,
+            messages: ratingData.messages || 0,
+            initiatives: ratingData.initiatives || 0,
+            signals: ratingData.signals || 0,
+            profitableSignals: ratingData.profitableSignals || 0,
+            referrals: userReferrals,
+            daysOff,
+            sickDays,
+            vacationDays,
+            absenceDays,
+            truancyDays,
+            internshipDays,
+            poolAmount,
+            lastUpdated: new Date().toISOString(),
+          }
+
+          const rating = calculateRating(updatedData, weeklyHours, weeklyEarnings, weeklyDaysOff, weeklySickDays, ninetyDayVacationDays)
+          const breakdown = getRatingBreakdown(updatedData, weeklyHours, weeklyEarnings, weeklyDaysOff, weeklySickDays, ninetyDayVacationDays)
+
+          return {
+            ...updatedData,
+            rating,
+            breakdown,
+          }
+        } catch (err) {
+          console.error(`Error processing rating for member ${member.id}:`, err)
+          return null
         }
+      })
 
-        const userReferrals = currentReferrals.filter((referral) => referral.ownerId === member.id).length
-
-        const updatedData: Omit<RatingData, 'rating'> = {
-          userId: member.id,
-          earnings: totalEarnings,
-          messages: ratingData.messages || 0,
-          initiatives: ratingData.initiatives || 0,
-          signals: ratingData.signals || 0,
-          profitableSignals: ratingData.profitableSignals || 0,
-          referrals: userReferrals,
-          daysOff,
-          sickDays,
-          vacationDays,
-          absenceDays,
-          truancyDays,
-          internshipDays,
-          poolAmount,
-          lastUpdated: new Date().toISOString(),
-        }
-
-        const rating = calculateRating(updatedData, weeklyHours, weeklyEarnings, weeklyDaysOff, weeklySickDays, ninetyDayVacationDays)
-        const breakdown = getRatingBreakdown(updatedData, weeklyHours, weeklyEarnings, weeklyDaysOff, weeklySickDays, ninetyDayVacationDays)
-
-        allRatings.push({
-          ...updatedData,
-          rating,
-          breakdown,
-        })
-      }
+      const results = await Promise.all(ratingPromises)
+      const validRatings = results.filter((r): r is RatingWithBreakdown => r !== null)
 
       // Sort by rating
-      allRatings.sort((a, b) => b.rating - a.rating)
-      console.log('Rating.tsx - allRatings after sort:', allRatings)
-      console.log('Rating.tsx - allRatings length:', allRatings.length)
-      console.log('Rating.tsx - first rating breakdown:', allRatings[0]?.breakdown)
-      setRatings(allRatings)
-
-
-
+      validRatings.sort((a, b) => b.rating - a.rating)
+      setRatings(validRatings)
     } catch (error) {
       console.error('Error loading ratings:', error)
     } finally {
