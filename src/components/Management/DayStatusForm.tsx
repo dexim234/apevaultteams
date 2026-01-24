@@ -30,7 +30,12 @@ export const DayStatusForm = ({ type, status, onClose, onSave }: DayStatusFormPr
   const [endDate, setEndDate] = useState(status?.endDate || initialDate)
   const [isMultiDay, setIsMultiDay] = useState(!!status?.endDate)
   const [comment, setComment] = useState(status?.comment || '')
-  const [selectedType, setSelectedType] = useState<'dayoff' | 'sick' | 'vacation' | 'absence' | 'truancy' | 'internship' | null>(type || status?.type || null)
+  const [selectedType, setSelectedType] = useState<'dayoff' | 'sick' | 'vacation' | 'absence' | 'truancy' | 'internship' | null>(
+    type || 
+    (status?.type && ['dayoff', 'sick', 'vacation', 'absence', 'truancy', 'internship'].includes(status.type) 
+      ? (status.type as 'dayoff' | 'sick' | 'vacation' | 'absence' | 'truancy' | 'internship') 
+      : null)
+  )
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [dateMode, setDateMode] = useState<'single' | 'range' | 'multiple'>('single')
@@ -1064,7 +1069,7 @@ export const DayStatusForm = ({ type, status, onClose, onSave }: DayStatusFormPr
               )}
 
               <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 pt-2">
-                {status && isAdmin && adminOnlyTypes.includes(status.type) && (
+                {status && isAdmin && (adminOnlyTypes as readonly string[]).includes(status.type) && (
                   <button
                     onClick={handleDelete}
                     className="px-4 py-2.5 sm:py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg sm:rounded-xl transition-colors text-sm sm:text-base font-medium touch-manipulation active:scale-95 flex items-center justify-center gap-2"
