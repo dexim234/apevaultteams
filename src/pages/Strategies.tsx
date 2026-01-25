@@ -12,15 +12,17 @@ import {
     Zap,
     Gift,
     X,
-    LayoutGrid
+    LayoutGrid,
+    MoreHorizontal
 } from 'lucide-react'
 import { MemecoinStrategies } from '@/components/Strategies/MemecoinStrategies'
 import { PolymarketStrategies } from '@/components/Strategies/PolymarketStrategies'
 import { NftStrategies } from '@/components/Strategies/NftStrategies'
 import { FuturesStrategies } from '@/components/Strategies/FuturesStrategies'
 import { AirDropStrategies } from '@/components/Strategies/AirDropStrategies'
+import { OtherStrategies } from '@/components/Strategies/OtherStrategies'
 
-type TabType = 'memecoins' | 'polymarket' | 'nft' | 'staking' | 'spot' | 'futures' | 'airdrop';
+type TabType = 'memecoins' | 'polymarket' | 'nft' | 'staking' | 'spot' | 'futures' | 'airdrop' | 'other';
 
 export const Strategies = () => {
     const { theme } = useThemeStore()
@@ -37,6 +39,7 @@ export const Strategies = () => {
     const spotAccess = useAccessControl('tools_kontur_spot')
     const futuresAccess = useAccessControl('tools_kontur_futures')
     const airdropAccess = useAccessControl('tools_kontur_airdrop')
+    const otherAccess = useAccessControl('tools_kontur_other')
 
     const tabs: { id: TabType; label: string; icon: any; access: { hasAccess: boolean; loading: boolean } }[] = [
         { id: 'memecoins', label: 'Мемкоины', icon: <Rocket className="w-4 h-4" />, access: memecoinsAccess },
@@ -46,6 +49,7 @@ export const Strategies = () => {
         { id: 'spot', label: 'Спот', icon: <Wallet2 className="w-4 h-4" />, access: spotAccess },
         { id: 'futures', label: 'Фьючерсы', icon: <Zap className="w-4 h-4" />, access: futuresAccess },
         { id: 'airdrop', label: 'AirDrop', icon: <Gift className="w-4 h-4" />, access: airdropAccess },
+        { id: 'other', label: 'Прочее', icon: <MoreHorizontal className="w-4 h-4" />, access: otherAccess },
     ]
 
     const visibleTabs = tabs.filter(t => t.access.hasAccess)
@@ -214,6 +218,8 @@ export const Strategies = () => {
                     <FuturesStrategies />
                 ) : activeTab === 'airdrop' ? (
                     <AirDropStrategies />
+                ) : activeTab === 'other' ? (
+                    <OtherStrategies />
                 ) : (
                     <div className="py-20 text-center space-y-4">
                         <div className="flex justify-center">
