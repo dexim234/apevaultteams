@@ -18,7 +18,7 @@ import {
 import { MemecoinStrategies } from '@/components/Strategies/MemecoinStrategies'
 import { PolymarketStrategies } from '@/components/Strategies/PolymarketStrategies'
 import { NftStrategies } from '@/components/Strategies/NftStrategies'
-import FuturesStrategies from '@/components/Strategies/FuturesStrategies'
+import { FuturesStrategies } from '@/components/Strategies/FuturesStrategies'
 import { AirDropStrategies } from '@/components/Strategies/AirDropStrategies'
 import { OtherStrategies } from '@/components/Strategies/OtherStrategies'
 

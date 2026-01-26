@@ -39,7 +39,7 @@ const StrategyStep: React.FC<StrategyStepProps> = ({ number, title, children, ic
                 className="w-full flex items-center justify-between p-5 text-left transition-colors hover:bg-white/5"
             >
                 <div className="flex items-center gap-4">
-                    <div className={`flex items-center justify-center w-10 h-10 rounded-xl font-black text-lg ${theme === 'dark' ? 'bg-blue-500/20 text-blue-400' : 'bg-blue-50 text-blue-600'
+                    <div className={`flex items-center justify-center w-10 h-10 rounded-xl font-black text-lg ${theme === 'dark' ? 'bg-red-500/20 text-red-400' : 'bg-red-50 text-red-600'
                         }`}>
                         {number}
                     </div>
@@ -80,14 +80,14 @@ export const AvfEventTradingStrategy: React.FC = () => {
         <div className="space-y-8 animate-fade-in">
             {/* Strategy Intro */}
             <div className={`relative overflow-hidden rounded-3xl p-8 border ${theme === 'dark'
-                    ? 'bg-gradient-to-br from-[#1a212a] to-[#0f1216] border-blue-500/20 shadow-2xl'
-                    : 'bg-gradient-to-br from-white to-blue-50/30 border-blue-500/10 shadow-xl'
+                    ? 'bg-gradient-to-br from-[#1a212a] to-[#0f1216] border-red-500/20 shadow-2xl'
+                    : 'bg-gradient-to-br from-white to-red-50/30 border-red-500/10 shadow-xl'
                 }`}>
-                <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 blur-3xl rounded-full -mr-20 -mt-20 pointer-events-none"></div>
+                <div className="absolute top-0 right-0 w-64 h-64 bg-red-500/5 blur-3xl rounded-full -mr-20 -mt-20 pointer-events-none"></div>
 
                 <div className="relative flex flex-col md:flex-row gap-8 items-start">
-                    <div className={`p-4 rounded-2xl ${theme === 'dark' ? 'bg-blue-500/10' : 'bg-blue-500/5'}`}>
-                        <Megaphone className={`w-12 h-12 ${theme === 'dark' ? 'text-blue-400' : 'text-blue-500'}`} />
+                    <div className={`p-4 rounded-2xl ${theme === 'dark' ? 'bg-red-500/10' : 'bg-red-500/5'}`}>
+                        <Megaphone className={`w-12 h-12 ${theme === 'dark' ? 'text-red-400' : 'text-red-500'}`} />
                     </div>
                     <div className="flex-1 space-y-4">
                         <h2 className={`text-2xl md:text-3xl font-black ${headingColor}`}>AVF — Event Trading</h2>
@@ -105,7 +105,7 @@ export const AvfEventTradingStrategy: React.FC = () => {
                                 <Brain className="w-3.5 h-3.5" />
                                 IMPULSE REACTION
                             </div>
-                            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold ${theme === 'dark' ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' : 'bg-blue-50 text-blue-600 border border-blue-200'
+                            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold ${theme === 'dark' ? 'bg-red-500/10 text-red-400 border border-red-500/20' : 'bg-red-50 text-red-600 border border-red-200'
                                 }`}>
                                 <TrendingUp className="w-3.5 h-3.5" />
                                 QUICK MOVES
@@ -116,14 +116,14 @@ export const AvfEventTradingStrategy: React.FC = () => {
             </div>
 
             {/* Key Principle */}
-            <div className={`rounded-2xl p-6 border-l-8 ${theme === 'dark' ? 'bg-blue-500/5 border-blue-500/50' : 'bg-blue-50 border-blue-500/30'
+            <div className={`rounded-2xl p-6 border-l-8 ${theme === 'dark' ? 'bg-red-500/5 border-red-500/50' : 'bg-red-50 border-red-500/30'
                 }`}>
                 <div className="flex gap-4 items-start">
-                    <TrendingUp className="w-8 h-8 text-blue-500 shrink-0" />
+                    <TrendingUp className="w-8 h-8 text-red-500 shrink-0" />
                     <div className="space-y-2">
                         <h4 className={`text-lg font-black ${headingColor}`}>В чём логика</h4>
                         <p className={`text-sm leading-relaxed ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                            Рынок очень чувствителен к крупным событиям: отчёты компаний, макроэкономика, новости регуляторов, неожиданные заявления. В первые минуты после новости часто происходят резкие движения: цена скачет, импульс может быть огромным. Наша задача — сразу понять, кто управляет движением, и подключиться к уже сформированному импульсу. Это не «догоняющая» торговля. Мы не пытаемся предугадать реакцию. Мы работаем с тем, что рынок уже показал.
+                            Рынок очень чувствителен к крупным событиям: отчёты компаний, макроэкономика, новости регуляторов, неожиданные заявления. В первые минуты после новости часто происходят резкие движения: цена скачет, импульс может быть огромным. Наша задача — сразу понять, кто управляет движением, и подключиться к уже сформированному импульсу.
                         </p>
                         <p className={`text-sm italic mt-4 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>
                             Это не «догоняющая» торговля. Мы не пытаемся предугадать реакцию. Мы работаем с тем, что рынок уже показал.
@@ -136,7 +136,7 @@ export const AvfEventTradingStrategy: React.FC = () => {
                 {/* Main Steps */}
                 <div className="lg:col-span-2 space-y-4">
                     <div className="flex items-center gap-3 mb-2">
-                        <Newspaper className={`w-6 h-6 ${theme === 'dark' ? 'text-blue-400' : 'text-blue-500'}`} />
+                        <Newspaper className={`w-6 h-6 ${theme === 'dark' ? 'text-red-400' : 'text-red-500'}`} />
                         <h3 className={`text-xl font-black ${headingColor}`}>Как применять стратегию</h3>
                     </div>
 
@@ -192,9 +192,7 @@ export const AvfEventTradingStrategy: React.FC = () => {
                             <li>Импульс подтверждается объёмом или повторной свечой в сторону движения.</li>
                             <li>Цена корректируется, возвращаясь к ключевому уровню (иногда — к VWAP, иногда — к последнему локальному максимуму/минимуму).</li>
                         </ul>
-                        <div className={`mt-4 p-4 rounded-xl border ${theme === 'dark' ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-emerald-50 border-emerald-500/20'}
-                        }
-                        `}>
+                        <div className={`mt-4 p-4 rounded-xl border ${theme === 'dark' ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-emerald-50 border-emerald-500/20'}`}>
                             <p className="text-sm">
                                 <strong>В этот момент мы входим по движению</strong>, а не на догадке «куда пойдёт цена».
                             </p>
@@ -243,25 +241,29 @@ export const AvfEventTradingStrategy: React.FC = () => {
                     <div className={`rounded-2xl p-6 border ${theme === 'dark' ? 'bg-[#151a21]/80 border-white/5' : 'bg-white border-gray-100'
                         } shadow-lg space-y-4`}>
                         <div className="flex items-center gap-3">
-                            <BarChart2 className={`w-6 h-6 text-blue-500`} />
+                            <BarChart2 className={`w-6 h-6 text-red-500`} />
                             <h3 className={`text-lg font-black ${headingColor}`}>Ключевые параметры</h3>
                         </div>
 
                         <div className="space-y-3">
                             <div className={`p-3 rounded-xl ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-50'}`}>
-                                <p className="text-xs font-bold text-blue-500">Крупные новости: макроэкономика, отчёты, регуляторы</p>
+                                <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Катализатор</p>
+                                <p className="font-bold text-red-500">Крупные новости: макроэкономика, отчёты, регуляторы</p>
                                 <p className="text-xs text-gray-500 mt-1">Только события, которые реально двигают рынок</p>
                             </div>
                             <div className={`p-3 rounded-xl ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-50'}`}>
-                                <p className="text-xs font-bold text-blue-500">Ключевые уровни, диапазон, волатильность</p>
+                                <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Подготовка</p>
+                                <p className="font-bold text-red-500">Ключевые уровни, диапазон, волатильность</p>
                                 <p className="text-xs text-gray-500 mt-1">Заранее знаем стоп и цель</p>
                             </div>
                             <div className={`p-3 rounded-xl ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-50'}`}>
-                                <p className="text-xs font-bold text-blue-500">По импульсу после коррекции к уровню</p>
+                                <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Вход</p>
+                                <p className="font-bold text-red-500">По импульсу после коррекции к уровню</p>
                                 <p className="text-xs text-gray-500 mt-1">Работаем с тем, что рынок уже показал</p>
                             </div>
                             <div className={`p-3 rounded-xl ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-50'}`}>
-                                <p className="text-xs font-bold text-blue-500">Короткий, за локальный экстремум</p>
+                                <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Стоп-лосс</p>
+                                <p className="font-bold text-red-500">Короткий, за локальный экстремум</p>
                                 <p className="text-xs text-gray-500 mt-1">Сделка отменяется при пробое уровня</p>
                             </div>
                         </div>
@@ -325,11 +327,11 @@ export const AvfEventTradingStrategy: React.FC = () => {
 
             {/* Example Case */}
             <div className={`rounded-3xl p-8 border ${theme === 'dark'
-                    ? 'bg-gradient-to-br from-[#1a212a] to-[#0f1216] border-blue-500/20'
-                    : 'bg-gradient-to-br from-white to-blue-50/30 border-blue-500/10'
+                    ? 'bg-gradient-to-br from-[#1a212a] to-[#0f1216] border-red-500/20'
+                    : 'bg-gradient-to-br from-white to-red-50/30 border-red-500/10'
                 } shadow-xl`}>
                 <h3 className={`text-xl font-black ${headingColor} mb-4 flex items-center gap-3`}>
-                    <Lightbulb className="w-6 h-6 text-blue-500" />
+                    <Lightbulb className="w-6 h-6 text-red-500" />
                     Пример сделки
                 </h3>
                 <div className="space-y-4">
@@ -355,7 +357,7 @@ export const AvfEventTradingStrategy: React.FC = () => {
                         </div>
                     </div>
                     
-                    <div className={`p-4 rounded-xl ${theme === 'dark' ? 'bg-blue-500/10 border border-blue-500/20' : 'bg-blue-50 border border-blue-500/20'}`}>
+                    <div className={`p-4 rounded-xl ${theme === 'dark' ? 'bg-red-500/10 border border-red-500/20' : 'bg-red-50 border border-red-500/20'}`}>
                         <p className="text-sm font-bold mb-2">🎯 Вход</p>
                         <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                             <strong>Входим в лонг.</strong> Стоп — под экстремум перед импульсом.
@@ -372,10 +374,10 @@ export const AvfEventTradingStrategy: React.FC = () => {
             </div>
 
             {/* Final Logic Footer */}
-            <div className={`rounded-2xl p-6 border-l-8 ${theme === 'dark' ? 'bg-[#0b1015] border-blue-500/50' : 'bg-gray-50 border-blue-500/30'
+            <div className={`rounded-2xl p-6 border-l-8 ${theme === 'dark' ? 'bg-[#0b1015] border-red-500/50' : 'bg-gray-50 border-red-500/30'
                 }`}>
                 <div className="flex gap-4 items-start">
-                    <Megaphone className="w-8 h-8 text-blue-500 shrink-0" />
+                    <Megaphone className="w-8 h-8 text-red-500 shrink-0" />
                     <div className="space-y-2">
                         <h4 className={`text-lg font-black ${headingColor}`}>Суть стратегии</h4>
                         <p className={`text-sm leading-relaxed ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
@@ -387,4 +389,3 @@ export const AvfEventTradingStrategy: React.FC = () => {
         </div>
     )
 }
-// ... остальной код ...

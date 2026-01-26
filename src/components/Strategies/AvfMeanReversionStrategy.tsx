@@ -40,7 +40,7 @@ const StrategyStep: React.FC<StrategyStepProps> = ({ number, title, children, ic
                 className="w-full flex items-center justify-between p-5 text-left transition-colors hover:bg-white/5"
             >
                 <div className="flex items-center gap-4">
-                    <div className={`flex items-center justify-center w-10 h-10 rounded-xl font-black text-lg ${theme === 'dark' ? 'bg-blue-500/20 text-blue-400' : 'bg-blue-50 text-blue-600'
+                    <div className={`flex items-center justify-center w-10 h-10 rounded-xl font-black text-lg ${theme === 'dark' ? 'bg-indigo-500/20 text-indigo-400' : 'bg-indigo-50 text-indigo-600'
                         }`}>
                         {number}
                     </div>
@@ -81,14 +81,14 @@ export const AvfMeanReversionStrategy: React.FC = () => {
         <div className="space-y-8 animate-fade-in">
             {/* Strategy Intro */}
             <div className={`relative overflow-hidden rounded-3xl p-8 border ${theme === 'dark'
-                    ? 'bg-gradient-to-br from-[#1a212a] to-[#0f1216] border-blue-500/20 shadow-2xl'
-                    : 'bg-gradient-to-br from-white to-blue-50/30 border-blue-500/10 shadow-xl'
+                    ? 'bg-gradient-to-br from-[#1a212a] to-[#0f1216] border-indigo-500/20 shadow-2xl'
+                    : 'bg-gradient-to-br from-white to-indigo-50/30 border-indigo-500/10 shadow-xl'
                 }`}>
-                <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 blur-3xl rounded-full -mr-20 -mt-20 pointer-events-none"></div>
+                <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 blur-3xl rounded-full -mr-20 -mt-20 pointer-events-none"></div>
 
                 <div className="relative flex flex-col md:flex-row gap-8 items-start">
-                    <div className={`p-4 rounded-2xl ${theme === 'dark' ? 'bg-blue-500/10' : 'bg-blue-500/5'}`}>
-                        <ArrowDownUp className={`w-12 h-12 ${theme === 'dark' ? 'text-blue-400' : 'text-blue-500'}`} />
+                    <div className={`p-4 rounded-2xl ${theme === 'dark' ? 'bg-indigo-500/10' : 'bg-indigo-500/5'}`}>
+                        <ArrowDownUp className={`w-12 h-12 ${theme === 'dark' ? 'text-indigo-400' : 'text-indigo-500'}`} />
                     </div>
                     <div className="flex-1 space-y-4">
                         <h2 className={`text-2xl md:text-3xl font-black ${headingColor}`}>AVF — Mean Reversion</h2>
@@ -101,12 +101,12 @@ export const AvfMeanReversionStrategy: React.FC = () => {
                                 <Activity className="w-3.5 h-3.5" />
                                 CONTRARIAN
                             </div>
-                            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold ${theme === 'dark' ? 'bg-white/5 text-gray-400 border border-white/10' : 'bg-gray-100 text-gray-600 border border-gray-200'
+                            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold ${theme === 'dark' ? 'bg-gray-100 text-gray-600 border border-gray-200' : 'bg-gray-100 text-gray-600 border border-gray-200'
                                 }`}>
                                 <Brain className="w-3.5 h-3.5" />
                                 EXTREME ANALYSIS
                             </div>
-                            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold ${theme === 'dark' ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' : 'bg-blue-50 text-blue-600 border border-blue-200'
+                            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold ${theme === 'dark' ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20' : 'bg-indigo-50 text-indigo-600 border border-indigo-200'
                                 }`}>
                                 <Target className="w-3.5 h-3.5" />
                                 SWING TRADING
@@ -117,13 +117,13 @@ export const AvfMeanReversionStrategy: React.FC = () => {
             </div>
 
             {/* Key Principle */}
-            <div className={`rounded-2xl p-6 border-l-8 ${theme === 'dark' ? 'bg-blue-500/5 border-blue-500/50' : 'bg-blue-50 border-blue-500/30'
+            <div className={`rounded-2xl p-6 border-l-8 ${theme === 'dark' ? 'bg-indigo-500/5 border-indigo-500/50' : 'bg-indigo-50 border-indigo-500/30'
                 }`}>
                 <div className="flex gap-4 items-start">
-                    <Scale className="w-8 h-8 text-blue-500 shrink-0" />
+                    <Scale className="w-8 h-8 text-indigo-500 shrink-0" />
                     <div className="space-y-2">
                         <h4 className={`text-lg font-black ${headingColor}`}>В чём здесь логика</h4>
-                        <p className={`text-sm leading-relaxed ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                        <p className={`text-sm leading-relaxed ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                             Большая часть реальных объёмов в течение дня проходит около справедливой цены. Для нас это VWAP или, в более простом виде, средняя зона диапазона. Когда цена резко уходит слишком далеко от этой зоны, она часто возвращается. Не потому что «должна», а потому что:
                         </p>
                         <ul className="list-disc list-inside text-sm mt-2 space-y-1">
@@ -139,7 +139,7 @@ export const AvfMeanReversionStrategy: React.FC = () => {
                 {/* Main Steps */}
                 <div className="lg:col-span-2 space-y-4">
                     <div className="flex items-center gap-3 mb-2">
-                        <LineChart className={`w-6 h-6 ${theme === 'dark' ? 'text-blue-400' : 'text-blue-500'}`} />
+                        <LineChart className={`w-6 h-6 ${theme === 'dark' ? 'text-indigo-400' : 'text-indigo-500'}`} />
                         <h3 className={`text-xl font-black ${headingColor}`}>Как применять стратегию</h3>
                     </div>
 
@@ -265,29 +265,29 @@ export const AvfMeanReversionStrategy: React.FC = () => {
                     <div className={`rounded-2xl p-6 border ${theme === 'dark' ? 'bg-[#151a21]/80 border-white/5' : 'bg-white border-gray-100'
                         } shadow-lg space-y-4`}>
                         <div className="flex items-center gap-3">
-                            <BarChart2 className={`w-6 h-6 text-blue-500`} />
+                            <BarChart2 className={`w-6 h-6 text-indigo-500`} />
                             <h3 className={`text-lg font-black ${headingColor}`}>Ключевые параметры</h3>
                         </div>
 
                         <div className="space-y-3">
                             <div className={`p-3 rounded-xl ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-50'}`}>
                                 <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Условия рынка</p>
-                                <p className="font-bold text-blue-500">Флэт или умеренный тренд. Нет сильных новостей.</p>
+                                <p className="font-bold text-indigo-500">Флэт или умеренный тренд. Нет сильных новостей.</p>
                                 <p className="text-xs text-gray-500 mt-1">Крайне важен правильный контекст рынка</p>
                             </div>
                             <div className={`p-3 rounded-xl ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-50'}`}>
                                 <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Сигналы входа</p>
-                                <p className="font-bold text-blue-500">VWAP, Bollinger Bands, Затухание импульса</p>
+                                <p className="font-bold text-indigo-500">VWAP, Bollinger Bands, Затухание импульса</p>
                                 <p className="text-xs text-gray-500 mt-1">Совпадение нескольких факторов</p>
                             </div>
                             <div className={`p-3 rounded-xl ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-50'}`}>
                                 <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Стоп-лосс</p>
-                                <p className="font-bold text-blue-500">Короткий, жёсткий, за экстремум</p>
+                                <p className="font-bold text-indigo-500">Короткий, жёсткий, за экстремум</p>
                                 <p className="text-xs text-gray-500 mt-1">Идея отменяется при обновлении экстремума</p>
                             </div>
-                            <div className={`p-3 rounded-xl ${theme === 'dark' ? 'bg-blue-50 border-blue-500/20' : 'bg-blue-50 border-blue-500/20'}`}>
+                            <div className={`p-3 rounded-xl ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-50'}`}>
                                 <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Цель</p>
-                                <p className="font-bold text-blue-500">Возврат к VWAP / середине диапазона</p>
+                                <p className="font-bold text-indigo-500">Возврат к VWAP / середине диапазона</p>
                                 <p className="text-xs text-gray-500 mt-1">Быстрое движение, не пересиживаем</p>
                             </div>
                         </div>
@@ -351,11 +351,11 @@ export const AvfMeanReversionStrategy: React.FC = () => {
 
             {/* Example Case */}
             <div className={`rounded-3xl p-8 border ${theme === 'dark'
-                    ? 'bg-gradient-to-br from-[#1a212a] to-[#0f1216] border-blue-500/20'
-                    : 'bg-gradient-to-br from-white to-blue-50/30 border-blue-500/10'
+                    ? 'bg-gradient-to-br from-[#1a212a] to-[#0f1216] border-indigo-500/20'
+                    : 'bg-gradient-to-br from-white to-indigo-50/30 border-indigo-500/10'
                 } shadow-xl`}>
                 <h3 className={`text-xl font-black ${headingColor} mb-4 flex items-center gap-3`}>
-                    <Lightbulb className="w-6 h-6 text-blue-500" />
+                    <Lightbulb className="w-6 h-6 text-indigo-500" />
                     Пример сделки
                 </h3>
                 <div className="space-y-4">
@@ -381,7 +381,7 @@ export const AvfMeanReversionStrategy: React.FC = () => {
                         </div>
                     </div>
                     
-                    <div className={`p-4 rounded-xl ${theme === 'dark' ? 'bg-blue-500/10 border border-blue-500/20' : 'bg-blue-50 border border-blue-500/20'}`}>
+                    <div className={`p-4 rounded-xl ${theme === 'dark' ? 'bg-indigo-500/10 border border-indigo-500/20' : 'bg-indigo-50 border border-indigo-500/20'}`}>
                         <p className="text-sm font-bold mb-2">🎯 Вход</p>
                         <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                             Цена резко улетела вверх от VWAP, прошла несколько импульсных свечей подряд. Объём начинает снижаться, свечи укорачиваются, появляется первая красная реакция. Мы входим в шорт. Стоп — сразу за максимум.
@@ -398,10 +398,10 @@ export const AvfMeanReversionStrategy: React.FC = () => {
             </div>
 
             {/* Final Logic Footer */}
-            <div className={`rounded-2xl p-6 border-l-8 ${theme === 'dark' ? 'bg-[#0b1015] border-blue-500/50' : 'bg-gray-50 border-blue-500/30'
+            <div className={`rounded-2xl p-6 border-l-8 ${theme === 'dark' ? 'bg-[#0b1015] border-indigo-500/50' : 'bg-gray-50 border-indigo-500/30'
                 }`}>
                 <div className="flex gap-4 items-start">
-                    <ArrowDownUp className="w-8 h-8 text-blue-500 shrink-0" />
+                    <ArrowDownUp className="w-8 h-8 text-indigo-500 shrink-0" />
                     <div className="space-y-2">
                         <h4 className={`text-lg font-black ${headingColor}`}>Суть стратегии</h4>
                         <p className={`text-sm leading-relaxed ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
@@ -413,4 +413,3 @@ export const AvfMeanReversionStrategy: React.FC = () => {
         </div>
     )
 }
-// ... остальной код ...
