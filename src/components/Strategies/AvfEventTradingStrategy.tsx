@@ -192,7 +192,7 @@ export const AvfEventTradingStrategy: React.FC = () => {
                             <li>Импульс подтверждается объёмом или повторной свечой в сторону движения.</li>
                             <li>Цена корректируется, возвращаясь к ключевому уровню (иногда — к VWAP, иногда — к последнему локальному максимуму/минимуму).</li>
                         </ul>
-                        <div className={`mt-4 p-4 rounded-xl border ${theme === 'dark' ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-emerald-50 border-emerald-500/20'}`}>
+                        <div className={`mt-4 p-4 rounded-xl border ${theme === 'dark' ? 'bg-blue-500/10 border-blue-500/20' : 'bg-blue-50 border-blue-500/20'}`}>
                             <p className="text-sm">
                                 <strong>В этот момент мы входим по движению</strong>, а не на догадке «куда пойдёт цена».
                             </p>

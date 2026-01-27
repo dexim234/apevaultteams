@@ -307,7 +307,7 @@ export const AvfBreakoutRetestStrategy: React.FC = () => {
                                 </ul>
                             </div>
                         </div>
-                        <div className={`mt-4 p-4 rounded-xl border-l-4 ${theme === 'dark' ? 'bg-emerald-500/10 border-emerald-500/50' : 'bg-emerald-50 border-emerald-500/30'}`}>
+                        <div className={`mt-4 p-4 rounded-xl border-l-4 ${theme === 'dark' ? 'bg-blue-500/10 border-blue-500/50' : 'bg-blue-50 border-blue-500/30'}`}>
                             <p className="text-sm">
                                 <strong>Момент входа:</strong> Мы входим от уровня, а не в погоне за движением. Это ключевое отличие от входа «на пробой».
                             </p>
@@ -354,18 +354,18 @@ export const AvfBreakoutRetestStrategy: React.FC = () => {
                     >
                         <p>Есть два рабочих подхода, мы используем оба в зависимости от контекста:</p>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-                            <div className={`p-4 rounded-xl border ${theme === 'dark' ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-emerald-50 border-emerald-500/20'}`}>
+                            <div className={`p-4 rounded-xl border ${theme === 'dark' ? 'bg-blue-500/10 border-blue-500/30' : 'bg-blue-50 border-blue-500/20'}`}>
                                 <div className="flex items-center gap-2 mb-2">
-                                    <Target className="w-5 h-5 text-emerald-500" />
+                                    <Target className="w-5 h-5 text-blue-500" />
                                     <p className="font-bold text-sm">Цель по диапазону</p>
                                 </div>
                                 <p className="text-xs text-gray-500">
                                     Откладываем высоту предыдущего диапазона от точки пробоя. Это логичная цель, основанная на структуре движения.
                                 </p>
                             </div>
-                            <div className={`p-4 rounded-xl border ${theme === 'dark' ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-emerald-50 border-emerald-500/20'}`}>
+                            <div className={`p-4 rounded-xl border ${theme === 'dark' ? 'bg-blue-500/10 border-blue-500/30' : 'bg-blue-50 border-blue-500/20'}`}>
                                 <div className="flex items-center gap-2 mb-2">
-                                    <TrendingUp className="w-5 h-5 text-emerald-500" />
+                                    <TrendingUp className="w-5 h-5 text-blue-500" />
                                     <p className="font-bold text-sm">Риск/Прибыль</p>
                                 </div>
                                 <p className="text-xs text-gray-500">
@@ -373,7 +373,7 @@ export const AvfBreakoutRetestStrategy: React.FC = () => {
                                 </p>
                             </div>
                         </div>
-                        <div className={`mt-4 p-4 rounded-xl ${theme === 'dark' ? 'bg-emerald-500/10 border border-emerald-500/20' : 'bg-emerald-50 border border-emerald-500/20'}`}>
+                        <div className={`mt-4 p-4 rounded-xl ${theme === 'dark' ? 'bg-blue-500/10 border border-blue-500/20' : 'bg-blue-50 border border-blue-500/20'}`}>
                             <p className="text-sm">
                                 <strong>Важно:</strong> Мы не гонимся за максимумами. Фиксация части прибыли на 1:3 защищает результат.
                             </p>
@@ -519,14 +519,14 @@ export const AvfBreakoutRetestStrategy: React.FC = () => {
                         </p>
                     </div>
 
-                    <div className={`p-4 rounded-xl ${theme === 'dark' ? 'bg-emerald-500/10 border border-emerald-500/20' : 'bg-emerald-50 border border-emerald-500/20'}`}>
+                    <div className={`p-4 rounded-xl ${theme === 'dark' ? 'bg-blue-500/10 border border-blue-500/20' : 'bg-blue-50 border border-blue-500/20'}`}>
                         <p className="text-sm font-bold mb-2">🛡️ Стоп</p>
                         <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                             Сразу под уровнем. Если цена возвращается в диапазон — выходим без колебаний.
                         </p>
                     </div>
 
-                    <div className={`p-4 rounded-xl ${theme === 'dark' ? 'bg-purple-500/10 border border-purple-500/20' : 'bg-purple-50 border border-purple-500/20'}`}>
+                    <div className={`p-4 rounded-xl ${theme === 'dark' ? 'bg-blue-500/10 border border-blue-500/20' : 'bg-blue-50 border border-blue-500/20'}`}>
                         <p className="text-sm font-bold mb-2">📈 Цель</p>
                         <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                             Минимум в три раза больше стопа или проекция диапазона. При импульсном движении — часть позиции ведём дальше.

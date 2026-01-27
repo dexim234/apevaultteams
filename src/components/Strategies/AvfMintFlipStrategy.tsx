@@ -160,7 +160,7 @@ export const AvfMintFlipStrategy: React.FC = () => {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div className="space-y-4">
-                        <h5 className="text-xs font-bold uppercase text-green-500 flex items-center gap-2">
+                        <h5 className="text-xs font-bold uppercase text-blue-500 flex items-center gap-2">
                             Бычий рынок (NFT Bull)
                         </h5>
                         <ul className="text-sm space-y-2 opacity-80">
@@ -274,8 +274,8 @@ export const AvfMintFlipStrategy: React.FC = () => {
                     >
                         <div className="space-y-4 text-sm">
                             <div className="grid grid-cols-2 gap-4">
-                                <div className="p-4 rounded-xl bg-green-500/10 border border-green-500/20">
-                                    <h6 className="text-[10px] font-black uppercase text-green-500 mb-1">Тайминг:</h6>
+                                <div className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20">
+                                    <h6 className="text-[10px] font-black uppercase text-blue-500 mb-1">Тайминг:</h6>
                                     <p className="font-bold">Первые 24–72 часа</p>
                                 </div>
                                 <div className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20">

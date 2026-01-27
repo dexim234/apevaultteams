@@ -40,7 +40,7 @@ const StrategyStep: React.FC<StrategyStepProps> = ({ number, title, children, ic
                 className="w-full flex items-center justify-between p-5 text-left transition-colors hover:bg-white/5"
             >
                 <div className="flex items-center gap-4">
-                    <div className={`flex items-center justify-center w-10 h-10 rounded-xl font-black text-lg ${theme === 'dark' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-emerald-50 text-emerald-600'
+                    <div className={`flex items-center justify-center w-10 h-10 rounded-xl font-black text-lg ${theme === 'dark' ? 'bg-blue-500/20 text-blue-400' : 'bg-blue-50 text-blue-600'
                         }`}>
                         {number}
                     </div>
@@ -81,14 +81,14 @@ export const AvfTrendFollowingStrategy: React.FC = () => {
         <div className="space-y-8 animate-fade-in">
             {/* Strategy Intro */}
             <div className={`relative overflow-hidden rounded-3xl p-8 border ${theme === 'dark'
-                    ? 'bg-gradient-to-br from-[#1a212a] to-[#0f1216] border-emerald-500/20 shadow-2xl'
-                    : 'bg-gradient-to-br from-white to-emerald-50/30 border-emerald-500/10 shadow-xl'
+                    ? 'bg-gradient-to-br from-[#1a212a] to-[#0f1216] border-blue-500/20 shadow-2xl'
+                    : 'bg-gradient-to-br from-white to-blue-50/30 border-blue-500/10 shadow-xl'
                 }`}>
-                <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 blur-3xl rounded-full -mr-20 -mt-20 pointer-events-none"></div>
+                <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 blur-3xl rounded-full -mr-20 -mt-20 pointer-events-none"></div>
 
                 <div className="relative flex flex-col md:flex-row gap-8 items-start">
-                    <div className={`p-4 rounded-2xl ${theme === 'dark' ? 'bg-emerald-500/10' : 'bg-emerald-500/5'}`}>
-                        <TrendingUp className={`w-12 h-12 ${theme === 'dark' ? 'text-emerald-400' : 'text-emerald-500'}`} />
+                    <div className={`p-4 rounded-2xl ${theme === 'dark' ? 'bg-blue-500/10' : 'bg-blue-500/5'}`}>
+                        <TrendingUp className={`w-12 h-12 ${theme === 'dark' ? 'text-blue-400' : 'text-blue-500'}`} />
                     </div>
                     <div className="flex-1 space-y-4">
                         <h2 className={`text-2xl md:text-3xl font-black ${headingColor}`}>AVF — Тренд-фолловинг</h2>
@@ -106,7 +106,7 @@ export const AvfTrendFollowingStrategy: React.FC = () => {
                                 <Brain className="w-3.5 h-3.5" />
                                 STRUCTURE ANALYSIS
                             </div>
-                            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold ${theme === 'dark' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-emerald-50 text-emerald-600 border border-emerald-200'
+                            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold ${theme === 'dark' ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' : 'bg-blue-50 text-blue-600 border border-blue-200'
                                 }`}>
                                 <Target className="w-3.5 h-3.5" />
                                 MARKET EDGE
@@ -117,25 +117,25 @@ export const AvfTrendFollowingStrategy: React.FC = () => {
             </div>
 
             {/* Key Principle */}
-            <div className={`rounded-2xl p-6 border-l-8 ${theme === 'dark' ? 'bg-emerald-500/5 border-emerald-500/50' : 'bg-emerald-50 border-emerald-500/30'
+            <div className={`rounded-2xl p-6 border-l-8 ${theme === 'dark' ? 'bg-blue-500/5 border-blue-500/50' : 'bg-blue-50 border-blue-500/30'
                 }`}>
                 <div className="flex gap-4 items-start">
-                    <Brain className="w-8 h-8 text-emerald-500 shrink-0" />
+                    <Brain className="w-8 h-8 text-blue-500 shrink-0" />
                     <div className="space-y-2">
                         <h4 className={`text-lg font-black ${headingColor}`}>Что такое тренд для нас</h4>
                         <p className={`text-sm leading-relaxed ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                             Для нас тренд — это не линия и не скользящая. Тренд — это <strong>поведение цены</strong>. Если по сути, рынок движется волнами в одну сторону. В лонге это выглядит так: цена обновляет максимум, затем откатывается, но не уходит ниже прошлого минимума, после чего снова растёт. И так несколько раз подряд.
                         </p>
-                        <div className={`mt-4 p-4 rounded-xl ${theme === 'dark' ? 'bg-white/5' : 'bg-white'} border border-emerald-500/20`}>
-                            <p className="text-sm font-bold text-emerald-500 mb-2">Структура тренда:</p>
+                        <div className={`mt-4 p-4 rounded-xl ${theme === 'dark' ? 'bg-white/5' : 'bg-white'} border border-blue-500/20`}>
+                            <p className="text-sm font-bold text-blue-500 mb-2">Структура тренда:</p>
                             <div className="flex items-center gap-2 text-xs text-gray-500 flex-wrap">
-                                <span className="px-2 py-1 bg-emerald-500/10 rounded-lg text-emerald-600">Максимум</span>
+                                <span className="px-2 py-1 bg-blue-500/10 rounded-lg text-blue-600">Максимум</span>
                                 <span className="text-gray-400">→</span>
-                                <span className="px-2 py-1 bg-emerald-500/10 rounded-lg text-emerald-600">Откат</span>
+                                <span className="px-2 py-1 bg-blue-500/10 rounded-lg text-blue-600">Откат</span>
                                 <span className="text-gray-400">→</span>
-                                <span className="px-2 py-1 bg-emerald-500/10 rounded-lg text-emerald-600">Максимум выше прошлого</span>
+                                <span className="px-2 py-1 bg-blue-500/10 rounded-lg text-blue-600">Максимум выше прошлого</span>
                                 <span className="text-gray-400">→</span>
-                                <span className="px-2 py-1 bg-emerald-500/10 rounded-lg text-emerald-600">Откат выше прошлого</span>
+                                <span className="px-2 py-1 bg-blue-500/10 rounded-lg text-blue-600">Откат выше прошлого</span>
                             </div>
                         </div>
                         <p className={`text-sm mt-4 italic ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>
@@ -149,7 +149,7 @@ export const AvfTrendFollowingStrategy: React.FC = () => {
                 {/* Main Steps */}
                 <div className="lg:col-span-2 space-y-4">
                     <div className="flex items-center gap-3 mb-2">
-                        <LineChart className={`w-6 h-6 ${theme === 'dark' ? 'text-emerald-400' : 'text-emerald-500'}`} />
+                        <LineChart className={`w-6 h-6 ${theme === 'dark' ? 'text-blue-400' : 'text-blue-500'}`} />
                         <h3 className={`text-xl font-black ${headingColor}`}>Как применять стратегию</h3>
                     </div>
 
@@ -162,9 +162,9 @@ export const AvfTrendFollowingStrategy: React.FC = () => {
                     >
                         <p>Чтобы не гадать и не подгонять картинку под ожидания, мы используем один простой фильтр — <strong>EMA 200</strong>:</p>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-                            <div className={`p-4 rounded-xl border ${theme === 'dark' ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-emerald-50 border-emerald-500/20'}`}>
+                            <div className={`p-4 rounded-xl border ${theme === 'dark' ? 'bg-blue-500/10 border-blue-500/30' : 'bg-blue-50 border-blue-500/20'}`}>
                                 <div className="flex items-center gap-2 mb-2">
-                                    <ArrowUpRight className="w-5 h-5 text-emerald-500" />
+                                    <ArrowUpRight className="w-5 h-5 text-blue-500" />
                                     <p className="font-bold text-sm">Цена выше EMA 200</p>
                                 </div>
                                 <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
@@ -229,7 +229,7 @@ export const AvfTrendFollowingStrategy: React.FC = () => {
                                 </ol>
                             </div>
                         </div>
-                        <div className={`mt-4 p-4 rounded-xl border ${theme === 'dark' ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-emerald-50 border-emerald-500/20'}`}>
+                        <div className={`mt-4 p-4 rounded-xl border ${theme === 'dark' ? 'bg-blue-500/5 border-blue-500/20' : 'bg-blue-50 border-blue-500/20'}`}>
                             <p className="text-sm">
                                 <strong>Важно:</strong> откат должен быть медленным, свечи небольшими, без резких объёмов против движения. Это нормальная пауза внутри тренда.
                             </p>
@@ -245,9 +245,9 @@ export const AvfTrendFollowingStrategy: React.FC = () => {
                     >
                         <p>Паттерн входа должен соответствовать всем критериям:</p>
                         <div className="grid grid-cols-1 gap-4 mt-4">
-                            <div className={`p-4 rounded-xl border-2 ${theme === 'dark' ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-emerald-50 border-emerald-500/30'}`}>
+                            <div className={`p-4 rounded-xl border-2 ${theme === 'dark' ? 'bg-blue-500/10 border-blue-500/30' : 'bg-blue-50 border-blue-500/30'}`}>
                                 <div className="flex items-center gap-2 mb-3">
-                                    <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+                                    <CheckCircle2 className="w-5 h-5 text-blue-500" />
                                     <p className="font-bold text-sm">Условия для входа в лонг</p>
                                 </div>
                                 <ul className="space-y-1 text-xs text-gray-500">
@@ -315,7 +315,7 @@ export const AvfTrendFollowingStrategy: React.FC = () => {
                                 </ul>
                             </div>
                         </div>
-                        <div className={`mt-4 p-4 rounded-xl ${theme === 'dark' ? 'bg-emerald-500/10 border border-emerald-500/20' : 'bg-emerald-50 border border-emerald-500/20'}`}>
+                        <div className={`mt-4 p-4 rounded-xl ${theme === 'dark' ? 'bg-blue-500/10 border border-blue-500/20' : 'bg-blue-50 border border-blue-500/20'}`}>
                             <p className="text-sm">
                                 <strong>Важно понимать:</strong> Одна качественная трендовая сделка способна перекрыть пять–семь убыточных. На этом и держится стратегия.
                             </p>
@@ -329,29 +329,29 @@ export const AvfTrendFollowingStrategy: React.FC = () => {
                     <div className={`rounded-2xl p-6 border ${theme === 'dark' ? 'bg-[#151a21]/80 border-white/5' : 'bg-white border-gray-100'
                         } shadow-lg space-y-4`}>
                         <div className="flex items-center gap-3">
-                            <BarChart2 className={`w-6 h-6 text-emerald-500`} />
+                            <BarChart2 className={`w-6 h-6 text-blue-500`} />
                             <h3 className={`text-lg font-black ${headingColor}`}>Ключевые параметры</h3>
                         </div>
 
                         <div className="space-y-3">
                             <div className={`p-3 rounded-xl ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-50'}`}>
                                 <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">EMA для фильтра</p>
-                                <p className="font-bold text-emerald-500">EMA 200</p>
+                                <p className="font-bold text-blue-500">EMA 200</p>
                                 <p className="text-xs text-gray-500 mt-1">Граница интереса крупного капитала</p>
                             </div>
                             <div className={`p-3 rounded-xl ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-50'}`}>
                                 <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Зоны отката</p>
-                                <p className="font-bold text-emerald-500">EMA 20 / EMA 50</p>
+                                <p className="font-bold text-blue-500">EMA 20 / EMA 50</p>
                                 <p className="text-xs text-gray-500 mt-1">Рабочие зоны для входа</p>
                             </div>
                             <div className={`p-3 rounded-xl ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-50'}`}>
                                 <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Стоп-лосс</p>
-                                <p className="font-bold text-emerald-500">1–1.5 ATR</p>
+                                <p className="font-bold text-blue-500">1–1.5 ATR</p>
                                 <p className="text-xs text-gray-500 mt-1">Или за локальный минимум отката</p>
                             </div>
                             <div className={`p-3 rounded-xl ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-50'}`}>
                                 <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Минимальная цель</p>
-                                <p className="font-bold text-emerald-500">1:3</p>
+                                <p className="font-bold text-blue-500">1:3</p>
                                 <p className="text-xs text-gray-500 mt-1">Risk/Reward не менее 1 к 3</p>
                             </div>
                         </div>
@@ -415,11 +415,11 @@ export const AvfTrendFollowingStrategy: React.FC = () => {
 
             {/* Example Case */}
             <div className={`rounded-3xl p-8 border ${theme === 'dark'
-                    ? 'bg-gradient-to-br from-[#1a212a] to-[#0f1216] border-emerald-500/20'
-                    : 'bg-gradient-to-br from-white to-emerald-50/30 border-emerald-500/10'
+                    ? 'bg-gradient-to-br from-[#1a212a] to-[#0f1216] border-blue-500/20'
+                    : 'bg-gradient-to-br from-white to-blue-50/30 border-blue-500/10'
                 } shadow-xl`}>
                 <h3 className={`text-xl font-black ${headingColor} mb-4 flex items-center gap-3`}>
-                    <Target className="w-6 h-6 text-emerald-500" />
+                    <Target className="w-6 h-6 text-blue-500" />
                     Пример сделки
                 </h3>
                 <div className="space-y-4">
@@ -445,7 +445,7 @@ export const AvfTrendFollowingStrategy: React.FC = () => {
                         </div>
                     </div>
                     
-                    <div className={`p-4 rounded-xl ${theme === 'dark' ? 'bg-emerald-500/10 border border-emerald-500/20' : 'bg-emerald-50 border border-emerald-500/20'}`}>
+                    <div className={`p-4 rounded-xl ${theme === 'dark' ? 'bg-blue-500/10 border border-blue-500/20' : 'bg-blue-50 border border-blue-500/20'}`}>
                         <p className="text-sm font-bold mb-2">🎯 Вход</p>
                         <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                             Появляется уверенная свеча в сторону тренда → <strong>входим в лонг</strong> → стоп ставим под минимум отката.
@@ -462,10 +462,10 @@ export const AvfTrendFollowingStrategy: React.FC = () => {
             </div>
 
             {/* Final Logic Footer */}
-            <div className={`rounded-2xl p-6 border-l-8 ${theme === 'dark' ? 'bg-[#0b1015] border-emerald-500/50' : 'bg-gray-50 border-emerald-500/30'
+            <div className={`rounded-2xl p-6 border-l-8 ${theme === 'dark' ? 'bg-[#0b1015] border-blue-500/50' : 'bg-gray-50 border-blue-500/30'
                 }`}>
                 <div className="flex gap-4 items-start">
-                    <TrendingUp className="w-8 h-8 text-emerald-500 shrink-0" />
+                    <TrendingUp className="w-8 h-8 text-blue-500 shrink-0" />
                     <div className="space-y-2">
                         <h4 className={`text-lg font-black ${headingColor}`}>Суть стратегии</h4>
                         <p className={`text-sm leading-relaxed ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
