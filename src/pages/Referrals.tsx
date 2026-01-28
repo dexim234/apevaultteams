@@ -43,7 +43,7 @@ const ReferralBattery = ({ count, theme }: { count: number; theme: 'dark' | 'lig
         <div className={`relative p-6 rounded-[2rem] border transition-all duration-500 ${theme === 'dark' ? 'bg-[#0b1015] border-white/5 hover:border-emerald-500/20' : 'bg-white border-gray-100 hover:border-emerald-500/10'} shadow-2xl group overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 blur-[50px] rounded-full pointer-events-none" />
 
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-3">
                     <div className={`p-2.5 rounded-xl ${theme === 'dark' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-emerald-50 text-emerald-600'}`}>
                         <Battery className="w-5 h-5" />
@@ -52,38 +52,34 @@ const ReferralBattery = ({ count, theme }: { count: number; theme: 'dark' | 'lig
                         <h4 className={`text-sm font-black uppercase tracking-widest ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Месячный драйв</h4>
                     </div>
                 </div>
+                <div className="text-right">
+                    <span className={`text-3xl font-black tracking-tighter ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{count}</span>
+                    <span className="text-sm font-bold text-gray-500"> / 30</span>
+                </div>
             </div>
 
-            <div className="flex flex-col items-center">
-                {/* Vertical battery */}
-                <div className="relative w-16 h-48 rounded-2xl overflow-hidden p-1.5 bg-white/5 border border-white/5">
+            <div className="space-y-4">
+                <div className={`relative h-14 w-full rounded-2xl overflow-hidden p-1.5 ${theme === 'dark' ? 'bg-white/5 border border-white/5' : 'bg-gray-100 border border-gray-200'}`}>
                     <div
-                        className={`absolute bottom-0 left-0 right-0 rounded-xl transition-all duration-1000 ease-out ${colorClass}`}
-                        style={{ height: `${progress}%` }}
+                        className={`h-full rounded-xl transition-all duration-1000 ease-out ${colorClass}`}
+                        style={{ width: `${progress}%` }}
                     />
 
                     {/* Milestone markers */}
                     {[5, 10, 20, 30].map((m) => (
                         <div
                             key={m}
-                            className="absolute left-0 right-0 border-t border-white/10 dark:border-white/5"
-                            style={{ bottom: `${(m / 30) * 100}%` }}
+                            className="absolute top-0 bottom-0 border-r border-white/10 dark:border-white/5"
+                            style={{ left: `${(m / 30) * 100}%` }}
                         />
                     ))}
                 </div>
 
-                {/* Count display */}
-                <div className="mt-4 text-center">
-                    <span className={`text-4xl font-black tracking-tighter ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{count}</span>
-                    <span className="text-sm font-bold text-gray-500 ml-1">/ 30</span>
-                </div>
-
-                {/* Milestone labels */}
-                <div className="flex flex-col justify-between h-40 mt-2 px-2">
-                    {[30, 20, 10, 5].map((m) => (
-                        <div key={m} className={`flex items-center gap-1 transition-all duration-300 ${count >= m ? 'opacity-100' : 'opacity-40'}`}>
-                            <div className={`w-1 h-1 rounded-full ${count >= m ? 'bg-emerald-500' : 'bg-gray-500'}`} />
+                <div className="flex justify-between px-1">
+                    {[5, 10, 20, 30].map((m) => (
+                        <div key={m} className={`flex flex-col items-center gap-1 transition-all duration-300 ${count >= m ? 'opacity-100' : 'opacity-40'}`}>
                             <span className={`text-[10px] font-black tracking-tighter ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{m}</span>
+                            <div className={`w-1 h-1 rounded-full ${count >= m ? 'bg-emerald-500' : 'bg-gray-500'}`} />
                         </div>
                     ))}
                 </div>
@@ -257,15 +253,26 @@ const ReferralModal = ({
                             {isAdmin && (
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 ml-2">Статус</label>
-                                    <select
-                                        className={inputClasses}
-                                        value={formData.status}
-                                        onChange={e => setFormData(prev => ({ ...prev, status: e.target.value as any }))}
-                                    >
-                                        <option value="active">Активный</option>
-                                        <option value="inactive">Неактивный</option>
-                                        <option value="deleted">Удаленный</option>
-                                    </select>
+                                    <div className={`relative ${inputClasses} p-1 flex items-center gap-1`}>
+                                        {[
+                                            { value: 'active', label: 'Активный', color: 'bg-emerald-500' },
+                                            { value: 'inactive', label: 'Неактивный', color: 'bg-amber-500' },
+                                            { value: 'deleted', label: 'Удаленный', color: 'bg-rose-500' }
+                                        ].map((option) => (
+                                            <button
+                                                key={option.value}
+                                                onClick={() => setFormData(prev => ({ ...prev, status: option.value as any }))}
+                                                className={`flex-1 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-300 ${
+                                                    formData.status === option.value
+                                                        ? theme === 'dark' ? 'bg-white/10 text-white' : 'bg-gray-100 text-gray-900'
+                                                        : theme === 'dark' ? 'text-gray-500 hover:text-gray-300' : 'text-gray-400 hover:text-gray-600'
+                                                }`}
+                                            >
+                                                <span className={`w-2 h-2 rounded-full ${option.color} mr-1.5 inline-block align-middle`} />
+                                                {option.label}
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
                             )}
                         </div>
