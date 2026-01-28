@@ -15,7 +15,8 @@ import {
     User as UserIcon,
     Check,
     Battery,
-    Trash2
+    Trash2,
+    ChevronDown
 } from 'lucide-react'
 
 // Battery Component
@@ -111,6 +112,7 @@ const ReferralModal = ({
     })
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
+    const [statusDropdownOpen, setStatusDropdownOpen] = useState(false)
 
     const referralId = useMemo(() => referral?.referralId || `REF-${Math.random().toString(36).slice(2, 8).toUpperCase()}`, [referral])
 
@@ -253,25 +255,42 @@ const ReferralModal = ({
                             {isAdmin && (
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 ml-2">Статус</label>
-                                    <div className={`relative ${inputClasses} p-1 flex items-center gap-1`}>
-                                        {[
-                                            { value: 'active', label: 'Активный', color: 'bg-emerald-500' },
-                                            { value: 'inactive', label: 'Неактивный', color: 'bg-amber-500' },
-                                            { value: 'deleted', label: 'Удаленный', color: 'bg-rose-500' }
-                                        ].map((option) => (
-                                            <button
-                                                key={option.value}
-                                                onClick={() => setFormData(prev => ({ ...prev, status: option.value as any }))}
-                                                className={`flex-1 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-300 ${
-                                                    formData.status === option.value
-                                                        ? theme === 'dark' ? 'bg-white/10 text-white' : 'bg-gray-100 text-gray-900'
-                                                        : theme === 'dark' ? 'text-gray-500 hover:text-gray-300' : 'text-gray-400 hover:text-gray-600'
-                                                }`}
-                                            >
-                                                <span className={`w-2 h-2 rounded-full ${option.color} mr-1.5 inline-block align-middle`} />
-                                                {option.label}
-                                            </button>
-                                        ))}
+                                    <div className="relative">
+                                        <button
+                                            onClick={() => setStatusDropdownOpen(!statusDropdownOpen)}
+                                            className={`${inputClasses} flex items-center justify-between text-left`}
+                                        >
+                                            <span className="flex items-center gap-2">
+                                                <span className={`w-2 h-2 rounded-full ${formData.status === 'active' ? 'bg-emerald-500' : formData.status === 'inactive' ? 'bg-amber-500' : 'bg-rose-500'}`} />
+                                                {formData.status === 'active' ? 'Активный' : formData.status === 'inactive' ? 'Неактивный' : 'Удаленный'}
+                                            </span>
+                                            <ChevronDown className={`w-4 h-4 transition-transform ${statusDropdownOpen ? 'rotate-180' : ''}`} />
+                                        </button>
+                                        {statusDropdownOpen && (
+                                            <div className={`absolute top-full left-0 right-0 mt-2 rounded-xl border overflow-hidden z-50 ${theme === 'dark' ? 'bg-[#0b1015] border-white/10' : 'bg-white border-gray-200'} shadow-xl`}>
+                                                {[
+                                                    { value: 'active', label: 'Активный', color: 'bg-emerald-500' },
+                                                    { value: 'inactive', label: 'Неактивный', color: 'bg-amber-500' },
+                                                    { value: 'deleted', label: 'Удаленный', color: 'bg-rose-500' }
+                                                ].map((option) => (
+                                                    <button
+                                                        key={option.value}
+                                                        onClick={() => {
+                                                            setFormData(prev => ({ ...prev, status: option.value as any }))
+                                                            setStatusDropdownOpen(false)
+                                                        }}
+                                                        className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-bold transition-colors ${
+                                                            formData.status === option.value
+                                                                ? theme === 'dark' ? 'bg-white/10 text-white' : 'bg-gray-100 text-gray-900'
+                                                                : theme === 'dark' ? 'text-gray-400 hover:text-white hover:bg-white/5' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                                                        }`}
+                                                    >
+                                                        <span className={`w-2 h-2 rounded-full ${option.color}`} />
+                                                        {option.label}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             )}
