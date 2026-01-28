@@ -86,8 +86,8 @@ export const Strategies = () => {
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
-                    <div className={`p-3 rounded-2xl ${theme === 'dark' ? 'bg-white/10 border-white/20' : 'bg-blue-500/10 border-blue-500/30'}`}>
-                        <TrendingUp className={`w-8 h-8 ${theme === 'dark' ? 'text-white' : 'text-blue-500'}`} />
+                    <div className="p-3 bg-blue-500/10 rounded-2xl border border-blue-500/20">
+                        <TrendingUp className="w-8 h-8 text-blue-500" />
                     </div>
                     <div>
                         <h1 className={`text-2xl md:text-3xl font-black tracking-tight ${headingColor}`}>
