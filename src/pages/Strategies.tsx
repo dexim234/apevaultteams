@@ -82,26 +82,20 @@ export const Strategies = () => {
     }
 
     return (
-        <div className="space-y-8 pb-12">
+        <div className="space-y-6">
             {/* Header */}
-            <div className={`relative overflow-hidden rounded-3xl border ${theme === 'dark' ? 'border-blue-500/30 bg-[#151a21]/80 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.4)]' : 'border-blue-500/20 bg-white/80 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.08)]'}`}>
-                <div className="absolute inset-0 pointer-events-none">
-                    <div className="absolute -left-16 -bottom-10 w-80 h-80 bg-blue-500/10 blur-3xl"></div>
-                    <div className={`absolute inset-0 ${theme === 'dark' ? 'bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.05),transparent_45%)]' : 'bg-[radial-gradient(circle_at_50%_0%,rgba(59,130,246,0.05),transparent_45%)]'}`}></div>
-                </div>
-
-                <div className="relative p-6 sm:p-8 flex flex-col lg:flex-row items-center justify-between gap-6">
-                    {/* Left: Icon + Title */}
-                    <div className="flex items-center gap-4">
-                        <div className={`p-3 rounded-2xl ${theme === 'dark' ? 'bg-white/10 border-white/20' : 'bg-blue-500/10 border-blue-500/30'}`}>
-                            <TrendingUp className={`w-8 h-8 ${theme === 'dark' ? 'text-white' : 'text-blue-500'}`} />
-                        </div>
-                        <div>
-                            <h1 className={`text-3xl font-black ${headingColor} whitespace-nowrap`}>AVF Контур</h1>
-                            <p className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                                Стратегические направления и инструменты ApeVault Frontier
-                            </p>
-                        </div>
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                    <div className={`p-3 rounded-2xl ${theme === 'dark' ? 'bg-white/10 border-white/20' : 'bg-blue-500/10 border-blue-500/30'}`}>
+                        <TrendingUp className={`w-8 h-8 ${theme === 'dark' ? 'text-white' : 'text-blue-500'}`} />
+                    </div>
+                    <div>
+                        <h1 className={`text-2xl md:text-3xl font-black tracking-tight ${headingColor}`}>
+                            AVF Контур
+                        </h1>
+                        <p className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                            Стратегические направления и инструменты ApeVault Frontier
+                        </p>
                     </div>
                 </div>
             </div>
@@ -183,25 +177,21 @@ export const Strategies = () => {
                 </div>
 
                 {/* PC Centered Tabs */}
-                <div className="hidden sm:flex justify-center w-full">
-                    <div className="overflow-x-auto pb-2 scrollbar-hide">
-                        <div className={`flex items-center gap-2 p-2 rounded-2xl ${theme === 'dark' ? 'bg-white/5 border-white/10' : 'bg-gray-100/50 border-gray-200'} border backdrop-blur-sm w-fit`}>
-                            {visibleTabs.map((tab) => (
-                                <button
-                                    key={tab.id}
-                                    onClick={() => setActiveTab(tab.id as TabType)}
-                                    className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 relative ${activeTab === tab.id
-                                        ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/25'
-                                        : 'text-gray-400 hover:bg-white/5 hover:text-white'
-                                        }`}
-                                >
-                                    <div className="flex items-center gap-2">
-                                        {tab.icon}
-                                        {tab.label}
-                                    </div>
-                                </button>
-                            ))}
-                        </div>
+                <div className="hidden sm:flex w-full overflow-x-auto pb-2 scrollbar-hide">
+                    <div className={`flex items-center gap-2 p-1.5 rounded-xl border ${theme === 'dark' ? 'bg-[#151a21] border-white/5' : 'bg-gray-50 border-gray-200'}`}>
+                        {visibleTabs.map((tab) => (
+                            <button
+                                key={tab.id}
+                                onClick={() => setActiveTab(tab.id as TabType)}
+                                className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-bold transition-all ${activeTab === tab.id
+                                    ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/20'
+                                    : 'text-gray-400 hover:text-gray-200'
+                                    }`}
+                            >
+                                {tab.icon}
+                                <span>{tab.label}</span>
+                            </button>
+                        ))}
                     </div>
                 </div>
             </div>
